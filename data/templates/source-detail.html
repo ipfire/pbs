@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Source") }}: {{ source.name }}</h1>
+
+	<table>
+		<!-- Status -->
+		<tr>
+			<td>{{ _("Revision") }}</td>
+			<td>{{ source.revision }}</td>
+		</tr>
+
+		<!-- Branch -->
+		<tr>
+			<td>{{ _("Branch") }}</td>
+			<td>
+				{{ source.branch }}
+			</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h2>{{ _("Latest builds") }}</h2>
+	{{ modules.BuildTable(source.builds) }}
+{% end block %}

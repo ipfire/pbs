@@ -1,0 +1,28 @@
+<table class="log">
+	{% if messages %}
+		{% for message in messages %}
+			<tr>
+				<td>
+					{{ locale.format_date(message.time, relative=False, full_format=True) }}
+				</td>
+				<td class="links">
+					{% if hasattr(message, "build") %}
+						[<a href="/build/{{ message.build.uuid }}">{{ _("Build") }}: {{ message.build.name }}</a>]
+					{% elif hasattr(message, "pkg") %}
+						[{{ _("Package") }}: {{ message.pkg.friendly_name }}]
+					{% end %}
+				</td>
+				<td>
+					{{ escape(message.message) }}
+				</td>
+			</tr>
+		{% end %}
+	{% else %}
+		<tr>
+			<td colspan="3">
+				{{ _("No log entries, yet.") }}
+			</td>
+		</tr>
+	{% end %}
+</table>
+<div style="clear: both;">&nbsp;</div>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Edit successful") }}</h1>
+	<p>
+		{{ _("The user profile was successfully altered.") }}
+		{{ _("But as you have changed the email address, you need to re-activate the account.") }}
+		{{ _("Have a look at you mailbox - you already do know what to do.") }}
+	</p>
+{% end %}

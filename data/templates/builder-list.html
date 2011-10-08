@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Build servers") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Build servers") }}</h1>
+
+	<p>
+		{{ _("Builders are those, that do all the hard work.") }}
+		{{ _("Build jobs are scheduled to these hosts that they process and send back the result.") }}
+	</p>
+
+	<ul class="builders">
+		{% for builder in builders %}
+			<li>
+				<a class="builder {{ builder.status.lower() }}" href="/builder/{{ builder.name }}">{{ builder.name }}</a>
+			</li>
+		{% end %}
+	</ul>
+{% end block %}
+
+{% if current_user.is_admin() %}
+	{% block sidebar %}
+		<h1>{{ _("Actions") }}</h1>
+		<ul>
+			<li><a href="/builder/new">{{ _("Create new builder") }}</a></li>
+		</ul>
+	{% end block %}
+{% end %}

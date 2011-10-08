@@ -1,0 +1,45 @@
+<div class="repo-actions">
+	{% for action in actions %}
+		<div class="action {{ action.action }}" id="action-{{ action.id }}">
+			<a id="action-link-{{ action.id }}" href="#">{{ action.pkg.friendly_name }}</a>
+			{{ _("added %s") % locale.format_date(action.time_added) }}
+
+			{% if current_user and action.have_permission(current_user) %}
+				<p class="buttons">
+					{% if action.is_doable() %}
+						<a href="javascript:action_run({{ action.id }})">{{ _("Run") }}</a>
+					{% end %}
+					<a href="?action=remove">{{ _("Remove action") }}</a>
+				</p>
+			{% end %}
+
+			<div id="action-info-{{ action.id }}">
+				<p>
+					{% if action.credits_needed %}
+						{{ _("%(credits)s more credit needed.", "%(credits)s more credits needed.", action.credits_needed) % { "credits" : action.credits_needed } }}
+					{% else %}
+						{{ _("No more credits needed.") }}
+					{% end %}
+					<br />
+					{% if action.pkg.maintainer %}
+						{{ _("Maintainer: %s") % action.pkg.maintainer }}
+						<br />
+					{% end %}
+					<a href="/package/{{ action.pkg.name }}/{{ action.pkg.epoch }}/{{ action.pkg.version }}/{{ action.pkg.release }}">{{ _("Go to package description") }}</a>
+					<br />
+				</p>
+			</div>
+
+			<script>
+				$(function() {
+					$("#action-info-{{ action.id }}").hide();
+					$("#action-link-{{ action.id }}").toggle(
+						function() { $("#action-info-{{ action.id }}").show(); },
+						function() { $("#action-info-{{ action.id }}").hide(); }
+					);
+				});
+			</script>
+		</div>
+	{% end %}
+</div>
+<div style="clear: both;">&nbsp;</div>

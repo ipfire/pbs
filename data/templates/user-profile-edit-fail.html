@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Edit failed") }}</h1>
+	<p>
+		{{ _("We are sorry.") }}
+		{{ _("The user profile cannot be saved.") }}
+	</p>
+
+	<ul>
+		{% for msg in messages %}
+			<li>{{ msg }}</li>
+		{% end %}
+	</ul>
+
+	<p>
+		{{ _("Use the back button on your web browser to go back to the previous page and correct your submission.") }}
+	</p>
+{% end %}

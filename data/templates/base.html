@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<title>{{ hostname }} - {% block title %}{{ _("No title given") }}{% end block %}</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+		<!-- styling stuff -->
+		<link rel="stylesheet" type="text/css" href="{{ static_url("css/style.css") }}" />
+
+		<!-- javascript stuff -->
+		<script src="{{ static_url("js/jquery-1.6.min.js") }}"></script>
+		<script src="{{ static_url("js/pbs.js") }}"></script>
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="logo">
+				<div id="user">
+					{% if current_user %}
+						<a href="/profile"><span>{{ current_user.realname }}</span></a> |
+						<a href="/logout">{{ _("Logout") }}</a>
+					{% else %}
+						<a href="/login">{{ _("Login") }}</a> |
+						<a href="/register">{{ _("Register") }}</a>
+					{% end %}
+				</div>
+				<h1><a href="/">Pakfire</a> build service</h1>
+				<p>{{ _("A service by the %s.") % """<a href="http://www.ipfire.org/" target="_blank">IPFire Project</a>""" }}</p>
+			</div>
+			<div id="menu">
+				<ul>
+					<li>
+						<a href="/">{{ _("Index") }}</a>
+					</li>
+					<li>
+						<a href="/packages">{{ _("Packages") }}</a>
+					</li>
+					<li>
+						<a href="/distributions">{{ _("Distributions") }}</a>
+					</li>
+					<li>
+						<a href="/builds">{{ _("Build jobs") }}</a>
+					</li>
+					<li>
+						<a href="/builders">{{ _("Build servers") }}</a>
+					</li>
+					{% if current_user %}
+						<li>
+							<a href="/users">{{ _("Users") }}</a>
+						</li>
+					{% end %}
+					<li>
+						<a href="/log">{{ _("Log") }}</a>
+					</li>
+					<li class="search">
+						<form method="GET" action="/search">
+							<input id="search" type="text" name="q" value="{{ _("Search...") }}" />
+						</form>
+					</li>
+				</ul>
+			</div>
+			<!-- <div id="header">
+				<div id="search">
+					<form method="get" action="">
+						<fieldset>
+							<input type="text" name="s" id="search-text" size="15" value="enter keywords here..." />
+							<input type="submit" id="search-submit" value="GO" />
+						</fieldset>
+					</form>
+				</div>
+			</div> -->
+			<div id="page">
+				<div id="page-bgtop">
+					<div id="page-bgbtm">
+						<div id="content">
+							{% block body %}EMPTY BODY{% end block %}
+						</div>
+						<div id="sidebar">
+							{% block sidebar %}
+								<img src="{{ static_url("images/ipfire_tux_128x128.png") }}" alt="IPFire Logo" />
+							{% end block %}
+						</div>
+						<div style="clear: both;">&nbsp;</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="two-columns">
+			<div id="column1">
+				<h2>{{ _("About Pakfire") }}</h2>
+				<p>
+					{{ _("Pakfire is the buildsystem that is used to build the IPFire Linux firewall distribution.") }}
+					{{ _("It also installs and updates packages on the IPFire systems.") }}
+				</p>
+			</div>
+			<div id="column2">
+				<h2>{{ _("Documentation") }}</h2>
+				<ul>
+					<li>
+						<a href="/documents">{{ _("Documentation index") }}</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div id="footer">
+			<p>Copyright (c) 2011 IPFire.org. {{ _("All rights reserved.") }}</p>
+		</div>
+	</body>
+</html>

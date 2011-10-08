@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Package") }}: {{ pkg.friendly_name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Package") }}: <a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>-{{ pkg.friendly_version }}</h1>
+
+	<p class="pkg-summary">{{ pkg.description }}</p>
+
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("URL") }}</td>
+			<td class="col2">
+				<a href="{{ pkg.url }}" target="_blank">{{ pkg.url }}</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("License") }}</td>
+			<td class="col2">{{ pkg.license }}</td>
+		</tr>
+
+		{% if pkg.maintainer %}
+			<tr>
+				<td class="col1">{{ _("Maintainer") }}</td>
+				<td class="col2">{{ escape(pkg.maintainer) }}</td>
+			</tr>
+		{% end %}
+
+		<tr>
+			<td class="col1">{{ _("Supported architectures") }}</td>
+			<td class="col2">{{ locale.list(pkg.supported_arches) }}</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h2>{{ _("Comments") }}</h2>
+	<p>
+		{{ _("This package got a total credit count of %s credits.") % pkg.credits }}
+	</p>
+
+	{% if current_user %}
+		<p>
+			<a id="comment-toggle" href="#">{{ _("Add comment") }}</a>
+			<script>
+				/* Initially hide the comment area and show it if the user clicks "add comment". */
+				$(function() {
+					$(".add-comment").hide();
+					$("#comment-toggle").toggle(
+						function() { $(".add-comment").show(); },
+						function() { $(".add-comment").hide(); }
+					);
+				});
+			</script>
+		</p>
+		<div class="add-comment">
+			<h4>{{ _("Add comment") }}</h4>
+			<form method="post" action="">
+				{{ xsrf_form_html() }}
+				<input type="hidden" name="action" value="comment" />
+				<table class="form form2">
+					<tr>
+						<td colspan="2">
+							<textarea name="text" cols="90" rows="6"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							{% if current_user.is_tester() or current_user.is_admin() %}
+								{{ _("Vote") }}:
+								<input name="vote" type="radio" value="none" selected="selected" />{{ _("Not tested") }}
+								<input name="vote" type="radio" value="up" />{{ _("Works for me") }}
+								<input name="vote" type="radio" value="down" />{{ _("Doesn't work for me") }}
+							{% end %}
+						</td>
+						<td class="buttons">
+							<input name="submit" type="submit" value="{{ _("Submit") }}" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	{% else %}
+		<p>{{ _("You must be logged in to comment.") }}</p>
+	{% end %}
+	{{ modules.CommentsTable(pkg.comments) }}
+
+	{% if pkg.builds %}
+		<h2>{{ _("Build jobs") }}</h2>
+		{{ modules.BuildTable(pkg.builds) }}
+	{% end %}
+
+	{% if pkg.packagefiles %}
+		<h2>{{ _("Package files") }}</h2>
+		{{ modules.FilesTable(pkg.packagefiles) }}
+	{% end %}
+
+	{% if pkg.logfiles %}
+		<h2>{{ _("Logfiles") }}</h2>
+		{{ modules.FilesTable(pkg.logfiles) }}
+	{% end %}
+
+	<h2>{{ _("Log") }}</h2>
+	{{ modules.LogTable(pkg.log) }}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<a href="">{{ _("Package is broken") }}</a>
+	</ul>
+{% end block %}

@@ -1,0 +1,50 @@
+#!/usr/bin/python
+
+import logging
+import time
+import tornado.ioloop
+import tornado.options
+
+import backend
+from backend.managers import *
+
+tornado.options.parse_command_line()
+
+class Daemon(object):
+	def __init__(self):
+		self._managers = []
+
+		self.ioloop.set_blocking_log_threshold(300)
+
+		self.pakfire = backend.Pakfire()
+
+	@property
+	def ioloop(self):
+		return tornado.ioloop.IOLoop.instance()
+
+	def add(self, manager_cls):
+		logging.info("Registering new manager: %s" % manager_cls.__name__)
+		manager = manager_cls(self.pakfire)
+		self._managers.append(manager)
+
+	def run(self):
+		"""
+			Main loop.
+		"""
+		for manager in self._managers:
+			manager.pc.start()
+
+		self.ioloop.start()
+
+	def shutdown(self):
+		self.ioloop.stop()
+
+
+
+
+if __name__ == "__main__":
+	d = Daemon()
+	for manager in managers:
+		d.add(manager)
+
+	d.run()

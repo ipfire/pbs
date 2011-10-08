@@ -1,0 +1,27 @@
+{% extends "docs-base.html" %}
+
+{% block title %}{{ _("Legend of the build states") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Documents") }}</h1>
+	<p>
+		{{ _("This is a collection of documents that should be read by everybody who is using this system.") }}
+		{{ _("To make this easy for you, the documents are grouped into two parts.") }}
+	</p>
+
+	<h2>{{ _("Documents for testers") }}</h2>
+	<ul>
+		<li><a href="/documents/users">{{ _("Users") }}</a></li>
+	</ul>
+
+	<h2>{{ _("Documents for developers") }}</h2>
+	<ul>
+		<li><a href="/documents/builds">{{ _("Builds") }}</a></li>
+		<li><a href="/documents/users">{{ _("Users") }}</a></li>
+	</ul>
+
+	<p>
+		{{ _("Technical documentation is available on the wiki:") }}
+		<a href="http://redmine.ipfire.org/projects/pakfire3/wiki" target="_blank">{{ _("Technical documentation") }}</a>.
+	</p>
+{% end %}

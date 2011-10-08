@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Edit builder %s") % builder.hostname }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Edit builder %s") % builder.hostname }}</h1>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Name") }}</td>
+				<td class="col2">
+					{{ builder.hostname }}
+				</td>
+				<td class="col3">
+					{{ _("The hostname cannot be changed.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Enabled") }}</td>
+				<td class="col2">
+					<input type="checkbox" name="enabled" {% if builder.enabled %}checked="checked"{% end %} />
+				</td>
+				<td class="col3">
+					{{ _("The builder must be enabled in order to process build jobs.") }}
+				</td>
+			</tr>
+		</table>
+		<div style="clear: both;">&nbsp;</div>
+
+		<h2>{{ _("Build job settings") }}</h2>
+		<p>
+			{{ _("These settings do only take effect if the builder is enabled.") }}
+		</p>
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Authorized to build source packages") }}</td>
+				<td class="col2">
+					<input type="checkbox" name="build_src" {%if builder.build_src %}checked="checked"{% end %} />
+				</td>
+				<td class="col3">
+					{{ _("Only a few build servers are allowed to build source packages.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Authorized to build binary packages") }}</td>
+				<td class="col2">
+					<input type="checkbox" name="build_bin" {%if builder.build_bin %}checked="checked"{% end %} />
+				</td>
+				<td class="col3">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Authorized to build test packages") }}</td>
+				<td class="col2">
+					<input type="checkbox" name="build_test" {%if builder.build_test %}checked="checked"{% end %} />
+				</td>
+				<td class="col3">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Maximum number of parallel build jobs") }}</td>
+				<td class="col2">
+					<select name="max_jobs">
+						{% for i in (1, 2, 3, 4, 5, 6, 7, 8,) %}
+							<option value="{{ i }}" {% if i == builder.max_jobs %}selected="selected"{% end %}>{{ i }}</option>
+						{% end %}
+					</select>
+				</td>
+				<td class="col3">
+					{{ _("This is the number of build jobs that are started in parallel.") }}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Save") }}" />
+				</td>
+			</tr>
+		</table>
+	</form>
+{% end block %}

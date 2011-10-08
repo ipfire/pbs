@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+
+	<p>
+		{% if action == "new" %}
+			{{ _("The new host <strong>%s</strong> has been successfully created.") % builder.name }}
+		{% elif action == "update" %}
+			{{ _("The passphrase for <strong>%s</strong> has been regenerated.") % builder.name }}
+		{% end %}
+
+		{{ _("For authorization to the Pakfire Master Server there is a passphrase required which must be configured to the host.") }}
+		{{ _("This passphrase is:") }}
+	</p>
+
+	<p class="focus">{{ builder.passphrase }}</p>
+
+	<p>
+		<a href="/builder/{{ builder.name }}">{{ _("Next") }}</a>
+	</p>
+{% end block %}

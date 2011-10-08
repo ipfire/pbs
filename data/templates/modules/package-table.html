@@ -1,0 +1,14 @@
+
+<a name="{{ letter }}"></a>
+<h3>{{ letter.upper() }}</h3>
+
+<table class="package-list">
+	{% for pkg in packages %}
+		<tr>
+			<td>
+				<a href="/package/{{ pkg }}">{{ pkg }}</a>
+			</td>
+		</tr>
+	{% end %}
+</table>
+<div style="clear: both;">&nbsp;</div>

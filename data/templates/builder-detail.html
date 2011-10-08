@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Builder") }}: {{ builder.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+	<table class="form form2">
+		<!-- Status -->
+		<tr>
+			<td class="col1">{{ _("Status") }}</td>
+			<td class="col2">{{ builder.status }}</td>
+		</tr>
+
+		<!-- Load AVG -->
+		<tr>
+			<td class="col1">{{ _("Load average") }}</td>
+			<td class="col2">
+				{{ builder.loadavg }}
+			</td>
+		</tr>
+
+		<!-- Supported architectures -->
+		<tr>
+			<td class="col1">{{ _("Supported architectures") }}</td>
+			<td class="col2">
+				{{ locale.list(builder.arches) or _("Unknown") }}
+			</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+	
+	<h2>{{ _("Configuration") }}</h2>
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("Builds source packages") }}</td>
+			<td class="col2">
+				{% if builder.build_src %}{{ _("Yes") }}{% else %}{{ _("No") }}{% end %}
+			</td>
+		</td>
+		<tr>
+			<td class="col1">{{ _("Builds binary packages") }}</td>
+			<td class="col2">
+				{% if builder.build_bin %}{{ _("Yes") }}{% else %}{{ _("No") }}{% end %}
+			</td>
+		</td>
+		<tr>
+			<td class="col1">{{ _("Runs tests") }}</td>
+			<td class="col2">
+				{% if builder.build_test %}{{ _("Yes") }}{% else %}{{ _("No") }}{% end %}
+			</td>
+		</td>
+		<tr>
+			<td class="col1">{{ _("Parallel build jobs") }}</td>
+			<td class="col2">{{ _("One job only.", "Up to %(num)s jobs.", builder.max_jobs) % { "num" : builder.max_jobs } }}</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h2>{{ _("Host information") }}</h2>
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("CPU model") }}</td>
+			<td class="col2">{{ builder.cpu_model or _("Unknown") }}</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("Memory") }}</td>
+			<td class="col2">{{ friendly_size(builder.memory) }}</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	{% if builder.active_builds %}
+		<h2>{{ _("Currently running builds on this host") }}</h2>
+		{{ modules.BuildTable(builder.active_builds) }}
+	{% end %}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li>
+			<a href="/builds?state=&builder={{ builder.id }}">{{ _("Show all build jobs") }}</a>
+		</li>
+		{% if current_user and current_user.is_admin() %}
+			<li>
+				<a href="/builder/edit/{{ builder.name }}">{{ _("Edit builder") }}</a>
+			</li>
+			{% if not builder.enabled %}
+				<li>
+					<a href="/builder/renew/{{ builder.name }}">{{ _("Renew passphrase") }}</a>
+				</li>
+			{% end %}
+			<li>
+				<a href="/builder/delete/{{ builder.name }}">{{ _("Delete builder") }}</a>
+			</li>
+		{% end %}
+	</ul>
+{% end block %}

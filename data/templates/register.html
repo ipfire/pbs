@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Register new account") }}</h1>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Name") }}:</td>
+				<td class="col2">
+					<input name="name" type="text" length="64" />
+				</td>
+				<td class="col3">
+					{{ _("Must be a unique name you login with.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Email") }}:</td>
+				<td class="col2">
+					<input name="email" type="text" length="100" />
+				</td>
+				<td class="col3">
+					{{ _("Type your email address.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Real name (optional)") }}:</td>
+				<td class="col2">
+					<input name="realname" type="text" length="200" />
+				</td>
+				<td class="col3">
+					{{ _("Type you firstname and your lastname here.") }}
+				</td>
+			</tr>
+		</table>
+		
+		<h2>{{ _("Account security") }}</h2>
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Password") }}:</td>
+				<td class="col2">
+					<input name="pass1" type="password" />
+				</td>
+				<td class="col3">
+					{{ _("The password is used to secure the login and must be at least 8 characters.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Confirm") }}:</td>
+				<td class="col2">
+					<input name="pass2" type="password" />
+				</td>
+				<td class="col3">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Register") }}" />
+				</td>
+			</tr>
+		</table>
+	</form>
+{% end block %}

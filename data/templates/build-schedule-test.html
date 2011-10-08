@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Schedule test build for %s") % build.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Schedule test build for %s") % build.name }}</h1>
+	<p>
+		{{ _("A test build is used to check if a package builds with the current package set.") }}
+		{{ _("In this way, developers are able to find quality issues fast and without actively searching for them.") }}
+	</p>
+	<p>
+		{{ _("As this build platform only has a limited amount of performance, test builds only have a very less priority.") }}
+		{{ _("However, you can manually request to run a test.") }}
+	</p>
+	<p>
+		{{ _("The build job will be started when a build slot is available but not before the given time.") }}
+	</p>
+
+	{{ modules.BuildOffset() }}
+{% end block %}

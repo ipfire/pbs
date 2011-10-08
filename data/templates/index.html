@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Welcome to the Pakfire Build Service") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Welcome to the Pakfire Build Service") }}</h1>
+	<p>
+		{{ _("This is a service that organizes development and packaging for the IPFire distribution.") }}
+		{{ _("It is used to build and track packages as well as assembling images.") }}
+		<a href="/documents">{{ _("Learn more...") }}</a>
+	</p>
+
+	{% if active_builds %}
+		<h2>{{ _("Ongoing builds") }}</h2>
+		{{ modules.BuildTable(active_builds) }}
+	{% end %}
+
+	{% if next_builds %}
+		<h2>{{ _("Queued builds") }}</h2>
+		{{ modules.BuildTable(next_builds) }}
+	{% end %}
+
+	<h2>{{ _("Lately updated builds") }}</h2>
+	{{ modules.BuildTable(latest_builds) }}
+
+	<h2>{{ _("Statistics") }}</h2>
+	<ul>
+		<li>
+			{{ _("There is currently one pending build job.", "There are currently %(num)s pending build jobs.", counter_pending) % { "num" : counter_pending } }}
+		</li>
+		<li>
+			{{ _("Average build time is %.1f minutes.") % (average_build_time / 60) }}
+		</li>
+	</ul>
+{% end %}

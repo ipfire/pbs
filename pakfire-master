@@ -1,0 +1,7 @@
+#!/usr/bin/python
+
+from master import MasterApplication
+
+app = MasterApplication()
+
+app.run()

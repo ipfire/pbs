@@ -1,0 +1,13 @@
+
+<table class="build-log">
+	{% for message in messages %}
+		<tr>
+			<td>
+				{{ message.time }}
+			</td>
+			<td>
+				{{ message.message }}
+			</td>
+		</tr>
+	{% end %}
+</table>

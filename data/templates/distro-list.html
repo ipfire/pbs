@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Distributions") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Distributions") }}</h1>
+	<ul class="distros">
+		{% for distro in distros %}
+			<li>
+				<a href="/distribution/{{ distro.sname }}">{{ distro.name }}</a> - {{ distro.slogan }}
+			</li>
+		{% end %}
+	</ul>
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li><a href="">{{ _("Add distribution") }}</a></li>
+	</ul>
+{% end block %}

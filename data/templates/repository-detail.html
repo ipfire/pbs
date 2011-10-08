@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>
+		{{ _("Repository") }}: {{ repo.name }} -
+		{{ _("from") }} <a href="/distribution/{{ distro.sname }}">{{ distro.name }}</a>
+	</h1>
+
+	<p class="pkg-summary">{{ repo.description }}</p>
+
+	<p>
+		{{ _("This repository contains %s packages and is available for %s.") % (len(repo.packages), locale.list(repo.arches)) }}
+	</p>
+
+	{% if repo.has_actions() %}
+		<h2>{{ _("Pending actions") }}</h2>
+		{{ modules.RepoActionsTable(repo) }}
+	{% end %}
+
+	<h2>{{ _("Waiting packages") }}</h2>
+	<p>
+		{{ _("These packages are waiting to be published.") }}
+	</p>
+	{{ modules.PackageTable2(repo.waiting_packages) }}
+
+	<h2>{{ _("Pushed packages") }}</h2>
+	{{ modules.PackageTable2(repo.pushed_packages) }}
+
+	<h2>{{ _("Log") }}</h2>
+	{{ modules.LogTable(repo.log) }}
+{% end block %}

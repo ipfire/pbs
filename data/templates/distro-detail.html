@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Distribution") }}: {{ distro.name }}</a></h1>
+
+	<p class="pkg-summary">{{ distro.description }}</p>
+
+	<p>
+		{{ _("This distribution is available for %s and maintained by %s.") % (locale.list(distro.arches), distro.vendor) }}
+	</p>
+
+	<h2>{{ _("Binary repositories") }}</h2>
+	{{ modules.RepositoryTable(distro, distro.repositories) }}
+
+	<h2>{{ _("Sources") }}</h2>
+	{{ modules.SourceTable(distro, distro.sources) }}
+
+	<h2>{{ _("Log") }}</h2>
+	{{ modules.LogTable(distro.log) }}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li><a href="/distribution/edit/{{ distro.sname }}">{{ _("Edit distribution") }}</a></li>
+		<li><a href="/distribution/delete/{{ distro.sname }}">{{ _("Delete distribution") }}</a></li>
+	</ul>
+{% end block %}

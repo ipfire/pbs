@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Edit distribution %s") % distro.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Edit distribution %s") % distro.name }}</h1>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Name") }}</td>
+				<td class="col2">
+					<input type="text" name="name" value="{{ distro.name }}" />
+				</td>
+				<td class="col3">
+					{{ _("The fancy name of the distribution.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Identifier") }}</td>
+				<td class="col2">
+					{{ distro.sname }}
+				</td>
+				<td class="col3">
+					{{ _("Cannot be changed.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Vendor") }}</td>
+				<td class="col2">
+					<input type="text" name="vendor" value="{{ distro.vendor }}" />
+				</td>
+				<td class="col3">
+					{{ _("From whom is the distribution from?") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Slogan") }}</td>
+				<td class="col2">
+					<input type="text" name="slogan" value="{{ distro.slogan }}" />
+				</td>
+				<td class="col3">
+					{{ _("A short sentence that characterizes the distribution.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Architectures") }}</td>
+				<td class="col2">
+					<select name="arches" size="4" multiple>
+						{% for arch in arches %}
+							<option value="{{ arch }}" {% if arch in distro.arches %}selected="selected"{% end %}>{{ arch }}</option>
+						{% end %}
+					</select>
+				</td>
+				<td class="col3">
+					{{ _("For which architectures should the distribution be built?") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Sources") }}</td>
+				<td class="col2">
+					<select name="sources" size="4" multiple>
+						{% for source in sources %}
+							<option value="{{ source.id }}" {% if source in distro.sources %}selected="selected"{% end %}>{{ source.name }}</option>
+						{% end %}
+					</select>
+				</td>
+				<td class="col3">
+					{{ _("Which sources should be imported to the distribution?") }}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Save") }}" />
+				</td>
+			</tr>
+		</table>
+		<div style="clear: both;">&nbsp;</div>
+	</form>
+{% end block %}

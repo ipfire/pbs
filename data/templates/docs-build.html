@@ -1,0 +1,28 @@
+{% extends "docs-base.html" %}
+
+{% block title %}{{ _("Legend of the build states") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Legend of the build states") }}</h1>
+	<p>
+		{{ _("Every build that is done by the Pakfire Build Service has to go through several states:") }}
+	</p>
+	<p>
+		{{ _("After checking out the source from the source repository a source package is created and submitted to the build server.") }}
+		{{ _("Starting from inserting a source file to the build service, there are binary build jobs created for every supported architecture.") }}
+	</p>
+	<p>
+		{{ _("These get assigned to a build host which has to compile or assemble the package and return it back to the build server.") }}
+		{{ _("In the table below, there are all states that a build job goes through:") }}
+	</p>
+	<ul class="builds">
+		<li><a class="build running" name="#">{{ _("Build is running") }}</a></li>
+		<li><a class="build failed" name="#">{{ _("Build has failed") }}</a></li>
+		<li><a class="build pending" name="#">{{ _("Build is waiting to be processed") }}</a></li>
+		<li><a class="build dependency_error" name="#">{{ _("There was a dependency error when the package was built") }}</a></li>
+		<li><a class="build waiting" name="#">{{ _("Build is waiting for source to go to pending state") }}</a></li>
+		<li><a class="build dispatching" name="#">{{ _("Files of this build are transferred to the build server") }}</a></li>
+		<li><a class="build uploading" name="#">{{ _("Files are being uploaded to the service") }}</a></li>
+		<li><a class="build unknown" name="#">{{ _("Build has an unknown state") }}</a></li>
+	</ul>
+{% end %}

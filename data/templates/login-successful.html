@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Login successful") }}</h1>
+	<p>
+		{{ _("Welcome, %s.") % escape(user.realname) }}
+	</p>
+
+	<p>
+		{{ _("Your login to the Pakfire Build Server was successful.") }}
+	</p>
+
+	<p>
+		<a href="/">{{ _("Go on") }}</a>
+	</p>
+{% end %}

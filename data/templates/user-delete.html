@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Delete user %s") % user.realname }}</h1>
+
+	<p>
+		{% if current_user == user %}
+			{{ _("Do you really want to delete your own account?") }}
+			{{ _("You won't be able to login and use this service any more.") }}
+		{% else %}
+			{{ _("Do you really want to delete the user %s?") % user.realname }}
+		{% end %}
+	</p>
+
+	<p class="buttons">
+		<a href="/user/delete/{{ user.name }}?confirmed=1">{{ _("Delete %s") % user.realname }}</a>
+		|
+		<a href="/user/{{ user.name }}">{{ _("Back") }}</a>
+	</p>
+{% end block %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Login") }}</h1>
+
+	{% if failed %}
+		<p class="important">
+			{{ _("Username and/or password was wrong. Login failed.") }}
+		</p>
+	{% end %}
+
+	<p>
+		{{ _("Please type your username and your password to the form to log in.") }}
+		{{ _("If you have no account, yet you can create a new one.") }}
+		<a href="/register">{{ _("Register a new account.") }}</a>
+	</p>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table>
+			<tr>
+				<td>{{ _("Username") }}</td>
+				<td><input name="name" type="text" /></td>
+			</tr>
+			<tr>
+				<td>{{ _("Password") }}</td>
+				<td><input name="pass" type="password" /></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="buttons">
+					<input type="submit" value="{{ _("Login") }}" />
+				</td>
+			</tr>
+		</table>
+	</form>
+{% end %}

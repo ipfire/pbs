@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<img class="avatar" src="{{ user.gravatar_icon() }}" alt="{{ user.name }}" />
+	<h1>{{ _("User") }}: {{ escape(user.realname) }}</h1>
+
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("Username") }}</td>
+			<td class="col2">{{ escape(user.name) }}</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("Email") }}</td>
+			<td class="col2">
+				<a href="mailto:{{ escape(user.email) }}">{{ escape(user.email) }}</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("State") }}</td>
+			<td class="col2">
+				{% if user.is_admin() %}
+					{{ _("Admin") }}
+				{% elif user.is_tester() %}
+					{{ _("Tester") }}
+				{% else %}
+					{{ _("User") }}
+				{% end %}
+			</td>
+		</tr>
+		{% if current_user == user or current_user.is_admin() %}
+			<tr>
+				<td class="col1">{{ _("Registered") }}</td>
+				<td class="col2">{{ locale.format_date(user.registered, full_format=True) }}</td>
+			</tr>
+		{% end %}
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h2>{{ _("Log") }}</h2>
+	{{ modules.LogTable(user.log) }}
+
+	<h2>{{ _("Comments written by %s") % user.realname }}</h2>
+	{{ modules.CommentsTable(user.comments, show_package=True, show_user=False) }}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		{% if current_user == user or current_user.is_admin() %}
+			<li>
+				<a href="/user/edit/{{ user.name }}">{{ _("Account settings") }}</a>
+			</li>
+			<li>
+				<a href="/user/delete/{{ user.name }}">{{ _("Delete account") }}</a>
+			</li>
+		{% end %}
+	</ul>
+{% end block %}

@@ -1,0 +1,21 @@
+<div class="comments">
+	{% if comments %}
+		{% for comment in comments %}
+			<div class="comment {{ comment.vote }}">
+				<p class="text">{{ escape(comment.text) }}</p>
+				<span>
+					{% if show_package %}
+						<a href="/package/{{ comment.pkg.name }}/{{ comment.pkg.epoch }}/{{ comment.pkg.version }}/{{ comment.pkg.release }}">{{ _("on %s") % comment.pkg.friendly_name }}</a> -
+					{% end %}
+					{% if show_user %}
+						<a href="/user/{{ comment.user.name }}">{{ _("by %s") % escape(comment.user.realname) }}</a> -
+					{% end %}
+					{{ locale.format_date(comment.time) }}
+				</span>
+			</div>
+		{% end %}
+	{% else %}
+		<p>{{ _("No comments so far.") }}</p>
+	{% end %}
+</div>
+<div style="clear: both;">&nbsp;</div>

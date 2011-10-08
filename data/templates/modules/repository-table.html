@@ -1,0 +1,8 @@
+<ul class="repositories">
+	{% for repo in repos %}
+		<li>
+			<a href="/distribution/{{ distro.sname }}/repository/{{ repo.name }}">{{ repo.name }}</a>
+		</li>
+	{% end %}
+</ul>
+<div style="clear: both;">&nbsp;</div>

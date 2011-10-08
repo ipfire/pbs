@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Edit build priority") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Edit build priority") }}: {{ build.name }}</h1>
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Priority") }}</td>
+				<td class="col2">
+					<select name="priority">
+						<option value="2" {% if build.priority >= 2 %}selected="selected"{% end %}>{{ _("Very high") }}</option>
+						<option value="1" {% if build.priority == 1 %}selected="selected"{% end %}>{{ _("High") }}</option>
+						<option value="0" {% if build.priority == 0 %}selected="selected"{% end %}>{{ _("Medium") }}</option>
+						<option value="-1" {% if build.priority == -1 %}selected="selected"{% end %}>{{ _("Low") }}</option>
+						<option value="-2" {% if build.priority <= -2 %}selected="selected"{% end %}>{{ _("Very low") }}</option>
+					</select>
+				</td>
+				<td class="col3">
+					{{ _("Set the priority of the build process.") }}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<p>
+						<strong>{{ _("Beware") }}:</strong>
+						{{ _("Shuffeling build jobs can cause problems with the dependency solving.") }}
+						{{ _("Don't do this if you are not totally sure you won't break anything.") }}
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Save") }}" />
+				</td>
+			</tr>
+		</table>
+	</form>
+{% end block %}

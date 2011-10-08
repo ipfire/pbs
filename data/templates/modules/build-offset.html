@@ -1,0 +1,25 @@
+<form method="post" action="">
+	{{ xsrf_form_html() }}
+	<table class="form form3">
+		<tr>
+			<td class="col1">{{ _("Start time") }}</td>
+			<td class="col2">
+				<select name="offset">
+					<option value="0"}>{{ _("As soon as possible") }}</option>
+					<option value="300">{{ _("After 5 minutes") }}</option>
+					<option value="900">{{ _("After 15 minutes") }}</option>
+					<option value="3600">{{ _("After one hour") }}</option>
+					<option value="86400">{{ _("After one day") }}</option>
+				</select>
+			</td>
+			<td class="col3">
+				{{ _("Set the time after which the build job starts.") }}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" class="buttons">
+				<input type="submit" value="{{ _("Schedule build") }}" />
+			</td>
+		</tr>
+	</table>
+</form>

@@ -1,0 +1,7 @@
+<ul class="packages">
+	{% for pkg in packages %}
+		<li>
+			<a href="/package/{{ pkg.name }}/{{ pkg.epoch }}/{{ pkg.version }}/{{ pkg.release }}">{{ pkg.friendly_name }}</a>
+		</li>
+	{% end %}
+</ul>

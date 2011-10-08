@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>
+		{{ _("File") }}:
+		<a href="/package/{{ pkg.name }}/{{ pkg.epoch }}/{{ pkg.version }}/{{ pkg.release }}">{{ file.name }}</a>
+	</h1>
+
+	<p class="pkg-summary">{{ file.summary or pkg.summary }}</p>
+
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("Package") }}</td>
+			<td class="col2">
+				<a href="/package/{{ pkg.name }}/{{ pkg.epoch }}/{{ pkg.version }}/{{ pkg.release }}">{{ pkg.friendly_name }}</a>
+			</td>
+		</tr>
+
+		<tr>
+			<td colspan="2">{{ _("Description") }}</td>
+		</tr>
+		<tr>
+			<td colspan="2">{{ file.description or pkg.description }}</td>
+		</tr>
+
+		<tr>
+			<td class="col1">{{ _("URL") }}</td>
+			<td class="col2">
+				<a href="{{ pkg.url }}" target="_blank">{{ file.url or pkg.url }}</a>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="col1">{{ _("License") }}</td>
+			<td class="col2">{{ file.license or pkg.license}}</td>
+		</tr>
+
+		{% if file.maintainer %}
+			<tr>
+				<td class="col1">{{ _("Maintainer") }}</td>
+				<td class="col2">{{ escape(file.maintainer or pkg.maintainer) }}</td>
+			</tr>
+		{% end %}
+
+		<tr>
+			<td class="col1">{{ _("Size") }}</td>
+			<td class="col2">{{ friendly_size(file.size) }}</td>
+		</tr>
+
+		<tr>
+			<td class="col1">{{ _("Hash") }}</td>
+			<td class="col2">{{ file.hash1 }}</td>
+		</tr>
+
+		{% for i in file.provides %}
+			<tr>
+				<td class="col1">{{ _("Provides") }}</td>
+				<td class="col2">{{ i }}</td>
+			</tr>
+		{% end %}
+
+		<tr>
+			<td class="col1">{{ _("Requires") }}</td>
+			<td class="col2">{{ "<br />".join(file.requires) }}</td>
+		</tr>
+
+		{% for i in file.requires %}
+			<tr>
+				<td class="col1">{{ _("Requires") }}</td>
+				<td class="col2">{{ i }}</td>
+			</tr>
+		{% end %}
+
+		{% for i in file.obsoletes %}
+			<tr>
+				<td class="col1">{{ _("Obsoletes") }}</td>
+				<td class="col2">{{ i }}</td>
+			</tr>
+		{% end %}
+
+		{% for i in file.conflicts %}
+			<tr>
+				<td class="col1">{{ _("Conflicts") }}</td>
+				<td class="col2">{{ i }}</td>
+			</tr>
+		{% end %}
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h2>{{ _("Build information") }}</h2>
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("ID") }}</td>
+			<td class="col2">
+				<a href="/build/{{ file.build_id }}">{{ file.build_id }}</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("Host") }}</td>
+			<td class="col2">
+				<a href="/builder/{{ file.build_host }}">{{ file.build_host }}</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("Time") }}</td>
+			<td class="col2">{{ file.build_date }}</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h3>{{ _("Files") }}</h3>
+	{{ modules.PackageFilesTable(file.filelist) }}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li><a href="{{ file.download }}">{{ _("Download file") }}</a></li>
+	</ul>
+{% end block %}

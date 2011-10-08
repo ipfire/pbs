@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+	<ul>
+		<li><a href="/documents">{{ _("All Documents") }}</a></li>
+	</ul>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h1>{{ _("Topics") }}</h1>
+	<ul>
+		<li><a href="/documents/builds">{{ _("Builds") }}</a></li>
+		<li><a href="/documents/users">{{ _("Users") }}</a></li>
+	</ul>
+{% end block %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Create new builder") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Create a new builder") }}</h1>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Name") }}</td>
+				<td class="col2">
+					<input name="name" type="text" length="64" />
+				</td>
+				<td class="col3">
+					{{ _("Must be the canonical hostname of the machine.") }}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Save") }}" />
+				</td>
+			</tr>
+		</table>
+	</form>
+{% end block %}

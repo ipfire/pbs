@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Activation successful") }}</h1>
+	<p>
+		{{ _("Your account has been activated, %s.") % user.realname }}
+		{{ _("Have fun!") }}
+	</p>
+{% end %}

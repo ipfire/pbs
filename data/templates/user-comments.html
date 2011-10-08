@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Latest user comments") }}</h1>
+
+	{{ modules.CommentsTable(comments, show_package=True, show_user=True) }}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li><a href="/users">{{ _("Show all users") }}</a></li>
+	</ul>
+{% end block %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Users") }}</h1>
+	<p>
+		{{ _("On this page you can see a list of all users that are known to the system.") }}
+	</p>
+
+	{% if admins %}
+		<h2>{{ _("Administrators") }}</h2>
+		{{ modules.UsersTable(admins) }}
+	{% end %}
+
+	{% if testers %}
+		<h2>{{ _("Testers") }}</h2>
+		{{ modules.UsersTable(testers) }}
+	{% end %}
+
+	{% if users %}
+		<h2>{{ _("Users") }}</h2>
+		{{ modules.UsersTable(users) }}
+	{% end %}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li><a href="/users/comments">{{ _("Latest comments") }}</a></li>
+	</ul>
+{% end block %}

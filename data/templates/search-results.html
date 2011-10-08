@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Search results for '%s'") % escape(query) }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Search results for '%s'") % escape(query) }}</h1>
+	<p>
+		{{ _("These are the results you searched for.") }}
+	</p>
+
+	<table class="form2">
+		{% for pkg in pkgs %}
+			<tr>
+				<td class="col1">
+					<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
+				</td>
+				<td class="col2">{{ pkg.summary }}</td>
+			</tr>
+		{% end %}
+	</table>
+{% end block %}

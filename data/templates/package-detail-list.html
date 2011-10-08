@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Package") }} {{ pkg.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Package") }}: {{ pkg.name }}</h1>
+
+	<p class="pkg-summary">
+		{{ pkg.summary }}
+	</p>
+	<p>
+		{{ _("There is one version of %(pkg)s.", "There are %(num)s different versions of %(pkg)s.", len(packages)) % { "num" : len(packages), "pkg" : pkg.name, } }}
+	</p>
+	{{ modules.PackageTable2(packages) }}
+{% end block %}
