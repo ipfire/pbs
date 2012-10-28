@@ -1,6 +1,6 @@
 <div class="modal hide fade" id="{% block id %}{% end block %}">
 	<form class="modal-form form-horizontal" method="POST" action="{% block form_action %}{% end block %}">
-		{{ xsrf_form_html() }}
+		{% raw xsrf_form_html() %}
 
 		<div class="modal-header">
 			{% block header %}

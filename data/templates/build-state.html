@@ -32,7 +32,7 @@
 	{% if current_user and build.has_perm(current_user) %}
 		{% if build.state in ("building", "testing", "stable") %}
 			<form method="POST" action="">
-				{{ xsrf_form_html() }}
+				{% raw xsrf_form_html() %}
 				<table class="form form2">
 					<tr>
 						<td class="col1" colspan="2">
@@ -65,7 +65,7 @@
 
 		{% if build.state == "broken" %}
 			<form method="POST" action="">
-				{{ xsrf_form_html() }}
+				{% raw xsrf_form_html() %}
 				<table class="form form2">
 					<tr>
 						<td class="col1" colspan="2">
@@ -86,7 +86,7 @@
 			</form>
 		{% else %}
 			<form method="POST" action="">
-				{{ xsrf_form_html() }}
+				{% raw xsrf_form_html() %}
 				<table class="form form2">
 					<tr>
 						<td class="col1" colspan="2">

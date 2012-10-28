@@ -15,7 +15,7 @@
 	{% end %}
 
 	<form class="form-horizontal" method="POST" action="">
-		{{ xsrf_form_html() }}
+		{% raw xsrf_form_html() %}
 
 		<fieldset>
 			<div class="control-group">

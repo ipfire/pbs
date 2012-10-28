@@ -23,7 +23,7 @@
 			</div>
 
 			<form method="POST" action="">
-				{{ xsrf_form_html() }}
+				{% raw xsrf_form_html() %}
 				<input type="hidden" name="user" value="{{ user.name }}" />
 				<input class="btn btn-danger pull-right" type="submit" value="{{ _("Impersonate %s") % user.realname }}" />
 			</form>

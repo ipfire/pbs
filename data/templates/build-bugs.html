@@ -63,7 +63,7 @@
 
 	<div class="modal hide fade" id="add">
 		<form class="modal-form form-horizontal" method="POST" action="">
-			{{ xsrf_form_html() }}
+			{% raw xsrf_form_html() %}
 			<input type="hidden" name="action" value="add" />
 
 			<div class="modal-header">
@@ -120,7 +120,7 @@
 
 	<div class="modal hide fade" id="rem">
 		<form class="modal-form form-horizontal" method="POST" action="">
-			{{ xsrf_form_html() }}
+			{% raw xsrf_form_html() %}
 			<input type="hidden" name="action" value="remove" />
 
 			<div class="modal-header">

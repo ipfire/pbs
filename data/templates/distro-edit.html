@@ -6,7 +6,7 @@
 	<h1>{{ _("Edit distribution %s") % distro.name }}</h1>
 
 	<form method="post" action="">
-		{{ xsrf_form_html() }}
+		{% raw xsrf_form_html() %}
 		<table class="form form3">
 			<tr>
 				<td class="col1">{{ _("Name") }}</td>

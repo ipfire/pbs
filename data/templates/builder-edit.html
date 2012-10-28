@@ -28,7 +28,7 @@
 	<div class="row">
 		<div class="span8">
 			<form class="form-horizontal" method="POST" action="">
-				{{ xsrf_form_html() }}
+				{% raw xsrf_form_html() %}
 				<fieldset>
 					<div class="control-group">
 						<label class="control-label">{{ _("Hostname") }}</label>
