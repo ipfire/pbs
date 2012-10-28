@@ -21,7 +21,7 @@ class Application(tornado.web.Application):
 
 		settings = dict(
 			debug = True,
-			gzip  = False,
+			gzip  = True,
 			login_url = "/login",
 			template_path = os.path.join(BASEDIR, "templates"),
 			ui_modules = {
