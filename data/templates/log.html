@@ -3,5 +3,5 @@
 {% block body %}
 	<h1>{{ _("Log") }}</h1>
 
-	{{ modules.LogTable(log) }}
+	{% module LogTable(log) %}
 {% end %}

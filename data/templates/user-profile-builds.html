@@ -8,7 +8,7 @@
 		{% for order, items in sorted(builds.items()) %}
 			{{ order }}
 
-			{{ modules.BuildTable(items) }}
+			{% module BuildTable(items) %}
 		{% end %}
 
 	{% else %}

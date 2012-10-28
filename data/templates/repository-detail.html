@@ -55,7 +55,7 @@
 	<div class="row">
 		<div class="span8">
 			<blockquote>
-				{{ modules.Text(repo.description, pre=False) }}
+				{% module Text(repo.description, pre=False) %}
 			</blockquote>
 
 			<br><br>
@@ -127,7 +127,7 @@
 				<div class="alert">
 					{{ _("These builds were already put into this repository, but were not pushed out to the mirror servers, yet.") }}
 				</div>
-				{{ modules.BuildTable(unpushed_builds, show_repo_time=True) }}
+				{% module BuildTable(unpushed_builds, show_repo_time=True) %}
 			</div>
 		</div>
 	{% end %}
@@ -139,7 +139,7 @@
 					{{ _("Builds in this repository") }}
 					<small>({{ len(builds) }})</small>
 				</h2>
-				{{ modules.BuildTable(builds, show_repo_time=True, show_can_move_forward=True) }}
+				{% module BuildTable(builds, show_repo_time=True, show_can_move_forward=True) %}
 			</div>
 		</div>
 	{% end %}
@@ -151,7 +151,7 @@
 					{{ _("Obsolete builds") }}
 					<small>({{ len(obsolete_builds) }})</small>
 				</h2>
-				{{ modules.BuildTable(obsolete_builds) }}
+				{% module BuildTable(obsolete_builds) %}
 			</div>
 		</div>
 	{% end %}

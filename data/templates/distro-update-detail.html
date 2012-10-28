@@ -39,7 +39,7 @@
 	<div style="clear: both;">&nbsp;</div>
 
 	<h2>{{ _("Builds in this update") }}</h2>
-	{{ modules.BuildTable(update.builds) }}
+	{% module BuildTable(update.builds) %}
 {% end block %}
 
 {% block sidebar %}

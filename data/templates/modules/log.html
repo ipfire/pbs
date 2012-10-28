@@ -1,9 +1,9 @@
 <div class="log">
 	{% for entry in entries %}
 		{% if entry.type == "comment" %}
-			{{ modules.LogEntryComment(entry, **args) }}
+			{% module LogEntryComment(entry, **args) %}
 		{% else %}
-			{{ modules.LogEntry(entry, **args) }}
+			{% module LogEntry(entry, **args) %}
 		{% end %}
 	{% end %}
 </div>

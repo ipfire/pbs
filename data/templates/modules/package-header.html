@@ -33,7 +33,7 @@
 					<tr>
 						<td>{{ _("Maintainer") }}</td>
 						<td>
-							{{ modules.Maintainer(pkg.maintainer) }}
+							{% module Maintainer(pkg.maintainer) %}
 						</td>
 					</tr>
 				{% end %}

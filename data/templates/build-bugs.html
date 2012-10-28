@@ -21,13 +21,13 @@
 		</li>
 	</ul>
 
-	{{ modules.BuildHeadline(_("Bug list"), build, short=True) }}
+	{% module BuildHeadline(_("Bug list"), build, short=True) %}
 
 	<div class="row">
 		<div class="span8 offset2">
 			{% if fixed_bugs %}
 				<h2>{{ _("Fixed bugs") }}</h2>
-				{{ modules.BugsTable(pkg, fixed_bugs) }}
+				{% module BugsTable(pkg, fixed_bugs) %}
 			{% else %}
 				<p>
 					{{ _("No bugs here, yet.") }}

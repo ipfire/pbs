@@ -49,7 +49,7 @@
 					<div class="tab-content">
 						{% for type, updts, active in updates %}
 							<div class="tab-pane {% if active %}active{% end %}" id="updates_{{ type }}">
-								{{ modules.UpdatesTable(updts) }}
+								{% module UpdatesTable(updts) %}
 							</div>
 						{% end %}
 					</div>
@@ -71,7 +71,7 @@
 					{{ _("Ongoing build jobs") }}
 					<small>({{ len(active_jobs) }})</small>
 				</h3>
-				{{ modules.JobsList(active_jobs, show_builder=True) }}
+				{% module JobsList(active_jobs, show_builder=True) %}
 			{% end %}
 
 			<a href="/builds/queue">
@@ -85,7 +85,7 @@
 
 		<div class="span6">
 			<h3>{{ _("Lately processed jobs") }}</h3>
-			{{ modules.JobsList(latest_jobs) }}
+			{% module JobsList(latest_jobs) %}
 		</div>
 	</div>
 {% end %}

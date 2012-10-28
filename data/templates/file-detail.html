@@ -109,7 +109,7 @@
 	<div style="clear: both;">&nbsp;</div>
 
 	<h3>{{ _("Files") }}</h3>
-	{{ modules.PackageFilesTable(file.filelist) }}
+	{% module PackageFilesTable(file.filelist) %}
 {% end block %}
 
 {% block sidebar %}

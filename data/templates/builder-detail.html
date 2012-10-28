@@ -75,7 +75,7 @@
 			{% if builder.description %}
 				<h2>{{ _("Remarks") }}</h2>
 				<p>
-					{{ modules.Text(builder.description) }}
+					{% module Text(builder.description) %}
 				</p>
 			{% end %}
 		</div>
@@ -192,7 +192,7 @@
 		<div class="row">
 			<div class="span10 offset1">
 				<h2>{{ _("Currently running builds on this host") }}</h2>
-				{{ modules.JobsList(builder.get_active_jobs()) }}
+				{% module JobsList(builder.get_active_jobs()) %}
 			</div>
 		</div>
 	{% end %}
@@ -200,7 +200,7 @@
 	<div class="row">
 		<div class="span10 offset1">
 			<h2>{{ _("Log") }}</h2>
-			{{ modules.Log(builder.get_history(limit=20)) }}
+			{% module Log(builder.get_history(limit=20)) %}
 		</div>
 	</div>
 {% end block %}

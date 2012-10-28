@@ -23,7 +23,7 @@
 			{{ _("Developers") }}
 			<span>({{ len(admins) }})</span>
 		</h2>
-		{{ modules.UsersTable(admins) }}
+		{% module UsersTable(admins) %}
 	{% end %}
 
 	{% if testers %}
@@ -31,7 +31,7 @@
 			{{ _("Testers") }}
 			<span>({{ len(testers) }})</span>
 		</h2>
-		{{ modules.UsersTable(testers) }}
+		{% module UsersTable(testers) %}
 	{% end %}
 
 	{% if users %}
@@ -39,6 +39,6 @@
 			{{ _("Users") }}
 			<span>({{ len(admins) }})</span>
 		</h2>
-		{{ modules.UsersTable(users) }}
+		{% module UsersTable(users) %}
 	{% end %}
 {% end block %}

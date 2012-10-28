@@ -21,9 +21,9 @@
 		</li>
 	</ul>
 
-	{{ modules.BuildHeadline(_("Build"), build) }}
-	{{ modules.BuildStateWarnings(build) }}
-	{{ modules.PackageHeader(pkg) }}
+	{% module BuildHeadline(_("Build"), build) %}
+	{% module BuildStateWarnings(build) %}
+	{% module PackageHeader(pkg) %}
 
 	{% if build.type == "scratch" and build.has_perm(current_user) %}
 		<div class="btn-toolbar pull-right">
@@ -97,7 +97,7 @@
 								{% if build.message %}
 									<tr>
 										<td colspan="2">
-											{{ modules.Text(build.message) }}
+											{% module Text(build.message) %}
 										</td>
 									</tr>
 								{% end %}
@@ -107,7 +107,7 @@
 
 					<div class="tab-pane" id="bugs">
 						{% if bugs %}
-							{{ modules.BugsTable(pkg, bugs) }}
+							{% module BugsTable(pkg, bugs) %}
 						{% else %}
 							<p>
 								{{ _("Nothing in here, yet.") }}
@@ -181,7 +181,7 @@
 													</a>
 												</div>
 
-												{{ modules.Modal("build-push", build=build, current_repo=repo, next_repo=next_repo) }}
+												{% module Modal("build-push", build=build, current_repo=repo, next_repo=next_repo) %}
 											{% end %}
 
 											{% if build.repo %}
@@ -191,7 +191,7 @@
 													</a>
 												</div>
 
-												{{ modules.Modal("build-unpush", build=build, repo=repo) }}
+												{% module Modal("build-unpush", build=build, repo=repo) %}
 											{% end %}
 										</div>
 									{% elif build.can_move_forward %}
@@ -224,16 +224,16 @@
 				</a>
 			</div>
 
-			{{ modules.Modal("build-comment", build=build) }}
+			{% module Modal("build-comment", build=build) %}
 
-			{{ modules.WatchersSidebarTable(build, build.get_watchers()) }}
+			{% module WatchersSidebarTable(build, build.get_watchers()) %}
 			<br />
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="span12">
-			{{ modules.Log(log) }}
+			{% module Log(log) %}
 		</div>
 	</div>
 
@@ -265,7 +265,7 @@
 				<div class="tab-pane active" id="buildjobs">
 					<div class="row">
 						<div class="span12">
-							{{ modules.JobsTable(build) }}
+							{% module JobsTable(build) %}
 						</div>
 					</div>
 				</div>
@@ -274,7 +274,7 @@
 					<div class="tab-pane" id="testjobs">
 						<div class="row">
 							<div class="span12">
-								{{ modules.JobsTable(build, build.test_jobs, type="test") }}
+								{% module JobsTable(build, build.test_jobs, type="test") %}
 							</div>
 						</div>
 					</div>

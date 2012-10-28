@@ -54,7 +54,7 @@
 				<a href="/documents/enable-repositories">{{ _("Learn how to use them.") }}</a>
 			</blockquote>
 
-			{{ modules.RepositoryTable(distro, distro.repositories) }}
+			{% module RepositoryTable(distro, distro.repositories) %}
 
 			<hr />
 		</div>
@@ -67,7 +67,7 @@
 				<small>({{ len(distro.sources) }})</small>
 			</h2>
 
-			{{ modules.SourceTable(distro, distro.sources) }}
+			{% module SourceTable(distro, distro.sources) %}
 		</div>
 	</div>
 

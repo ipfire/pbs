@@ -3,7 +3,7 @@
 {% block body %}
 	<h1>{{ _("Latest user comments") }}</h1>
 
-	{{ modules.CommentsTable(comments, show_package=True, show_user=True) }}
+	{% module CommentsTable(comments, show_package=True, show_user=True) %}
 {% end block %}
 
 {% block sidebar %}

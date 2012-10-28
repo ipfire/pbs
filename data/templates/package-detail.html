@@ -75,7 +75,7 @@
 					{% if pkg.maintainer %}
 						<tr>
 							<td>{{ _("Maintainer") }}</td>
-							<td>{{ modules.Maintainer(pkg.maintainer) }}</td>
+							<td>{% module Maintainer(pkg.maintainer) %}</td>
 						</tr>
 					{% end %}
 					<tr>
@@ -271,6 +271,6 @@
 
 	{% if pkg.filelist %}
 		<h2>{{ _("Files") }}</h2>
-		{{ modules.PackageFilesTable(pkg, pkg.filelist) }}
+		{% module PackageFilesTable(pkg, pkg.filelist) %}
 	{% end %}
 {% end block %}

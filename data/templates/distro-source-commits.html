@@ -13,7 +13,7 @@
 		</a>
 	</p>
 
-	{{ modules.CommitsTable(distro, source, commits) }}
+	{% module CommitsTable(distro, source, commits) %}
 
 	<div class="links">
 		{% if offset %}

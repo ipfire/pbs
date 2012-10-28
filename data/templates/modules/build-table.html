@@ -49,10 +49,10 @@
 					{% if show_user %}
 						{% if build.type == "scratch" and build.user %}
 							<td class="user">
-								{{ modules.Maintainer(build.user) }}
+								{% module Maintainer(build.user) %}
 							</td>
 						{% elif build.type == "release" %}
-							<td>{{ modules.Maintainer(build.pkg.maintainer) }}</td>
+							<td>{% module Maintainer(build.pkg.maintainer) %}</td>
 						{% else %}
 							<td>&nbsp;</td>
 						{% end %}

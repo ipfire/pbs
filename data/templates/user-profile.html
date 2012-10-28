@@ -148,8 +148,8 @@
 	</ul> -->
 
 	<!-- <h2>{{ _("Log") }}</h2>
-	{{ modules.LogTable(user.log) }} -->
+	{% module LogTable(user.log) %} -->
 
 	<!-- <h2>{{ _("Comments written by %s") % user.realname }}</h2>
-	{..{ modules.CommentsTable(user.comments, show_package=True, show_user=False) }..} -->
+	{..% module CommentsTable(user.comments, show_package=True, show_user=False) %..} -->
 {% end block %}

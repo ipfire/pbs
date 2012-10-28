@@ -10,7 +10,7 @@
 	</p>
 
 	{% if jobs %}
-		{{ modules.JobsList(jobs) }}
+		{% module JobsList(jobs) %}
 	{% else %}
 		{{ _("No jobs to do.") }}
 	{% end %}

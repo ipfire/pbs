@@ -25,7 +25,7 @@
 
 		{% block message %}
 			<p>
-				{{ modules.Text(entry.get_message(current_user), pre=False) }}
+				{% module Text(entry.get_message(current_user), pre=False) %}
 			</p>
 		{% end block %}
 

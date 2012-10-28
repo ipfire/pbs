@@ -43,7 +43,7 @@
 				{{ _("The build job will be started when a build slot is available but not before the given time.") }}
 			</p>
 
-			{{ modules.BuildOffset() }}
+			{% module BuildOffset() %}
 		</div>
 	</div>
 {% end block %}

@@ -17,8 +17,8 @@
 		</li>
 	</ul>
 
-	{{ modules.BuildHeadline(_("Package"), latest_build, shorter=True) }}
-	{{ modules.PackageHeader(pkg) }}
+	{% module BuildHeadline(_("Package"), latest_build, shorter=True) %}
+	{% module PackageHeader(pkg) %}
 
 	<div class="row">
 		<div class="span12">
@@ -53,7 +53,7 @@
 					<div class="tab-pane active" id="release">
 						<div class="row">
 							<div class="span12">
-								{{ modules.BuildTable(release_builds, show_repo=True) }}
+								{% module BuildTable(release_builds, show_repo=True) %}
 							</div>
 						</div>
 					</div>
@@ -63,7 +63,7 @@
 					<div class="tab-pane {% if not release_builds %}active{% end %}" id="scratch">
 						<div class="row">
 							<div class="span12">
-								{{ modules.BuildTable(scratch_builds, show_user=True) }}
+								{% module BuildTable(scratch_builds, show_user=True) %}
 							</div>
 						</div>
 					</div>
@@ -82,7 +82,7 @@
 		<div class="span8">
 			<h3>{{ _("Open bugs") }}</h3>
 			{% if bugs %}
-				{{ modules.BugsTable(pkg, bugs) }}
+				{% module BugsTable(pkg, bugs) %}
 			{% else %}
 				<blockquote>
 					{{ _("There are currently no open bugs for <em>%s</em>.") % escape(pkg.name) }}

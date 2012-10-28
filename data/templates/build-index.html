@@ -4,7 +4,7 @@
 
 {% block body %}
 	<h1>{{ _("Build list") }}</h1>
-	{{ modules.BuildTable(builds, show_user=True) }}
+	{% module BuildTable(builds, show_user=True) %}
 {% end block %}
 
 {% block sidebar %}

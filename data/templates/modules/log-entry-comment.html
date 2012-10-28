@@ -12,7 +12,7 @@
 
 {% block message %}
 	{% if entry.get_message(current_user) %}
-		{{ modules.Text(entry.get_message(current_user), pre=False) }}
+		{% module Text(entry.get_message(current_user), pre=False) %}
 	{% else %}
 		<em>{{ _("No comment given.") }}</em>
 	{% end %}

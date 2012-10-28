@@ -67,7 +67,7 @@
 					{% if commit.message %}
 						<tr>
 							<td colspan="2">
-								{{ modules.Text(commit.message, pre=True) }}</pre>
+								{% module Text(commit.message, pre=True) %}
 							</td>
 						</tr>
 					{% end %}

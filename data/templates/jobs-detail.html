@@ -182,7 +182,7 @@
 					<div class="tab-pane" id="logs">
 						<div class="row">
 							<div class="span12">
-								{{ modules.LogFilesTable(job, job.logfiles) }}
+								{% module LogFilesTable(job, job.logfiles) %}
 							</div>
 						</div>
 					</div>
@@ -201,7 +201,7 @@
 					<small>({{ len(job.packages) }})</small>
 				</h2>
 
-				{{ modules.PackagesTable(job, job.packages) }}
+				{% module PackagesTable(job, job.packages) %}
 			</div>
 		</div>
 	{% end %}
@@ -212,7 +212,7 @@
 				<hr>
 
 				<h2>{{ _("Log") }}</h2>
-				{{ modules.Log(log) }}
+				{% module Log(log) %}
 			</div>
 		</div>
 	{% end %}
