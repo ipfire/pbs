@@ -15,48 +15,35 @@
 
 	{% if pattern %}
 		<div class="page-header">
-			<h1>{{ _("No search results for '%s'.") % pattern }}</h1>
-		</div>
-
-		<div class="alert alert-block">
-			<a class="close" data-dismiss="alert">&times;</a>
-			<h4 class="alert-header">{{ _("Notice") }}</h4>
-			{{ _("Your search query '<em>%s</em>' did not return any results.") % pattern }}
-			{{ _("Use the box below to try again.") }}
+			<h1>{{ _("No results for '%s'.") % pattern }}</h1>
 		</div>
 	{% else %}
 		<div class="page-header">
 			<h1>{{ _("Advanced search") }}</h1>
 		</div>
 
-		<div class="row">
-			<div class="span8 offset2">
-				<p>
-					{{ _("Type a search pattern into the box below and hit the 'Search' button.") }}
-				</p>
-			</div>
-		</div>
+		<p class="lead ac">
+			{{ _("Type a search pattern into the box below and hit the button.") }}
+		</p>
 	{% end %}
 
 	<div class="row">
 		<div class="span4 offset4">
-			<form class="well form-search" method="GET" action="/search">
-				<input type="text" class="input-medium search-query" name="q" value="{{ pattern }}">
-				<button type="submit" class="btn">{{ _("Search") }}</button>
+			<form class="well ac" method="GET" action="/search">
+				<div class="input-append">
+					<input type="text" class="input-large" name="q" placeholder="{{ _("Search") }}"
+						value="{{ pattern }}"><button type="submit" class="btn">{{ _("Go!") }}</button>
+				</div>
 			</form>
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="span6">
-			<h2>{{ _("Search pattern syntax") }}</h2>
-		</div>
-	</div>
+	<hr>
 
 	<div class="row">
-		<div class="span6">
+		<div class="span12">
 			<div class="well">
-				<h3>{{ _("Package names and descriptions") }}</h3>
+				<h3>{{ _("Search for packages by name or description") }}</h3>
 				<p>
 					{{ _("If you type a package name to the search box you will get a link to the package.") }}
 					{{ _("The search is performed in case insensitive mode.") }}
@@ -68,7 +55,7 @@
 	<div class="row">
 		<div class="span6">
 			<div class="well">
-				<h3>{{ _("UUIDs") }}</h3>
+				<h3>{{ _("Search for UUIDs") }}</h3>
 				<p>
 					{{ _("If you type a UUID to the search box, you will be directed to the job, build or package it belongs to.") }}
 					{{ _("This is a handy feature if you have a UUID and search for the corresponding package or build.") }}
@@ -83,7 +70,7 @@
 
 		<div class="span6">
 			<div class="well">
-				<h3>{{ _("Files") }}</h3>
+				<h3>{{ _("Search for files") }}</h3>
 				<p>
 					{{ _("You may also search for file names.") }}
 					{{ _("You will get a list of packages that contain the file.") }}
