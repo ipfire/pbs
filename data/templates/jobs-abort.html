@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Abort build job %s") % job.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Abort build job %s") % job.name }}</h1>
+	<p>
+		{{ _("You may abort a running build.") }}
+		{{ _("The build server will eventually stop to build the package.") }}
+	</p>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Build job") }}</td>
+				<td class="col2">
+					<a href="/job/{{ job.uuid }}">{{ job.name }}</a>
+				</td>
+				<td class="col3">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Start time") }}</td>
+				<td class="col2">
+					{% if job.time_started %}
+						{{ locale.format_date(job.time_started, full_format=True) }}
+					{% else %}
+						{{ _("No started, yet.") }}
+					{% end %}
+				</td>
+				<td class="col3">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Build server") }}</td>
+				<td class="col2">
+					<a href="/builder/{{ job.builder.name }}">{{ job.builder.name }}</a>
+				</td>
+				<td class="col3">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Abort build job") }}" />
+				</td>
+			</tr>
+		</table>
+	</form>
+{% end block %}

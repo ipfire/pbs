@@ -10,7 +10,11 @@
 					{% if show_user %}
 						<a href="/user/{{ comment.user.name }}">{{ _("by %s") % escape(comment.user.realname) }}</a> -
 					{% end %}
-					{{ locale.format_date(comment.time) }}
+					{{ locale.format_date(comment.time_created) }}
+
+					{% if comment.time_updated %}
+						_("Updated") {{ locale.format_date(comment.time_updated) }}
+					{% end %}
 				</span>
 			</div>
 		{% end %}

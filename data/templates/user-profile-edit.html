@@ -61,6 +61,17 @@
 				</td>
 				<td class="col3">{{ _("Auto-detect will use the language transmitted by your browser.") }}</td>
 			</tr>
+			<tr>
+				<td class="col1">{{ _("Timezone") }}:</td>
+				<td class="col2">
+					<select name="timezone">
+						{% for tz in supported_timezones %}
+							<option value="{{ tz }}" {% if user.timezone.zone == tz %}selected{% end %}>{{ tz }}</option>
+						{% end %}
+					</select>
+				</td>
+				<td class="col3">{{ _("Auto-detect will use the language transmitted by your browser.") }}</td>
+			</tr>
 
 	{% if current_user.is_admin() and not current_user == user %}
 		</table>

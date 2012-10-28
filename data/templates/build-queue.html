@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Builds") }} - {{ _("Job queue") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Builds") }}: {{ _("Job queue") }}</h1>
+	<p>
+		{{ _("This is a list of all jobs that are waiting to be processed.") }}
+		{{ _("They one at the top is next.") }}
+	</p>
+
+	{% if jobs %}
+		{{ modules.JobsList(jobs) }}
+	{% else %}
+		{{ _("No jobs to do.") }}
+	{% end %}
+{% end %}

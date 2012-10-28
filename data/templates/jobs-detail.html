@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Job") }}: {{ job.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/job/{{ job.uuid }}">{{ escape(job.arch.name) }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>
+			{{ _("Build job") }}: {{ escape(job.name) }}<br />
+			<small>{{ escape(job.pkg.summary) }}</small>
+		</h1>
+	</div>
+
+	{% if job.message %}
+		<div class="alert alert-block">
+			{{ "<br />".join(job.message.splitlines()) }}
+		</div>
+	{% end %}
+
+	{% if job.state == "aborted" and job.aborted_state %}
+		<div class="alert alert-block alert-danger">
+			<span>{{ _("Job has been aborted") }}</span>
+			<p>
+				{{ _("This build job is in an aborted state, because the build process crashed unexpectedly.") }}
+				{{ _("In most cases, there is no log file and you must figure out the issue on your own.") }}
+			</p>
+			<p>
+				{{ _("The error code is:") }}
+
+				{% if job.aborted_state == -11 %}
+					SEGV - {{ _("Segmentation violation") }}
+				{% else %}
+					{{ job.aborted_state }} - {{ _("Unknown") }}
+				{% end %}
+			</p>
+
+			{% if current_user and current_user.is_admin() %}
+				<p>
+					{{ _("You may resubmit the job to try again:") }}
+					<a href="/job/{{ job.uuid }}/schedule?type=rebuild">{{ _("Re-submit build") }}</a>
+				</p>
+			{% end %}
+		</div>
+	{% end %}
+
+	<div class="row">
+		<div class="span12">	
+			<ul class="nav nav-pills">
+				<li class="active">
+					<a href="#detail" data-toggle="tab">{{ _("Job details") }}</a>
+				</li>
+				<li>
+					<a href="#time" data-toggle="tab">{{ _("Time") }}</a>
+				</li>
+
+				{% if job.logfiles %}
+					<li>
+						<a href="#logs" data-toggle="tab">
+							{{ _("Log files") }} ({{ len(job.logfiles) }})
+						</a>
+					</li>
+				{% end %}
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane active" id="detail">
+					<div class="row">
+						<div class="span4">
+							<table class="table table-striped">
+								<tbody>
+									<tr>
+										<td>{{ _("State") }}</td>
+										<td>
+											{{ job.state }}
+
+											{% if job.state in ("dispatching", "running", "uploading") %}
+												<a class="btn btn-mini btn-inverse pull-right" href="/job/{{ job.uuid }}/abort">
+													{{ _("Abort job") }}
+												</a>
+											{% elif job.state in ("aborted", "failed") %}
+												<a class="btn btn-mini btn-success pull-right" href="/job/{{ job.uuid }}/schedule?type=rebuild">
+													{{ _("Restart") }}
+												</a>
+											{% elif job.state == "finished" %}
+												<a class="btn btn-mini pull-right" href="/job/{{ job.uuid }}/schedule?type=test">
+													{{ _("Schedule test build") }}
+												</a>
+											{% end %}
+										</td>
+									</tr>
+									<tr>
+										<td>{{ _("Builder") }}</td>
+										<td>
+											{% if job.builder %}
+												<a href="/builder/{{ job.builder.name }}">{{ job.builder.name }}</a>
+											{% else %}
+												{{ _("No host assigned, yet.") }}
+											{% end %}
+										</td>
+									</tr>
+
+									{% if job.has_buildroot() %}
+										<tr>
+											<td>{{ _("Buildroot") }}</td>
+											<td>
+												<a href="/job/{{ job.uuid }}/buildroot?tries={{ job.tries }}">
+													{{ _("%s package", "%s packages", job.has_buildroot()) % job.has_buildroot() }}
+												</a>
+											</td>
+										</tr>
+									{% end %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-pane" id="time">
+					<div class="row">				
+						<div class="span6">
+							<table class="table">
+								<tbody>
+									{% if job.duration %}
+										<tr>
+											<td>{{ _("Duration") }}</td>
+											<td>{{ friendly_time(job.duration) }}</td>
+										</tr>
+									{% end %}
+
+									<tr>
+										<td>{{ _("Job created") }}</td>
+										<td>{{ format_date(job.time_created, full_format=True) }}</td>
+									</tr>
+									<tr>
+										<td>{{ _("Job started") }}</td>
+										<td>
+											{% if job.time_started %}
+												{{ format_date(job.time_started, full_format=True) }}
+											{% else %}
+												{{ _("Not started, yet.") }}
+											{% end %}
+										</td>
+									</tr>
+									<tr>
+										<td>{{ _("Job finished") }}</td>
+										<td>
+											{% if job.time_finished %}
+												{{ format_date(job.time_finished, full_format=True) }}
+											{% else %}
+												{{ _("Not finished, yet.") }}
+											{% end %}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				{% if job.logfiles %}
+					<div class="tab-pane" id="logs">
+						<div class="row">
+							<div class="span12">
+								{{ modules.LogFilesTable(job, job.logfiles) }}
+							</div>
+						</div>
+					</div>
+				{% end %}
+			</div>
+		</div>
+	</div>
+
+	{% if job.packages %}
+		<div class="row">
+			<div class="span12">
+				<hr>
+
+				<h2>
+					{{ _("Package files") }}
+					<small>({{ len(job.packages) }})</small>
+				</h2>
+
+				{{ modules.PackagesTable(job, job.packages) }}
+			</div>
+		</div>
+	{% end %}
+
+	{% if log %}
+		<div class="row">
+			<div class="span12">
+				<hr>
+
+				<h2>{{ _("Log") }}</h2>
+				{{ modules.Log(log) }}
+			</div>
+		</div>
+	{% end %}
+{% end block %}

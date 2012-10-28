@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Mirrors") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/mirrors">{{ _("Mirrors") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>
+			{{ _("Mirrors") }}
+			<small>({{ len(mirrors) }})</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span12">
+			<p>
+				{{ _("On this page, you will see a list of all mirror servers.") }}
+			</p>
+
+			{% if mirrors %}
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>&nbsp;</th>
+							<th>{{ _("Hostname") }}</th>
+							<th>{{ _("Owner") }}</th>
+							<th>{{ _("Status") }}</th>
+							<th>{{ _("Last check") }}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for mirror in mirrors %}
+							<tr>
+								<td>
+									[{{ escape(mirror.country_code) }}]
+								</td>
+								<td>
+									<a href="/mirror/{{ escape(mirror.hostname) }}">
+										{{ escape(mirror.hostname) }}
+									</a>
+								</td>
+								<td>
+									{{ escape(mirror.owner or _("N/A")) }}
+								</td>
+								<td>
+									{{ mirror.check_status }}
+								</td>
+								<td>
+									{% if mirror.last_check %}
+										{{ format_date(mirror.last_check, relative=True) }}
+									{% else %}
+										{{ _("Unknown") }}
+									{% end %}
+								</td>
+							</tr>
+						{% end %}
+					</tbody>
+				</table>
+			{% else %}
+				<div class="alert alert-block">
+					<h4 class="alert-heading">{{ _("No mirrors") }}</h4>
+					{{ _("There are no mirrors configured, yet.") }}
+				</div>
+			{% end %}
+		</div>
+	</div>
+
+	{% if current_user and current_user.has_perm("manage_mirrors") %}
+		<div class="row">
+			<div class="span12">
+				<a class="btn pull-right" href="/mirror/new">
+					<i class="icon-star"></i>
+					{{ _("Add new mirror") }}
+				</a>
+			</div>
+		</div>
+	{% end %}
+
+	<div class="row">
+		<div class="span12">
+			<h2>{{ _("Log") }}</h2>
+			{{ modules.Log(log) }}
+		</div>
+	</div>
+{% end block %}

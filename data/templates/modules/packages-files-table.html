@@ -1,0 +1,32 @@
+<table class="table table-striped">
+	<tbody>
+		{% for file in filelist %}
+			<tr>
+				<td>
+					{{ format_filemode(file.type, file.mode) }}
+				</td>
+				<td>
+					{{ escape(file.user) }}:{{ escape(file.group) }}
+				</td>
+				<td>
+					{% if file.size is None %}
+						-
+					{% else %}
+						{{ format_size(file.size) }}
+					{% end %}
+				</td>
+				<td>
+					{{ escape(file.name) }}
+				</td>
+				<td>
+					<div class="btn-toolbar">
+						<div class="btn-group">
+							<a class="btn btn-mini" href="#">V</a>
+							<a class="btn btn-mini" href="#">D</a>
+						</div>
+					</div>
+				</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>

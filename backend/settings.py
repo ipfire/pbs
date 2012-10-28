@@ -3,6 +3,10 @@
 import base
 
 class Settings(base.Object):
+	"""
+		The cache is not available here.
+	"""
+
 	def query(self, key):
 		return self.db.get("SELECT * FROM settings WHERE k = %s", key)
 

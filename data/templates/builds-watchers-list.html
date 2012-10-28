@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+<!-- XXX I THINK THIS IS UNUSED -->
+
+{% block title %}{{ _("Build") }}: {{ _("Watchers of %s") % build.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Build") }}: {{ _("Watchers of %s") % build.name }}</h1>
+
+	<p>
+		{{ _("This is a list of all users who watch this build.") }}
+		{{ _("If you write a comment or the status of the build is changed, they all will get a message.") }}
+	</p>
+
+	{% if current_user in watchers %}
+		<p>
+			{{ _("You are already watching this build.") }}
+		</p>
+	{% elif build.owner and current_user == build.owner %}
+		<p>
+			{{ _("You are the owner of this build. So you don't need to watch it.") }}
+		</p>
+	{% else %}
+		<p>
+			<a href="/build/{{ build.uuid }}/watch">{{ _("Watch this build.") }}</a>
+		</p>
+	{% end %}
+
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("Build") }}</td>
+			<td class="col2">
+				<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
+			</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h2>{{ _("List of all watchers") }}</h2>
+	<ul class="watchers">
+		{% for watcher in watchers %}
+			<li class="user">
+				<a class="{{ watcher.state }}" href="/user/{{ watcher.name }}">{{ watcher.realname }}</a>
+			</li>
+		{% end %}
+	</ul>
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li>
+			<a href="/build/{{ build.uuid }}">{{ _("Back to build") }}</a>
+		</li>
+	</ul>
+{% end %}

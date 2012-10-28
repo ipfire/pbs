@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>
+		{{ _("Update") }}: {{ update.uuid }}
+		<span>- {{ _("Distribution") }}: {{ distro.name }}</span>
+	</h1>
+
+	<div class="update-description">
+		<strong>{{ _("Summary") }}: {{ escape(update.summary) }}</strong>
+
+		<pre>{{ escape(update.description) }}</pre>
+	</div>
+
+	<table class="form form2">
+		<tr>
+			<td class="col1">{{ _("Current repository") }}</td>
+			<td class="col2">
+				<a href="/distro/{{ distro.identifier }}/repository/{{ repo.name }}">{{ repo.name }}</a>
+
+				{% if current_user and current_user.is_admin() %}
+					<a href="#">Submit</a>
+				{% end %}
+			</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("Maintainer") }}</td>
+			<td class="col2">
+				<a href="/user/{{ user.name }}">{{ escape(user.realname) }}</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="col1">{{ _("Time created") }}</td>
+			<td class="col2">
+				{{ locale.format_date(update.time_created, relative=False, full_format=True) }} UTC
+			</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<h2>{{ _("Builds in this update") }}</h2>
+	{{ modules.BuildTable(update.builds) }}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li>
+			<a href="/distro/{{ distro.identifier }}/update/{{ update.year }}/{{ update.num }}/edit">{{ _("Edit") }}</a>
+		</li>
+	</ul>
+{% end block %}

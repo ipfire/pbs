@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Advanced options") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Advanced options") }}</h1>
+	<p>
+		{{ _("On this page you will find advanced things to do.") }}
+	</p>
+
+	<h2>{{ _("Statistics") }}</h2>
+	<p>
+		{{ _("See a lot of interesting statistics from the build service.") }}
+	</p>
+	<ul>
+		<li>
+			<a href="/statistics">{{ _("Statistics overview") }}</a>
+		</li>
+	</ul>
+
+	<h2>{{ _("Users") }}</h2>
+	<p>
+		{{ _("See a list of all users.") }}
+	</p>
+	<ul>
+		<li>
+			<a href="/users">{{ _("User list") }}</a>
+		</li>
+	</ul>
+
+	<h2>{{ _("Mirrors") }}</h2>
+	<ul>
+		<li>
+			<a href="/mirrors">{{ _("Mirror list") }}</a>
+		</li>
+
+		{% if current_user and current_user.is_admin() %}
+			<li>
+				<a href="/mirror/new">{{ _("Add new mirror") }}</a>
+			</li>
+		{% end %}
+	</ul>
+
+	<h2>{{ _("Logs") }}</h2>
+	<p>
+		{{ _("If you need detailed information about what happended you may want to have a look at the logs.") }}
+	</p>
+	<ul>
+		<a href="/logs">{{ _("Logs") }}</a>
+	</ul>
+
+	{% if current_user and current_user.is_admin() %}
+		<h2>{{ _("Administrator's stuff") }}</h2>
+		<p>
+			{{ _("These are a bunch of functions only available for administrators.") }}
+		</p>
+		<ul>
+			<li>
+				<a href="/uploads">{{ _("Running uploads") }}</a>
+			</li>
+		</ul>
+	{% end %}
+
+	<div style="clear: both;">&nbsp;</div>
+{% end block %}

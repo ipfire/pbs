@@ -1,58 +1,155 @@
 {% extends "base.html" %}
 
+{% block title %}{{ escape(user.realname) }}{% end block %}
+
 {% block body %}
-	<img class="avatar" src="{{ user.gravatar_icon() }}" alt="{{ user.name }}" />
-	<h1>{{ _("User") }}: {{ escape(user.realname) }}</h1>
-
-	<table class="form form2">
-		<tr>
-			<td class="col1">{{ _("Username") }}</td>
-			<td class="col2">{{ escape(user.name) }}</td>
-		</tr>
-		<tr>
-			<td class="col1">{{ _("Email") }}</td>
-			<td class="col2">
-				<a href="mailto:{{ escape(user.email) }}">{{ escape(user.email) }}</a>
-			</td>
-		</tr>
-		<tr>
-			<td class="col1">{{ _("State") }}</td>
-			<td class="col2">
-				{% if user.is_admin() %}
-					{{ _("Admin") }}
-				{% elif user.is_tester() %}
-					{{ _("Tester") }}
-				{% else %}
-					{{ _("User") }}
-				{% end %}
-			</td>
-		</tr>
-		{% if current_user == user or current_user.is_admin() %}
-			<tr>
-				<td class="col1">{{ _("Registered") }}</td>
-				<td class="col2">{{ locale.format_date(user.registered, full_format=True) }}</td>
-			</tr>
-		{% end %}
-	</table>
-	<div style="clear: both;">&nbsp;</div>
-
-	<h2>{{ _("Log") }}</h2>
-	{{ modules.LogTable(user.log) }}
-
-	<h2>{{ _("Comments written by %s") % user.realname }}</h2>
-	{{ modules.CommentsTable(user.comments, show_package=True, show_user=False) }}
-{% end block %}
-
-{% block sidebar %}
-	<h1>{{ _("Actions") }}</h1>
-	<ul>
-		{% if current_user == user or current_user.is_admin() %}
-			<li>
-				<a href="/user/edit/{{ user.name }}">{{ _("Account settings") }}</a>
-			</li>
-			<li>
-				<a href="/user/delete/{{ user.name }}">{{ _("Delete account") }}</a>
-			</li>
-		{% end %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/users">{{ _("Users") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/user/{{ escape(user.name) }}">{{ escape(user.realname) }}</a>
+		</li>
 	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("User") }}: {{ escape(user.realname) }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset2">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>{{ _("Username") }}</td>
+						<td>{{ escape(user.name) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Email") }}</td>
+						<td>
+							<a href="mailto:{{ escape(user.email) }}">{{ escape(user.email) }}</a>
+						</td>
+					</tr>
+					<tr>
+						<td>{{ _("State") }}</td>
+						<td>
+							{% if user.is_admin() %}
+								{{ _("Admin") }}
+							{% elif user.is_tester() %}
+								{{ _("Tester") }}
+							{% else %}
+								{{ _("User") }}
+							{% end %}
+						</td>
+					</tr>
+
+					{% if current_user == user or current_user.is_admin() %}
+						<tr>
+							<td>{{ _("Registered") }}</td>
+							<td>
+								{{ format_date(user.registered, full_format=True) }}
+							</td>
+						</tr>
+					{% end %}
+
+					{% if current_user == user or current_user.is_admin() %}
+						<tr>
+							<td colspan="2">
+								<div class="btn-group pull-right">
+									<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+										{{ _("Action") }}
+										<span class="caret"></span>
+									</a>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="/user/{{ user.name }}/edit">
+												<i class="icon-edit"></i>
+												{{ _("Edit profile") }}
+											</a>
+										</li>
+										<li>
+											<a href="/user/{{ user.name }}/passwd">
+												<i class="icon-lock"></i>
+												{{ _("Change password") }}
+											</a>
+										</li>
+
+										<li class="divider"></li>
+										<li>
+											<a href="/user/{{ user.name }}/delete">
+												<i class="icon-trash"></i>
+												{{ _("Delete account") }}
+											</a>
+										</li>
+
+										{% if not current_user == user and current_user.is_admin() %}
+											<li class="divider"></li>
+											<li>
+												<a href="/user/impersonate?user={{ escape(user.name) }}">{{ _("Impersonate user") }}</a>
+											</li>
+										{% end %}
+									</ul>
+								</div>
+							</td>
+						</tr>
+					{% end %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="span4">
+			<img src="{{ user.gravatar_icon(200) }}" alt="{{ user.name }}" />
+		</div>
+	</div>
+
+	{% if current_user == user or current_user.is_admin() %}
+		<div class="row">
+			<div class="span6 offset2">
+				<h2>{{ _("Permissions") }}</h2>
+
+				{% if user.is_admin() %}			
+					<p>
+						{{ _("This user has administration rights.") }}
+						<i class="icon-star"></i>
+					</p>
+				{% else %}
+					<table class="table table-striped">
+						<tr>
+							<td>
+								{{ _("User is allowed to create scratch builds?") }}
+							</td>
+							<td>
+								{% if user.has_perm("create_scratch_builds") %}
+									{{ _("Yes") }}
+								{% else %}
+									{{ _("No") }}
+								{% end %}
+							</td>
+						</tr>
+					</table>
+				{% end %}
+			</div>
+		</div>
+	{% end %}
+
+	<!-- <h2>{{ _("Links") }}</h2>
+	<ul class="user-links">
+		<li>
+			<a href="#">{{ _("View all comments written %s.") % escape(user.realname) }}</a>
+		</li>
+		<li>
+			<a href="#">{{ _("View all builds %s is linked to.") % escape(user.realname) }}</a>
+		</li>
+	</ul> -->
+
+	<!-- <h2>{{ _("Log") }}</h2>
+	{{ modules.LogTable(user.log) }} -->
+
+	<!-- <h2>{{ _("Comments written by %s") % user.realname }}</h2>
+	{..{ modules.CommentsTable(user.comments, show_package=True, show_user=False) }..} -->
 {% end block %}

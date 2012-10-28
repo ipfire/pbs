@@ -1,8 +1,29 @@
-<ul class="repositories">
-	{% for repo in repos %}
-		<li>
-			<a href="/distribution/{{ distro.sname }}/repository/{{ repo.name }}">{{ repo.name }}</a>
-		</li>
-	{% end %}
-</ul>
-<div style="clear: both;">&nbsp;</div>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>{{ _("Name") }}</th>
+			<th>{{ _("No. of builds") }}</th>
+			<th>{{ _("Enabled for builds") }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for repo in repos %}
+			<tr>
+				<td>
+					<a href="/distro/{{ distro.sname }}/repo/{{ repo.name }}">{{ repo.name }}</a>
+					<br />{{ repo.summary or _("N/A") }}
+				</td>
+				<td>
+					{{ repo.build_count() }}
+				</td>
+				<td>
+					{% if repo.enabled_for_builds %}
+						{{ _("Yes") }}
+					{% else %}
+						{{ _("No") }}
+					{% end %}
+				</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>

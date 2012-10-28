@@ -1,8 +1,26 @@
 {% extends "docs-base.html" %}
 
-{% block title %}{{ _("Legend of the build states") }}{% end block %}
+{% block title %}{{ _("Documentation") }} - {{ _("User groups") }}{% end block %}
 
 {% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/documents">{{ _("Documentation") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/documents/users">{{ _("User groups") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Documentation") }}: {{ _("User groups") }}</h1>
+	</div>
+
 	<h1>{{ _("Users") }}</h1>
 	<p>
 		{{ _("All users can join the Pakfire Build Service and are separated into three groups:") }}
@@ -13,7 +31,7 @@
 		{{ _("Developers manage this build service and have access to all parts of it.") }}
 		{{ _("They are responsible to keep the system running and able to push package updates to the repostories.") }}
 	</p>
-	<p class="buttons">
+	<p class="pull-right">
 		<a href="/documents/guidelines/developers">{{ _("Guidelines for developers") }}</a>
 	</p>
 
@@ -23,7 +41,7 @@
 		{{ _("Everyone can become a tester after he or she has proven to know the IPFire system very well.") }}
 		{{ _("On these people depends a very huge amount of the quality of the distribution that is made out of the feedback they give.") }}
 	</p>
-	<p class="buttons">
+	<p class="pull-right">
 		<a href="/documents/guidelines/testers">{{ _("Guidelines for testers") }}</a>
 	</p>
 
@@ -34,7 +52,7 @@
 	</p>
 
 	{% if not current_user %}
-		<p class="buttons">
+		<p class="pull-right">
 			<a href="/register">{{ _("Register") }}</a>
 		</p>
 	{% end %}

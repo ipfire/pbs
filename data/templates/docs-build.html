@@ -1,9 +1,26 @@
 {% extends "docs-base.html" %}
 
-{% block title %}{{ _("Legend of the build states") }}{% end block %}
+{% block title %}{{ _("Documentation") }} - {{ _("Legend of the build states") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Legend of the build states") }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/documents">{{ _("Documentation") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/documents/builds">{{ _("Builds") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Documentation") }}: {{ _("Legend of the build states") }}</h1>
+	</div>
+
 	<p>
 		{{ _("Every build that is done by the Pakfire Build Service has to go through several states:") }}
 	</p>

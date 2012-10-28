@@ -1,109 +1,261 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 	<head>
 		<title>{{ hostname }} - {% block title %}{{ _("No title given") }}{% end block %}</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="author" content="IPFire.org - Pakfire Development Team" />
 
 		<!-- styling stuff -->
+		<link rel="stylesheet" type="text/css" href="{{ static_url("css/bootstrap.min.css") }}" />
 		<link rel="stylesheet" type="text/css" href="{{ static_url("css/style.css") }}" />
+		<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">
 
-		<!-- javascript stuff -->
-		<script src="{{ static_url("js/jquery-1.6.min.js") }}"></script>
-		<script src="{{ static_url("js/pbs.js") }}"></script>
+		<!-- disable responsive layout
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" type="text/css" href="{{ static_url("css/bootstrap-responsive.min.css") }}" />
+		-->
 	</head>
+
 	<body>
-		<div id="wrapper">
-			<div id="logo">
-				<div id="user">
-					{% if current_user %}
-						<a href="/profile"><span>{{ current_user.realname }}</span></a> |
-						<a href="/logout">{{ _("Logout") }}</a>
-					{% else %}
-						<a href="/login">{{ _("Login") }}</a> |
-						<a href="/register">{{ _("Register") }}</a>
-					{% end %}
-				</div>
-				<h1><a href="/">Pakfire</a> build service</h1>
-				<p>{{ _("A service by the %s.") % """<a href="http://www.ipfire.org/" target="_blank">IPFire Project</a>""" }}</p>
-			</div>
-			<div id="menu">
-				<ul>
-					<li>
-						<a href="/">{{ _("Index") }}</a>
-					</li>
-					<li>
-						<a href="/packages">{{ _("Packages") }}</a>
-					</li>
-					<li>
-						<a href="/distributions">{{ _("Distributions") }}</a>
-					</li>
-					<li>
-						<a href="/builds">{{ _("Build jobs") }}</a>
-					</li>
-					<li>
-						<a href="/builders">{{ _("Build servers") }}</a>
-					</li>
-					{% if current_user %}
-						<li>
-							<a href="/users">{{ _("Users") }}</a>
-						</li>
-					{% end %}
-					<li>
-						<a href="/log">{{ _("Log") }}</a>
-					</li>
-					<li class="search">
-						<form method="GET" action="/search">
-							<input id="search" type="text" name="q" value="{{ _("Search...") }}" />
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+					<a class="brand" href="/">
+						{{ _("Pakfire Build Service") }}
+						<span class="label label-info">{{ _("BETA") }}</span>
+					</a>
+					<div class="nav-collapse">
+						<ul class="nav">
+							<li>
+								<a href="/packages">{{ _("Packages") }}</a>
+							</li>
+							<li>
+								<a href="/builds">{{ _("Builds") }}</a>
+							</li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+									{{ _("More") }} <b class="caret"></b>
+								</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="/documents">
+											<i class="icon-book"></i>
+											{{ _("Documentation") }}
+										</a>
+									</li>
+									<li>
+										<a href="/search">
+											<i class="icon-search"></i>
+											{{ _("Search") }}
+										</a>
+									</li>
+									<li class="divider"></li>
+									<li>
+										<a href="/distros">
+											<i class="icon-star"></i>
+											{{ _("Distributions") }}
+										</a>
+									</li>
+									<li>
+										<a href="/builders">
+											<i class="icon-cog"></i>
+											{{ _("Builders") }}
+										</a>
+									</li>
+									<li>
+										<a href="/mirrors">
+											<i class="icon-road"></i>
+											{{ _("Mirrors") }}
+										</a>
+									</li>
+									<li>
+										<a href="/keys">
+											<i class="icon-barcode"></i>
+											{{ _("Key management") }}
+										</a>
+									</li>
+
+									{% if current_user %}
+										<li>
+											<a href="/users">
+												<i class="icon-user"></i>
+												{{ _("Users") }}
+											</a>
+										</li>
+									{% end %}
+
+									<li class="divider"></li>
+									<li>
+										<a href="/statistics">
+											<i class="icon-align-left"></i>
+											{{ _("Statistics") }}
+										</a>
+									</li>
+									<li>
+										<a href="/advanced">{{ _("Even more...") }}</a>
+									</li>
+
+									{% if current_user and current_user.is_admin() %}
+										<li class="divider"></li>
+										<li class="nav-header">
+											{{ _("Administration") }}
+										</li>
+										<li>
+											<a href="/uploads">
+												<i class="icon-upload"></i>
+												{{ _("Uploads") }}
+											</a>
+										</li>
+									{% end %}
+								</ul>
+							</li>
+						</ul>
+					
+						<ul class="nav pull-right">
+							<li class="divider-vertical"></li>
+
+							{% if current_user %}
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="icon-user icon-white"></i>
+										<b class="caret"></b>
+									</a>
+									<ul class="dropdown-menu">
+										<li class="nav-header">
+											{{ _("Logged in as") }}
+										</li>
+										<li>
+											<a href="/profile">
+												{{ escape(current_user.realname) }}
+											</a>
+										</li>
+										{% if session and session.impersonated_user %}
+											<li class="nav-header">{{ _("Impersonated by") }}</li>
+											<li>
+												<a href="/user/{{ escape(session.user.name) }}">
+													<i class="icon-user"></i>
+													{{ escape(session.user.realname) }}
+												</a>
+											</li>
+										{% end %}
+										<li class="divider"></li>
+										<li>
+											<a href="/profile">
+												<i class="icon-user"></i>
+												{{ _("My profile") }}
+											</a>
+										</li>
+										<li>
+											<a href="/profile/builds">
+												<i class="icon-signal"></i>
+												{{ _("My builds") }}
+											</a>
+										</li>
+										<li class="divider"></li>
+
+										{% if session and session.impersonated_user %}
+											<li>
+												<a href="/user/impersonate?action=stop">
+													<i class="icon-off"></i>
+													{{ _("End impersonation") }}
+												</a>
+											</li>
+										{% else %}
+											<li>
+												<a href="/logout">
+													<i class="icon-off"></i>
+													{{ _("Logout") }}
+												</a>
+											</li>
+										{% end %}
+									</ul>
+								</li>
+							{% else %}
+								<li>
+									<a data-toggle="modal" href="#login">{{ _("Login") }}</a>
+								</li>
+							{% end %}
+						</ul>
+
+						<form class="navbar-search pull-right" method="GET" action="/search">
+							<input type="text" class="search-query" placeholder="{{ _("Search...") }}" name="q">
 						</form>
-					</li>
-				</ul>
-			</div>
-			<!-- <div id="header">
-				<div id="search">
-					<form method="get" action="">
-						<fieldset>
-							<input type="text" name="s" id="search-text" size="15" value="enter keywords here..." />
-							<input type="submit" id="search-submit" value="GO" />
-						</fieldset>
-					</form>
-				</div>
-			</div> -->
-			<div id="page">
-				<div id="page-bgtop">
-					<div id="page-bgbtm">
-						<div id="content">
-							{% block body %}EMPTY BODY{% end block %}
-						</div>
-						<div id="sidebar">
-							{% block sidebar %}
-								<img src="{{ static_url("images/ipfire_tux_128x128.png") }}" alt="IPFire Logo" />
-							{% end block %}
-						</div>
-						<div style="clear: both;">&nbsp;</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div id="two-columns">
-			<div id="column1">
-				<h2>{{ _("About Pakfire") }}</h2>
-				<p>
-					{{ _("Pakfire is the buildsystem that is used to build the IPFire Linux firewall distribution.") }}
-					{{ _("It also installs and updates packages on the IPFire systems.") }}
-				</p>
+		{% block container %}
+			<div class="container container-body">
+				{% block body %}EMPTY BODY{% end block %}
+
+				{{ modules.Footer() }}
 			</div>
-			<div id="column2">
-				<h2>{{ _("Documentation") }}</h2>
-				<ul>
-					<li>
-						<a href="/documents">{{ _("Documentation index") }}</a>
-					</li>
-				</ul>
+		{% end block %}
+
+		{% if not current_user %}
+			<div class="modal hide fade" id="login">
+				<form id="loginfrm" class="modal-form form-horizontal" method="POST" action="/login">
+					{{ xsrf_form_html() }}
+
+					<div class="modal-header">
+						<a class="close" data-dismiss="modal">&times;</a>
+						<h3>{{ _("Welcome to Pakfire Build Service!") }}</h3>
+					</div>
+
+					<div class="modal-body">
+						<fieldset>
+							<div class="control-group">
+								<label class="control-label" for="name">{{ _("Username") }}</label>
+								<div class="controls">
+									<input type="text" class="input-xlarge" id="name" name="name" />
+								</div>
+							</div>
+
+							<div class="control-group">
+								<label class="control-label" for="pass">{{ _("Password") }}</label>
+								<div class="controls">
+									<input type="password" class="input-xlarge" id="pass" name="pass" />
+								</div>
+							</div>
+						</fieldset>
+
+						<p>
+							{{ _("Please type your credentials into the form above in order to login.") }}
+						</p>
+
+						<hr />
+
+						<ul>
+							<li>
+								<a href="/register">
+									{{ _("Register a new account") }}
+								</a>
+							</li>
+							<li>
+								<a href="/password-recovery">
+									{{ _("Forgot your password?") }}
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="modal-footer">
+						<button class="btn btn-primary" type="submit">{{ _("Login") }}</button>
+						<a class="btn" href="#" data-dismiss="modal">{{ _("Cancel") }}</a>
+					</div>
+				</form>
 			</div>
-		</div>
-		<div id="footer">
-			<p>Copyright (c) 2011 IPFire.org. {{ _("All rights reserved.") }}</p>
-		</div>
+		{% end %}
+
+		<!-- include javascript files -->
+		<script src="{{ static_url("js/jquery.js") }}"></script>
+		<script src="{{ static_url("js/bootstrap.min.js") }}"></script>
+		<!-- <script src="{{ static_url("js/pbs.js") }}"></script> -->
 	</body>
 </html>

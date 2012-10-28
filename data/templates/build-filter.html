@@ -7,17 +7,41 @@
 	<form method="get" action="/builds">
 		<table class="form form3">
 			<tr>
+				<td class="col1">
+					{{ _("Distribution") }}
+				</td>
+				<td class="col2">
+					<select name="distro">
+						<option value="">{{ _("Any") }}</option>
+
+						{% for distro in distros %}
+							<option value="{{ escape(distro.identifier) }}">{{ escape(distro.name) }}</option>
+						{% end %}
+					</select>
+				</td>
+				<td class="col3">
+					{{ _("Show only builds in that distribution.") }}
+				</td>
+			</tr>
+			<tr>
 				<td class="col1">{{ _("State") }}</td>
 				<td class="col2">
 					<select name="state">
-						<option value="">{{ _("All") }}</option>
+<!-- XXX does not apply to builds <option value="">{{ _("All") }}</option>
 						<option value="running">{{ _("Running") }}</option>
 						<option value="pending">{{ _("Pending") }}</option>
 						<option value="finished">{{ _("Finished") }}</option>
 						<option value="failed">{{ _("Failed") }}</option>
 						<option value="permanently_failed">{{ _("Permanently failed") }}</option>
 						<option value="dispatching">{{ _("Dispatching") }}</option>
-						<option value="uploading">{{ _("Uploading") }}</option>
+						<option value="uploading">{{ _("Uploading") }}</option> -->
+
+						<option value="">{{ _("Any") }}</option>
+						<option value="building">{{ _("Building") }}</option>
+						<option value="testing">{{ _("Testing") }}</option>
+						<option value="stable">{{ _("Stable") }}</option>
+						<option value="obsolete">{{ _("Obsolete") }}</option>
+						<option value="broken">{{ _("Broken") }}</option>
 					</select>
 				</td>
 				<td class="col3">
@@ -30,7 +54,7 @@
 					<select name="builder">
 						<option value="">{{ _("Any") }}</option>
 						{% for builder in builders %}
-							<option value="{{ builder.id }}">{{ builder.name }}</option>
+							<option value="{{ escape(builder.name) }}">{{ escape(builder.name) }}</option>
 						{% end %}
 					</select>
 				</td>

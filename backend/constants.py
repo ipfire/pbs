@@ -1,38 +1,22 @@
 #!/usr/bin/python
 
+import os.path
+
+# Import all constants from the pakfire module.
+from pakfire.constants import *
+
+PAKFIRE_DIR  = "/pakfire"
+PACKAGES_DIR = os.path.join(PAKFIRE_DIR, "packages")
+BUILD_RELEASE_DIR = os.path.join(PACKAGES_DIR, "release")
+BUILD_SCRATCH_DIR = os.path.join(PACKAGES_DIR, "scratch")
+REPOS_DIR    = os.path.join(PAKFIRE_DIR, "repositories")
+SOURCES_DIR  = os.path.join(PAKFIRE_DIR, "sources")
+
+UPLOADS_DIR  = "/var/tmp/pakfire/uploads"
+
+BUFFER_SIZE = 1024 * 100 # 100kb
+
 N_ = lambda x: x
-
-# NEVER EVER CHANGE ONE OF THE IDS!
-LOG_BUILD_CREATED				= 1
-LOG_BUILD_STATE_PENDING			= 2
-LOG_BUILD_STATE_DISPATCHING		= 3
-LOG_BUILD_STATE_RUNNING			= 4
-LOG_BUILD_STATE_FAILED			= 5
-LOG_BUILD_STATE_PERM_FAILED		= 6
-LOG_BUILD_STATE_DEP_ERROR		= 7
-LOG_BUILD_STATE_WAITING			= 8
-LOG_BUILD_STATE_FINISHED		= 9
-LOG_BUILD_STATE_UNKNOWN			= 10
-LOG_BUILD_STATE_UPLOADING		= 11
-
-LOG_PKG_CREATED					= 20
-
-
-LOG2MSG = {
-	LOG_BUILD_CREATED			: N_("Build job created"),
-	LOG_BUILD_STATE_PENDING		: N_("Build job is now pending"),
-	LOG_BUILD_STATE_DISPATCHING	: N_("Build job is dispatching"),
-	LOG_BUILD_STATE_RUNNING		: N_("Build job is running"),
-	LOG_BUILD_STATE_FAILED		: N_("Build job has failed"),
-	LOG_BUILD_STATE_PERM_FAILED	: N_("Build job has permanently failed"),
-	LOG_BUILD_STATE_DEP_ERROR	: N_("Build job has dependency errors"),
-	LOG_BUILD_STATE_WAITING		: N_("Build job is waiting for the source package"),
-	LOG_BUILD_STATE_FINISHED	: N_("Build job is finished"),
-	LOG_BUILD_STATE_UNKNOWN		: N_("Build job has an unknown state"),
-	LOG_BUILD_STATE_UPLOADING	: N_("Build job is uploading"),
-}
-
-UPLOADS_DIR = "/var/tmp/pakfire/uploads"
 
 MSG_BUILD_FAILED_SUBJECT = N_("[%(build_name)s] Build job failed.")
 MSG_BUILD_FAILED = N_("""\
@@ -46,7 +30,7 @@ Here is more information about the incident:
     Build host: %(build_host)s
 
 Click on this link to get all details about the build:
-    http://pakfire.ipfire.org/build/%(build_uuid)s
+    https://pakfire.ipfire.org/job/%(build_uuid)s
 
 Sincerely,
     The Pakfire Build Service""")
@@ -59,7 +43,42 @@ The build job "%(build_name)s" has finished.
 If you are the maintainer, it is up to you to push it to one or more repositories.
 
 Click on this link to get all details about the build:
-    http://pakfire.ipfire.org/build/%(build_uuid)s
+    https://pakfire.ipfire.org/job/%(build_uuid)s
 
 Sincerely,
     The Pakfire Build Service""")
+
+# Bug update messages.
+BUG_TESTING_MSG = """\
+%(package_name)s has been pushed to the %(distro_name)s %(repo_name)s repository.
+
+You can provide feedback for this build here:
+  %(build_url)s"""
+
+BUG_UNSTABLE_MSG = """\
+%(package_name)s has been pushed to the %(distro_name)s %(repo_name)s repository.
+
+You can provide feedback for this build here:
+  %(build_url)s"""
+
+BUG_STABLE_MSG = """\
+%(package_name)s has been pushed to the %(distro_name)s %(repo_name)s repository.
+
+If problems still persist, please make note of it in this bug report."""
+
+BUG_MESSAGES = {
+	"testing" : {
+		"status"  : "MODIFIED",
+		"comment" : BUG_TESTING_MSG,
+	},
+
+	"unstable" : {
+		"status"  : "ON_QA",
+		"comment" : BUG_UNSTABLE_MSG,
+	},
+
+	"stable" : {
+		"status"  : "CLOSED", "resolution" : "FIXED",
+		"comment" : BUG_STABLE_MSG,
+	},
+}

@@ -1,0 +1,60 @@
+{% extends "modal-base.html" %}
+
+{% block id %}push{% end block %}
+{% block form_action %}/build/{{ build.uuid }}/manage{% end block %}
+
+{% block title %}
+	{{ _("Push %s to a repository") % build.name }}
+{% end block %}
+
+{% block body %}
+	<input type="hidden" name="action" value="push" />
+
+	{% if not build.all_jobs_finished %}
+		<div class="alert alert-warning">
+			<strong>{{ _("Not all jobs are finished!") }}</strong>
+			{{ _("So it is <em>strongly</em> discouraged to push this build into the next repository.") }}
+		</div>
+
+		<hr>
+	{% end %}
+
+	<fieldset>
+		<div class="control-group">
+			<label class="control-label">{{ _("New repository") }}</label>
+			<div class="controls">
+				<select id="repo" name="repo" {% if not current_user.is_admin() %}disabled{% end %}>
+					{% for repo in [r for r in build.distro.repositories if not r == current_repo] %}
+						<option value="{{ repo.identifier }}" {% if repo == next_repo %}selected{% end %}>
+							{{ repo.name }} - {{ repo.summary }}
+						</option>
+					{% end %}
+				</select>
+
+				<p class="help-block">
+					{{ _("The build will be put into this repository.") }}
+				</p>
+			</div>
+		</div>
+	</fieldset>
+
+	<hr>
+
+	<p>
+		{{ _("You are going to push this build into a new repository.") }}
+		{{ _("This means that the build won't be part of the repository it is currently in anymore.") }}
+	</p>
+	<p>
+		{{ _("Please make sure you tested this build well enough that it will keep up with the quality level of the target repository.") }}
+	</p>
+{% end block %}
+
+{% block footer_text %}
+	{% if current_repo %}
+		{{ _("Current repository") }}:
+		<a href="/distro/{{ build.distro.identifier }}/repo/{{ current_repo.identifier }}">
+			{{ current_repo.name }}
+		</a>
+	{% end %}
+{% end %}
+{% block submit_text %}{{ _("Push") }}{% end block %}

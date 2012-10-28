@@ -1,0 +1,17 @@
+{% extends "error.html" %}
+
+{% block bigbox_headline %}
+	{{ _("Access forbidden") }}
+{% end block %}
+
+{% block bigbox_subtitle %}
+	<small>{{ _("You are not allowed to access this ressource.") }}</small>
+{% end block %}
+
+{% block explanation %}
+	<p>
+		{{ _("Access to the requested page has been denied because you do not have sufficient rights.") }}
+	</p>
+{% end block %}
+
+{% block message %}{% end block %}

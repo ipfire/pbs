@@ -1,16 +1,33 @@
 {% extends "base.html" %}
 
+{% block title %}{{ _("Login successful") }}{% end block %}
+
 {% block body %}
-	<h1>{{ _("Login successful") }}</h1>
-	<p>
-		{{ _("Welcome, %s.") % escape(user.realname) }}
-	</p>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			{{ _("Login successful") }}
+		</li>
+	</ul>
 
-	<p>
-		{{ _("Your login to the Pakfire Build Server was successful.") }}
-	</p>
+	<div class="page-header">
+		<h1>{{ _("Login successful") }}</h1>
+	</div>
 
-	<p>
-		<a href="/">{{ _("Go on") }}</a>
-	</p>
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("Welcome, %s.") % escape(user.realname) }}
+			</p>
+
+			<p>
+				{{ _("Your login to the Pakfire Build Service was successful.") }}
+			</p>
+
+			<a class="btn btn-primary pull-right" href="/">{{ _("Start!") }}</a>
+		</div>
+	</div>
 {% end %}

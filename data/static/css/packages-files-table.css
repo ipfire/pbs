@@ -1,0 +1,36 @@
+/*
+
+	CSS attributes for the files table.
+
+*/
+
+table.filelist {
+	width: 95%;
+}
+
+table.filelist tr {
+	font-family: "monospace";
+}
+
+table.filelist tr td {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+
+table.filelist tr td.mode {
+	text-align: right;
+	width: 6em;
+}
+
+table.filelist tr td.owner {
+	width: 6em;
+}
+
+table.filelist tr td.size {
+	width: 2em;
+	text-align: right;
+}
+
+table.filelist tr td.name {
+
+}

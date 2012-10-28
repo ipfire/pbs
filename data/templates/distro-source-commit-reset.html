@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distros">{{ _("Distributions") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
+				{{ _("Source: %s") % escape(source.name) }}
+			</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/{{ commit.revision }}">
+				{{ commit.revision[:7] }}
+			</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>
+			{{ _("Source") }}: {{ escape(source.name) }}
+			<br />
+			<small>
+				{{ commit.revision[:7] }} - {{ escape(commit.subject) }}
+			</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<div class="alert alert-block alert-important">
+				<h4 class="alert-heading">{{ _("Danger!") }}</h4>
+				{{ _("This is a very dangerous action!") }}<br />
+				{{ _("Don't do it, if you are not absolutely sure what you are doing.") }}
+			</div>
+
+			<p>
+				{{ _("This commit will be reset. Which means all packages associated with it will be deleted, and the commit will be parsed again.") }}
+				{{ _("This action may cause severe problems and may only be allowed when something went horribly wrong.") }}
+			</p>
+
+			<a class="btn btn-danger pull-right" href="?confirmed=1">
+				{{ _("Reset commit") }}
+			</a>
+		</div>
+	</div>
+
+	{% if commit.packages %}
+		<div class="row">
+			<div class="span10 offset1">
+				<h2>{{ _("These packages will be deleted") }}</h2>
+				<table class="table table-striped">
+					{% for pkg in commit.packages %}
+						<tr>
+							<td>
+								<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
+							</td>
+							<td>
+								{{ escape(pkg.summary) }}
+							</td>
+						</tr>
+					{% end %}
+				</table>
+			</div>
+		</div>
+	{% end %}
+{% end block %}

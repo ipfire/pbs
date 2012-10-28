@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Manage build %s") % escape(build.name) }}{% end block %}
+
+{% block body %}
+	<div class="page-header">
+		<h1>
+			{{ _("Manage build") }}: {{ escape(build.name) }}
+			<small>- {{ _("Distribution") }}: {{ escape(distro.name) }}</small>
+		</h1>
+	</div>
+
+	{% if build.critical_path and not current_user.has_perm("manage_critical_path") %}
+		<div class="alert alert-block alert-error">
+			<h4 class="alert-heading">{{ _("Permission denied") }}</h4>
+			{{ _("You do not have the permission to update packages that belong to the <em>critical path</em>.") }}
+		</div>
+	{% end %}
+
+	{% if not build.all_jobs_finished %}
+		<div class="alert alert-block alert-warning">
+			<h4 class="alert-heading">{{ _("Not all jobs are finished") }}</h4>
+			<p>
+				{{ _("Not all jobs of this build are finished, yet.") }}
+				{{ _("It is <strong>strongly discouraged</strong> to push this build into the next repository.") }}
+			</p>
+			<p>
+				{{ _("However, the build will be automatically unpushed if one or more build jobs fail.") }}
+			</p>
+		</div>
+	{% end %}
+
+	<div class="row">
+		<div class="span6 offset3">
+			<form class="form-horizontal" method="POST" action="">
+				{{ xsrf_form_html() }}
+				<input type="hidden" name="action" value="push" />
+
+				<fieldset>
+					<legend>
+						{% if mode == "admin" %}
+							{{ _("Push to a repository") }}
+						{% elif build.repo %}
+							{{ _("Push to next repository") }}
+						{% else %}
+							{{ _("Push to first repository") }}
+						{% end %}
+					</legend>
+
+					<div class="control-group">
+						<label class="control-label" for="repo_push">{{ _("New repository") }}</label>
+						<div class="controls">
+							{% if mode == "admin" %}
+								<select id="repo_push" name="repo">
+									{% for repo in distro.repositories %}
+										{% if not build.repo == repo %}
+											<option value="{{ repo.identifier }}" {% if repo == next_repo %}selected="selected"{% end %}>
+												{{ escape(repo.name) }} - {{ escape(repo.summary) }}
+											</option>
+										{% end %}
+									{% end %}
+								</select>
+							{% elif next_repo %}
+								<input type="hidden" name="repo" value="{{ next_repo.identifier }}" />
+
+								<a href="/distro/{{ distro.identifier }}/repo/{{ next_repo.identifier }}">{{ escape(next_repo.name) }}</a>
+								- {{ escape(next_repo.summary) }}
+							{% end %}
+
+							<p class="help-block">
+								{{ _("This is the target repository for the build.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">{{ _("Push") }}</button>
+						<a class="btn btn-danger" href="/build/{{ build.uuid }}/unpush">{{ _("Unpush") }}</a>
+						<a class="btn" href="/build/{{ build.uuid }}">{{ _("Cancel") }}</a>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+
+	{% if current_user and current_user.is_admin() %}
+		<div class="row">
+			<div class="span6 offset3">
+				{% if mode == "admin" %}
+					<a class="btn pull-right" href="?mode=user">{{ _("Switch to user mode") }}</a>
+				{% else %}
+					<a class="btn pull-right" href="?mode=admin">{{ _("Switch to admin mode") }}</a>
+				{% end %}
+			</div>
+		</div>
+	{% end %}
+{% end block %}

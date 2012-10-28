@@ -1,0 +1,29 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>{{ _("Name") }}</th>
+			<th>{{ _("Version") }}</th>
+			<th>{{ _("Arch") }}</th>
+			<th>{{ _("Size") }}</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for package in packages %}
+			<tr>
+				<td>
+					<a href="/package/{{ package.uuid }}">{{ package.name }}</a>
+				</td>
+				<td>{{ package.friendly_version }}</td>
+				<td>{{ package.arch.name }}</td>
+				<td>{{ format_size(package.filesize) }}</td>
+				<td>
+					<a class="btn btn-mini" href="{{ job.build.download_prefix }}/{{ package.path }}">
+						<i class="icon-download"></i>
+						{{ _("Download") }}
+					</a>
+				</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>

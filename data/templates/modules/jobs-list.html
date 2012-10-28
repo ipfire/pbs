@@ -1,0 +1,44 @@
+{% if jobs %}
+	<table class="table table-striped">
+		{% for job in jobs %}
+			<tr>
+				<td>
+					{% if job.state == "dispatching" %}
+						<i class="icon-chevron-left"></i>
+					{% elif job.state == "running" %}
+						<i class="icon-retweet"></i>
+					{% elif job.state == "finished" %}
+						<i class="icon-ok"></i>
+					{% elif job.state == "dependency_error" %}
+						<i class="icon-random"></i>
+					{% elif job.state == "failed" %}
+						<i class="icon-remove"></i>
+					{% elif job.state == "uploading" %}
+						<i class="icon-chevron-right"></i>
+					{% elif job.state == "aborted" %}
+						<i class="icon-warning-sign"></i>
+					{% end %}
+
+					<a href="/build/{{ job.build.uuid }}">
+						{{ job.build.name }}</a>.<a href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
+
+					{% if job.build.type == "scratch" %}
+						<span class="label label-inverse">S</span>
+					{% elif job.type == "test" %}
+						<span class="label label-inverse">T</span>
+					{% end %}
+				
+					{% if show_builder and job.builder %}
+						<br />
+						{{ _("Builder") }}:
+						<a href="/builder/{{ job.builder.name }}">
+							{{ job.builder.name }}
+						</a>
+					{% end %}
+				</td>
+			</tr>
+		{% end %}
+	</table>
+{% else %}
+	{{ _("No jobs to display.") }}
+{% end %}

@@ -1,0 +1,39 @@
+
+
+table.commits {
+	width: 95%;
+}
+
+table.commits tr.commit {
+	background-color: #e1e1e1;
+}
+
+table.commits tr.commit td.revision {
+	font-family: monospace;
+
+	width: 10%;
+}
+
+table.commits tr.commit td.author {
+	width: 20%;
+}
+
+table.commits tr.commit td.subject {
+	width: 70%;
+}
+
+/* States */
+
+table.commits tr.state-running {
+	background-color: yellow;
+}
+
+table.commits tr.state-failed {
+	background-color: red;
+	color: white;
+}
+
+table.commits tr.state-finished {
+	background-color: green;
+	color: white;
+}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Edit distribution %s") % distro.name }}{% end block %}
+
+{% block body %}
+	<h1>
+		{% if update %}
+			{{ _("Edit update %s - %s") % (update.uuid, update.summary) }}
+		{% else %}
+			{{ _("Create new update") }}
+		{% end %}
+		<span> - {{ _("Distribution") }}: {{ escape(distro.name) }}</span>
+	</h1>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Builds") }}</td>
+				<td class="col2" colspan="2">
+					<select name="builds" size="5" multiple>
+						{% for build in builds %}
+							<option value="{{ build.uuid }}">{{ build.name }}</option>
+						{% end %}
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Create update") }}" />
+				</td>
+			</tr>
+		</table>
+		<div style="clear: both;">&nbsp;</div>
+	</form>
+{% end block %}

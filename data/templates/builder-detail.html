@@ -3,96 +3,204 @@
 {% block title %}{{ _("Builder") }}: {{ builder.name }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
-	<table class="form form2">
-		<!-- Status -->
-		<tr>
-			<td class="col1">{{ _("Status") }}</td>
-			<td class="col2">{{ builder.status }}</td>
-		</tr>
-
-		<!-- Load AVG -->
-		<tr>
-			<td class="col1">{{ _("Load average") }}</td>
-			<td class="col2">
-				{{ builder.loadavg }}
-			</td>
-		</tr>
-
-		<!-- Supported architectures -->
-		<tr>
-			<td class="col1">{{ _("Supported architectures") }}</td>
-			<td class="col2">
-				{{ locale.list(builder.arches) or _("Unknown") }}
-			</td>
-		</tr>
-	</table>
-	<div style="clear: both;">&nbsp;</div>
-	
-	<h2>{{ _("Configuration") }}</h2>
-	<table class="form form2">
-		<tr>
-			<td class="col1">{{ _("Builds source packages") }}</td>
-			<td class="col2">
-				{% if builder.build_src %}{{ _("Yes") }}{% else %}{{ _("No") }}{% end %}
-			</td>
-		</td>
-		<tr>
-			<td class="col1">{{ _("Builds binary packages") }}</td>
-			<td class="col2">
-				{% if builder.build_bin %}{{ _("Yes") }}{% else %}{{ _("No") }}{% end %}
-			</td>
-		</td>
-		<tr>
-			<td class="col1">{{ _("Runs tests") }}</td>
-			<td class="col2">
-				{% if builder.build_test %}{{ _("Yes") }}{% else %}{{ _("No") }}{% end %}
-			</td>
-		</td>
-		<tr>
-			<td class="col1">{{ _("Parallel build jobs") }}</td>
-			<td class="col2">{{ _("One job only.", "Up to %(num)s jobs.", builder.max_jobs) % { "num" : builder.max_jobs } }}</td>
-		</tr>
-	</table>
-	<div style="clear: both;">&nbsp;</div>
-
-	<h2>{{ _("Host information") }}</h2>
-	<table class="form form2">
-		<tr>
-			<td class="col1">{{ _("CPU model") }}</td>
-			<td class="col2">{{ builder.cpu_model or _("Unknown") }}</td>
-		</tr>
-		<tr>
-			<td class="col1">{{ _("Memory") }}</td>
-			<td class="col2">{{ friendly_size(builder.memory) }}</td>
-		</tr>
-	</table>
-	<div style="clear: both;">&nbsp;</div>
-
-	{% if builder.active_builds %}
-		<h2>{{ _("Currently running builds on this host") }}</h2>
-		{{ modules.BuildTable(builder.active_builds) }}
-	{% end %}
-{% end block %}
-
-{% block sidebar %}
-	<h1>{{ _("Actions") }}</h1>
-	<ul>
+	<ul class="breadcrumb">
 		<li>
-			<a href="/builds?state=&builder={{ builder.id }}">{{ _("Show all build jobs") }}</a>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
 		</li>
-		{% if current_user and current_user.is_admin() %}
-			<li>
-				<a href="/builder/edit/{{ builder.name }}">{{ _("Edit builder") }}</a>
-			</li>
-			{% if not builder.enabled %}
-				<li>
-					<a href="/builder/renew/{{ builder.name }}">{{ _("Renew passphrase") }}</a>
-				</li>
-			{% end %}
-			<li>
-				<a href="/builder/delete/{{ builder.name }}">{{ _("Delete builder") }}</a>
-			</li>
-		{% end %}
+		<li>
+			<a href="/builders">{{ _("Builders") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/builder/{{ escape(builder.name) }}">{{ escape(builder.name) }}</a>
+		</li>
 	</ul>
+
+	{% if builder.overload %}
+		<div class="alert alert-warning">
+			<strong>{{ _("Warning") }}</strong>! {{ _("This builder is overloaded.") }}
+			{{ _("That means it will take no additional jobs although it has not reached its threshold.") }}
+			{{ _("If the load decreases new jobs will be added automatically.") }}
+		</div>
+	{% end %}
+
+	<div class="page-header">
+		<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span4 offset1">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>{{ _("State") }}</td>
+						<td>
+							{% if builder.status == "enabled" %}
+								{{ _("Enabled") }}
+							{% elif builder.status == "disabled" %}
+								{{ _("Disabled") }}
+							{% elif builder.status == "deleted" %}
+								{{ _("Deleted") }}
+							{% else %}
+								{{ _("Unknown status: %s") % escape(builder.status) }}
+							{% end %}
+						</td>
+					</tr>
+					<tr>
+						<td>{{ _("Parallel builds") }}</td>
+						<td>{{ _("One job only.", "Up to %(num)s jobs.", builder.max_jobs) % { "num" : builder.max_jobs } }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("This host builds") }}</td>
+						<td>
+							<ul>
+								{% for type in builder.build_types %}
+									<li>
+										{% if type == "release" %}
+											{{ _("Release builds") }}
+										{% elif type == "scratch" %}
+											{{ _("Scratch builds") }}
+										{% elif type == "test" %}
+											{{ _("Test builds") }}
+										{% end %}
+									</li>
+								{% end %}
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			{% if builder.description %}
+				<h2>{{ _("Remarks") }}</h2>
+				<p>
+					{{ modules.Text(builder.description) }}
+				</p>
+			{% end %}
+		</div>
+
+		<div class="span6">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>{{ _("Pakfire version") }}</td>
+						<td>
+							{{ escape(builder.pakfire_version) or _("N/A") }}
+						</td>
+					</tr>
+					<tr>
+						<td>{{ _("Supported architectures") }}</td>
+						<td>
+							{{ locale.list([a.name for a in builder.get_arches() ]) }}
+
+							{% if builder.disabled_arches %}
+								({{ _("disabled: %s") % locale.list([a.name for a in builder.disabled_arches]) }})
+							{% end %}
+						</td>
+					</tr>
+					<tr>
+						<td>{{ _("CPU model") }}</td>
+						<td>
+							{{ escape(builder.cpu_model) or _("Unknown") }}
+						</td>
+					</tr>
+					<tr>
+						<td>{{ _("CPU count") }}</td>
+						<td>{{ builder.cpu_count }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Memory") }}</td>
+						<td>{{ format_size(builder.memory) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Load average") }}</td>
+						<td>
+							{{ escape(builder.loadavg or _("N/A")) }}
+							{% if builder.overload %}
+									<span class="label label-important">{{ _("Overload") }}</span>
+							{% end %}
+						</td>
+					</tr>
+					<tr>
+						<td>{{ _("Free disk space") }}</td>
+						<td>{{ format_size(builder.free_space * 1024**2) }}</td>
+					</tr>
+
+					<tr>
+						<td>{{ _("Host key") }}</td>
+						<td>
+							{{ builder.host_key_id or _("N/A") }}
+						</td>
+					</tr>					
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{% if current_user and current_user.has_perm("maintain_builders") %}
+		<div class="row">
+			<div class="span10 offset1">
+				<div class="btn-toolbar">
+					<div class="btn-group pull-right">
+						{% if builder.enabled %}
+							<a class="btn btn-danger" href="/builder/{{ builder.name }}/disable">
+								{{ _("Disable") }}
+							</a>
+						{% else %}
+							<a class="btn btn-success" href="/builder/{{ builder.name }}/enable">
+								{{ _("Enable") }}
+							</a>
+						{% end %}
+
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							{{ _("Action") }}
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a href="/builder/{{ builder.name }}/edit">
+									<i class="icon-edit"></i>
+									{{ _("Edit settings") }}
+								</a>
+							</li>
+
+							{% if not builder.enabled %}
+								<li>
+									<a href="/builder/{{ builder.name }}/renew">
+										<i class="icon-refresh"></i>
+										{{ _("Renew passphrase") }}
+									</a>
+								</li>
+							{% end %}
+
+							<li class="divider"></li>
+							<li>
+								<a href="/builder/{{ builder.name }}/delete">
+									<i class="icon-trash"></i>
+									{{ _("Delete builder") }}
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% end %}
+
+	{% if builder.get_active_jobs() %}
+		<div class="row">
+			<div class="span10 offset1">
+				<h2>{{ _("Currently running builds on this host") }}</h2>
+				{{ modules.JobsList(builder.get_active_jobs()) }}
+			</div>
+		</div>
+	{% end %}
+
+	<div class="row">
+		<div class="span10 offset1">
+			<h2>{{ _("Log") }}</h2>
+			{{ modules.Log(builder.get_history(limit=20)) }}
+		</div>
+	</div>
 {% end block %}

@@ -3,14 +3,42 @@
 {% block title %}{{ _("Delete builder %s") % builder.name }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builders">{{ _("Builders") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builder/{{ escape(builder.name) }}">{{ escape(builder.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/builder/{{ escape(builder.name) }}/delete">{{ _("Delete") }}</a>
+		</li>
+	</ul>
 
-	<p>
-		{{ _("You are going to delete the build host <strong>%s</strong>.") % builder.name }}
-	</p>
+	<div class="page-header">
+		<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+	</div>
 
-	<p>
-		<a href="/builder/delete/{{ builder.name }}?confirmed=1">{{ _("Delete %s") % builder.name }}</a>
-		<a href="/builder/{{ builder.name }}">{{ _("Back") }}</a>
-	</p>
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("You are going to delete the build host <strong>%s</strong>.") % builder.name }}
+			</p>
+
+			<div class="btn-toolbar">
+				<div class="btn-group pull-right">
+					<a class="btn btn-danger" href="/builder/{{ escape(builder.name) }}/delete?confirmed=1">
+						{{ _("Delete %s") % builder.name }}
+					</a>
+					<a class="btn" href="/builder/{{ escape(builder.name) }}">{{ _("Cancel") }}</a>
+				</div>
+			</div>
+		</div>
+	</div>
 {% end block %}

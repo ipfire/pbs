@@ -1,0 +1,30 @@
+<div class="page-header">
+	<div class="pull-right">
+		{% if pkg.critical_path %}
+			<span class="label label-important pull-right">{{ _("Critical path") }}</span>
+		{% end %}
+
+		{% if not short %}	
+			{% if build.type == "release" %}
+				<span class="label label-success">{{ _("Release build") }}</span>
+			{% elif build.type == "scratch" %}
+				<span class="label label-important">{{ _("Scratch build") }}</span>
+			{% end %}
+		{% end %}
+	</div>
+
+	<h1>
+		{% if prefix %}
+			{{ prefix }}:
+		{% end %}
+
+		{% if shorter %}
+			{{ escape(pkg.name) }}
+		{% else %}
+			{{ escape(build.name) }}
+		{% end %}
+		<br>
+
+		<small>{{ escape(pkg.summary) }}</small>
+	</h1>
+</div>

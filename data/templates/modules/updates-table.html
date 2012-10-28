@@ -1,0 +1,24 @@
+<table class="table table-striped">
+	<tbody>
+		{% for update in updates %}
+			<tr>
+				<td>
+					{% if update.severity == "bugfix" %}
+						<i class="icon-ok-sign"></i>
+					{% elif update.severity == "enhancement" %}
+						<i class="icon-plus-sign"></i>
+					{% else %}
+						<i class="icon-question-sign"></i>
+					{% end %}
+					{{ update.build.update_id }}
+					-
+					<a href="/build/{{ update.build.uuid }}">{{ update.name }}</a>
+				</td>
+				<td>
+					{{ _("Score:") }} {{ update.score }} - 
+					{{ format_date(update.when) }}
+				</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>

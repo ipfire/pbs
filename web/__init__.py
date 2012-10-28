@@ -17,26 +17,49 @@ tornado.options.parse_command_line()
 
 class Application(tornado.web.Application):
 	def __init__(self):
+		self.__pakfire = None
+
 		settings = dict(
-			cookie_secret = "12345",
 			debug = True,
-			gzip = True,
+			gzip  = False,
 			login_url = "/login",
 			template_path = os.path.join(BASEDIR, "templates"),
 			ui_modules = {
-				"BuildLog"        : BuildLogModule,
-				"BuildOffset"     : BuildOffsetModule,
-				"BuildTable"      : BuildTableModule,
-				"CommentsTable"   : CommentsTableModule,
-				"FilesTable"      : FilesTableModule,
-				"LogTable"        : LogTableModule,
-				"PackageTable"    : PackageTableModule,
-				"PackageTable2"   : PackageTable2Module,
-				"PackageFilesTable" : PackageFilesTableModule,
-				"RepositoryTable" : RepositoryTableModule,
-				"RepoActionsTable": RepoActionsTableModule,
-				"SourceTable"     : SourceTableModule,
-				"UsersTable"      : UsersTableModule,
+				"Text"               : TextModule,
+				"Modal"              : ModalModule,
+
+				"Footer"             : FooterModule,
+
+				# Logging
+				"Log"                : LogModule,
+				"LogEntry"           : LogEntryModule,
+				"LogEntryComment"    : LogEntryCommentModule,
+
+				"BuildHeadline"      : BuildHeadlineModule,
+				"BuildStateWarnings" : BuildStateWarningsModule,
+
+				"BugsTable"          : BugsTableModule,
+				"BuildLog"           : BuildLogModule,
+				"BuildOffset"        : BuildOffsetModule,
+				"BuildTable"         : BuildTableModule,
+				"CommitsTable"       : CommitsTableModule,
+				"JobsTable"          : JobsTableModule,
+				"JobsList"           : JobsListModule,
+				"CommentsTable"      : CommentsTableModule,
+				"FilesTable"         : FilesTableModule,
+				"LogTable"           : LogTableModule,
+				"LogFilesTable"      : LogFilesTableModule,
+				"Maintainer"         : MaintainerModule,
+				"PackagesTable"      : PackagesTableModule,
+				"PackageTable2"      : PackageTable2Module,
+				"PackageHeader"      : PackageHeaderModule,
+				"PackageFilesTable"  : PackageFilesTableModule,
+				"RepositoryTable"    : RepositoryTableModule,
+				"RepoActionsTable"   : RepoActionsTableModule,
+				"SourceTable"        : SourceTableModule,
+				"UpdatesTable"       : UpdatesTableModule,
+				"UsersTable"         : UsersTableModule,
+				"WatchersSidebarTable" : WatchersSidebarTableModule,
 			},
 			xsrf_cookies = True,
 		)
@@ -58,70 +81,145 @@ class Application(tornado.web.Application):
 			# Entry site that lead the user to index
 			(r"/", IndexHandler),
 
+			# Advanced options for logged in users.
+			(r"/advanced", AdvancedHandler),
+
 			# Handle all the users logins/logouts/registers and stuff.
 			(r"/login", LoginHandler),
 			(r"/logout", LogoutHandler),
 			(r"/register", RegisterHandler),
+			(r"/password-recovery", PasswordRecoveryHandler),
+
+			# User profiles
 			(r"/users", UsersHandler),
 			(r"/users/comments", UsersCommentsHandler),
-			(r"/user/delete/(\w+)", UserDeleteHandler),
-			(r"/user/edit/(\w+)", UserEditHandler),
+			(r"/user/impersonate", UserImpersonateHandler),
+			(r"/user/(\w+)/passwd", UserPasswdHandler),
+			(r"/user/(\w+)/delete", UserDeleteHandler),
+			(r"/user/(\w+)/edit", UserEditHandler),
+			(r"/user/(\w+)/activate", ActivationHandler),
 			(r"/user/(\w+)", UserHandler),
-			(r"/user/(\w+)/activate/(\w+)", ActivationHandler),
 			(r"/profile", UserHandler),
+			(r"/profile/builds", UsersBuildsHandler),
 
 			# Packages
 			(r"/packages", PackageListHandler),
-			(r"/package/([\w\-\+]+)/([\d]+)/([\w\.\-]+)/([\w\.]+)", PackageDetailHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", PackageDetailHandler),
+			(r"/package/([\w\-\+]+)/properties", PackagePropertiesHandler),
 			(r"/package/([\w\-\+]+)", PackageNameHandler),
 
 			# Files
 			(r"/file/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", FileDetailHandler),
 
 			# Builds
-			(r"/builds", BuildListHandler),
+			(r"/builds", BuildsHandler),
 			(r"/builds/filter", BuildFilterHandler),
+			(r"/builds/queue", BuildQueueHandler),
 			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", BuildDetailHandler),
-			(r"/build/priority/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", BuildPriorityHandler),
-			(r"/build/schedule/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", BuildScheduleHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/bugs", BuildBugsHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/manage", BuildManageHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/comment", BuildDetailCommentHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/priority", BuildPriorityHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/state", BuildStateHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watch", BuildWatchersAddHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watchers", BuildWatchersHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/delete", BuildDeleteHandler),
+
+			# Jobs
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", JobDetailHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/abort", JobAbortHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/buildroot", JobBuildrootHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/schedule", JobScheduleHandler),
 
 			# Builders
 			(r"/builders", BuilderListHandler),
 			(r"/builder/new", BuilderNewHandler),
-			(r"/builder/delete/([A-Za-z0-9\-\.]+)", BuilderDeleteHandler),
-			(r"/builder/edit/([A-Za-z0-9\-\.]+)", BuilderEditHandler),
-			(r"/builder/renew/([A-Za-z0-9\-\.]+)", BuilderRenewPassphraseHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/enable", BuilderEnableHander),
+			(r"/builder/([A-Za-z0-9\-\.]+)/disable", BuilderDisableHander),
+			(r"/builder/([A-Za-z0-9\-\.]+)/delete", BuilderDeleteHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/edit", BuilderEditHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/renew", BuilderRenewPassphraseHandler),
 			(r"/builder/([A-Za-z0-9\-\.]+)", BuilderDetailHandler),
 
-			# Sources
-			(r"/sources", SourceListHandler),
-			(r"/source/([0-9]+)", SourceDetailHandler),
-
 			# Distributions
-			(r"/distributions", DistributionListHandler),
+			(r"/distros", DistributionListHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)", DistributionDetailHandler),
+
+			# XXX THOSE URLS ARE DEPRECATED
 			(r"/distribution/delete/([A-Za-z0-9\-\.]+)", DistributionDetailHandler),
 			(r"/distribution/edit/([A-Za-z0-9\-\.]+)", DistributionEditHandler),
-			(r"/distribution/([A-Za-z0-9\-\.]+)", DistributionDetailHandler),
-			(r"/distribution/([A-Za-z0-9\-\.]+)/repository/([A-Za-z0-9\-\.]+)", RepositoryDetailHandler),
+
+			(r"/distro/([A-Za-z0-9\-\.]+)/repo/([A-Za-z0-9\-]+)",
+				RepositoryDetailHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)/repo/([A-Za-z0-9\-]+)\.repo",
+				RepositoryConfHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)/repo/([A-Za-z0-9\-]+)/mirrorlist",
+				RepositoryMirrorlistHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)/repo/([A-Za-z0-9\-]+)/edit",
+				RepositoryEditHandler),
+
+			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)",
+				DistroSourceDetailHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/commits",
+				DistroSourceCommitsHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/([\w]{40})",
+				DistroSourceCommitDetailHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/([\w]{40})/reset",
+				DistroSourceCommitResetHandler),
+
+			(r"/distro/([A-Za-z0-9\-\.]+)/update/create",
+				DistroUpdateCreateHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)/update/(\d+)/(\d+)",
+				DistroUpdateDetailHandler),
+
+			# Updates
+			(r"/updates", UpdatesHandler),
+
+			# Mirrors
+			(r"/mirrors", MirrorListHandler),
+			(r"/mirror/new", MirrorNewHandler),
+			(r"/mirror/([A-Za-z0-9\-\.]+)/delete", MirrorDeleteHandler),
+			(r"/mirror/([A-Za-z0-9\-\.]+)/edit", MirrorEditHandler),
+			(r"/mirror/([A-Za-z0-9\-\.]+)", MirrorDetailHandler),
+
+			# Key management
+			(r"/keys", KeysListHandler),
+			(r"/key/import", KeysImportHandler),
+			(r"/key/([A-Z0-9]+)", KeysDownloadHandler),
+			(r"/key/([A-Z0-9]+)/delete", KeysDeleteHandler),
+
+			# Statistics
+			(r"/statistics", StatisticsMainHandler),
 
 			# Documents
 			(r"/documents", DocsIndexHandler),
 			(r"/documents/builds", DocsBuildsHandler),
 			(r"/documents/users", DocsUsersHandler),
+			(r"/documents/what-is-the-pakfire-build-service", DocsWhatsthisHandler),
 
 			# Search
 			(r"/search", SearchHandler),
 
-			# API
-			(r"/api/action/(\w+)", RepoActionHandler),
+			# Uploads
+			(r"/uploads", UploadsHandler),
 
 			# Log
 			(r"/log", LogHandler),
-		] + static_handlers)
 
-		self.pakfire = backend.Pakfire()
+		] + static_handlers + [
+
+			# Everything else is catched by the 404 handler.
+			(r"/.*", Error404Handler),
+		])
 
 		logging.info("Successfully initialied application")
+
+	@property
+	def pakfire(self):
+		if self.__pakfire is None:
+			self.__pakfire = backend.Pakfire()
+
+		return self.__pakfire
 
 	def __del__(self):
 		logging.info("Shutting down application")
@@ -137,9 +235,6 @@ class Application(tornado.web.Application):
 	def run(self, port=80):
 		logging.debug("Going to background")
 
-		# All requests should be done after 30 seconds or they will be killed.
-		self.ioloop.set_blocking_log_threshold(30)
-
 		http_server = tornado.httpserver.HTTPServer(self, xheaders=True)
 
 		# If we are not running in debug mode, we can actually run multiple
@@ -149,6 +244,9 @@ class Application(tornado.web.Application):
 			http_server.start(num_processes=4)
 		else:
 			http_server.listen(port)
+
+		# All requests should be done after 60 seconds or they will be killed.
+		self.ioloop.set_blocking_log_threshold(60)
 
 		self.ioloop.start()
 

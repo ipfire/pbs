@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Commit") }}: {{ commit.revision }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distros">{{ _("Distributions") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
+				{{ _("Source: %s") % escape(source.name) }}
+			</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/{{ commit.revision }}">
+				{{ commit.revision[:7] }}
+			</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>
+			{{ _("Source") }}: {{ escape(source.name) }}
+			<br />
+			<small>
+				{{ commit.revision[:7] }} - {{ escape(commit.subject) }}
+			</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span10 offset1">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>{{ _("Revision") }}</td>
+						<td>{{ escape(commit.revision) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Date") }}</td>
+						<td>{{ format_date(commit.date, full_format=True) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Author") }}</td>
+						<td>{{ format_email(commit.author) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Committer") }}</td>
+						<td>{{ format_email(commit.committer) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Subject") }}</td>
+						<td>{{ escape(commit.subject) }}</td>
+					</tr>
+
+					{% if commit.message %}
+						<tr>
+							<td colspan="2">
+								{{ modules.Text(commit.message, pre=True) }}</pre>
+							</td>
+						</tr>
+					{% end %}
+
+					<tr>
+						<td colspan="2">
+							<div class="btn-toolbar pull-right">
+								{% if source.gitweb %}
+									<div class="btn-group">
+										<a class="btn" href="{{ escape(source.gitweb) }};a=commitdiff;h={{ commit.revision }}" target="_blank">
+											{{ _("Open in gitweb") }}
+										</a>
+									</div>
+								{% end %}
+
+								{% if current_user and current_user.is_admin() %}
+									<div class="btn-group">
+										<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+											<i class="icon-star"></i>
+											{{ _("Action") }}
+											<span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu">
+											<li>
+												<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/{{ commit.revision }}/reset">
+													{{ _("Reset commit") }}
+												</a>
+											</li>
+										</ul>
+									</div>
+								{% end %}
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span10 offset1">
+			<h2>{{ _("Packages created from this commit") }}</h2>
+
+			{% if commit.packages %}
+				<table class="table table-striped">
+					{% for pkg in commit.packages %}
+						<tr>
+							<td>
+								<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
+							</td>
+							<td>
+								{{ escape(pkg.summary) }}
+							</td>
+						</tr>
+					{% end %}
+				</table>
+			{% else %}
+				<p>{{ _("There were no packages created from this commit.") }}</p>
+			{% end %}
+		</div>
+	</div>
+{% end block %}

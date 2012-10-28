@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Bug list") }}: {{ build.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+		</li>
+	</ul>
+
+	{{ modules.BuildHeadline(_("Bug list"), build, short=True) }}
+
+	<div class="row">
+		<div class="span8 offset2">
+			{% if fixed_bugs %}
+				<h2>{{ _("Fixed bugs") }}</h2>
+				{{ modules.BugsTable(pkg, fixed_bugs) }}
+			{% else %}
+				<p>
+					{{ _("No bugs here, yet.") }}
+					{{ _("Click below, to add one.") }}
+				</p>
+			{% end %}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span8 offset2">
+			<div class="btn-toolbar pull-right">
+				<div class="btn-group">
+					<a class="btn" href="#add" data-toggle="modal">
+						{{ _("Add") }}
+					</a>
+
+					{% if fixed_bugs %}
+						<a class="btn" href="#rem" data-toggle="modal">
+							{{ _("Remove") }}
+						</a>
+					{% end %}
+				</div>
+
+				<div class="btn-group">
+					<a class="btn" href="/build/{{ build.uuid }}">
+						{{ _("Back") }}
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal hide fade" id="add">
+		<form class="modal-form form-horizontal" method="POST" action="">
+			{{ xsrf_form_html() }}
+			<input type="hidden" name="action" value="add" />
+
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal">&times;</a>
+				<h3>{{ _("Add a bug") }}</h3>
+			</div>
+
+			<div class="modal-body">
+				<fieldset>
+					<div class="control-group">
+						<label class="control-label" for="bugid">{{ _("Bug ID") }}</label>
+						<div class="controls">
+							<div class="input-prepend">
+								<span class="add-on">#</span><input class="span2" id="bugid" name="bugid" size="16" type="text">
+							</div>
+
+							<p class="help-block">
+								{{ _("Enter a bug ID.") }}
+							</p>
+						</div>
+					</div>
+				</fieldset>
+
+				{% if open_bugs %}
+					<hr />
+					<p>
+						{{ _("This is a list of more open bugs of this package.") }}
+					</p>
+					<p>
+						{{ _("Maybe you want to pick one of these.") }}
+					</p>
+
+					<table class="table table-condensed">
+						{% for bug in open_bugs %}
+							<tr>
+								<td>
+									#{{ bug.id }} - {{ bug.status }}
+								</td>
+								<td>
+									{{ bug.summary }}
+								</td>
+							</tr>
+						{% end %}
+					</table>
+				{% end %}
+			</div>
+
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary">{{ _("Add bug") }}</button>
+				<a class="btn" href="#" data-dismiss="modal">{{ _("Cancel") }}</a>
+			</div>
+		</form>
+	</div>
+
+	<div class="modal hide fade" id="rem">
+		<form class="modal-form form-horizontal" method="POST" action="">
+			{{ xsrf_form_html() }}
+			<input type="hidden" name="action" value="remove" />
+
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal">&times;</a>
+				<h3>{{ _("Remove a bug") }}</h3>
+			</div>
+
+			<div class="modal-body">
+				<fieldset>
+					<div class="control-group">
+						<label class="control-label" for="bugid">{{ _("Bug ID") }}</label>
+						<div class="controls">
+							<div class="input-prepend">
+								<span class="add-on">#</span><input class="span2" id="bugid" name="bugid" size="16" type="text">
+							</div>
+
+							<p class="help-block">
+								{{ _("Enter a bug ID from the list below.") }}
+							</p>
+						</div>
+					</div>
+				</fieldset>
+
+				{% if fixed_bugs %}
+					<table class="table table-condensed">
+						{% for bug in fixed_bugs %}
+							<tr>
+								<td>
+									#{{ bug.id }} - {{ bug.status }}
+								</td>
+								<td>
+									{{ bug.summary }}
+								</td>
+							</tr>
+						{% end %}
+					</table>
+				{% end %}
+			</div>
+
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary">{{ _("Remove bug") }}</button>
+				<a class="btn" href="#" data-dismiss="modal">{{ _("Cancel") }}</a>
+			</div>
+		</form>
+	</div>
+{% end block %}

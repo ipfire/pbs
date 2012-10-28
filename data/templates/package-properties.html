@@ -1,0 +1,99 @@
+{% extends "base-form1.html" %}
+
+{% block title %}{{ _("Package") }} {{ pkg.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(pkg.name) }}">{{ escape(pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/package/{{ escape(pkg.name) }}/properties">{{ _("Properties") }}</a>
+		</li>
+	</ul>
+
+	{{ modules.BuildHeadline(None, build, shorter=True) }}
+
+	<div class="row">
+		<div class="span8">
+			<form class="form form-horizontal" method="POST" action="">
+				{{ xsrf_form_html() }}
+
+				<fieldset>
+					<legend>{{ _("Maintainers") }}</legend>
+					
+				</fieldset>
+
+				<fieldset>
+					<legend>{{ _("Default priority") }}</legend>
+					<p>
+						{{ _("A big benefit of the Pakfire Build Service is, that builds are available to end-users in a very short time.") }}
+						{{ _("Some packages might need some extra boost if the build servers are very busy.") }}
+					</p>
+					<p>
+						{{ _("You may set a default priority for all builds of this package.") }}
+					</p>
+
+					<div class="control-group">
+						<label class="control-label" for="priority">{{ _("Default priority") }}</label>
+						<div class="controls">
+							<select name="priority" id="priority">
+								<option value="2" {% if properties.priority >= 2 %}selected="selected"{% end %}>
+									{{ _("Very high") }}
+								</option>
+								<option value="1" {% if properties.priority == 1 %}selected="selected"{% end %}>
+									{{ _("High") }}
+								</option>
+								<option value="0" {% if properties.priority == 0 %}selected="selected"{% end %}>
+									{{ _("Medium") }}
+								</option>
+								<option value="-1" {% if properties.priority == -1 %}selected="selected"{% end %}>
+									{{ _("Low") }}
+								</option>
+								<option value="-2" {% if properties.priority <= -2 %}selected="selected"{% end %}>
+									{{ _("Very low") }}
+								</option>
+							</select>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>{{ _("Critical path") }}</legend>
+					<p>
+						{{ _("A package that belongs to the critical path is a package that plays a very essential role in the distribution.") }}
+						{{ _("If such a package is broken, it may not be possible to boot or recover the system anymore, so we need to be extra sure that these packages work.") }}
+					</p>
+					<p>
+						{{ _("If this package is marked to belong to the critical path, it will need a higher score to pass to the next repository and more.") }}
+						<a href="/documents/critical-path">{{ _("Learn more.") }}</a>
+					</p>
+
+					<div class="control-group">
+						<label class="control-label" for="critical_path">{{ _("Critical path") }}</label>
+						<div class="controls">
+							<label class="checkbox">
+								<input type="checkbox" id="critical_path">
+								{{ _("This package belongs to the critical path") }}
+							</label>
+						</div>
+					</div>
+				</fieldset>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">{{ _("Save changes") }}</button>
+					<a class="btn" href="/package/{{ escape(pkg.name) }}">{{ _("Cancel") }}</a>
+				</div>
+			</form>
+		</div>
+	</div>
+{% end block %}

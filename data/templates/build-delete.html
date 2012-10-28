@@ -1,0 +1,51 @@
+{% extends "base-form1.html" %}
+
+{% block title %}{{ _("Delete build") }}: {{ build.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/build/{{ build.uuid }}">{{ escape(build.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/build/{{ build.uuid }}/delete">{{ _("Delete") }}</a>
+		</li>
+	</ul>
+
+	{{ modules.BuildHeadline(_("Build"), build) }}
+
+	<div class="row">
+		<div class="span8">
+			<p>
+				<strong>
+					{{ _("You are about to delete build %s.") % escape(build.name) }}
+				</strong>
+			</p>
+
+			<p>
+				{{ _("Please make sure, that this is the right build you intend to delete.") }}
+				{{ _("Once a build has been deleted, it can not been recovered.") }}
+			</p>
+
+			<hr>
+
+			<div class="btn-toolbar pull-right">
+				<a class="btn btn-primary" href="?confirmed=1">{{ _("Delete build") }}</a>
+				<a class="btn" href="/build/{{ build.uuid }}">{{ _("Cancel") }}</a>
+			</div>
+		</div>
+	</div>
+{% end block %}

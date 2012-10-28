@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Delete mirror %s") % escape(mirror.hostname) }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/mirrors">{{ _("Mirrors") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/mirror/{{ escape(mirror.hostname) }}">{{ escape(mirror.hostname) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/mirror/{{ escape(mirror.hostname) }}/delete">{{ _("Delete") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Mirror") }}: {{ escape(mirror.hostname) }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("You are going to delete the mirror <strong>%s</strong>.") % escape(mirror.hostname) }}
+			</p>
+
+			<div class="btn-toolbar">
+				<div class="btn-group pull-right">
+					<a class="btn btn-danger" href="/mirror/{{ escape(mirror.hostname) }}/delete?confirmed=1">
+						{{ _("Delete %s") % escape(mirror.hostname) }}
+					</a>
+					<a class="btn" href="/mirror/{{ escape(mirror.hostname) }}">{{ _("Cancel") }}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% end block %}

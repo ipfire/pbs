@@ -1,22 +1,47 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builders">{{ _("Builders") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builder/{{ escape(builder.name) }}">{{ escape(builder.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/builder/{{ escape(builder.name) }}/edit">{{ _("Manage") }}</a>
+		</li>
+	</ul>
 
-	<p>
-		{% if action == "new" %}
-			{{ _("The new host <strong>%s</strong> has been successfully created.") % builder.name }}
-		{% elif action == "update" %}
-			{{ _("The passphrase for <strong>%s</strong> has been regenerated.") % builder.name }}
-		{% end %}
+	<div class="page-header">
+		<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+	</div>
 
-		{{ _("For authorization to the Pakfire Master Server there is a passphrase required which must be configured to the host.") }}
-		{{ _("This passphrase is:") }}
-	</p>
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{% if action == "new" %}
+					{{ _("The new host <strong>%s</strong> has been successfully created.") % builder.name }}
+				{% elif action == "update" %}
+					{{ _("The passphrase for <strong>%s</strong> has been regenerated.") % builder.name }}
+				{% end %}
 
-	<p class="focus">{{ builder.passphrase }}</p>
+				{{ _("For authorization to the Pakfire Master Server there is a passphrase required which must be configured to the host.") }}
+			</p>
 
-	<p>
-		<a href="/builder/{{ builder.name }}">{{ _("Next") }}</a>
-	</p>
+			<p>
+				{{ _("This passphrase is:") }} <strong>{{ passphrase }}</strong>
+			</p>
+
+			<p class="pull-right">
+				<a class="btn btn-primary" href="/builder/{{ builder.name }}">{{ _("Next") }}</a>
+			</p>
+		</div>
+	</div>
 {% end block %}

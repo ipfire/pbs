@@ -3,27 +3,97 @@
 {% block title %}{{ _("Build servers") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Build servers") }}</h1>
-
-	<p>
-		{{ _("Builders are those, that do all the hard work.") }}
-		{{ _("Build jobs are scheduled to these hosts that they process and send back the result.") }}
-	</p>
-
-	<ul class="builders">
-		{% for builder in builders %}
-			<li>
-				<a class="builder {{ builder.status.lower() }}" href="/builder/{{ builder.name }}">{{ builder.name }}</a>
-			</li>
-		{% end %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/builders">{{ _("Builders") }}</a>
+		</li>
 	</ul>
-{% end block %}
 
-{% if current_user.is_admin() %}
-	{% block sidebar %}
-		<h1>{{ _("Actions") }}</h1>
-		<ul>
-			<li><a href="/builder/new">{{ _("Create new builder") }}</a></li>
-		</ul>
-	{% end block %}
-{% end %}
+	<div class="page-header">
+		<h1>{{ _("Build servers") }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span12">
+			<p>
+				{{ _("Builders are those, that do all the hard work.") }}
+				{{ _("Build jobs are scheduled to these hosts that they process and send back the result.") }}
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>&nbsp;</th>
+						<th>{{ _("Hostname") }}</th>
+						<th>{{ _("Load") }}</th>
+						<th>{{ _("Running jobs") }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for builder in builders %}
+						<tr>
+							<td>
+								<img src="{{ static_url("images/icons/builder-%s.png" % builder.state.lower()) }}"
+									alt="{{ _("State %s") % builder.state }}" />
+							</td>
+							<td>
+								<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
+								{% if builder.overload %}
+										<span class="label label-important">{{ _("Overload") }}</span>
+								{% end %}
+								<br />
+								{{ locale.list([a.name for a in builder.arches]) }}
+							</td>
+							<td>
+								{{ escape(builder.load1 or _("N/A")) }}
+							</td>
+							<td>
+								{{ len(builder.get_active_jobs()) }}/{{ builder.max_jobs }}
+							</td>
+						</tr>
+					{% end %}
+
+					<tr>
+						<td colspan="3">
+							<div class="progress progress-info">
+								<div class="bar" style="width: {{ load }}%;"></div>
+							</div>
+						</td>
+						<td>
+							{% if current_user and current_user.is_admin() %}
+								<div class="btn-group pull-right">
+									<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+										{{ _("Action") }}
+										<span class="caret"></span>
+									</a>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="/builder/new">{{ _("Create new builder") }}</a>
+										</li>
+									</ul>
+								</div>
+							{% end %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span12">
+			{% if log %}
+				<h2>{{ _("Log") }}</h2>
+				{{ modules.Log(log) }}
+			{% end %}
+		</div>
+	</div>
+{% end block %}

@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 
+{% block title %}{{ _("Account activation failed") }}{% end block %}
+
 {% block body %}
-	<h1>{{ _("Activation failed") }}</h1>
-	<p>
-		{{ _("We are sorry.") }}
-		{{ _("The activation of your account has failed.") }}
-		{{ _("Possibly the registration code is wrong or your registration timed out.") }}
-	</p>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			{{ _("Account activation") }}
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Activation failed") }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("We are sorry.") }}
+				{{ _("The activation of your account has failed.") }}
+				{{ _("Possibly the registration code is wrong or your registration timed out.") }}
+			</p>
+		</div>
+	</div>
 {% end %}

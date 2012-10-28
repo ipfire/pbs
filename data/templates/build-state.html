@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Build") }}: {{ build.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Build") }}:
+		<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>-{{ build.pkg.friendly_version }}
+		{% if build.type == "scratch" %}
+			<span>{{ _("Scratch build") }}</span>
+		{% end %}
+
+		{% if build.distro %}
+			- <span>{{ _("Distribution") }}: {{ build.distro.name }}</span>
+		{% end %}
+	</h1>
+
+	<div class="pkg-summary">
+		{{ escape(build.pkg.summary) }}
+	</div>
+
+	<table class="form form2">
+		<tr>
+			<td class="col1" colspan="2">
+				{{ _("The state of a build can be either building, testing, stable, obsolete or broken.") }}
+			</td>
+		</tr>
+	</table>
+	<div style="clear: both;">&nbsp;</div>
+
+	<!-- XXX add some more information about what every single state means -->
+
+	{% if current_user and build.has_perm(current_user) %}
+		{% if build.state in ("building", "testing", "stable") %}
+			<form method="POST" action="">
+				{{ xsrf_form_html() }}
+				<table class="form form2">
+					<tr>
+						<td class="col1" colspan="2">
+							<h2>{{ _("Mark build as obsolete") }}</h2>
+							<p>
+								{{ _("If a package is updated by an other package it should be marked as <em>obsolete</em>.") }}
+								{{ _("For obsolete builds, there will be no test jobs created and it is recommended to remove them from the repositories soon.") }}
+							</p>
+						</td>
+					</tr>
+
+					{% if build.repo %}
+						<tr>
+							<td class="col1" colspan="2">
+								<input type="checkbox" name="rem_from_repo" checked="checked" />
+								{{ _("Remove build from the repository it is currently in?") }}
+							</td>
+						</tr>
+					{% end %}
+
+					<tr>
+						<td colspan="2" class="buttons">
+							<input type="hidden" name="state" value="obsolete" />
+							<input type="submit" value="{{ _("Mark build as obsolete") }}" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		{% end %}
+
+		{% if build.state == "broken" %}
+			<form method="POST" action="">
+				{{ xsrf_form_html() }}
+				<table class="form form2">
+					<tr>
+						<td class="col1" colspan="2">
+							<h2>{{ _("Unbreak this build") }}</h2>
+
+							<p>
+								{{ _("In case this build has accidentially be marked as broken, it is possible to recover that state.") }}
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" class="buttons">
+							<input type="hidden" name="state" value="unbreak" />
+							<input type="submit" value="{{ _("Unbreak this build") }}" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		{% else %}
+			<form method="POST" action="">
+				{{ xsrf_form_html() }}
+				<table class="form form2">
+					<tr>
+						<td class="col1" colspan="2">
+							<h2>{{ _("Mark build as broken") }}</h2>
+
+							<p>
+								{{ _("If a package does not build or contains <em>serious</em> bugs, it should be marked as broken.") }}
+								{{ _("Those builds can not be added into any repositories and are removed from all repositories they may currently be in.") }}
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" class="buttons">
+							<input type="hidden" name="state" value="broken" />
+							<input type="submit" value="{{ _("Mark build as broken") }}" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		{% end %}
+		<div style="clear: both;">&nbsp;</div>
+	{% end %}
+
+	{% if build.repo %}
+		<table class="form form2">
+			<tr>
+				<td class="col1" colspan="2">
+					{{ _("Current repository") }}:
+					<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
+						{{ _("since %s") % locale.format_date(build.repo_time, relative=False) }}
+				</td>
+			</tr>
+		</table>
+	{% end %}
+{% end block %}
+
+{% block sidebar %}
+	<h1>{{ _("Actions") }}</h1>
+	<ul>
+		<li><a href="/build/{{ build.uuid }}">{{ _("Back to build") }}</a></li>
+	</ul>
+	<div style="clear: both;">&nbsp;</div>
+{% end %}

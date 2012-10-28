@@ -1,80 +1,121 @@
-{% extends "base.html" %}
+{% extends "base-form1.html" %}
 
-{% block title %}{{ _("Edit builder %s") % builder.hostname }}{% end block %}
+{% block title %}{{ _("Edit builder %s") % escape(builder.hostname) }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Edit builder %s") % builder.hostname }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builders">{{ _("Builders") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builder/{{ escape(builder.name) }}">{{ escape(builder.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/builder/{{ escape(builder.name) }}/edit">{{ _("Manage") }}</a>
+		</li>
+	</ul>
 
-	<form method="post" action="">
-		{{ xsrf_form_html() }}
-		<table class="form form3">
-			<tr>
-				<td class="col1">{{ _("Name") }}</td>
-				<td class="col2">
-					{{ builder.hostname }}
-				</td>
-				<td class="col3">
-					{{ _("The hostname cannot be changed.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Enabled") }}</td>
-				<td class="col2">
-					<input type="checkbox" name="enabled" {% if builder.enabled %}checked="checked"{% end %} />
-				</td>
-				<td class="col3">
-					{{ _("The builder must be enabled in order to process build jobs.") }}
-				</td>
-			</tr>
-		</table>
-		<div style="clear: both;">&nbsp;</div>
+	<div class="page-header">
+		<h1>{{ _("Manage builder:") }} {{ escape(builder.hostname) }}</h1>
+	</div>
 
-		<h2>{{ _("Build job settings") }}</h2>
-		<p>
-			{{ _("These settings do only take effect if the builder is enabled.") }}
-		</p>
-		<table class="form form3">
-			<tr>
-				<td class="col1">{{ _("Authorized to build source packages") }}</td>
-				<td class="col2">
-					<input type="checkbox" name="build_src" {%if builder.build_src %}checked="checked"{% end %} />
-				</td>
-				<td class="col3">
-					{{ _("Only a few build servers are allowed to build source packages.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Authorized to build binary packages") }}</td>
-				<td class="col2">
-					<input type="checkbox" name="build_bin" {%if builder.build_bin %}checked="checked"{% end %} />
-				</td>
-				<td class="col3">&nbsp;</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Authorized to build test packages") }}</td>
-				<td class="col2">
-					<input type="checkbox" name="build_test" {%if builder.build_test %}checked="checked"{% end %} />
-				</td>
-				<td class="col3">&nbsp;</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Maximum number of parallel build jobs") }}</td>
-				<td class="col2">
-					<select name="max_jobs">
-						{% for i in (1, 2, 3, 4, 5, 6, 7, 8,) %}
-							<option value="{{ i }}" {% if i == builder.max_jobs %}selected="selected"{% end %}>{{ i }}</option>
-						{% end %}
-					</select>
-				</td>
-				<td class="col3">
-					{{ _("This is the number of build jobs that are started in parallel.") }}
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3" class="buttons">
-					<input type="submit" value="{{ _("Save") }}" />
-				</td>
-			</tr>
-		</table>
-	</form>
+	<div class="row">
+		<div class="span8">
+			<form class="form-horizontal" method="POST" action="">
+				{{ xsrf_form_html() }}
+				<fieldset>
+					<div class="control-group">
+						<label class="control-label">{{ _("Hostname") }}</label>
+						<div class="controls">
+							<span class="input-xlarge uneditable-input">{{ escape(builder.hostname) }}</span>
+							<p class="help-block">
+								{{ _("The hostname cannot be changed.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<label class="control-label" for="enabled">{{ _("Enabled") }}</label>
+						<div class="controls">
+							<label class="checkbox">
+								<input type="checkbox" id="enabled" name="enabled" {% if builder.enabled %}checked="checked"{% end %}>
+								{{ _("The builder must be enabled in order to process build jobs.") }}
+							</label>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>{{ _("Build job settings") }}</legend>
+
+					<div class="control-group">
+						<label class="control-label" for="max_jobs">{{ _("Maximum number of parallel build jobs") }}</label>
+						<div class="controls">
+							<select id="max_jobs" name="max_jobs">
+								{% for i in range(1, (2 * builder.cpu_count) + 1) %}
+									<option value="{{ i }}" {% if i == builder.max_jobs %}selected="selected"{% end %}>{{ i }}</option>
+								{% end %}
+							</select>
+
+							<p class="help-block">
+								{{ _("This is the number of build jobs that are started in parallel.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<div class="controls">
+							<label class="checkbox">
+								<input type="checkbox" id="build_release" name="build_release" {%if builder.build_release %}checked="checked"{% end %}>
+								{{ _("Authorized to build release builds.") }}
+							</label>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<div class="controls">
+							<label class="checkbox">
+								<input type="checkbox" id="build_scratch" name="build_scratch" {%if builder.build_scratch %}checked="checked"{% end %}>
+								{{ _("Authorized to build scratch builds.") }}
+							</label>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<div class="controls">
+							<label class="checkbox">
+								<input type="checkbox" id="build_test" name="build_test" {%if builder.build_test %}checked="checked"{% end %}>
+								{{ _("Authorized to build test builds.") }}
+							</label>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<label class="control-label" for="arches">{{ _("Enable host for these architectures") }}</label>
+						<div class="controls">
+							<select multiple="multiple" id="arches" name="arches">
+								{% for arch in builder.get_arches() %}
+									<option value="{{ arch.name }}"	{% if arch in builder.arches %}selected="selected"{% end %}>{{ arch.name }}</option>
+								{% end %}
+							</select>
+
+							<p class="help-block">
+								{{ _("Select or deselect the architectures, this builder should build or not.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">{{ _("Save changes") }}</button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
 {% end block %}

@@ -1,0 +1,38 @@
+{% extends "modal-base.html" %}
+
+{% block id %}unpush{% end block %}
+{% block form_action %}/build/{{ build.uuid }}/manage{% end block %}
+
+{% block title %}{{ _("Unpush %s from a repository") % build.name }}{% end block %}
+
+{% block body %}
+	<input type="hidden" name="action" value="unpush" />
+
+	<fieldset>
+		<div class="control-group">
+			<label class="control-label">{{ _("Current repository") }}</label>
+			<div class="controls">
+				<select id="repo" name="repo" disabled>
+					<option value="{{ repo.identifier }}">
+						{{ repo.name }} - {{ repo.summary }}
+					</option>
+				</select>
+			</div>
+		</div>
+	</fieldset>
+
+	<hr>
+
+	<p>
+		{{ _("You are going to unpush this build from its repository.") }}
+		{{ _("This means that the build won't be installable from this repository anymore.") }}
+	</p>
+
+	{% if not build.state in ("obsolete", "broken") %}
+		<p>
+			{{ _("If you consider this build being obsolete or broken, please don't forget to mark it so.") }}
+		</p>
+	{% end %}
+{% end block %}
+
+{% block submit_text %}{{ _("Unpush") }}{% end block %}

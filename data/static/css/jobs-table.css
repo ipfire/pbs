@@ -1,0 +1,82 @@
+
+/*
+	General table attributes.
+*/
+
+table.jobs {
+	width: 95%;
+	margin: 1em;
+
+	border: 1px solid #66000f;
+}
+
+table.jobs th {
+	text-align: center;
+
+	background-color: #707081;
+	color: white;
+	font-weight: normal;
+
+	border-bottom: 1px solid #66000f;
+}
+
+table.jobs td {
+}
+
+table.jobs tr.job {
+
+}
+
+table.jobs td.aborted {
+	background-color: black;
+	color: white;
+}
+
+table.jobs td.failed {
+	background-color: #cc0000;
+	color: white;
+}
+
+table.jobs td.failed a {
+
+}
+
+table.jobs td.finished {
+	background-color: #66ff66;
+	color: black;
+}
+
+table.jobs td.pending {
+	background-color: #ffcc33;
+	color: black;
+}
+
+table.jobs td.supported_arches {
+	border-top: 1px solid black;
+	text-align: center;
+}
+
+/* Positioning of texts in the cells. */
+
+table.jobs td.icon {
+	text-align: center;
+}
+
+table.jobs td.duration {
+	text-align: right;
+}
+
+table.jobs td.arch {
+	text-align: center;
+}
+
+table.jobs .state {
+	text-align: center;
+
+	border-left:  1px solid black;
+	border-right: 1px solid black;
+}
+
+table.jobs td.host {
+	text-align: center;
+}

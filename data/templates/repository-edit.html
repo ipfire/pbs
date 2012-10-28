@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Edit repository %s") % escape(repo.name) }}{% end block %}
+
+{% block body %}
+	<h1>
+		{{ _("Edit repository %s") % escape(repo.name) }}
+		<span>- {{ _("Distribution") }}: {{ escape(distro.name) }}</span>
+	</h1>
+
+	<form method="post" action="">
+		{{ xsrf_form_html() }}
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Name") }}</td>
+				<td class="col2">
+					<input name="name" type="text" value="{{ escape(repo.name) }}" />
+				</td>
+				<td class="col3">
+					{{ _("The name of the repository.") }}
+					{{ _("Must only contain of the lowercase characters.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Description") }}</td>
+				<td colspan="2">		
+					<textarea name="description">{{ escape(repo.description) }}</textarea>
+				</td>
+			</tr>
+		</table>
+		<div style="clear: both;">&nbsp;</div>
+
+		<h2>{{ _("Score settings") }}</h2>
+		<p>
+			{{ _("These settings configure the automatic score feature.") }}
+			{{ _("Builds that gained a certain score are moved to the next repository automatically and removed if the score is too bad.") }}
+		</p>
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Needed score") }}</td>
+				<td class="col2">
+					<input name="name" type="text" value="{{ repo.score_needed }}" />
+				</td>
+				<td class="col3">
+					{{ _("The score that is needed for builds to automatically be moved into this repository.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Minimum time") }}</td>
+				<td class="col2">
+					<input name="name" type="text" value="{{ repo.time_min }}" />
+				</td>
+				<td class="col3">
+					{{ _("Every build must stay a minimum time in a repository.") }}
+					{{ _("This is to ensure that a package gets tested well.") }}
+					{{ _("Enter zero to disable the feature.") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Maximum time") }}</td>
+				<td class="col2">
+					<input name="name" type="text" value="{{ repo.time_max }}" />
+				</td>
+				<td class="col3">
+					{{ _("If a build is more than a certain amount of time in a repository, it will automatically be removed.") }}
+					{{ _("This is to ensure that packages are not forgotten to be pushed.") }}
+					{{ _("Enter zero to disable the feature.") }}
+				</td>
+			</tr>
+		</table>
+		<div style="clear: both;">&nbsp;</div>
+
+		<h2>{{ _("Build settings") }}</h2>
+		<table class="form form3">
+			<tr>
+				<td class="col1">{{ _("Use package for builds?") }}</td>
+				<td class="col2">
+					<input type="checkbox" name="enabled_for_builds" {%if repo.enabled_for_builds %}checked="checked"{% end %} />
+				</td>
+				<td class="col3">
+					{{ _("Should the package be selected for builds by default?") }}
+					{{ _("Use with caution!") }}
+				</td>
+			</tr>
+		</table>
+		<div style="clear: both;">&nbsp;</div>
+
+		<table class="form form3">
+			<tr>
+				<td colspan="3" class="buttons">
+					<input type="submit" value="{{ _("Save") }}" />
+				</td>
+			</tr>
+		</table>
+	</form>
+{% end block %}

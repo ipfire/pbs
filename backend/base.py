@@ -17,3 +17,14 @@ class Object(object):
 		# Shortcut to settings.
 		if hasattr(self.pakfire, "settings"):
 			self.settings = self.pakfire.settings
+
+	@property
+	def cache(self):
+		"""
+			Shortcut to the cache.
+		"""
+		return self.pakfire.cache
+
+	@property
+	def geoip(self):
+		return self.pakfire.geoip

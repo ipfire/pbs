@@ -3,9 +3,99 @@
 {% block title %}{{ _("Advanced search") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Advanced search") }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/search">{{ _("Search") }}</a>
+		</li>
+	</ul>
 
-	<p>
-		XXX TO BE DONE
-	</p>
+	{% if pattern %}
+		<div class="page-header">
+			<h1>{{ _("No search results for '%s'.") % escape(pattern) }}</h1>
+		</div>
+
+		<div class="alert alert-block">
+			<a class="close" data-dismiss="alert">&times;</a>
+			<h4 class="alert-header">{{ _("Notice") }}</h4>
+			{{ _("Your search query '<em>%s</em>' did not return any results.") % escape(pattern) }}
+			{{ _("Use the box below to try again.") }}
+		</div>
+	{% else %}
+		<div class="page-header">
+			<h1>{{ _("Advanced search") }}</h1>
+		</div>
+
+		<div class="row">
+			<div class="span8 offset2">
+				<p>
+					{{ _("Type a search pattern into the box below and hit the 'Search' button.") }}
+				</p>
+			</div>
+		</div>
+	{% end %}
+
+	<div class="row">
+		<div class="span4 offset4">
+			<form class="well form-search" method="GET" action="/search">
+				<input type="text" class="input-medium search-query" name="q" value="{{ escape(pattern) }}">
+				<button type="submit" class="btn">{{ _("Search") }}</button>
+			</form>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span6">
+			<h2>{{ _("Search pattern syntax") }}</h2>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span6">
+			<div class="well">
+				<h3>{{ _("Package names and descriptions") }}</h3>
+				<p>
+					{{ _("If you type a package name to the search box you will get a link to the package.") }}
+					{{ _("The search is performed in case insensitive mode.") }}
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span6">
+			<div class="well">
+				<h3>{{ _("UUIDs") }}</h3>
+				<p>
+					{{ _("If you type a UUID to the search box, you will be directed to the job, build or package it belongs to.") }}
+					{{ _("This is a handy feature if you have a UUID and search for the corresponding package or build.") }}
+				</p>
+
+				<h4>{{ _("Examples") }}</h4>
+				<ul>
+					<li>fde110ca-f7d9-4ae5-a6c4-1e465a05662a</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="span6">
+			<div class="well">
+				<h3>{{ _("Files") }}</h3>
+				<p>
+					{{ _("You may also search for file names.") }}
+					{{ _("You will get a list of packages that contain the file.") }}
+					{{ _("The search pattern must start with a slash that it will be recognized as a file.") }}
+				</p>
+
+				<h4>{{ _("Examples") }}</h4>
+				<ul>
+					<li>/bin/bash</li>
+					<li>/usr/bin/gcc</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 {% end block %}

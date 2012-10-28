@@ -1,0 +1,19 @@
+{% extends "log-entry.html" %}
+
+{% block extra-title %}
+	{% if entry.vote == "up" %}
+		<span class="label label-success pull-right"
+			title="{{ _("This build works for %s.") % entry.user.firstname }}">+{{ entry.credit }}</span>
+	{% elif entry.vote == "down" %}
+		<span class="label label-important pull-right"
+			title="{{ _("This build does not work for %s.") % entry.user.firstname }}">-1</span>
+	{% end %}
+{% end %}
+
+{% block message %}
+	{% if entry.get_message(current_user) %}
+		{{ modules.Text(entry.get_message(current_user), pre=False) }}
+	{% else %}
+		<em>{{ _("No comment given.") }}</em>
+	{% end %}
+{% end %}

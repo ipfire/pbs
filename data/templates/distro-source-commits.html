@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>
+		{{ _("Distribution") }}: {{ escape(distro.name) }}
+		<span>- {{ _("Source") }}: {{ escape(source.name) }} - {{ _("Commits") }}</span>
+	</h1>
+
+	<p>
+		{{ _("Source repository") }}:
+		<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
+			{{ escape(source.name) }}
+		</a>
+	</p>
+
+	{{ modules.CommitsTable(distro, source, commits) }}
+
+	<div class="links">
+		{% if offset %}
+			<a href="?offset={{ offset - number }}">{{ _("Previous commits") }}</a>
+		{% end %}
+
+		{% if limit %}
+			<a href="?offset={{ offset + number }}">{{ _("Next commits") }}</a>
+		{% end %}
+	</div>
+{% end block %}

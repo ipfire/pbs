@@ -8,10 +8,37 @@ import string
 import time
 
 import base
+import logs
+
+from users import generate_password_hash, check_password_hash, generate_random_string
 
 class Builders(base.Object):
+	def auth(self, name, passphrase):
+		# If either name or passphrase is None, we don't check at all.
+		if None in (name, passphrase):
+			return
+
+		# Search for the hostname in the database.
+		# The builder must not be deleted.
+		builder = self.db.get("SELECT id FROM builders WHERE name = %s AND \
+			NOT status = 'deleted'", name)
+
+		if not builder:
+			return
+
+		# Get the whole Builder object from the database.
+		builder = self.get_by_id(builder.id)
+
+		# If the builder was not found or the passphrase does not match,
+		# you have bad luck.
+		if not builder or not builder.validate_passphrase(passphrase):
+			return
+
+		# Otherwise we return the Builder object.
+		return builder
+
 	def get_all(self):
-		builders = self.db.query("SELECT id FROM builders WHERE deleted = 'N' ORDER BY name")
+		builders = self.db.query("SELECT id FROM builders WHERE NOT status = 'deleted' ORDER BY name")
 
 		return [Builder(self.pakfire, b.id) for b in builders]
 
@@ -41,6 +68,53 @@ class Builders(base.Object):
 
 		return sorted(arches)
 
+	def get_load(self):
+		slots = 1
+		running_jobs = 0
+
+		for builder in self.get_all():
+			if not builder.state == "online":
+				continue
+
+			slots += builder.max_jobs
+			running_jobs += len(builder.get_active_jobs(uploads=False))
+
+		return int(running_jobs * 100 / slots)
+
+	def get_history(self, limit=None, offset=None, builder=None, user=None):
+		query = "SELECT * FROM builders_history"
+		args  = []
+
+		conditions = []
+
+		if builder:
+			conditions.append("builder_id = %s")
+			args.append(builder.id)
+
+		if user:
+			conditions.append("user_id = %s")
+			args.append(user.id)
+
+		if conditions:
+			query += " WHERE %s" % " AND ".join(conditions)
+
+		query += " ORDER BY time DESC"
+
+		if limit:
+			if offset:
+				query += " LIMIT %s,%s"
+				args  += [offset, limit,]
+			else:
+				query += " LIMIT %s"
+				args  += [limit,]
+
+		entries = []
+		for entry in self.db.query(query, *args):
+			entry = logs.BuilderLogEntry(self.pakfire, entry)
+			entries.append(entry)
+
+		return entries
+
 
 class Builder(base.Object):
 	def __init__(self, pakfire, id):
@@ -48,98 +122,311 @@ class Builder(base.Object):
 
 		self.id = id
 
-		self.data = self.db.get("SELECT * FROM builders WHERE id = %s", self.id)
+		# Cache.
+		self._data = None
+		self._active_jobs = None
+		self._arches = None
+		self._disabled_arches = None
 
 	def __cmp__(self, other):
 		return cmp(self.id, other.id)
 
+	@property
+	def data(self):
+		if self._data is None:
+			self._data = \
+				self.db.get("SELECT *, NOW() - time_keepalive AS updated \
+					FROM builders WHERE id = %s", self.id)
+
+		return self._data
+
 	@classmethod
-	def new(cls, pakfire, name):
-		id = pakfire.db.execute("INSERT INTO builders(name) VALUES(%s)", name)
+	def create(cls, pakfire, name, user=None, log=True):
+		"""
+			Creates a new builder.
+		"""
+		builder_id = pakfire.db.execute("INSERT INTO builders(name, time_created) \
+			VALUES(%s, NOW())", name)
 
-		builder = cls(pakfire, id)
-		builder.regenerate_passphrase()
+		# Create Builder object.
+		builder = cls(pakfire, builder_id)
 
-		return builder
+		# Generate a new passphrase.
+		passphrase = builder.regenerate_passphrase()
+
+		# Log what we have done.
+		if log:
+			builder.log("created", user=user)
+
+		# The Builder object and the passphrase are returned.
+		return builder, passphrase
+
+	def log(self, action, user=None):
+		user_id = None
+		if user:
+			user_id = user.id
+
+		self.db.execute("INSERT INTO builders_history(builder_id, action, user_id, time) \
+			VALUES(%s, %s, %s, NOW())", self.id, action, user_id)
 
 	def set(self, key, value):
 		self.db.execute("UPDATE builders SET %s = %%s WHERE id = %%s LIMIT 1" % key,
 			value, self.id)
 		self.data[key] = value
 
-	def delete(self):
-		self.set("disabled", "Y")
-		self.set("deleted",  "Y")
-
 	def regenerate_passphrase(self):
-		source = string.ascii_letters + string.digits
-		passphrase = "".join(random.sample(source * 30, 20))
+		"""
+			Generates a new random passphrase and stores it as a salted hash
+			to the database.
 
-		self.set("passphrase", passphrase)
+			The new passphrase is returned to be sent to the user (once).
+		"""
+		# Generate a random string with 20 chars.
+		passphrase = generate_random_string(length=20)
+
+		# Create salted hash.
+		passphrase_hash = generate_password_hash(passphrase)
+
+		# Store the hash in the database.
+		self.db.execute("UPDATE builders SET passphrase = %s WHERE id = %s",
+			passphrase_hash, self.id)
+
+		# Return the clear-text passphrase.
+		return passphrase
 
 	def validate_passphrase(self, passphrase):
-		return self.passphrase == passphrase
+		"""
+			Compare the given passphrase with the one stored in the database.
+		"""
+		return check_password_hash(passphrase, self.data.passphrase)
 
-	def update_info(self, loadavg, cpu_model, memory, arches):
-		self.set("loadavg", loadavg)
-		self.set("cpu_model", cpu_model)
-		self.set("memory", memory)
-		self.set("arches", arches)
+	@property
+	def description(self):
+		return self.data.description or ""
+
+	@property
+	def status(self):
+		return self.data.status
+
+	def update_description(self, description):
+		self.db.execute("UPDATE builders SET description = %s, time_updated = NOW() \
+			WHERE id = %s", description, self.id)
+
+		if self._data:
+			self._data["description"] = description
+
+	@property
+	def keepalive(self):
+		"""
+			Returns time of last keepalive message from this host.
+		"""
+		return self.data.time_keepalive
+
+	def update_keepalive(self, loadavg, free_space):
+		"""
+			Update the keepalive timestamp of this machine.
+		"""
+		if free_space is None:
+			free_space = 0
+
+		self.db.execute("UPDATE builders SET time_keepalive = NOW(), loadavg = %s, \
+			free_space = %s WHERE id = %s", loadavg, free_space, self.id)
+
+		logging.debug("Builder %s updated it keepalive status: %s" \
+			% (self.name, loadavg))
+
+	def needs_update(self):
+		query = self.db.get("SELECT time_updated, NOW() - time_updated \
+			AS seconds FROM builders WHERE id = %s", self.id)
+
+		# If there has been no update at all, we will need a new one.
+		if query.time_updated is None:
+			return True
+
+		# Require an update after the data is older than 24 hours.
+		return query.seconds >= 24*3600
+
+	def update_info(self, arches, cpu_model, cpu_count, memory, pakfire_version=None, host_key_id=None):
+		# Update architecture information.
+		self.update_arches(arches)
+
+		# Update all the rest.
+		self.db.execute("UPDATE builders SET time_updated = NOW(), \
+			pakfire_version = %s, cpu_model = %s, cpu_count = %s, memory = %s, \
+			host_key_id = %s \
+			WHERE id = %s", pakfire_version or "", cpu_model, cpu_count, memory,
+			host_key_id, self.id)
+
+	def update_arches(self, arches):
+		# Get all arches this builder does currently support.
+		supported_arches = [a.name for a in self.get_arches()]
+
+		# Noarch is always supported.
+		if not "noarch" in arches:
+			arches.append("noarch")
+
+		arches_add = []
+		for arch in arches:
+			if arch in supported_arches:
+				supported_arches.remove(arch)
+				continue
+
+			arches_add.append(arch)
+		arches_rem = supported_arches
+
+		for arch_name in arches_add:
+			arch = self.pakfire.arches.get_by_name(arch_name)
+			if not arch:
+				logging.info("Client sent unknown architecture: %s" % arch_name)
+				continue
+
+			self.db.execute("INSERT INTO builders_arches(builder_id, arch_id) \
+				VALUES(%s, %s)", self.id, arch.id)
+
+		for arch_name in arches_rem:
+			arch = self.pakfire.arches.get_by_name(arch_name)
+			assert arch
+
+			self.db.execute("DELETE FROM builders_arches WHERE builder_id = %s \
+				AND arch_id = %s", self.id, arch.id)
+
+	def update_overload(self, overload):
+		if overload:
+			overload = "Y"
+		else:
+			overload = "N"
+
+		self.db.execute("UPDATE builders SET overload = %s WHERE id = %s",
+			overload, self.id)
+		self._data["overload"] = overload
+
+		logging.debug("Builder %s updated it overload status to %s" % \
+			(self.name, self.overload))
 
 	def get_enabled(self):
-		return not self.disabled
+		return self.status == "enabled"
 
 	def set_enabled(self, value):
-		if value:
-			value = "N"
-		else:
-			value = "Y"
+		# XXX deprecated
 
-		self.set("disabled", value)
+		if value:
+			value = "enabled"
+		else:
+			value = "disabled"
+
+		self.set_status(value)
 
 	enabled = property(get_enabled, set_enabled)
 
 	@property
 	def disabled(self):
-		return self.data.disabled == "Y"
+		return not self.enabled
+
+	def set_status(self, status, user=None, log=True):
+		assert status in ("created", "enabled", "disabled", "deleted")
+
+		if self.status == status:
+			return
+
+		self.db.execute("UPDATE builders SET status = %s WHERE id = %s",
+			status, self.id)
+
+		if self._data:
+			self._data["status"] = status
+
+		if log:
+			self.log(status, user=user)
+
+	def get_arches(self, enabled=None):
+		"""
+			A list of architectures that are supported by this builder.
+		"""
+		if enabled is True:
+			enabled = "Y"
+		elif enabled is False:
+			enabled = "N"
+		else:
+			enabled = None
+
+		query = "SELECT arch_id AS id FROM builders_arches WHERE builder_id = %s"
+		args  = [self.id,]
+
+		if enabled:
+			query += " AND enabled = %s"
+			args.append(enabled)
+
+		# Get all other arches from the database.
+		arches = []
+		for arch in self.db.query(query, *args):
+			arch = self.pakfire.arches.get_by_id(arch.id)
+			arches.append(arch)
+
+		# Save a sorted list of supported architectures.
+		arches.sort()
+
+		return arches
 
 	@property
 	def arches(self):
-		arches = ["noarch",]
+		if self._arches is None:
+			self._arches = self.get_arches(enabled=True)
 
-		if self.build_src:
-			arches.append("src")
+		return self._arches
 
-		if self.data.arches:
-			arches += self.data.arches.split()
+	@property
+	def disabled_arches(self):
+		if self._disabled_arches is None:
+			self._disabled_arches = self.get_arches(enabled=False)
 
-		return sorted(arches)
+		return self._disabled_arches
 
-	def get_build_src(self):
-		return self.data.build_src == "Y"
+	def set_arch_status(self, arch, enabled):
+		if enabled:
+			enabled = "Y"
+		else:
+			enabled = "N"
 
-	def set_build_src(self, value):
+		self.db.execute("UPDATE builders_arches SET enabled = %s \
+			WHERE builder_id = %s AND arch_id = %s", enabled, self.id, arch.id)
+
+		# Reset the arch cache.
+		self._arches = None
+
+	def get_build_release(self):
+		return self.data.build_release == "Y"
+
+	def set_build_release(self, value):
 		if value:
 			value = "Y"
 		else:
 			value = "N"
 
-		self.set("build_src", value)
+		self.db.execute("UPDATE builders SET build_release = %s WHERE id = %s",
+			value, self.id)
 
-	build_src = property(get_build_src, set_build_src)
+		# Update the cache.
+		if self._data:
+			self._data["build_release"] = value
 
-	def get_build_bin(self):
-		return self.data.build_bin == "Y"
+	build_release = property(get_build_release, set_build_release)
 
-	def set_build_bin(self, value):
+	def get_build_scratch(self):
+		return self.data.build_scratch == "Y"
+
+	def set_build_scratch(self, value):
 		if value:
 			value = "Y"
 		else:
 			value = "N"
 
-		self.set("build_bin", value)
+		self.db.execute("UPDATE builders SET build_scratch = %s WHERE id = %s",
+			value, self.id)
 
-	build_bin = property(get_build_bin, set_build_bin)
+		# Update the cache.
+		if self._data:
+			self._data["build_scratch"] = value
+
+	build_scratch = property(get_build_scratch, set_build_scratch)
 
 	def get_build_test(self):
 		return self.data.build_test == "Y"
@@ -150,9 +437,29 @@ class Builder(base.Object):
 		else:
 			value = "N"
 
-		self.set("build_test", value)
+		self.db.execute("UPDATE builders SET build_test = %s WHERE id = %s",
+			value, self.id)
+
+		# Update the cache.
+		if self._data:
+			self._data["build_test"] = value
 
 	build_test = property(get_build_test, set_build_test)
+
+	@property
+	def build_types(self):
+		ret = []
+
+		if self.build_release:
+			ret.append("release")
+
+		if self.build_scratch:
+			ret.append("scratch")
+
+		if self.build_test:
+			ret.append("test")
+
+		return ret
 
 	def get_max_jobs(self):
 		return self.data.max_jobs
@@ -176,35 +483,67 @@ class Builder(base.Object):
 
 	@property
 	def loadavg(self):
-		if not self.status == "ONLINE":
-			return 0
+		if self.state == "online":
+			return self.data.loadavg
 
-		return self.data.loadavg
+	@property
+	def load1(self):
+		try:
+			load1, load5, load15 = self.loadavg.split(", ")
+		except:
+			return None
+
+		return load1
+
+	@property
+	def pakfire_version(self):
+		return self.data.pakfire_version or ""
 
 	@property
 	def cpu_model(self):
-		return self.data.cpu_model
+		return self.data.cpu_model or ""
+
+	@property
+	def cpu_count(self):
+		return self.data.cpu_count
 
 	@property
 	def memory(self):
-		return self.data.memory * 1024
+		return self.data.memory
 
 	@property
-	def status(self):
+	def free_space(self):
+		return self.data.free_space or 0
+
+	@property
+	def overload(self):
+		return self.data.overload == "Y"
+
+	@property
+	def host_key_id(self):
+		return self.data.host_key_id
+
+	@property
+	def state(self):
 		if self.disabled:
-			return "DISABLED"
+			return "disabled"
 
-		threshhold = datetime.datetime.utcnow() - datetime.timedelta(minutes=6)
+		if self.data.time_keepalive is None:
+			return "offline"
 
-		if self.data.updated < threshhold:
-			return "OFFLINE"
+		if self.data.updated >= 5*60:
+			return "offline"
 
-		return "ONLINE"
+		return "online"
 
-	@property
-	def builds(self):
-		return self.pakfire.builds.get_by_host(self.id)
+	def get_active_jobs(self, uploads=True):
+		if self._active_jobs is None:
+			self._active_jobs = \
+				self.pakfire.jobs.get_active(host_id=self.id, uploads=uploads)
 
-	@property
-	def active_builds(self):
-		return self.pakfire.builds.get_active(host_id=self.id)
+		return self._active_jobs
+
+	def get_history(self, *args, **kwargs):
+		kwargs["builder"] = self
+
+		return self.pakfire.builders.get_history(*args, **kwargs)

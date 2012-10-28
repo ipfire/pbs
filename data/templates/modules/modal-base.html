@@ -1,0 +1,33 @@
+<div class="modal hide fade" id="{% block id %}{% end block %}">
+	<form class="modal-form form-horizontal" method="POST" action="{% block form_action %}{% end block %}">
+		{{ xsrf_form_html() }}
+
+		<div class="modal-header">
+			{% block header %}
+				<a class="close" data-dismiss="modal">&times;</a>
+				<h3>
+					{% block title %}{% end block %}
+				</h3>
+			{% end block %}
+		</div>
+
+		<div class="modal-body">
+			{% block body %}{% end block %}
+		</div>
+
+		<div class="modal-footer">
+			{% block footer %}
+				<p class="pull-left">
+					{% block footer_text %}{% end block %}
+				</p>
+
+				<button type="submit" class="btn btn-primary">
+					{% block submit_text %}{{ _("Submit") }}{% end block %}
+				</button>
+				<a class="btn" data-dismiss="modal">
+					{% block close_text %}{{ _("Cancel") }}{% end block %}
+				</a>
+			{% end block %}
+		</div>
+	</form>
+</div>

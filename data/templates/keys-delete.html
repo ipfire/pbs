@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Delete key %s") % escape(key.uids) }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/keys">{{ _("Key management") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/key/{{ key.fingerprint }}">{{ escape(key.uids) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/key/{{ key.fingerprint }}/delete">{{ _("Delete") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>
+			{{ _("Key") }}: {{ escape(key.uids) }}
+			<small>{{ key.fingerprint }}</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("You are going to delete the key <strong>%s</strong>.") % escape(key.uids) }}
+			</p>
+
+			<div class="btn-toolbar">
+				<div class="btn-group pull-right">
+					<a class="btn btn-danger" href="/key/{{ key.fingerprint }}/delete?confirmed=1">
+						{{ _("Delete key") }}
+					</a>
+					<a class="btn" href="/keys">{{ _("Cancel") }}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% end block %}

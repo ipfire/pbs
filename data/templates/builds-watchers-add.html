@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Watch build %s") % build.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/build/{{ build.uuid }}/watch">{{ _("Watch") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Watch build %s") % build.name }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span12">
+			<p>
+				{{ _("You may here add yourself to the list of watchers of this build.") }}
+				{{ _("If you do so, you will receive messages about new comments and status updates.") }}
+			</p>
+		</div>
+	</div>
+
+	{% if not current_user.is_admin() and current_user in watchers %}
+		<div class="alert alert-block">
+			<h4 class="alert-heading">{{ _("Oops!") }}</h4>
+			{{ _("You are already watching this build.") }}
+		</div>
+	{% end %}
+
+	<div class="row">
+		<div class="span6 offset3">
+			<form class="form-horizontal" method="POST" action="">
+				{{ xsrf_form_html() }}
+
+				<fieldset>
+					{% if current_user.is_admin() %}
+						<div class="control-group">
+							<label class="control-label">{{ _("Choose user") }}</label>
+							<div class="controls">
+								<select name="user_id">
+									{% if not current_user in watchers %}
+										<option value="{{ current_user.id }}">{{ _("Myself") }}</option>
+										<option value="" disabled>--------</option>
+									{% end %}
+
+									{% for user in [u for u in users if not u in watchers] %}
+										<option value="{{ user.id }}">{{ user.realname }}</option>
+									{% end %}
+								</select>
+							
+								<p class="help-block">
+									{{ _("Choose a user who should watch this build.") }}
+								</p>
+							</div>
+						</div>
+					{% else %}
+						<div class="control-group">
+							<label class="control-label">{{ _("User") }}</label>
+							<div class="controls">
+								<span class="input-xlarge uneditable-input">{{ escape(current_user.realname) }}</span>
+							</div>
+						</div>
+					{% end %}
+
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">{{ _("Add watcher") }}</button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+{% end block %}

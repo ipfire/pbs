@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Import new key") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/keys">{{ _("Key management") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Key management") }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span12">
+			<p>
+				{{ _("The keys are a very important component when it comes to security.") }}
+				{{ _("Each package in the Pakfire Build Service is signed to prove its authenticity.") }}
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span12">
+			<table class="table">
+				<thead>
+					<tr>
+						<th colspan="2">&nbsp;</th>
+						<th>{{ _("Fingerprint") }}</th>
+						<th>{{ _("Created") }}</th>
+						<th>{{ _("Expires") }}</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					{% for key in keys %}
+						<tr>
+							<td colspan="4">
+								<strong>
+									{% for uid in key.uids %}
+										{{ escape(uid) }}<br />
+									{% end %}
+								</strong>
+							</td>
+							<td>
+								<div class="btn-group">
+									<a class="btn btn-mini" href="http://pgp.mit.edu:11371/pks/lookup?op=vindex&search=0x{{ key.fingerprint }}" target="_blank">
+										<i class="icon-search"></i>
+										{{ _("Lookup") }}
+									</a>
+									<a class="btn btn-mini" href="/key/{{ key.fingerprint }}">
+										<i class="icon-download"></i>
+										{{ _("Download") }}
+									</a>
+								</div>
+
+								{% if current_user and current_user.has_perm("manage_keys") and key.can_be_deleted() %}
+									<br />
+									<div class="btn-group">
+										<a class="btn btn-mini btn-danger" href="/key/{{ key.fingerprint }}/delete">
+											<i class="icon-trash icon-white"></i>
+											{{ _("Remove") }}
+										</a>
+									</div>
+								{% end %}
+							</td>
+						</tr>
+
+						{% for subkey in key.subkeys %}
+							<tr>
+								<td>&nbsp;</td>
+								<td>
+									{% if subkey.algo %}
+										{{ _("Subkey") }} ({{ subkey.algo }}):
+									{% else %}
+										{{ _("Subkey") }}:
+									{% end %}
+								</td>
+								<td>{{ subkey.fingerprint }}</td>
+								<td>{{ format_date(subkey.time_created) }}</td>
+								<td>
+									{% if subkey.time_expires %}
+										{% if subkey.expired %}
+											<i class="icon-warning-sign"></i>
+										{% end %}
+
+										{{ format_date(subkey.time_expires, full_format=True) }}
+									{% else %}
+										{{ _("This key does not expire.") }}
+									{% end %}
+								</td>
+							</tr>
+						{% end %}
+
+						<tr>
+							<td colspan="5">&nbsp;</td>
+						</tr>
+					{% end %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{% if current_user and current_user.has_perm("manage_keys") %}
+		<div class="row">
+			<div class="span12">
+				<a class="btn btn-danger pull-right" href="/key/import">
+					<i class="icon-star icon-white"></i>
+					{{ _("Import new key") }}
+				</a>
+			</div>
+		</div>
+	{% end %}
+{% end block %}

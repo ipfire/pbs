@@ -1,0 +1,36 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>{{ _("Commit") }}</th>
+			<th>{{ _("Author") }}</th>
+			<th>{{ _("Subject") }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for commit in commits %}
+			<tr>
+				<td>
+					{% if commit.state == "pending" %}
+						<i class="icon-share-alt"></i>
+					{% elif commit.state == "running" %}
+						<i class="icon-cycle"></i>
+					{% elif commit.state == "failed" %}
+						<i class="icon-exclamation-mark"></i>
+					{% end %}
+
+					<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/{{ commit.revision }}">
+						{{ commit.revision[:7] }}
+					</a>
+					<br />
+					{{ format_date(commit.date, full_format=True) }}
+				</td>
+				<td>
+					{{ format_email(commit.author) }}
+				</td>
+				<td>
+					{{ escape(commit.subject) }}
+				</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>

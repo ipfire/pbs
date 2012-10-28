@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Impersonate user %s") % escape(user.realname) }}{% end block %}
+
+{% block body %}
+	<div class="page-header">
+		<h1>{{ _("User impersonation") }}: {{ escape(user.realname) }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span2 offset2">
+			<img src="{{ user.gravatar_icon() }}" alt="{{ user.name }}" />
+		</div>
+
+		<div class="span6">
+			<p>
+				{{ _("When impersonating another user, every action you perform will be taking place as if you had logged in as the user whom will be impersonating.") }}
+			</p>
+
+			<div class="alert alert-danger">
+				<h4 class="alert-heading">{{ _("Use with caution!") }}</h4>
+				{{ _("This is a very powerful feature. You should be very careful while using it.") }}
+			</div>
+
+			<form method="POST" action="">
+				{{ xsrf_form_html() }}
+				<input type="hidden" name="user" value="{{ escape(user.name) }}" />
+				<input class="btn btn-danger pull-right" type="submit" value="{{ _("Impersonate %s") % escape(user.realname) }}" />
+			</form>
+		</div>
+	</div>
+{% end block %}

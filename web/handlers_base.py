@@ -1,20 +1,44 @@
 #!/usr/bin/python
 
+import pakfire
+
+import datetime
 import httplib
+import pytz
 import time
 import tornado.locale
 import tornado.web
+import traceback
 
 import backend
 import backend.misc
+import backend.sessions
 
 class BaseHandler(tornado.web.RequestHandler):
+	@property
+	def cache(self):
+		return self.pakfire.cache
+
 	def get_current_user(self):
-		user = self.get_secure_cookie("user")
-		if not user:
+		session_id = self.get_cookie("session_id")
+		if not session_id:
 			return
 
-		return self.pakfire.users.get_by_name(user)
+		try:
+			self.session = backend.sessions.Session(self.pakfire, session_id)
+		except:
+			return
+
+		# Update the session lifetime.
+		# XXX refresh cookie, too
+		self.session.refresh()
+
+		# If the session impersonated a user, we return that one.
+		if self.session.impersonated_user:
+			return self.session.impersonated_user
+
+		# By default, we return the user of this session.
+		return self.session.user
 
 	def get_user_locale(self):
 		DEFAULT_LOCALE = tornado.locale.get("en_US")
@@ -43,14 +67,55 @@ class BaseHandler(tornado.web.RequestHandler):
 		# If no one of the cases above worked we use our default locale
 		return DEFAULT_LOCALE
 
+	def random_slogan(self):
+		slogan = self.pakfire.db.get("SELECT message FROM slogans ORDER BY RAND() LIMIT 1")
+		if slogan:
+			return slogan.message
+
+	@property
+	def remote_address(self):
+		"""
+			Returns the IP address the request came from.
+		"""
+		remote_ips = self.request.remote_ip.split(", ")
+
+		return remote_ips[-1]
+
+	@property
+	def timezone(self):
+		if self.current_user:
+			return self.current_user.timezone
+
+		return pytz.utc
+
+	def format_date(self, date, relative=True, shorter=False,
+			full_format=False):
+		# XXX not very precise but working for now.
+		gmt_offset = self.timezone.utcoffset(date).total_seconds() / -60
+
+		return self.locale.format_date(date, gmt_offset=gmt_offset,
+			relative=relative, shorter=shorter, full_format=full_format)
+
 	@property
 	def render_args(self):
-		return {
-			"hostname" : self.request.host,
-			"friendly_size" : backend.misc.friendly_size,
-			"lang" : self.locale.code[:2],
-			"year" : time.strftime("%Y"),
+		ret = {
+			"bugtracker"      : self.pakfire.bugzilla,
+			"hostname"        : self.request.host,
+			"format_date"     : self.format_date,
+			"format_size"     : backend.misc.format_size,
+			"friendly_time"   : backend.misc.friendly_time,
+			"format_email"    : backend.misc.format_email,
+			"format_filemode" : backend.misc.format_filemode,
+			"lang"            : self.locale.code[:2],
+			"pakfire_version" : pakfire.__version__,
+			"random_slogan"   : self.random_slogan,
+			"year"            : time.strftime("%Y"),
 		}
+
+		# Add session.
+		ret["session"] = getattr(self, "session", None)
+
+		return ret
 
 	def render(self, *args, **kwargs):
 		kwargs.update(self.render_args)
@@ -60,18 +125,44 @@ class BaseHandler(tornado.web.RequestHandler):
 		kwargs.update(self.render_args)
 		return tornado.web.RequestHandler.render_string(self, *args, **kwargs)
 
-	def get_error_html(self, status_code, **kwargs):
-		if status_code in (404, 500):
-			render_args = ({
-				"code"      : status_code,
-				"exception" : kwargs.get("exception", None),
-				"message"   : httplib.responses[status_code],
-			})
-			return self.render_string("error-%s.html" % status_code, **render_args)
-		else:
-			return tornado.web.RequestHandler.get_error_html(self, status_code, **kwargs)
+	def get_error_html(self, status_code, exception=None, **kwargs):
+		error_document = "error.html"
+
+		kwargs.update({
+			"code"      : status_code,
+			"message"   : httplib.responses[status_code],
+		})
+
+		if status_code in (403, 404):
+			error_document = "error-%s.html" % status_code
+
+		# Collect more information about the exception if possible.
+		if exception:
+			exception = traceback.format_exc()
+
+		return self.render_string(error_document, exception=exception, **kwargs)
 
 	@property
 	def pakfire(self):
 		return self.application.pakfire
 
+	@property
+	def arches(self):
+		return self.pakfire.arches
+
+	@property
+	def mirrors(self):
+		return self.pakfire.mirrors
+
+	@property
+	def public(self):
+		"""
+			Indicates what level of public/non-public things a user
+			may see.
+		"""
+		if self.current_user and self.current_user.is_admin():
+			public = None
+		else:
+			public = True
+
+		return public

@@ -1,0 +1,19 @@
+/*
+
+	Watchers sidebar table.
+
+*/
+
+h2.watchers span {
+	font-size: 0.7em;
+	color: #515151;
+}
+
+/* XXX move the list items a little bit to the right. */
+ul.watchers {
+}
+
+ul.watchers li {
+	list-style: square;
+	list-style-position: inside;
+}

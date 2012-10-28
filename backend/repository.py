@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
+import os.path
+
 import base
+import builds
+import logs
 import packages
 
 class Repositories(base.Object):
@@ -27,20 +31,26 @@ class Repositories(base.Object):
 
 		return [Repository(self.pakfire, r.id) for r in repos]
 
-	def get_action_by_id(self, action_id):
-		action = self.db.get("SELECT id, repo_id FROM repository_actions WHERE id = %s"
-			" LIMIT 1" , action_id)
+	def get_history(self, limit=None, offset=None, build=None, repo=None, user=None):
+		query = "SELECT * FROM repositories_history"
+		args  = []
 
-		assert action
+		query += " ORDER BY time DESC"
 
-		repo = self.get_by_id(action.repo_id)
+		if limit:
+			if offset:
+				query += " LIMIT %s,%s"
+				args  += [offset, limit,]
+			else:
+				query += " LIMIT %s"
+				args  += [limit,]
 
-		return RepoAction(self.pakfire, repo, action.id)
+		entries = []
+		for entry in self.db.query(query, *args):
+			entry = logs.RepositoryLogEntry(self.pakfire, entry)
+			entries.append(entry)
 
-	def get_actions_by_pkgid(self, pkgid):
-		actions = self.db.query("SELECT id FROM repository_actions WHERE pkg_id = %s", pkg_id)
-
-		return [RepoAction(self.pakfire, self, a.id) for a in actions]
+		return entries
 
 
 class Repository(base.Object):
@@ -48,39 +58,63 @@ class Repository(base.Object):
 		base.Object.__init__(self, pakfire)
 		self.id = id
 
-		self.data = self.db.get("SELECT * FROM repositories WHERE id = %s", self.id)
+		# Cache.
+		self._data = None
+		self._next = None
+		self._prev = None
+		self._key  = None
+		self._distro = None
+
+	@property
+	def data(self):
+		if self._data is None:
+			self._data = \
+				self.db.get("SELECT * FROM repositories WHERE id = %s", self.id)
+
+		return self._data
 
 	def __cmp__(self, other):
-		if not self.upstream_id or not other.upstream_id:
-			return 0
-
-		if self.id == other.upstream_id:
-			return -1
-
-		elif self.upstream_id == other.id:
+		if other is None:
 			return 1
 
+		if self.id == other.id:
+			return 0
+
+		elif self.id == other.parent_id:
+			return 1
+
+		elif self.parent_id == other.id:
+			return -1
+
+		return 1
+
 	def next(self):
-		repo = self.db.get("SELECT id FROM repositories WHERE upstream = %s"
-			" LIMIT 1", self.id)
+		if self._next is None:
+			repo = self.db.get("SELECT id FROM repositories \
+				WHERE parent_id = %s LIMIT 1", self.id)
 
-		if repo:
-			return self.pakfire.repos.get_by_id(repo.id)
+			if not repo:
+				return
 
-	def last(self):
-		if self.upstream_id:
-			return self.pakfire.repos.get_by_id(self.upstream_id)
+			self._next = Repository(self.pakfire, repo.id)
+
+		return self._next
+
+	def prev(self):
+		if not self.parent_id:
+			return
+
+		if self._prev is None:
+			self._prev = Repository(self.pakfire, self.parent_id)
+
+		return self._prev
 
 	@property
-	def upstream(self):
-		return self.last()
-
-	@property
-	def is_upstream(self):
-		return not self.upstream
+	def parent(self):
+		return self.prev()
 
 	@classmethod
-	def new(cls, pakfire, distro, name, description):
+	def create(cls, pakfire, distro, name, description):
 		id = pakfire.db.execute("INSERT INTO repositories(distro_id, name, description)"
 			" VALUES(%s, %s, %s)", distro.id, name, description)
 
@@ -88,7 +122,11 @@ class Repository(base.Object):
 
 	@property
 	def distro(self):
-		return self.pakfire.distros.get_by_id(self.data.distro_id)
+		if self._distro is None:
+			self._distro = self.pakfire.distros.get_by_id(self.data.distro_id)
+			assert self._distro
+
+		return self._distro
 
 	@property
 	def info(self):
@@ -100,8 +138,307 @@ class Repository(base.Object):
 		}
 
 	@property
-	def comprehensive(self):
-		return not self.upstream_id
+	def url(self):
+		url = os.path.join(
+			self.settings.get("repository_baseurl", "http://pakfire.ipfire.org/repositories/"),
+			self.distro.identifier,
+			self.identifier,
+			"%{arch}"
+		)
+
+		return url
+
+	@property
+	def mirrorlist(self):
+		url = os.path.join(
+			self.settings.get("mirrorlist_baseurl", "https://pakfire.ipfire.org/"),
+			"distro", self.distro.identifier,
+			"repo", self.identifier,
+			"mirrorlist?arch=%{arch}"
+		)
+
+		return url
+
+	def get_conf(self):
+		prioritymap = {
+			"stable"   : 500,
+			"unstable" : 200,
+			"testing"  : 100,
+		}
+
+		try:
+			priority = prioritymap[self.type]
+		except KeyError:
+			priority = None
+
+		lines = [
+			"[repo:%s]" % self.identifier,
+			"description = %s - %s" % (self.distro.name, self.summary),
+			"enabled = 1",
+			"baseurl = %s" % self.url,
+			"mirrors = %s" % self.mirrorlist,
+		]
+
+		if priority:
+			lines.append("priority = %s" % priority)
+
+		return "\n".join(lines)
+
+	@property
+	def name(self):
+		return self.data.name
+
+	@property
+	def identifier(self):
+		return self.name.lower()
+
+	@property
+	def type(self):
+		return self.data.type
+
+	@property
+	def summary(self):
+		lines = self.description.splitlines()
+
+		if lines:
+			return lines[0]
+
+		return "N/A"
+
+	@property
+	def description(self):
+		return self.data.description or ""
+
+	@property
+	def parent_id(self):
+		return self.data.parent_id
+
+	@property
+	def key(self):
+		if not self.data.key_id:
+			return
+
+		if self._key is None:
+			self._key = self.pakfire.keys.get_by_id(self.data.key_id)
+			assert self._key
+
+		return self._key
+
+	@property
+	def arches(self):
+		return self.distro.arches
+
+	@property
+	def mirrored(self):
+		return self.data.mirrored == "Y"
+
+	def get_enabled_for_builds(self):
+		return self.data.enabled_for_builds == "Y"
+
+	def set_enabled_for_builds(self, state):
+		if state:
+			state = "Y"
+		else:
+			state = "N"
+
+		self.db.execute("UPDATE repositories SET enabled_for_builds = %s WHERE id = %s",
+			state, self.id)
+
+		if self._data:
+			self._data["enabled_for_builds"] = state
+
+	enabled_for_builds = property(get_enabled_for_builds, set_enabled_for_builds)
+
+	@property
+	def score_needed(self):
+		return self.data.score_needed
+
+	@property
+	def time_min(self):
+		return self.data.time_min
+
+	@property
+	def time_max(self):
+		return self.data.time_max
+
+	def _log_build(self, action, build, from_repo=None, to_repo=None, user=None):
+		user_id = None
+		if user:
+			user_id = user.id
+
+		from_repo_id = None
+		if from_repo:
+			from_repo_id = from_repo.id
+
+		to_repo_id = None
+		if to_repo:
+			to_repo_id = to_repo.id
+
+		self.db.execute("INSERT INTO repositories_history(action, build_id, from_repo_id, to_repo_id, user_id, time) \
+			VALUES(%s, %s, %s, %s, %s, NOW())", action, build.id, from_repo_id, to_repo_id, user_id)
+
+	def add_build(self, build, user=None, log=True):
+		self.db.execute("INSERT INTO repositories_builds(repo_id, build_id, time_added)"
+			" VALUES(%s, %s, NOW())", self.id, build.id)
+
+		# Update bug status.
+		build._update_bugs_helper(self)
+
+		if log:
+			self._log_build("added", build, to_repo=self, user=user)
+
+	def rem_build(self, build, user=None, log=True):
+		self.db.execute("DELETE FROM repositories_builds \
+			WHERE repo_id = %s AND build_id = %s", self.id, build.id)
+
+		if log:
+			self._log_build("removed", build, from_repo=self, user=user)
+
+	def move_build(self, build, to_repo, user=None, log=True):
+		self.db.execute("UPDATE repositories_builds SET repo_id = %s, time_added = NOW() \
+			WHERE repo_id = %s AND build_id = %s", to_repo.id, self.id, build.id)
+
+		# Update bug status.
+		build._update_bugs_helper(to_repo)
+
+		if log:
+			self._log_build("moved", build, from_repo=self, to_repo=to_repo,
+				user=user)
+
+	def build_count(self):
+		query = self.db.get("SELECT COUNT(*) AS count FROM repositories_builds \
+			WHERE repo_id = %s", self.id)
+
+		if query:
+			return query.count
+
+	def get_builds(self, limit=None, offset=None):
+		query = "SELECT build_id AS id FROM repositories_builds \
+			WHERE repo_id = %s ORDER BY time_added DESC"
+		args  = [self.id,]
+
+		if limit:
+			if offset:
+				query += " LIMIT %s,%s"
+				args  += [offset, limit,]
+			else:
+				query += " LIMIT %s"
+				args  += [limit,]
+
+		_builds = []
+		for build in self.db.query(query, *args):
+			build = builds.Build(self.pakfire, build.id)
+			build._repo = self
+
+			_builds.append(build)
+
+		return _builds
+
+	def get_packages(self, arch):
+		if arch.name == "src":
+			pkgs = self.db.query("SELECT packages.id AS id FROM packages \
+				JOIN builds ON builds.pkg_id = packages.id \
+				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
+				WHERE packages.arch = %s AND repositories_builds.repo_id = %s",
+				arch.id, self.id)
+
+		else:
+			noarch = self.pakfire.arches.get_by_name("noarch")
+			assert noarch
+
+			pkgs = self.db.query("SELECT packages.id AS id FROM packages \
+				JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
+				JOIN jobs ON jobs_packages.job_id = jobs.id \
+				JOIN builds ON builds.id = jobs.build_id \
+				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
+				WHERE (jobs.arch_id = %s OR jobs.arch_id = %s) AND \
+				repositories_builds.repo_id = %s",
+				arch.id, noarch.id, self.id)
+
+		return sorted([packages.Package(self.pakfire, p.id) for p in pkgs])
+
+	@property
+	def packages(self):
+		return self.get_packages()
+
+	def get_unpushed_builds(self):
+		query = self.db.query("SELECT build_id FROM repositories_builds \
+			WHERE repo_id = %s AND \
+			time_added > (SELECT last_update FROM repositories WHERE id = %s)",
+			self.id, self.id)
+
+		ret = []
+		for row in query:
+			b = builds.Build(self.pakfire, row.build_id)
+			ret.append(b)
+
+		return ret
+
+	def get_obsolete_builds(self):
+		#query = self.db.query("SELECT build_id AS id FROM repositories_builds \
+		#	JOIN builds ON repositories.build_id = builds.id \
+		#	WHERE repositories_builds.repo_id = %s AND builds.state = 'obsolete'",
+		#	self.id)
+		#
+		#ret = []
+		#for row in query:
+		#	b = builds.Build(self.pakfire, row.id)
+		#	ret.append(b)
+		#
+		#return ret
+		return self.pakfire.builds.get_obsolete(self)
+
+	def needs_update(self):
+		if self.get_unpushed_builds:
+			return True
+
+		return False
+
+	def updated(self):
+		self.db.execute("UPDATE repositories SET last_update = NOW() \
+			WHERE id = %s", self.id)
+
+	def get_history(self, **kwargs):
+		kwargs.update({
+			"repo" : self,
+		})
+
+		return self.pakfire.repos.get_history(**kwargs)
+
+	def get_build_times(self):
+		noarch = self.pakfire.arches.get_by_name("noarch")
+		assert noarch
+
+		times = []
+		for arch in self.pakfire.arches.get_all():
+			time = self.db.get("SELECT SUM(jobs.time_finished - jobs.time_started) AS time FROM jobs \
+				JOIN builds ON builds.id = jobs.build_id \
+				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
+				WHERE (jobs.arch_id = %s OR jobs.arch_id = %s) AND \
+				repositories_builds.repo_id = %s", arch.id, noarch.id, self.id)
+
+			times.append((arch, time.time))
+
+		return times
+
+
+class RepositoryAux(base.Object):
+	def __init__(self, pakfire, id):
+		base.Object.__init__(self, pakfire)
+
+		self.id = id
+
+		# Cache.
+		self._data = None
+		self._distro = None
+
+	@property
+	def data(self):
+		if self._data is None:
+			self._data = self.db.get("SELECT * FROM repositories_aux WHERE id = %s", self.id)
+			assert self._data
+
+		return self._data
 
 	@property
 	def name(self):
@@ -109,179 +446,31 @@ class Repository(base.Object):
 
 	@property
 	def description(self):
-		return self.data.description
+		return self.data.description or ""
 
 	@property
-	def upstream_id(self):
-		return self.data.upstream
+	def url(self):
+		return self.data.url
 
 	@property
-	def arches(self):
-		return self.distro.arches
-
-	def get_needs_update(self):
-		return self.data.needs_update
-
-	def set_needs_update(self, val):
-		if val:
-			val = "Y"
-		else:
-			val = "N"
-
-		self.db.execute("UPDATE repositories SET needs_update = %s WHERE id = %s",
-			val, self.id)
-
-	needs_update = property(get_needs_update, set_needs_update)
+	def identifier(self):
+		return self.name.lower()
 
 	@property
-	def credits_needed(self):
-		return self.data.credits_needed
+	def distro(self):
+		if self._distro is None:
+			self._distro = self.pakfire.distros.get_by_id(self.data.distro_id)
+			assert self._distro
 
-	def add_package(self, pkg_id):
-		id = self.db.execute("INSERT INTO repository_packages(repo_id, pkg_id)"
-			" VALUES(%s, %s)", self.id, pkg_id)
+		return self._distro
 
-		# Mark, that the repository was altered and needs an update.
-		self.needs_update = True
+	def get_conf(self):
+		lines = [
+			"[repo:%s]" % self.identifier,
+			"description = %s - %s" % (self.distro.name, self.name),
+			"enabled = 1",
+			"baseurl = %s" % self.url,
+			"priority = 0",
+		]
 
-		return id
-
-	def get_packages(self, _query=None):
-		query = "SELECT pkg_id FROM repository_packages WHERE repo_id = %s"
-		if _query:
-			query = "%s %s" % (query, _query)
-
-		pkgs = self.db.query(query, self.id)
-
-		return sorted([packages.Package(self.pakfire, p.pkg_id) for p in pkgs])
-
-	@property
-	def packages(self):
-		return self.get_packages()
-
-	@property
-	def waiting_packages(self):
-		return self.get_packages("AND state = 'waiting'")
-
-	@property
-	def pushed_packages(self):
-		return self.get_packages("AND state = 'pushed'")
-
-	@property
-	def log(self):
-		return self.db.query("SELECT * FROM log WHERE repo_id = %s ORDER BY time DESC", self.id)
-
-	def register_action(self, action, pkg_id, old_pkg_id=None):
-		assert action in ("add", "remove",)
-		assert pkg_id is not None
-
-		id = self.db.execute("INSERT INTO repository_actions(action, repo_id, pkg_id)"
-			" VALUES(%s, %s, %s)", action, self.id, pkg_id)
-
-		# On upstream repositories, all actions are done immediately.
-		if self.is_upstream:
-			action = RepoAction(self.pakfire, self, id)
-			action.run()
-
-		return id
-
-	def has_actions(self):
-		actions = self.db.get("SELECT COUNT(*) as c FROM repository_actions"
-			" WHERE repo_id = %s", self.id)
-
-		if actions.c:
-			return True
-
-		return False
-
-	def get_actions(self):
-		actions = self.db.query("SELECT id FROM repository_actions"
-			" WHERE repo_id = %s ORDER BY time_added ASC", self.id)
-
-		return [RepoAction(self.pakfire, self, a.id) for a in actions]
-
-
-class RepoAction(base.Object):
-	def __init__(self, pakfire, repo, id):
-		base.Object.__init__(self, pakfire)
-
-		self.repo = repo
-		self.id = id
-
-		self.data = self.db.get("SELECT * FROM repository_actions WHERE id = %s"
-			" LIMIT 1", self.id)
-		assert self.data
-		assert self.data.repo_id == self.repo.id
-
-	@property
-	def action(self):
-		return self.data.action
-
-	@property
-	def pkg_id(self):
-		return self.data.pkg_id
-
-	@property
-	def pkg(self):
-		return self.pakfire.packages.get_by_id(self.pkg_id)
-
-	@property
-	def credits_needed(self):
-		return self.repo.credits_needed - self.pkg.credits
-
-	@property
-	def time_added(self):
-		return self.data.time_added
-
-	def delete(self, who=None):
-		"""
-			Delete ourself from the database.
-		"""
-		if who and not self.have_permission(who):
-			raise Exception, "Insufficient permissions"
-
-		self.db.execute("DELETE FROM repository_actions WHERE id = %s LIMIT 1", self.id)
-
-	def have_permission(self, who):
-		"""
-			Check if "who" has the permission to perform this action.
-		"""
-		if who is None:
-			return True
-
-		# Admins are always allowed to do all actions.
-		if who.is_admin():
-			return True
-
-		# If the maintainer matches, he is also allowed.
-		if who.email == self.pkg.maintainer_email:
-			return True
-
-		# Everybody else is denied.
-		return False
-
-	def is_doable(self):
-		return self.credits_needed == 0
-
-	def run(self, who=None):
-		if who and not self.have_permission(who):
-			raise Exception, "Insufficient permissions"
-
-		if self.action == "add":
-			self.repo.add_package(self.pkg_id)
-
-		elif self.action == "remove":
-			self.db.excute("DELETE FROM repository_packages WHERE repo_id = %s"
-				" AND pkg_id = %s LIMIT 1", self.repo.id, self.pkg_id)
-
-		else:
-			raise Exception, "Invalid action"
-
-		# If the action was started by an upstream repository, we add it so
-		# the next one.
-		next = self.repo.next()
-		if next:
-			next.register_action(self.action, self.pkg_id)
-
-		# Delete ourself.
-		self.delete(who)
+		return "\n".join(lines)

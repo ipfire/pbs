@@ -3,25 +3,45 @@
 {% block title %}{{ _("Create new builder") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Create a new builder") }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builders">{{ _("Builders") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/builder/new">{{ _("Create new builder") }}</a>
+		</li>
+	</ul>
 
-	<form method="post" action="">
-		{{ xsrf_form_html() }}
-		<table class="form form3">
-			<tr>
-				<td class="col1">{{ _("Name") }}</td>
-				<td class="col2">
-					<input name="name" type="text" length="64" />
-				</td>
-				<td class="col3">
-					{{ _("Must be the canonical hostname of the machine.") }}
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3" class="buttons">
-					<input type="submit" value="{{ _("Save") }}" />
-				</td>
-			</tr>
-		</table>
-	</form>
+	<div class="page-header">
+		<h1>{{ _("Create a new builder") }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<form class="form-horizontal" method="POST" action="">
+				{{ xsrf_form_html() }}
+				<fieldset>
+					<div class="control-group">
+						<label class="control-label" for="name">{{ _("Hostname") }}</label>
+						<div class="controls">
+							<input type="text" class="input-xlarge" id="name" name="name">
+
+							<p class="help-block">
+								{{ _("Enter the canonical hostname of the machine.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">{{ _("Create new builder") }}</button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
 {% end block %}

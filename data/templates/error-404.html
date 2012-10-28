@@ -1,5 +1,17 @@
 {% extends "error.html" %}
 
-{% block body %}
-	404
+{% block bigbox_headline %}
+	{{ _("404 - Not Found") }}
 {% end block %}
+
+{% block bigbox_subtitle %}
+	<small>{{ _("I could not find what you were searching for.") }}</small>
+{% end block %}
+
+{% block explanation %}
+	<p>
+		{{ _("You may have clicked an expired link or mistyped the address.") }}
+	</p>
+{% end block %}
+
+{% block message %}{% end block %}

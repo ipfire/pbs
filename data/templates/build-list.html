@@ -2,9 +2,11 @@
 
 {% block title %}{{ _("Build job list") }}{% end block %}
 
+### UNUSED
+
 {% block body %}
 	<h1>{{ _("Build job list") }}</h1>
-	{{ modules.BuildTable(builds) }}
+	{{ modules.BuildTable(builds, show_user=True) }}
 {% end block %}
 
 {% block sidebar %}

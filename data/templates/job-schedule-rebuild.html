@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Schedule rebuild for %s") % job.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/build/{{ build.uuid }}/schedule?type=rebuild">{{ _("Schedule rebuild") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Schedule rebuild for %s") % job.name }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("At this place, you can submit failed build jobs to be built again.") }}
+			</p>
+			<p>
+				{{ _("The build job will be started when a build slot is available but not before the given time.") }}
+			</p>
+
+			{{ modules.BuildOffset() }}
+		</div>
+	</div>
+{% end block %}

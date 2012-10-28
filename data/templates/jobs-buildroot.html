@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Job buildroot")}}: {{ job.name }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Job buildroot")}}: {{ job.name }}</h1>
+	<p>
+		{{ _("This is the buildroot of build job %s.") % job.name }}
+	</p>
+	<p>
+		{{ _("The packages listed below were used for the build.") }}
+	</p>
+
+	<ul class="buildroot">
+		{% for name, uuid, pkg in buildroot %}
+			<li class="package">
+				{% if pkg %}
+					<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
+				{% else %}
+					{{ name }} (<span>{{ uuid }}</span>)
+				{% end %}
+			</li>
+		{% end %}
+	</ul>
+
+{% end block %}

@@ -1,9 +1,28 @@
 {% extends "base.html" %}
 
+{% block title %}{{ _("Account activation successful") }}{% end block %}
+
 {% block body %}
-	<h1>{{ _("Activation successful") }}</h1>
-	<p>
-		{{ _("Your account has been activated, %s.") % user.realname }}
-		{{ _("Have fun!") }}
-	</p>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			{{ _("Account activation") }}
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Activation successful") }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("Your account has been activated, %s.") % user.realname }}
+				{{ _("Have fun!") }}
+			</p>
+		</div>
+	</div>
 {% end %}

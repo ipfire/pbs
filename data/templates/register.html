@@ -1,63 +1,116 @@
-{% extends "base.html" %}
+{% extends "base-form1.html" %}
+
+{% block title %}{{ _("Register a new account") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Register new account") }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/register">{{ _("Register new account") }}</a>
+		</li>
+	</ul>
 
-	<form method="post" action="">
-		{{ xsrf_form_html() }}
-		<table class="form form3">
-			<tr>
-				<td class="col1">{{ _("Name") }}:</td>
-				<td class="col2">
-					<input name="name" type="text" length="64" />
-				</td>
-				<td class="col3">
-					{{ _("Must be a unique name you login with.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Email") }}:</td>
-				<td class="col2">
-					<input name="email" type="text" length="100" />
-				</td>
-				<td class="col3">
-					{{ _("Type your email address.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Real name (optional)") }}:</td>
-				<td class="col2">
-					<input name="realname" type="text" length="200" />
-				</td>
-				<td class="col3">
-					{{ _("Type you firstname and your lastname here.") }}
-				</td>
-			</tr>
-		</table>
-		
-		<h2>{{ _("Account security") }}</h2>
-		<table class="form form3">
-			<tr>
-				<td class="col1">{{ _("Password") }}:</td>
-				<td class="col2">
-					<input name="pass1" type="password" />
-				</td>
-				<td class="col3">
-					{{ _("The password is used to secure the login and must be at least 8 characters.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Confirm") }}:</td>
-				<td class="col2">
-					<input name="pass2" type="password" />
-				</td>
-				<td class="col3">&nbsp;</td>
-			</tr>
-			<tr>
-				<td colspan="3" class="buttons">
-					<input type="submit" value="{{ _("Register") }}" />
-				</td>
-			</tr>
-		</table>
-	</form>
+	<div class="page-header">
+		<h1>
+			{{ _("Register a new account") }}<br>
+			<small>{{ _("Join the community!") }}</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span8">
+			<p>
+				{{ _("Signing up to the Pakfire Build Service is free.") }}
+			</p>
+
+			<p>
+				{{ _("Please make sure you have read the guide about what Pakfire Build Service is, and what it is not:") }}
+
+				<a href="/documents/what-is-the-pakfire-build-service">
+					{{ _("What is the Pakfire Build Service?") }}
+				</a>
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span8">
+			<form class="form-horizontal" method="POST" action="">
+				{{ xsrf_form_html() }}
+
+				<legend>{{ _("Registration form") }}</legend>
+
+				<fieldset>
+					<div class="control-group">
+						<label class="control-label" for="name">{{ _("Username") }}</label>
+						<div class="controls">
+							<input type="text" class="input-xlarge" id="name" name="name" />
+
+							<p class="help-block">
+								{{ _("Must be a unique name you login with.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<label class="control-label" for="email">{{ _("Email") }}</label>
+						<div class="controls">
+							<input type="text" class="input-xlarge" id="email" name="email" />
+
+							<p class="help-block">
+								{{ _("Type in your email address, which is used to verify the account.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<label class="control-label" for="realname">{{ _("Real name (optional)") }}</label>
+						<div class="controls">
+							<input type="text" class="input-xlarge" id="realname" name="realname" />
+
+							<p class="help-block">
+								{{ _("Type you firstname and your lastname here.") }}
+							</p>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>{{ _("Account security") }}</legend>
+
+					<div class="control-group">
+						<label class="control-label" for="pass1">{{ _("Password") }}</label>
+						<div class="controls">
+							<input type="password" class="input-xlarge" id="pass1" name="pass1" />
+
+							<p class="help-block">
+								{{ _("The password is used to secure the login and must be at least 8 characters.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<label class="control-label" for="pass2">{{ _("Confirm password") }}</label>
+						<div class="controls">
+							<input type="password" class="input-xlarge" id="pass2" name="pass2" />
+
+							<p class="help-block">
+								{{ _("<strong>You</strong> are responsible for your account security!") }}
+								<br />
+								{{ _("Pick a password that is as strong as possible.") }}
+								{{ _("Don't login at unsecure places where people could spy on your password.") }}
+							</p>
+						</div>
+					</div>
+				</fieldset>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">{{ _("Sign up!") }}</button>
+				</div>
+			</form>
+		</div>
+	</div>
 {% end block %}

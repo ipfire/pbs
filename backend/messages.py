@@ -70,22 +70,6 @@ class Messages(base.Object):
 			# Add the message to the queue that it is sent.
 			self.add(recipient, _subject, _body)
 
-	def send_messages(self, limit=10):
-		i = 0
-		for msg in self.get_all(limit=10):
-			try:
-				self.send_msg(msg)
-			except Exception, e:
-				logging.debug("There was an error sending mail: %s" % e)
-				raise
-			else:
-				# If everything was okay, we can delete the message in the database.
-				self.delete(msg.id)
-				i += 1
-
-		logging.debug("Successfully sent %s message(s). %s still in queue." \
-			% (i, self.count))
-
 	@staticmethod
 	def send_msg(msg):
 		if not msg.to:

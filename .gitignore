@@ -1,2 +1,2 @@
-.py[co]
-.mo
+*.py[co]
+*.mo

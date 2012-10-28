@@ -1,111 +1,276 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Package") }}: {{ pkg.friendly_name }}{% end block %}
+{% block title %}{{ _("Package") }}: {{ escape(pkg.name) }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Package") }}: <a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>-{{ pkg.friendly_version }}</h1>
-
-	<p class="pkg-summary">{{ pkg.description }}</p>
-
-	<table class="form form2">
-		<tr>
-			<td class="col1">{{ _("URL") }}</td>
-			<td class="col2">
-				<a href="{{ pkg.url }}" target="_blank">{{ pkg.url }}</a>
-			</td>
-		</tr>
-		<tr>
-			<td class="col1">{{ _("License") }}</td>
-			<td class="col2">{{ pkg.license }}</td>
-		</tr>
-
-		{% if pkg.maintainer %}
-			<tr>
-				<td class="col1">{{ _("Maintainer") }}</td>
-				<td class="col2">{{ escape(pkg.maintainer) }}</td>
-			</tr>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(pkg.name) }}">{{ escape(pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		{% if pkg.build %}
+			<li>
+				<a href="/build/{{ pkg.build.uuid }}">{{ escape(pkg.build.name) }}</a>
+				<span class="divider">/</span>
+			</li>
 		{% end %}
+		{% if pkg.job %}
+			<li>
+				<a href="/job/{{ pkg.job.uuid }}">{{ escape(pkg.job.arch.name) }}</a>
+				<span class="divider">/</span>
+			</li>
+		{% end %}
+		<li class="active">
+			<a href="/package/{{ pkg.uuid }}">{{ escape(pkg.friendly_name) }}</a>
+		</li>			
+	</ul>
 
-		<tr>
-			<td class="col1">{{ _("Supported architectures") }}</td>
-			<td class="col2">{{ locale.list(pkg.supported_arches) }}</td>
-		</tr>
-	</table>
-	<div style="clear: both;">&nbsp;</div>
+	<div class="page-header">
+		<div class="pull-right">
+			{% if pkg.type == "source" %}
+				<span class="label label-success">{{ _("Source package") }}</span>
+			{% end %}
+			{% if pkg.name.endswith("-devel") %}
+				<span class="label label-info">{{ _("Development package") }}</span>
+			{% end %}
+			{% if pkg.name.endswith("-debuginfo") %}
+				<span class="label">{{ _("Debuginfo package") }}</span>
+			{% end %}
+		</div>
 
-	<h2>{{ _("Comments") }}</h2>
-	<p>
-		{{ _("This package got a total credit count of %s credits.") % pkg.credits }}
-	</p>
+		<h1>
+			{{ _("Package") }}: {{ escape(pkg.friendly_name) }}
+			<br /><small>{{ escape(pkg.summary) }}</small>
+		</h1>
+	</div>
 
-	{% if current_user %}
-		<p>
-			<a id="comment-toggle" href="#">{{ _("Add comment") }}</a>
-			<script>
-				/* Initially hide the comment area and show it if the user clicks "add comment". */
-				$(function() {
-					$(".add-comment").hide();
-					$("#comment-toggle").toggle(
-						function() { $(".add-comment").show(); },
-						function() { $(".add-comment").hide(); }
-					);
-				});
-			</script>
-		</p>
-		<div class="add-comment">
-			<h4>{{ _("Add comment") }}</h4>
-			<form method="post" action="">
-				{{ xsrf_form_html() }}
-				<input type="hidden" name="action" value="comment" />
-				<table class="form form2">
+	<div class="row">
+		<div class="span4">
+			<blockquote>{{ escape(pkg.description) }}</blockquote>
+		</div>
+
+		<div class="span4">
+			<table class="table">
+				<tbody>
 					<tr>
-						<td colspan="2">
-							<textarea name="text" cols="90" rows="6"></textarea>
+						<td>{{ _("Homepage") }}</td>
+						<td>
+							<a href="{{ escape(pkg.url) }}" target="_blank">{{ escape(pkg.url) }}</a>
 						</td>
 					</tr>
 					<tr>
+						<td>{{ _("License") }}</td>
 						<td>
-							{% if current_user.is_tester() or current_user.is_admin() %}
-								{{ _("Vote") }}:
-								<input name="vote" type="radio" value="none" selected="selected" />{{ _("Not tested") }}
-								<input name="vote" type="radio" value="up" />{{ _("Works for me") }}
-								<input name="vote" type="radio" value="down" />{{ _("Doesn't work for me") }}
+							{{ escape(pkg.license) }}
+						</td>
+					</tr>
+					{% if pkg.maintainer %}
+						<tr>
+							<td>{{ _("Maintainer") }}</td>
+							<td>{{ modules.Maintainer(pkg.maintainer) }}</td>
+						</tr>
+					{% end %}
+					<tr>
+						<td>{{ _("Build host") }}</td>
+						<td>
+							<a href="/builder/{{ pkg.build_host }}">{{ pkg.build_host }}</a>
+						</td>
+					</tr>
+					<tr>
+						<td>{{ _("Build time") }}</td>
+						<td>{{ locale.format_date(pkg.build_time, full_format=True) }} UTC</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="span4">
+			<table class="table">
+				<tbody>
+					{% if pkg.type == "binary" %}
+						<tr>
+							<td>{{ _("Source package") }}</td>
+							<td>
+								<a href="/package/{{ pkg.build.pkg.uuid }}">{{ pkg.build.pkg.friendly_name }}</a>
+							</td>
+						</tr>
+					{% end %}
+
+					{% if pkg.build %}
+						<tr>
+							<td>{{ _("Build") }}</td>
+							<td>
+								<a href="/build/{{ pkg.build.uuid }}">{{ escape(pkg.build.name) }}</a>
+							</td>
+						</tr>
+					{% end %}
+
+					{% if pkg.job %}
+						<tr>
+							<td>{{ _("Job") }}</td>
+							<td>
+								<a href="/job/{{ pkg.job.uuid }}">{{ escape(pkg.job.name) }}</a>
+							</td>
+						</tr>
+					{% end %}
+
+					<tr>
+						<td>{{ _("Size") }}</td>
+						<td>
+							{{ format_size(pkg.filesize) }}
+							{% if pkg.type == "binary" %}
+								({{ _("%(size)s when installed") % { "size" : format_size(pkg.size) } }})
 							{% end %}
 						</td>
-						<td class="buttons">
-							<input name="submit" type="submit" value="{{ _("Submit") }}" />
-						</td>
 					</tr>
-				</table>
-			</form>
+
+					{% if pkg.commit %}
+						<tr>
+							<td>{{ _("Commit") }}</td>
+							<td>
+								<a href="/distro/{{ pkg.commit.distro.identifier }}/source/{{ pkg.commit.source.identifier }}/commit/{{ pkg.commit.revision }}">{{ pkg.commit.revision[:7] }}</a>
+								<br />{{ escape(pkg.commit.subject) }}
+							</td>
+						</tr>
+					{% end %}
+				</tbody>
+			</table>
 		</div>
-	{% else %}
-		<p>{{ _("You must be logged in to comment.") }}</p>
+	</div>
+
+	<div class="row">
+		<div class="span12">
+			{% if pkg.build %}
+				<a class="btn pull-right" href="{{ pkg.build.download_prefix }}/{{ pkg.path }}">
+					<i class="icon-download"></i>
+					{{ _("Download") }}
+				</a>
+			{% end %}
+		</div>
+	</div>
+	<hr />
+
+	{% if pkg.type == "binary" %}
+		<div class="row">
+			<div class="span12">
+				<h2>{{ _("Dependencies") }}</h2>
+
+				<div class="tabbable">
+					<ul class="nav nav-pills">
+						{% if pkg.provides %}
+							<li class="active">
+								<a href="#deps_provides" data-toggle="tab">
+									{{ _("Provides") }}
+								</a>
+							</li>
+						{% end %}
+
+						{% if pkg.requires or pkg.prerequires %}
+							<li {% if not pkg.provides %}class="active"{% end %}>
+								<a href="#deps_requires" data-toggle="tab">
+									{{ _("Requires") }}
+								</a>
+							</li>
+						{% end %}
+
+						{% if pkg.obsoletes %}
+							<li {% if not any((pkg.provides, pkg.requires, pkg.prerequires)) %}class="active"{% end %}>
+								<a href="#deps_obsoletes" data-toggle="tab">
+									{{ _("Obsoletes") }}
+								</a>
+							</li>
+						{% end %}
+
+						{% if pkg.conflicts %}
+							<li {% if not any((pkg.provides, pkg.requires, pkg.prerequires, pkg.obsoletes)) %}class="active"{% end %}>
+								<a href="#deps_conflicts" data-toggle="tab">
+									{{ _("Conflicts") }}
+								</a>
+							</li>
+						{% end %}
+					</ul>
+
+					<div class="tab-content">
+						{% if pkg.provides %}
+							<div class="tab-pane active" id="deps_provides">
+								<ul>
+									{% for dep in pkg.provides %}
+										{% if not dep.startswith("uuid(") %}
+											<li>{{ escape(dep) }}</li>
+										{% end %}
+									{% end %}
+								</ul>
+							</div>
+						{% end %}
+
+						{% if pkg.requires or pkg.prerequires %}
+							<div class="tab-pane {% if not pkg.provides %}active{% end %}" id="deps_requires">
+								<ul>
+									{% for dep in pkg.requires %}
+										<li>{{ escape(dep) }}</li>
+									{% end %}
+								</ul>
+
+								{% if pkg.prerequires %}
+									<h3>{{ _("Prerequires") }}</h3>
+
+									<ul>
+										{% for dep in pkg.prerequires %}
+											<li>{{ escape(dep) }}</li>
+										{% end %}
+									</ul>
+								{% end %}
+							</div>
+						{% end %}
+
+						{% if pkg.obsoletes %}
+							<div class="tab-pane {% if not any((pkg.provides, pkg.requires, pkg.prerequires)) %}active{% end %}" id="deps_obsoletes">
+								<ul>
+									{% for dep in pkg.obsoletes %}
+										<li>{{ escape(dep) }}</li>
+									{% end %}
+								</ul>
+							</div>
+						{% end %}
+
+						{% if pkg.conflicts %}
+							<div class="tab-pane {% if not any((pkg.provides, pkg.requires, pkg.prerequires, pkg.obsoletes)) %}active{% end %}" id="deps_conflicts">
+								<ul>
+									{% for dep in pkg.conflicts %}
+										<li>{{ escape(dep) }}</li>
+									{% end %}
+								</ul>
+							</div>
+						{% end %}
+					</div>
+				</div>
+
+				<hr>
+			</div>
+		</div>
+	{% elif pkg.type == "source" %}
+		<div class="row">
+			<div class="span12">
+				<h2>{{ _("Build dependencies") }}</h2>
+				<ul>
+					{% for dep in pkg.requires %}
+						<li>{{ escape(dep) }}</li>
+					{% end %}
+				</ul>
+			</div>
+		</div>
 	{% end %}
-	{{ modules.CommentsTable(pkg.comments) }}
 
-	{% if pkg.builds %}
-		<h2>{{ _("Build jobs") }}</h2>
-		{{ modules.BuildTable(pkg.builds) }}
+	{% if pkg.filelist %}
+		<h2>{{ _("Files") }}</h2>
+		{{ modules.PackageFilesTable(pkg, pkg.filelist) }}
 	{% end %}
-
-	{% if pkg.packagefiles %}
-		<h2>{{ _("Package files") }}</h2>
-		{{ modules.FilesTable(pkg.packagefiles) }}
-	{% end %}
-
-	{% if pkg.logfiles %}
-		<h2>{{ _("Logfiles") }}</h2>
-		{{ modules.FilesTable(pkg.logfiles) }}
-	{% end %}
-
-	<h2>{{ _("Log") }}</h2>
-	{{ modules.LogTable(pkg.log) }}
-{% end block %}
-
-{% block sidebar %}
-	<h1>{{ _("Actions") }}</h1>
-	<ul>
-		<a href="">{{ _("Package is broken") }}</a>
-	</ul>
 {% end block %}

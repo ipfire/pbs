@@ -1,20 +1,88 @@
-<ul class="builds">
-	{% if builds %}
-		{% for build in builds %}
-			<li>
-				{% if build.type == "binary" %}
-					<a class="build {{ build.state }}"
-						href="/package/{{ build.pkg.name }}/{{ build.pkg.epoch }}/{{ build.pkg.version }}/{{ build.pkg.release }}"
-					>{{ build.pkg.friendly_name }}</a>.<a href="/build/{{ build.uuid }}">{{ build.arch }}</a>
-				{% elif build.type == "source" %}
-					<a class="build {{ build.state }}" href="/build/{{ build.uuid }}">{{ build.name }}</a>
-				{% else %}
-					{{ _("Unknown build type.") }}
+{% if builds %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>{{ _("Build") }}</th>
+				<th>{{ _("Jobs") }}</th>
+				{% if show_repo %}
+					<th>{{ _("Repository") }}</th>
 				{% end %}
-			</li>
-		{% end %}
-	{% else %}
-		<li>There are no builds to display.</li>
-	{% end %}
-</ul>
-<div style="clear: both;">&nbsp;</div>
+				{% if show_user %}
+					<th>{{ _("User") }}</th>
+				{% end %}
+				{% if show_when %}
+					<th>{{ _("When") }}</th>
+				{% end %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for build in builds %}
+			 	<tr class="build build_state_{{ build.state }}">
+			 		<td class="name">
+						<a class="build {{ build.type }} {{ build.state }}"
+							href="/build/{{ build.uuid }}">{{ build.name }}</a>
+					</td>
+
+					<td class="jobs">
+						{% if build.jobs %}
+							{% for job in build.jobs %}
+									<a class="job {{ job.state }}" title="{{ job.state }}"
+										href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
+							{% end %}
+						{% else %}
+							{{ _("This build has got no jobs.") }}
+						{% end %}
+					</td>
+
+					{% if show_repo %}
+						<td>
+							{% if build.repo %}
+								<a href="/distro/{{ escape(build.distro.identifier) }}">{{ escape(build.distro.name) }}</a>
+								/
+								<a href="/distro/{{ escape(build.distro.identifier) }}/repo/{{ escape(build.repo.identifier) }}">{{ escape(build.repo.name) }}</a>
+							{% else %}
+								&nbsp;
+							{% end %}
+						</td>
+					{% end %}
+
+					{% if show_user %}
+						{% if build.type == "scratch" and build.user %}
+							<td class="user">
+								{{ modules.Maintainer(build.user) }}
+							</td>
+						{% elif build.type == "release" %}
+							<td>{{ modules.Maintainer(build.pkg.maintainer) }}</td>
+						{% else %}
+							<td>&nbsp;</td>
+						{% end %}
+					{% end %}
+
+					{% if show_when %}
+						<td>
+							{{ format_date(build.created, relative=True) }}
+						</td>
+					{% end %}
+
+					{% if show_repo_time %}
+						<td class="time">
+							{{ format_date(build.repo_time, relative=False) }}
+						</td>
+					{% end %}
+
+					{% if show_can_move_forward %}
+						<td class="can-move-forward">
+							{{ build.can_move_forward }}
+						</td>
+					{% end %}
+				</tr>
+			{% end %}
+		</tbody>
+	</table>
+{% else %}
+	<div class="message message-warning">
+		<span>{{ _("No builds") }}</span>
+		{{ _("There are no builds to show at this place.") }}
+		{{ _("Possibly you need to adjust your search.") }}
+	</div>
+{% end %}

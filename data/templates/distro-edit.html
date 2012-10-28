@@ -27,12 +27,30 @@
 				</td>
 			</tr>
 			<tr>
+				<td class="col1">{{ _("Tag") }}</td>
+				<td class="col2">
+					<input type="text" name="tag" value="{{ distro.tag }}" />
+				</td>
+				<td class="col3">
+					{{ _("The tag is added to the package release.") }}
+				</td>
+			</tr>
+			<tr>
 				<td class="col1">{{ _("Vendor") }}</td>
 				<td class="col2">
 					<input type="text" name="vendor" value="{{ distro.vendor }}" />
 				</td>
 				<td class="col3">
 					{{ _("From whom is the distribution from?") }}
+				</td>
+			</tr>
+			<tr>
+				<td class="col1">{{ _("Contact") }}</td>
+				<td class="col2">
+					<input type="text" name="contact" value="{{ distro.contact or "" }}" />
+				</td>
+				<td>
+					{{ _("The email address from the vendor.") }}
 				</td>
 			</tr>
 			<tr>
@@ -49,7 +67,7 @@
 				<td class="col2">
 					<select name="arches" size="4" multiple>
 						{% for arch in arches %}
-							<option value="{{ arch }}" {% if arch in distro.arches %}selected="selected"{% end %}>{{ arch }}</option>
+							<option value="{{ arch.id }}" {% if arch in distro.arches %}selected="selected"{% end %}>{{ escape(arch.name) }}</option>
 						{% end %}
 					</select>
 				</td>

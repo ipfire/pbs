@@ -1,137 +1,306 @@
 #!/usr/bin/python
 
+import datetime
+import logging
 import os
 import shutil
-import time
-import urlparse
-import uuid
 
+import pakfire
+import pakfire.packages as packages
+
+import arches
 import base
-import build
+import builds
+import database
+import misc
+import sources
 
 from constants import *
 
 class Packages(base.Object):
-	def get_by_id(self, id):
-		return Package(self.pakfire, id)
+	def get_all_names(self, public=None, user=None, states=None):
+		query = "SELECT DISTINCT name, summary FROM packages \
+			JOIN builds ON builds.pkg_id = packages.id \
+			WHERE packages.type = 'source'"
 
-	def get_all_names(self):
-		names = self.db.query("SELECT DISTINCT name FROM packages ORDER BY name")
+		conditions = []
+		args = []
 
-		return [n.name for n in names]
+		if public in (True, False):
+			if public is True:
+				public = "Y"
+			elif public is False:
+				public = "N"
 
-	def get_by_name(self, name):
-		pkgs = self.db.query("SELECT id FROM packages WHERE name = %s ORDER BY id ASC", name)
+			conditions.append("builds.public = %s")
+			args.append(public)
 
-		return [Package(self.pakfire, pkg.id) for pkg in pkgs]
+		if user and not user.is_admin():
+			conditions.append("builds.owner_id = %s")
+			args.append(user.id)
 
-	find_by_name = get_by_name
+		if states:
+			for state in states:
+				conditions.append("builds.state = %s")
+				args.append(state)
 
-	def search(self, query):
-		# Search for an exact match
-		pkgs = self.db.query("SELECT DISTINCT name, summary FROM packages"
-			" WHERE name = %s LIMIT 1", query)
+		if conditions:
+			query += " AND (%s)" % " OR ".join(conditions)
+		
+		query += " ORDER BY packages.name"
 
-		if not pkgs:
-			query = "%%%s%%" % query
-			pkgs = self.db.query("SELECT DISTINCT name, summary FROM packages"
-			" WHERE name LIKE %s OR summary LIKE %s OR description LIKE %s"
-			" ORDER BY name", query, query, query)
+		return [(n.name, n.summary) for n in self.db.query(query, *args)]
+
+	def get_by_uuid(self, uuid):
+		pkg = self.db.get("SELECT id FROM packages WHERE uuid = %s LIMIT 1", uuid)
+		if not pkg:
+			return
+
+		return Package(self.pakfire, pkg.id)
+
+	def search(self, pattern, limit=None):
+		"""
+			Searches for packages that do match the query.
+
+			This function does not work for UUIDs or filenames.
+		"""
+		query = "SELECT id FROM packages WHERE type = 'source' AND \
+			(name LIKE %s OR MATCH(name, summary, description) AGAINST(%s)) \
+			GROUP BY name"
+
+		pkgs = []
+		for pkg in self.db.query(query, pattern, pattern):
+			pkg = Package(self.pakfire, pkg.id)
+			pkgs.append(pkg)
+
+			if limit and len(pkgs) >= limit:
+				break
 
 		return pkgs
 
-	def get_by_tuple(self, name, epoch, version, release):
-		pkg = self.db.get("""SELECT id FROM packages WHERE name = %s AND
-			epoch = %s AND version = %s AND `release` = %s LIMIT 1""",
-			name, epoch, version, release)
+	def search_by_filename(self, filename, limit=None):
+		query = "SELECT filelists.* FROM filelists \
+			JOIN packages ON filelists.pkg_id = packages.id \
+			WHERE filelists.name = %s ORDER BY packages.build_time DESC"
+		args = [filename,]
 
-		if pkg:
-			return Package(self.pakfire, pkg.id)
+		if limit:
+			query += " LIMIT %s"
+			args.append(limit)
 
-	def get_with_file_by_uuid(self, uuid):
-		file = self.db.get("SELECT id, type, pkg_id FROM package_files WHERE uuid = %s LIMIT 1", uuid)
+		files = []
+		for result in self.db.query(query, *args):
+			pkg = Package(self.pakfire, result.pkg_id)
+			files.append((pkg, result))
 
-		if not file:
-			return None, None
+		return files
 
-		pkg = Package(self.pakfire, file.pkg_id)
+	def get_avg_build_times(self, name):
+		query = "SELECT jobs.arch_id AS arch_id, \
+				AVG(jobs.time_finished - jobs.time_started) AS build_time \
+			FROM jobs \
+				JOIN builds ON jobs.build_id = builds.id \
+				JOIN packages ON builds.pkg_id = packages.id \
+			WHERE packages.name = %s \
+				AND jobs.state = 'finished' \
+				AND NOT jobs.time_started IS NULL \
+				AND NOT jobs.time_finished IS NULL \
+			GROUP BY jobs.arch_id"
 
-		if file.type == SourcePackageFile.type:
-			file = SourcePackageFile(self.pakfire, file.id)
+		ret = []
+		for row in self.db.query(query, name):
+			arch = arches.Arch(self.pakfire, row.arch_id)
+			ret.append((arch, row.build_time))
 
-		elif file.type == BinaryPackageFile.type:
-			file = BinaryPackageFile(self.pakfire, file.id)
+		# Sorts the list by the priority of the arches.
+		ret.sort()
 
-		return pkg, file
-
-	def get_comments(self, limit=50):
-		comments = self.db.query("""SELECT * FROM package_comments
-			ORDER BY time DESC LIMIT %s""", limit)
-
-		return comments
+		return ret
 
 
 class Package(base.Object):
-	"""
-		This class represents a package (like source package) that is passed to
-		the buildsystem.
-
-		New objects of this are created by the new() method.
-	"""
-
 	def __init__(self, pakfire, id):
 		base.Object.__init__(self, pakfire)
+
+		# The ID of the package.
 		self.id = id
 
-		self._data = self.db.get("SELECT * FROM packages WHERE id = %s", self.id)
+		# Cache.
+		self._data = None
+		self._deps = None
+		self._arch = None
+		self._filelist = None
+		self._job = None
+		self._commit = None
+		self._properties = None
+		self._maintainer = None
+
+	def __repr__(self):
+		return "<%s %s>" % (self.__class__.__name__, self.friendly_name)
 
 	def __cmp__(self, other):
-		# Order alphabetically.
-		return cmp(self.friendly_name, other.friendly_name)
+		return pakfire.util.version_compare(self.pakfire,
+			self.friendly_name, other.friendly_name)
 
 	@classmethod
-	def new(cls, pakfire, file, build):
-		# Check if the package does already exist in the database.
-		pkg = pakfire.packages.get_by_tuple(file.name, file.epoch, file.version,
-			file.release)
+	def open(cls, pakfire, path):
+		# Just check if the file really does exist.
+		assert os.path.exists(path)
 
-		if pkg:
-			return pkg
+		file = packages.open(None, None, path)
 
-		id = pakfire.db.execute("INSERT INTO packages(name, epoch, version,"
-		 	" `release`, groups, maintainer, license, url, summary, description,"
-		 	" supported_arches, source_build) VALUES(%s, %s, %s, %s, %s, %s, %s, %s,"
-		 	" %s, %s, %s, %s)", file.name, file.epoch, file.version, file.release,
-		 	" ".join(file.groups), file.maintainer, file.license, file.url,
-		 	file.summary, file.description, file.supported_arches, build.id)
+		# Get architecture from the database.
+		arch = pakfire.arches.get_by_name(file.arch)
+		assert arch, "Unknown architecture: %s" % file.arch
 
-		pkg = cls(pakfire, id)
-		pkg.add_file(file, build)
+		hash_sha512 = misc.calc_hash(path, "sha512")
+		assert hash_sha512
 
-		# Create all needed build jobs.
-		pkg.create_builds()
+		query = [
+			("name",        file.name),
+			("epoch",       file.epoch),
+			("version",     file.version),
+			("release",     file.release),
+			("type",        file.type),
+			("arch",        arch.id),
 
-		return pkg
+			("groups",      " ".join(file.groups)),
+			("maintainer",  file.maintainer),
+			("license",     file.license),
+			("url",         file.url),
+			("summary",     file.summary),
+			("description", file.description),
+			("size",        file.size),
+			("uuid",        file.uuid),
+
+			# Build information.
+			("build_id",    file.build_id),
+			("build_host",  file.build_host),
+			("build_time",  datetime.datetime.utcfromtimestamp(file.build_time)),
+
+			# File "metadata".
+			("path",        path),
+			("filesize",    os.path.getsize(path)),
+			("hash_sha512", hash_sha512),
+		]
+
+		if file.type == "source":
+			query.append(("supported_arches", file.supported_arches))
+
+		keys = []
+		vals = []
+		for key, val in query:
+			keys.append("`%s`" % key)
+			vals.append(val)
+
+		_query = "INSERT INTO packages(%s)" % ", ".join(keys)
+		_query += " VALUES(%s)" % ", ".join("%s" for v in vals)
+
+		# Create package entry in the database.
+		id = pakfire.db.execute(_query, *vals)
+
+		# Dependency information.
+		deps = []
+		for d in file.prerequires:
+			deps.append((id, "prerequires", d))
+
+		for d in file.requires:
+			deps.append((id, "requires", d))
+
+		for d in file.provides:
+			deps.append((id, "provides", d))
+
+		for d in file.conflicts:
+			deps.append((id, "conflicts", d))
+
+		for d in file.obsoletes:
+			deps.append((id, "obsoletes", d))
+
+		if deps:
+			pakfire.db.executemany("INSERT INTO packages_deps(pkg_id, type, what) \
+				VALUES(%s, %s, %s)", deps)
+
+		# Add all files to filelists table.
+		filelist = []
+		for f in file.filelist:
+			if f.config:
+				config = "Y"
+			else:
+				config = "N"
+
+			# Convert mtime to integer.
+			try:
+				mtime = int(f.mtime)
+			except ValueError:
+				mtime = 0
+
+			filelist.append((id, f.name, f.size, f.hash1, f.type, config, f.mode,
+				f.user, f.group, datetime.datetime.utcfromtimestamp(mtime),
+				f.capabilities))
+
+		pakfire.db.executemany("INSERT INTO filelists(pkg_id, name, size, hash_sha512, \
+			type, config, mode, user, `group`, mtime, capabilities) \
+			VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", filelist)
+
+		# Return the newly created object.
+		return cls(pakfire, id)
+
+	def delete(self):
+		self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", self.path)
+
+		# Delete all files from the filelist.
+		self.db.execute("DELETE FROM filelists WHERE pkg_id = %s", self.id)
+
+		# Delete the package.
+		self.db.execute("DELETE FROM packages WHERE id = %s", self.id)
+
+		# Remove cached data.
+		self._data = {}
+
+	@property
+	def data(self):
+		if self._data is None:
+			self._data = \
+				self.db.get("SELECT * FROM packages WHERE id = %s", self.id)
+			assert self._data, "Cannot fetch package %s: %s" % (self.id, self._data)
+
+		return self._data
+
+	@property
+	def uuid(self):
+		return self.data.uuid
 
 	@property
 	def name(self):
-		return self._data.get("name")
+		return self.data.name
 
 	@property
 	def epoch(self):
-		return self._data.get("epoch")
+		return self.data.epoch
 
 	@property
 	def version(self):
-		return self._data.get("version")
+		return self.data.version
 
 	@property
 	def release(self):
-		return self._data.get("release")
+		return self.data.release
+
+	@property
+	def arch(self):
+		if self._arch is None:
+			self._arch = self.pakfire.arches.get_by_id(self.data.arch)
+			assert self._arch
+
+		return self._arch
+
+	@property
+	def type(self):
+		return self.data.type
 
 	@property
 	def friendly_name(self):
-		return "%s-%s" % (self.name, self.friendly_version)
+		return "%s-%s.%s" % (self.name, self.friendly_version, self.arch.name)
 
 	@property
 	def friendly_version(self):
@@ -143,397 +312,322 @@ class Package(base.Object):
 		return s
 
 	@property
-	def distro(self):
-		return self.source.distro
-
-	def get_state(self):
-		return self._data.get("state")
-
-	def set_state(self, state):
-		self.db.execute("UPDATE packages SET state = %s WHERE id = %s", state, self.id)
-		self._data["state"] = state
-
-		if state == "finished":
-			# Add package to all comprehensive repositories.
-			for repo in self.distro.comprehensive_repositories:
-				self.add_to_repository(repo)
-
-	state = property(get_state, set_state)
-
-	@property
-	def summary(self):
-		return self._data.get("summary")
-
-	@property
-	def description(self):
-		return self._data.get("description")
-
-	@property
 	def groups(self):
-		return self._data.get("groups")
-
-	@property
-	def url(self):
-		return self._data.get("url")
+		return self.data.groups.split()
 
 	@property
 	def maintainer(self):
-		return self._data.get("maintainer")
+		if self._maintainer is None:
+			self._maintainer = self.data.maintainer
+
+			# Search if there is a user account for this person.
+			user = self.pakfire.users.find_maintainer(self._maintainer)
+			if user:
+				self._maintainer = user
+
+		return self._maintainer
 
 	@property
 	def license(self):
-		return self._data.get("license")
+		return self.data.license
 
 	@property
-	def source(self):
-		return self.source_build.source
-
-	def get_files(self, type=None):
-		files = []
-
-		query = "SELECT id, type FROM package_files WHERE pkg_id = %s"
-		if type:
-			query += " AND type = '%s'" % type
-
-		for p in self.db.query(query, self.id):
-			for p_class in (SourcePackageFile, BinaryPackageFile, LogFile):
-				if p.type == p_class.type:
-					p = p_class(self.pakfire, p.id)
-					break
-			else:
-				continue
-
-			files.append(p)
-
-		return files
+	def url(self):
+		return self.data.url
 
 	@property
-	def packagefiles(self):
-		return [f for f in self.get_files() if isinstance(f, PackageFile)]
+	def summary(self):
+		return self.data.summary
 
 	@property
-	def logfiles(self):
-		return [f for f in self.get_files() if isinstance(f, LogFile)]
-
-	@property
-	def sourcefile(self):
-		sourcefiles = [f for f in self.get_files() if isinstance(f, SourcePackageFile)]
-
-		assert len(sourcefiles) <= 1
-
-		if sourcefiles:
-			return sourcefiles[0]
-
-	@property
-	def log(self):
-		return self.db.query("SELECT * FROM log WHERE pkg_id = %s AND"
-			" build_id IS NULL ORDER BY time DESC", self.id)
-
-	def add_file(self, pkg, build):
-		path = os.path.join(
-			self.name,
-			"%s-%s-%s" % (self.epoch, self.version, self.release),
-			build.arch,
-			os.path.basename(pkg.filename))
-		abspath = os.path.join(self.source.targetpath, path)
-
-		if os.path.exists(abspath):
-			# Check if file is already in the database and return the id.
-			file = self.db.get("SELECT id FROM package_files WHERE path = %s LIMIT 1", path)
-			if file:
-				return file.id
-
-			os.unlink(abspath)
-
-		# Save the data to a file.
-		dirname = os.path.dirname(abspath)
-		if not os.path.exists(dirname):
-			os.makedirs(dirname)
-
-		# Copy file to target directory.
-		shutil.copy(pkg.filename, abspath)
-
-		id = self.db.execute("INSERT INTO package_files(path, pkg_id, source_id,"
-			" type, arch, summary, description, requires, provides, obsoletes,"
-			" conflicts, url, license, maintainer, size, hash1, build_host,"
-			" build_id, build_time, uuid) VALUES(%s, %s, %s, %s, %s, %s, %s, %s,"
-			" %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-			path, self.id, build.source.id, pkg.type, pkg.arch, pkg.summary,
-			pkg.description, " ".join(pkg.requires), " ".join(pkg.provides),
-			" ".join(pkg.obsoletes), " ".join(pkg.conflicts), pkg.url, pkg.license,
-			pkg.maintainer, pkg.size, pkg.hash1, pkg.build_host, pkg.build_id,
-			pkg.build_time, pkg.uuid)
-
-		# Add package filelist
-		self.db.executemany("INSERT INTO filelists(pkgfile_id, name, size, hash1)"
-			" VALUES(%s, %s, %s, %s)", [(id, f, 0, "0"*40) for f in pkg.filelist])
-
-		return id
-
-	def add_log(self, filename, build):
-		path = os.path.join(
-			self.name,
-			"%s-%s-%s" % (self.epoch, self.version, self.release),
-			"logs/build.%s.%s.log" % (build.arch, build.retries))
-		abspath = os.path.join(self.source.targetpath, path)
-
-		# Save the data to a file.
-		dirname = os.path.dirname(abspath)
-		if not os.path.exists(dirname):
-			os.makedirs(dirname)
-
-		# Move file to target directory.
-		shutil.copy(filename, abspath)
-
-		self.db.execute("INSERT INTO package_files(path, source_id, pkg_id,"
-			" type, arch, build_id) VALUES(%s, %s, %s, %s, %s, %s)", path,
-			self.source.id, self.id, "log", build.arch, build.uuid)
+	def description(self):
+		return self.data.description
 
 	@property
 	def supported_arches(self):
-		supported = self._data.get("supported_arches") or ""
-		supported = supported.split()
-
-		arches = []
-
-		if "all" in supported:
-			# Inherit all supported architectures from the distribution.
-			arches += self.distro.arches
-			supported.remove("all")
-
-		excludes = [a[1:] for a in supported if a.startswith("-")]
-
-		if excludes:
-			_arches = []
-
-			for arch in arches:
-				if arch in excludes:
-					continue
-
-				_arches.append(arch)
-
-			arches = _arches
-
-		includes = [a[1:] for a in supported if not a.startswith("-")]
-
-		# Add explicitely included architectures.
-		arches += includes
-
-		return arches
-
-	def create_builds(self):
-		builds = []
-
-		for arch in self.supported_arches:
-			b = build.BinaryBuild.new(self.pakfire, self, arch)
-
-			builds.append(b)
-
-		return builds
-
-	@property
-	def builds(self):
-		if not hasattr(self, "_builds"):
-			self._builds = self.pakfire.builds.get_by_pkgid(self.id)
-
-			if self.source_build:
-				self._builds.append(self.source_build)
-
-		return self._builds
-
-	@property
-	def source_build(self):
-		return self.pakfire.builds.get_by_id(self._data.source_build)
-
-	def update(self):
-		if not self.state == "finished":
-			# Check if all builds are finished and set package state to finished, too.
-			for build in self.builds:
-				if not build.finished:
-					return
-
-			self.state = "finished"
-
-	@property
-	def repositories(self):
-		repos = self.db.query("SELECT repo_id FROM repository_packages WHERE pkg_id = %s", self.id)
-
-		return [self.pakfire.repos.get_by_id(r.id) for r in repos]
-
-	def add_to_repository(self, repo):
-		#repo.add_package(self)
-		repo.register_action("add", self.id)
-
-	@property
-	def comments(self):
-		comments = self.db.query("""SELECT * FROM package_comments
-			WHERE pkg_id = %s ORDER BY time DESC""", self.id)
-
-		return comments
-
-	def comment(self, user_id, text, vote):
-		id = self.db.execute("""INSERT INTO package_comments(pkg_id, user_id,
-			text, vote) VALUES(%s, %s, %s, %s)""", self.id, user_id, text, vote)
-
-		vote2credit = { "up" : 1, "down" : -1, "none" : 0, }
-		try:
-			self.credits = self.credits + vote2credit[vote]
-
-		except KeyError:
-			pass
-
-		return id
-
-	def get_credits(self):
-		return self._data.credits
-
-	def set_credits(self, credits):
-		self.db.execute("UPDATE packages SET credits = %s WHERE id = %s",
-			credits, self.id)
-		self._data["credits"] = credits
-
-	credits = property(get_credits, set_credits)
-
-	def get_actions(self):
-		return self.pakfire.repos.get_actions_by_pkgid(self.id)
-
-
-class File(base.Object):
-	type = None
-
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
-		self.id = id
-
-		self._data = \
-			self.db.get("SELECT * FROM package_files WHERE id = %s", self.id)
-
-
-	def __repr__(self):
-		return "<%s %s>" % (self.__class__.__name__, self.name)
-
-	def __cmp__(self, other):
-		return cmp(self.name, other.name)
-
-	@property
-	def name(self):
-		return os.path.basename(self.path)
-
-	@property
-	def path(self):
-		path = self._data.get("path")
-
-		if path.startswith("/"):
-			path = path[1:]
-
-		return path
-
-	@property
-	def abspath(self):
-		return os.path.join(self.source.targetpath, self.path)
-
-	@property
-	def download(self):
-		path = self.abspath.split("/")
-
-		while path:
-			if path[0] == "packages":
-				break
-			path = path[1:]
-
-		return "%s/%s" % (self.pakfire.settings.get("baseurl"), "/".join(path))
-
-	@property
-	def source(self):
-		return self.pakfire.sources.get_by_id(self._data.source_id)
-
-
-class PackageFile(File):
-	@property
-	def filelist(self):
-		return self.db.query("SELECT name, size, hash1 FROM filelists"
-			" WHERE pkgfile_id = %s", self.id)
-
-	@property
-	def hash1(self):
-		return self._data.get("hash1")
-
-	@property
-	def uuid(self):
-		return self._data.get("uuid")
-
-	@property
-	def summary(self):
-		return self._data.get("summary")
-
-	@property
-	def description(self):
-		return self._data.get("description")
-
-	@property
-	def license(self):
-		return self._data.get("license")
+		return self.data.supported_arches
 
 	@property
 	def size(self):
-		return self._data.get("size")
+		return self.data.size
 
 	@property
-	def url(self):
-		return self._data.get("url")
+	def deps(self):
+		if self._deps is None:
+			query = self.db.query("SELECT type, what FROM packages_deps WHERE pkg_id = %s", self.id)
+
+			self._deps = []
+			for row in query:
+				self._deps.append((row.type, row.what))
+
+		return self._deps
 
 	@property
-	def maintainer(self):
-		return self._data.get("maintainer")
-
-	@property
-	def build_id(self):
-		return self._data.get("build_id")
-
-	@property
-	def build_host(self):
-		return self._data.get("build_host")
-
-	@property
-	def build_time(self):
-		return self._data.get("build_time")
-
-	@property
-	def build_date(self):
-		return time.strftime("%a, %d %b %Y %H:%M:%S +0000",
-			time.gmtime(self.build_time))
-
-	@property
-	def provides(self):
-		return self._data.get("provides").split()
+	def prerequires(self):
+		return [d[1] for d in self.deps if d[0] == "prerequires"]
 
 	@property
 	def requires(self):
-		requires = self._data.get("requires").split()
-
-		return sorted(requires)
+		return [d[1] for d in self.deps if d[0] == "requires"]
 
 	@property
-	def obsoletes(self):
-		obsoletes = self._data.get("obsoletes").split()
-
-		return sorted(obsoletes)
+	def provides(self):
+		return [d[1] for d in self.deps if d[0] == "provides"]
 
 	@property
 	def conflicts(self):
-		conflicts = self._data.get("conflicts").split()
+		return [d[1] for d in self.deps if d[0] == "conflicts"]
 
-		return sorted(conflicts)
+	@property
+	def obsoletes(self):
+		return [d[1] for d in self.deps if d[0] == "obsoletes"]
+
+	@property
+	def commit_id(self):
+		return self.data.commit_id
+
+	def get_commit(self):
+		if not self.commit_id:
+			return
+
+		if self._commit is None:
+			self._commit = sources.Commit(self.pakfire, self.commit_id)
+
+		return self._commit
+
+	def set_commit(self, commit):
+		self.db.execute("UPDATE packages SET commit_id = %s WHERE id = %s",
+			commit.id, self.id)
+		self._commit = commit
+
+	commit = property(get_commit, set_commit)
+
+	@property
+	def distro(self):
+		if not self.commit:
+			return
+
+		# XXX THIS CANNOT RETURN None
+
+		return self.commit.distro
+
+	@property
+	def build_id(self):
+		return self.data.build_id
+
+	@property
+	def build_host(self):
+		return self.data.build_host
+
+	@property
+	def build_time(self):
+		return self.data.build_time
+
+	@property
+	def path(self):
+		return self.data.path
+
+	@property
+	def hash_sha512(self):
+		return self.data.hash_sha512
+
+	@property
+	def filesize(self):
+		return self.data.filesize
+
+	def move(self, target_dir):
+		# Create directory if it does not exist, yet.
+		if not os.path.exists(target_dir):
+			os.makedirs(target_dir)
+
+		# Make full path where to put the file.
+		target = os.path.join(target_dir, os.path.basename(self.path))
+
+		# Copy the file to the target directory (keeping metadata).
+		shutil.move(self.path, target)
+
+		# Update file path in the database.
+		self.db.execute("UPDATE packages SET path = %s WHERE id = %s",
+			os.path.relpath(target, PACKAGES_DIR), self.id)
+		self._data["path"] = target
+
+	@property
+	def build(self):
+		build = self.db.get("SELECT id FROM builds \
+			WHERE type = 'release' AND pkg_id = %s", self.id)
+
+		if build:
+			return builds.Build(self.pakfire, build.id)
+
+		if self.job:
+			return self.job.build
+
+	@property
+	def job(self):
+		if self._job is None:
+			job = self.db.get("SELECT job_id AS id FROM jobs_packages \
+				WHERE pkg_id = %s", self.id)
+
+			if job:
+				self._job = builds.Job(self.pakfire, job.id)
+
+		return self._job
+
+	@property
+	def filelist(self):
+		if self._filelist is None:
+			self._filelist = \
+				self.db.query("SELECT * FROM filelists WHERE pkg_id = %s ORDER BY name",
+					self.id)
+
+		return self._filelist
+
+	def get_file(self):
+		if os.path.exists(self.path):
+			return pakfire.packages.open(self.path)
+
+	## properties
+
+	_default_properties = {
+		"critical_path" : False,
+		"priority"      : 0,
+	}
+
+	def update_property(self, key, value):
+		assert self._default_properties.has_key(key), "Unknown key: %s" % key
+
+		#print self.db.execute("UPDATE packages_properties SET 
+
+	@property
+	def properties(self):
+		if self._properties is None:
+			self._properties = \
+				self.db.get("SELECT * FROM packages_properties WHERE name = %s", self.name)
+
+			if not self._properties:
+				self._properties = database.Row(self._default_properties)
+
+		return self._properties
+
+	@property
+	def critical_path(self):
+		return self.properties.get("critical_path", "N") == "Y"
 
 
-class BinaryPackageFile(PackageFile):
-	type = "binary"
+# XXX DEAD CODE
+
+class File(base.Object):
+	def __init__(self, pakfire, path):
+		base.Object.__init__(self, pakfire)
+
+		assert os.path.exists(path)
+		self.path = path
+
+	def calc_hash(self, method="sha512"):
+		h = None
+
+		if method == "sha512":
+			h = hashlib.sha512()
+
+		if h is None:
+			raise Exception, "Not a valid hash method: %s" % method
+
+		logging.debug("Calculating %s hash for %s" % (method, self.path))
+
+		f = open(self.path, "rb")
+		while True:
+			buf = f.read(BUFFER_SIZE)
+			if not buf:
+				break
+
+			h.update(buf)
+		f.close()
+
+		return h.hexdigest()
 
 
-class SourcePackageFile(PackageFile):
+class DatabaseFile(File):
+	def __init__(self, pakfire, id):
+		base.Object.__init__(self, pakfire)
+
+		self.id = id
+
+		# Cache.
+		self._data = None
+
+	def fetch_data(self):
+		raise NotImplementedError
+
+	@property
+	def data(self):
+		if self._data is None:
+			self._data = self.fetch_data()
+
+		return self._data
+
+
+class DatabaseSourceFile(DatabaseFile):
+	def fetch_data(self):
+		return self.db.get("SELECT * FROM files_src WHERE id = %s", self.id)
+
+
+
+class PackageFile(File):
+	type = None
+
+	def __init__(self, pakfire, path):
+		File.__init__(self, pakfire, path)
+
+		# Open the package file for reading.
+		self.pkg = packages.open(None, None, self.path)
+		assert self.pkg.type == self.type
+
+	def to_database(self):
+		raise NotImplementedError
+
+	@property
+	def uuid(self):
+		return self.pkg.uuid
+
+	@property
+	def requires(self):
+		return self.pkg.requires
+
+	@property
+	def build_host(self):
+		return self.pkg.build_host
+
+	@property
+	def build_id(self):
+		return self.pkg.build_id
+
+	@property
+	def build_time(self):
+		build_time = self.pkg.build_time
+
+		return datetime.datetime.utcfromtimestamp(build_time)
+
+
+class PackageSourceFile(PackageFile):
 	type = "source"
 
+	def to_database(self):
+		# MUST BE RELATIVE TO BASEDIR
+		path = self.path
 
-class LogFile(File):
-	type = "log"
+		id = self.db.execute("""
+			INSERT INTO packages(path, uuid, requires, hash_sha512,
+				build_host, build_id, build_time)
+			VALUES(%s, %s, %s, %s, %s, %s, %s)""",
+			path, self.uuid, "\n".join(self.requires), self.calc_hash("sha512"),
+			self.build_host, self.build_id, self.build_time
+		)
+
+		# Return the newly created object.
+		return DatabaseSourceFile(self.pakfire, id)
+
+
+class PackageBinaryFile(PackageFile):
+	type = "binary"
+
 

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>{{ _("Builds by %s") % escape(user.realname) }}</h1>
+
+	{% if builds %}
+
+		{% for order, items in sorted(builds.items()) %}
+			{{ order }}
+
+			{{ modules.BuildTable(items) }}
+		{% end %}
+
+	{% else %}
+
+		{{ _("No builds found matching your search criteria.") }}
+
+	{% end %}
+{% end block %}
+

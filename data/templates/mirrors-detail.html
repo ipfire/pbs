@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Mirror: %s") % escape(mirror.hostname) }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/mirrors">{{ _("Mirrors") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/mirror/{{ escape(mirror.hostname) }}">{{ escape(mirror.hostname) }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>
+			{{ _("Mirror: %s") % escape(mirror.hostname) }}
+			<small>{{ _("hosted by %s") % escape(mirror.owner) }}</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span5">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>{{ _("Hostname") }}</td>
+						<td>{{ escape(mirror.hostname) }}</td>
+					</tr>
+
+					{% if current_user and current_user.has_perm("manage_mirrors") %}
+						<tr>
+							<td>{{ _("Contact") }}</td>
+							<td>
+								{% if mirror.contact %}
+									<a href="mailto:{{ escape(mirror.contact) }}">{{ escape(mirror.contact) }}</a>
+								{% else %}
+									{{ _("N/A") }}
+								{% end %}
+							</td>
+						</tr>
+					{% end %}
+				</tbody>
+			</table>
+
+			<h2>{{ _("Status information") }}</h2>
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>{{ _("Status") }}</td>
+						<td>{{ mirror.status }}</td>
+					</tr>
+
+					<tr>
+						<td>{{ _("Last check") }}</td>
+						<td>
+							{% if mirror.last_check %}
+								{{ format_date(mirror.last_check) }}
+							{% else %}
+								{{ _("Never") }}
+							{% end %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			{% if current_user and current_user.has_perm("manage_mirrors") %}
+				<div class="btn-toolbar">
+					<div class="btn-group pull-right">
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							{{ _("Action") }}
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a href="/mirror/{{ escape(mirror.hostname) }}/edit">
+									<i class="icon-edit"></i>
+									{{ _("Edit settings") }}
+								</a>
+							</li>
+
+							<li class="divider"></li>
+							<li>
+								<a href="/mirror/{{ escape(mirror.hostname) }}/delete">
+									<i class="icon-trash"></i>
+									{{ _("Delete mirror") }}
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			{% end %}
+		</div>
+
+		<div class="span7">
+			<h2>{{ _("Map") }}</h2>
+
+			{% if mirror.longitude and mirror.latitude %}
+				<p>
+					{{ _("The location of the mirror server is estimated by the IP address.") }}
+				</p>
+				<iframe width="525" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+					src="http://www.openstreetmap.org/export/embed.html?bbox={{ mirror.longitude - 4 }},{{ mirror.latitude - 4 }},{{ mirror.longitude + 4 }},{{ mirror.latitude + 4 }}&amp;layer=mapquest&amp;marker={{ mirror.latitude }},{{ mirror.longitude }}" style="border: 1px solid black">
+				</iframe>
+				<p>
+					<a href="http://www.openstreetmap.org/?lat={{ mirror.latitude }}&amp;lon={{ mirror.longitude }}&amp;zoom=8&amp;layers=M&amp;mlat={{ mirror.latitude }}&amp;mlon={{ mirror.longitude }}" target="_blank">{{ _("View larger map") }}</a>
+					-
+					&copy; <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA
+				</p>
+			{% else %}
+				{{ _("The location of the mirror server could not be estimated.") }}
+			{% end %}
+		</div>
+	</div>
+{% end block %}

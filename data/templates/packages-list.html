@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Package list") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/packages">{{ _("Packages") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Package list") }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span5 offset1">
+			<p>
+				{{ _("This is an alphabetically ordered list of all packages in the distribution.") }}
+				{{ _("Click on a link to see further information about the package.") }}
+			</p>
+		</div>
+
+		<div class="span5">
+			<div class="btn-group">
+				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+					{{ _("Selection") }}
+					<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<li>
+						<a href="?show=broken">{{ _("Show broken packages") }}</a>
+					</li>
+					<li>
+						<a href="?show=all">{{ _("Show all packages") }}</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span10 offset1">
+			<div class="btn-toolbar">
+				<div class="btn-group">
+					{% for letter in sorted(packages.keys()) %}
+						<a class="btn" href="#{{ letter }}">{{ letter.upper() }}</a>
+					{% end %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span10 offset1">
+			<table class="table table-striped">
+				<tbody>
+					{% for letter, pkgs in sorted(packages.items()) %}
+						<tr>
+							<td colspan="2">
+								<a name="{{ letter }}"></a>
+								<h2>{{ letter.upper() }} <small>({{ len(pkgs) }})</small></h2>
+							</td>
+						</tr>
+						{% for pkg, summary in pkgs %}
+							<tr>
+								<td>
+									<a href="/package/{{ pkg }}">{{ pkg }}</a>
+								</td>
+								<td>
+									{{ escape(summary) }}
+								</td>
+							</tr>
+						{% end %}
+					{% end %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% end block %}

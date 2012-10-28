@@ -3,18 +3,47 @@
 {% block title %}{{ _("Schedule test build for %s") % build.name }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Schedule test build for %s") % build.name }}</h1>
-	<p>
-		{{ _("A test build is used to check if a package builds with the current package set.") }}
-		{{ _("In this way, developers are able to find quality issues fast and without actively searching for them.") }}
-	</p>
-	<p>
-		{{ _("As this build platform only has a limited amount of performance, test builds only have a very less priority.") }}
-		{{ _("However, you can manually request to run a test.") }}
-	</p>
-	<p>
-		{{ _("The build job will be started when a build slot is available but not before the given time.") }}
-	</p>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/build/{{ build.uuid }}/schedule?type=test">{{ _("Schedule test build") }}</a>
+		</li>
+	</ul>
 
-	{{ modules.BuildOffset() }}
+	<div class="page-header">
+		<h1>{{ _("Schedule test build for %s") % job.name }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<p>
+				{{ _("A test build is used to check if a package builds with the current package set.") }}
+				{{ _("In this way, developers are able to find quality issues fast and without actively searching for them.") }}
+			</p>
+			<p>
+				{{ _("As this build platform only has a limited amount of performance, test builds only have a very less priority.") }}
+				{{ _("However, you can manually request to run a test.") }}
+			</p>
+			<p>
+				{{ _("The build job will be started when a build slot is available but not before the given time.") }}
+			</p>
+
+			{{ modules.BuildOffset() }}
+		</div>
+	</div>
 {% end block %}

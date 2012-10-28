@@ -1,31 +1,159 @@
 {% extends "base.html" %}
 
+{% block title %}
+	{{ _("Repository") }}: {{ escape(repo.name) }} - {{ _("Distribution") }}: {{ escape(distro.name) }}
+{% end block %}
+
 {% block body %}
-	<h1>
-		{{ _("Repository") }}: {{ repo.name }} -
-		{{ _("from") }} <a href="/distribution/{{ distro.sname }}">{{ distro.name }}</a>
-	</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distros">{{ _("Distributions") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}">{{ escape(repo.name) }}</a>
+		</li>
+	</ul>
 
-	<p class="pkg-summary">{{ repo.description }}</p>
+	<div class="page-header">
+		<div class="pull-right">
+			{% if repo.type == "stable" %}
+				<span class="label label-success">
+					{{ _("Stable repository") }}
+				</span>
+			{% elif repo.type == "unstable" %}
+				<span class="label label-warning">
+					{{ _("Unstable repository") }}
+				</span>
+			{% elif repo.type == "testing" %}
+				<span class="label label-important">
+					{{ _("Testing repository") }}
+				</span>
+			{% end %}
 
-	<p>
-		{{ _("This repository contains %s packages and is available for %s.") % (len(repo.packages), locale.list(repo.arches)) }}
-	</p>
+			{% if repo.enabled_for_builds %}
+				<span class="label label-inverse">
+					{{ _("Enabled for builds") }}
+				</span>
+			{% end %}
+		</div>
 
-	{% if repo.has_actions() %}
-		<h2>{{ _("Pending actions") }}</h2>
-		{{ modules.RepoActionsTable(repo) }}
+		<h1>
+			{{ _("Repository") }}: {{ escape(repo.name) }}
+			<small>{{ escape(distro.name) }}</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span8">
+			<blockquote>
+				{{ modules.Text(repo.description, pre=False) }}
+			</blockquote>
+
+			<br><br>
+
+			<table class="table">
+				<tr>
+					<td>{{ _("Repository is enabled for builds?") }}</td>
+					<td>
+						{% if repo.enabled_for_builds %}
+							{{ _("Yes") }}
+						{% else %}
+							{{ _("No") }}
+						{% end %}
+					</td>
+				</tr>
+
+				<tr>
+					<td>{{ _("Obsolete builds") }}</td>
+					<td>
+						{{ len(obsolete_builds) }}
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="span4">
+			<h3>{{ _("Total build time") }}</h3>
+
+			<table class="table table-striped">
+				<tbody>
+					{% for arch, build_time in build_times %}
+						<tr>
+							<td class="arch">{{ arch.name }}</td>
+							<td class="time">{{ friendly_time(build_time) }}</td>
+						</tr>
+					{% end %}
+				</tbody>
+			</table>
+
+			<p>
+				{{ _("The table above shows how long it took to build all packages in this repository.") }}
+			</p>
+		</div>
+	</div>
+
+	{% if current_user and current_user.is_admin() %}
+		<div class="row">
+			<div class="span12">
+				<hr>
+
+				<div class="btn-group pull-right">
+					<a class="btn btn-small btn-danger" href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}/edit">
+						<i class="icon-edit icon-white"></i>
+						{{ _("Edit") }}
+					</a>
+					<a class="btn btn-small btn-danger" href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}/delete">
+						<i class="icon-trash icon-white"></i>
+						{{ _("Delete") }}
+					</a>
+				</div>
+			</div>
+		</div>
 	{% end %}
 
-	<h2>{{ _("Waiting packages") }}</h2>
-	<p>
-		{{ _("These packages are waiting to be published.") }}
-	</p>
-	{{ modules.PackageTable2(repo.waiting_packages) }}
+	{% if unpushed_builds %}
+		<div class="row">
+			<div class="span12">
+				<h2>{{ _("Unpushed builds") }}</h2>
+				<div class="alert">
+					{{ _("These builds were already put into this repository, but were not pushed out to the mirror servers, yet.") }}
+				</div>
+				{{ modules.BuildTable(unpushed_builds, show_repo_time=True) }}
+			</div>
+		</div>
+	{% end %}
 
-	<h2>{{ _("Pushed packages") }}</h2>
-	{{ modules.PackageTable2(repo.pushed_packages) }}
+	{% if builds %}
+		<div class="row">
+			<div class="span12">
+				<h2>
+					{{ _("Builds in this repository") }}
+					<small>({{ len(builds) }})</small>
+				</h2>
+				{{ modules.BuildTable(builds, show_repo_time=True, show_can_move_forward=True) }}
+			</div>
+		</div>
+	{% end %}
 
-	<h2>{{ _("Log") }}</h2>
-	{{ modules.LogTable(repo.log) }}
+	{% if obsolete_builds %}
+		<div class="row">
+			<div class="span12">
+				<h2>
+					{{ _("Obsolete builds") }}
+					<small>({{ len(obsolete_builds) }})</small>
+				</h2>
+				{{ modules.BuildTable(obsolete_builds) }}
+			</div>
+		</div>
+	{% end %}
+
 {% end block %}

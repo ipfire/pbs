@@ -1,0 +1,70 @@
+/*
+
+	CSS attributes for the build table.
+
+*/
+
+/* Scratch builds are shown in italic font. */
+ul.builds li.build a.scratch {
+	font-style: italic;
+}
+
+table.builds tr.build {
+	line-height: 175%;
+}
+
+table.builds tr.build td.name {
+	width: 20em;
+}
+
+table.builds tr.build td.name a.scratch {
+	font-style: italic;
+}
+
+table.builds tr.build td.name a.unknown {
+	color: #515151;
+}
+
+table.builds tr.build td.name a.failed {
+	color: red;
+}
+
+table.builds tr.build td.name a.running {
+	color: yellow;
+}
+
+table.builds tr.build td.name a.finished {
+	color: green;
+}
+
+table.builds tr.build td.user {
+	width: 10em;
+}
+
+table.builds tr.build td.jobs a.pending {
+	color: #515151;
+}
+
+table.builds tr.build td.jobs a.running {
+	color: yellow;
+}
+
+table.builds tr.build td.jobs a.dependency_error {
+	color: blue;
+}
+
+table.builds tr.build td.jobs a.failed {
+	color: red;
+}
+
+table.builds tr.build td.jobs a.dispatching {
+	color: yellow;
+}
+
+table.builds tr.build td.jobs a.uploading {
+	color: yellow;
+}
+
+table.builds tr.build td.jobs a.finished {
+	color: green;
+}

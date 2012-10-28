@@ -1,0 +1,40 @@
+<div class="well well-small">
+	{% block body %}
+		{% block title %}
+			{% block extra-title %}{% end block %}
+			<h4>
+				{% if entry.system_msg %}
+					<i class="icon-star"></i>
+				{% else %}
+					<i class="icon-comment"></i>
+				{% end %}
+
+				{% if entry.user %}
+					{% if current_user == entry.user %}
+						<a href="/profile">{{ _("You") }}</a>
+					{% else %}
+						<a href="/user/{{ escape(entry.user.name) }}">{{ escape(entry.user.realname) }}</a>
+					{% end %}
+				{% else %}
+					{{ _("Pakfire Build Service") }}
+				{% end %}
+				-
+				{{ format_date(entry.time) }}
+			</h4>
+		{% end block %}
+
+		{% block message %}
+			<p>
+				{{ modules.Text(entry.get_message(current_user), pre=False) }}
+			</p>
+		{% end block %}
+
+		{% block footer %}
+			{% if entry.get_footer(current_user) %}
+				<p>
+					{{ escape(entry.get_footer(current_user)) }}
+				</p>
+			{% end %}
+		{% end block %}
+	{% end block %}
+</div>

@@ -1,0 +1,24 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>{{ _("Filename") }}</th>
+			<th>{{ _("Size") }}</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for file in files %}
+			<tr>
+				<td>{{ escape(file.name) }}</td>
+				<td>{{ format_size(file.filesize) }}</td>
+				<td>
+					<a class="btn btn-mini" href="{{ file.download_url }}">
+						<i class="icon-download"></i>
+						{{ _("Download") }}
+					</a>
+				</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>

@@ -1,0 +1,10 @@
+/*
+
+	CSS attributes for the job list.
+
+*/
+
+/* Scratch builds are shown in italic font. */
+ul.jobs li.job a.scratch {
+	font-style: italic;
+}

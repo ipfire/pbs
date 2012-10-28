@@ -3,33 +3,89 @@
 {% block title %}{{ _("Welcome to the Pakfire Build Service") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Welcome to the Pakfire Build Service") }}</h1>
-	<p>
-		{{ _("This is a service that organizes development and packaging for the IPFire distribution.") }}
-		{{ _("It is used to build and track packages as well as assembling images.") }}
-		<a href="/documents">{{ _("Learn more...") }}</a>
-	</p>
+	<div class="hero-unit">
+		<h1>
+			{{ _("Pakfire Build Service") }}
+			<small>{{ random_slogan() }}</small>
+		</h1>
 
-	{% if active_builds %}
-		<h2>{{ _("Ongoing builds") }}</h2>
-		{{ modules.BuildTable(active_builds) }}
+		{% if current_user %}
+			<p>
+				{{ _("Welcome %s! Great to see you again.") % current_user.firstname }}
+			</p>
+		{% else %}
+			<p>
+				{{ _("This is a service that organizes development and packaging for the IPFire distribution.") }}
+				<br />
+				{{ _("It is used to build and track packages as well as assembling images.") }}
+			</p>
+		{% end %}
+
+		<a class="btn btn-large pull-right" href="/documents">
+			{{ _("Documentation") }}
+		</a>
+	</div>
+
+	{% if updates %}
+		<div class="row">
+			<div class="span12">
+				<div class="tabbable">
+					<ul class="nav nav-tabs">
+						{% for type, updts, active in updates %}
+							<li {% if active %}class="active"{% end %}>
+								<a href="#updates_{{ type }}" data-toggle="tab">
+									{% if type == "stable" %}
+										{{ _("Latest stable updates") }}
+									{% elif type == "unstable" %}
+										{{ _("Unstable updates") }}
+									{% elif type == "testing" %}
+										{{ _("Testing updates") }}
+									{% end %}
+								</a>
+							</li>
+						{% end %}
+					</ul>
+
+					<div class="tab-content">
+						{% for type, updts, active in updates %}
+							<div class="tab-pane {% if active %}active{% end %}" id="updates_{{ type }}">
+								{{ modules.UpdatesTable(updts) }}
+							</div>
+						{% end %}
+					</div>
+				</div>
+
+				<p class="pull-right">
+					<a href="/updates">{{ _("View more updates...") }}</a>
+				</p>
+
+				<hr style="clear: both;">
+			</div>
+		</div>
 	{% end %}
 
-	{% if next_builds %}
-		<h2>{{ _("Queued builds") }}</h2>
-		{{ modules.BuildTable(next_builds) }}
-	{% end %}
+	<div class="row">
+		<div class="span6">
+			{% if active_jobs %}
+				<h3>
+					{{ _("Ongoing build jobs") }}
+					<small>({{ len(active_jobs) }})</small>
+				</h3>
+				{{ modules.JobsList(active_jobs, show_builder=True) }}
+			{% end %}
 
-	<h2>{{ _("Lately updated builds") }}</h2>
-	{{ modules.BuildTable(latest_builds) }}
+			<a href="/builds/queue">
+				{% if job_queue %}
+					{{ _("There is one job in the job queue.", "There are %(num)s jobs in the job queue.", job_queue) % { "num" : job_queue } }}
+				{% else %}
+					{{ _("There are no jobs in the job queue.") }}
+				{% end %}
+			</a>
+		</div>
 
-	<h2>{{ _("Statistics") }}</h2>
-	<ul>
-		<li>
-			{{ _("There is currently one pending build job.", "There are currently %(num)s pending build jobs.", counter_pending) % { "num" : counter_pending } }}
-		</li>
-		<li>
-			{{ _("Average build time is %.1f minutes.") % (average_build_time / 60) }}
-		</li>
-	</ul>
+		<div class="span6">
+			<h3>{{ _("Lately processed jobs") }}</h3>
+			{{ modules.JobsList(latest_jobs) }}
+		</div>
+	</div>
 {% end %}

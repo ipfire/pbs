@@ -3,19 +3,69 @@
 {% block title %}{{ _("Distributions") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Distributions") }}</h1>
-	<ul class="distros">
-		{% for distro in distros %}
-			<li>
-				<a href="/distribution/{{ distro.sname }}">{{ distro.name }}</a> - {{ distro.slogan }}
-			</li>
-		{% end %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/distros">{{ _("Distributions") }}</a>
+		</li>
 	</ul>
-{% end block %}
 
-{% block sidebar %}
-	<h1>{{ _("Actions") }}</h1>
-	<ul>
-		<li><a href="">{{ _("Add distribution") }}</a></li>
-	</ul>
+	<div class="page-header">
+		<h1>
+			{{ _("Distributions") }}
+			<small>({{ len(distros) }})</small>
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="span10 offset1">
+			<p>
+				{{ _("This is a list of all distributions, that are maintained in this build service.") }}
+				{{ _("You may click on one of them and see more details or jump directly to one of the repositories.") }}
+			</p>
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th>{{ _("Distribution") }}</th>
+						<th>{{ _("Repositories") }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for distro in distros %}
+						<tr>
+							<td>
+								<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+								<br /><em>{{ escape(distro.slogan) }}</em>
+							</td>
+							<td>
+								<ul class="unstyled">
+									{% for repo in distro.repositories %}
+										<li>
+											<a href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}">{{ escape(repo.name) }}</a>
+											- {{ escape(repo.summary) }}
+										</li>
+									{% end %}
+								</ul>
+							</td>
+						</tr>
+					{% end %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{% if current_user and current_user.is_admin() %}
+		<div class="row">
+			<div class="span10 offset1">
+				<a class="btn btn-danger pull-right" href="/distro/new">
+					<i class="icon-star icon-white"></i>
+					{{ _("New distribution") }}
+				</a>
+			</div>
+		</div>
+	{% end %}
 {% end block %}

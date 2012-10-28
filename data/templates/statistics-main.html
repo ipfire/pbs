@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Statistics") }}{% end block %}
+
+{% block body %}
+	<h1>{{ _("Statistics") }}</h1>
+	<p>
+		{{ _("On this page, you will find a lot of information bundled in graphs and figures.") }}
+		{{ _("They give a very quick overview about what is going on in the build service.") }}
+	</p>
+
+	<h2>{{ _("Builds") }}</h2>
+	<ul>
+		<li>
+			{{ _("The average build time is %.1f minutes.") % (jobs_avg_build_time / 60) }}
+		</li>
+		<li>
+			{{ _("There %(builds_count)s builds containing %(jobs_count_all)s jobs.") % globals() }}
+		</li>
+	</ul>
+
+	<h2>{{ _("Users") }}</h2>
+	<p>
+		{{ _("There is currently one user account.", "There are currently %s user accounts.", users_count) % users_count }}
+	</p>
+
+	<div style="clear: both;">&nbsp;</div>
+{% end block %}

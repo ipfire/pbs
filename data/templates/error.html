@@ -1,1 +1,55 @@
 {% extends "base.html" %}
+
+{% block body %}
+	<div class="hero-unit">
+		{% block bigbox %}
+			<h1>
+				{% block bigbox_headline %}
+					{{ _("Oops! Don't panic.") }}
+				{% end block %}
+				<br>
+
+				{% block bigbox_subtitle %}
+					<small>{{ _("An unexpected error happened.") }}</small>
+				{% end block %}
+			</h1>
+
+			{% block explanation %}
+				<p>
+					{{ _("Stay calm and read the text below to find out what went wrong.") }}
+				</p>
+			{% end block %}
+		{% end block %}
+	</div>
+
+	{% block message %}
+		<div class="row">
+			<div class="span12">
+				<table class="table">
+					<tbody>
+						<tr>
+							<td>{{ _("Error code") }}</td>
+							<td>{{ code }} - {{ message }}</td>
+						</tr>
+
+						{% if current_user and current_user.is_admin() and exception %}
+							<tr>
+								<td colspan="2">
+									{{ _("Exception (traceback):") }}
+									<br><br>
+									<pre>{{ escape(exception) }}</pre>
+								</td>
+							</tr>
+						{% end %}
+					</tbody>
+				</table>
+
+				<hr>				
+				<p>
+					{{ _("Please try going back to the previous page and try the action you did again in a moment.") }}
+					{{ _("If the error persists, you should consider to get in touch with an administrator.") }}
+				</p>
+			</div>
+		</div>
+	{% end block %}
+{% end %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Import new key") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/keys">{{ _("Key management") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/key/import">{{ _("Import new key") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h1>{{ _("Import a new key") }}</h1>
+	</div>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<form class="form-horizontal" method="POST" action="">
+				{{ xsrf_form_html() }}
+				<fieldset>
+					<div class="control-group">
+						<label class="control-label" for="data">{{ _("Key") }}</label>
+						<div class="controls">
+							<textarea name="data" id="data" rows="7"></textarea>
+
+							<p class="help-block">
+								{{ _("Paste the key to import.") }}
+							</p>
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">{{ _("Import new key") }}</button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+{% end block %}

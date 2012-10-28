@@ -1,36 +1,50 @@
-{% extends "base.html" %}
+{% extends "base-form2.html" %}
+
+{% block title %}{{ _("Login") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Login") }}</h1>
+	<div class="page-header">
+		<h1>{{ _("Login") }}</h1>
+	</div>
 
 	{% if failed %}
-		<p class="important">
+		<div class="alert alert-block alert-error">
+			<h4 class="alert-heading">{{ _("Login failed!") }}</h4>
 			{{ _("Username and/or password was wrong. Login failed.") }}
-		</p>
+		</div>
 	{% end %}
 
-	<p>
-		{{ _("Please type your username and your password to the form to log in.") }}
-		{{ _("If you have no account, yet you can create a new one.") }}
-		<a href="/register">{{ _("Register a new account.") }}</a>
-	</p>
-
-	<form method="post" action="">
+	<form class="form-horizontal" method="POST" action="">
 		{{ xsrf_form_html() }}
-		<table>
-			<tr>
-				<td>{{ _("Username") }}</td>
-				<td><input name="name" type="text" /></td>
-			</tr>
-			<tr>
-				<td>{{ _("Password") }}</td>
-				<td><input name="pass" type="password" /></td>
-			</tr>
-			<tr>
-				<td colspan="2" class="buttons">
-					<input type="submit" value="{{ _("Login") }}" />
-				</td>
-			</tr>
-		</table>
+
+		<fieldset>
+			<div class="control-group">
+				<label class="control-label" for="name">{{ _("Username") }}</label>
+				<div class="controls">
+					<input type="text" class="input-xlarge" id="name" name="name" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="pass">{{ _("Password") }}</label>
+				<div class="controls">
+					<input type="password" class="input-xlarge" id="pass" name="pass" />
+				</div>
+			</div>
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary">{{ _("Login") }}</button>
+			</div>
+		</fieldset>
 	</form>
+
+	<hr>
+
+	<h3>{{ _("You also might want to...") }}</h3>
+	<ul>
+		<li>
+			<a href="/register">{{ _("Register a new account.") }}</a>
+		</li>
+		<li>
+			<a href="/password-recovery">{{ _("Recover your password.") }}</a>
+		</li>
+	</ul>
 {% end %}

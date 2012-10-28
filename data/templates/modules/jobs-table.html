@@ -1,0 +1,70 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>{{ _("Arch") }}</th>
+			<th>{{ _("State") }}</th>
+			<th>{{ _("Host") }}</th>
+			<th>{{ _("Duration") }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% if jobs %}
+			{% for job in jobs %}
+				<tr>
+					<td>
+						<a href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
+					</td>
+					<td>
+						{% if job.state == "new" %}
+							{{ _("New") }}
+						{% elif job.state == "pending" %}
+							{{ _("Pending") }}
+						{% elif job.state == "failed" %}
+							{{ _("Failed") }}
+						{% elif job.state == "dispatching" %}
+							{{ _("Dispatching") }}
+						{% elif job.state == "finished" %}
+							{{ _("Finished") }}
+						{% elif job.state == "running" %}
+							{{ _("Running") }}
+						{% elif job.state == "aborted" %}
+							{{ _("Aborted") }}
+						{% elif job.state == "dependency_error" %}
+							{{ _("Dependency error") }}
+						{% else %}
+							{{ job.state }}
+						{% end %}
+					</td>
+					<td>
+						{% if job.builder %}
+							<a href="/builder/{{ job.builder.name }}">{{ job.builder.name }}</a>
+						{% else %}
+							{{ _("N/A") }}
+						{% end %}
+					</td>
+					<td>
+						{% if job.state == "running" %}
+							{{ _("Running since %s") % friendly_time(job.duration) }}
+						{% elif job.duration %}
+							{{ friendly_time(job.duration) }}
+						{% else %}
+							{{ _("Not finished, yet.") }}
+						{% end %}
+					</td>
+				</tr>
+			{% end %}
+
+			{% if not build.supported_arches == "all" %}
+				<tr>
+					<td colspan="4">
+						{{ _("This package only supports %s.") % locale.list(build.supported_arches.split()) }}
+					</td>
+				</tr>
+			{% end %}
+		{% else %}
+			<tr>
+				<td colspan="4">{{ _("No jobs, yet.") }}</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>
