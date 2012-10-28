@@ -49,7 +49,7 @@
 					<small>({{ len(pkgs) }})</small>
 				</h2>
 
-				<table class="table table-striped">
+				<table class="table table-striped table-hover">
 					<tbody>
 						{% for pkg in pkgs %}
 							<tr>
@@ -79,7 +79,7 @@
 					{{ _("%s was found in the following package.", "%s was found in the following packages.", len(files)) % pattern }}
 				</p>
 
-				<table class="table table-striped">
+				<table class="table table-striped table-hover">
 					<tbody>
 						{% for pkg, file in files %}
 							<tr>
@@ -105,7 +105,7 @@
 					<small>({{ len(users) }})</small>
 				</h2>
 
-				<table class="table table-striped">
+				<table class="table table-striped table-hover">
 					<tbody>
 						{% for user in users %}
 							<tr>
