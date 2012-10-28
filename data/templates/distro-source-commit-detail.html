@@ -53,11 +53,11 @@
 					</tr>
 					<tr>
 						<td>{{ _("Author") }}</td>
-						<td>{{ format_email(commit.author) }}</td>
+						<td>{% raw format_email(commit.author) %}</td>
 					</tr>
 					<tr>
 						<td>{{ _("Committer") }}</td>
-						<td>{{ format_email(commit.committer) }}</td>
+						<td>{% raw format_email(commit.committer) %}</td>
 					</tr>
 					<tr>
 						<td>{{ _("Subject") }}</td>

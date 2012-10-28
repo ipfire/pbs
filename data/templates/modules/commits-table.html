@@ -25,7 +25,7 @@
 					{{ format_date(commit.date, full_format=True) }}
 				</td>
 				<td>
-					{{ format_email(commit.author) }}
+					{% raw format_email(commit.author) %}
 				</td>
 				<td>
 					{{ commit.subject }}

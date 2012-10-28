@@ -1,5 +1,5 @@
 {% if type == "string" %}
-	{{ format_email(maintainer) }}
+	{% raw format_email(maintainer) %}
 {% elif type == "user" %}
 	<a href="/user/{{ maintainer.name }}">
 		{% if maintainer.is_admin() %}

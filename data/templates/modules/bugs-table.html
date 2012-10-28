@@ -10,7 +10,7 @@
 				{{ bug.summary }}
 
 				{% if bug.assignee %}
-					<br />{{ format_email(bug.assignee) }}
+					<br />{% raw format_email(bug.assignee) %}
 				{% end %}
 			</td>
 		</tr>

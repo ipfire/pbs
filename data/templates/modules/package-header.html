@@ -15,7 +15,7 @@
 					<tr>
 						<td>{{ _("Homepage") }}</td>
 						<td>
-							{{ linkify(pkg.url, shorten=True, extra_params='target="_blank"', permitted_protocols=["http", "https", "ftp"]) }}
+							{% raw linkify(pkg.url, shorten=True, extra_params='target="_blank"', permitted_protocols=["http", "https", "ftp"]) %}
 						</td>
 					</tr>
 				{% end %}
