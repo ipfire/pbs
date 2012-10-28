@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Package") }}: {{ escape(pkg.name) }}{% end block %}
+{% block title %}{{ _("Package") }}: {{ pkg.name }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -13,23 +13,23 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/package/{{ escape(pkg.name) }}">{{ escape(pkg.name) }}</a>
+			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		{% if pkg.build %}
 			<li>
-				<a href="/build/{{ pkg.build.uuid }}">{{ escape(pkg.build.name) }}</a>
+				<a href="/build/{{ pkg.build.uuid }}">{{ pkg.build.name }}</a>
 				<span class="divider">/</span>
 			</li>
 		{% end %}
 		{% if pkg.job %}
 			<li>
-				<a href="/job/{{ pkg.job.uuid }}">{{ escape(pkg.job.arch.name) }}</a>
+				<a href="/job/{{ pkg.job.uuid }}">{{ pkg.job.arch.name }}</a>
 				<span class="divider">/</span>
 			</li>
 		{% end %}
 		<li class="active">
-			<a href="/package/{{ pkg.uuid }}">{{ escape(pkg.friendly_name) }}</a>
+			<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
 		</li>			
 	</ul>
 
@@ -47,14 +47,14 @@
 		</div>
 
 		<h1>
-			{{ _("Package") }}: {{ escape(pkg.friendly_name) }}
-			<br /><small>{{ escape(pkg.summary) }}</small>
+			{{ _("Package") }}: {{ pkg.friendly_name }}
+			<br /><small>{{ pkg.summary }}</small>
 		</h1>
 	</div>
 
 	<div class="row">
 		<div class="span4">
-			<blockquote>{{ escape(pkg.description) }}</blockquote>
+			<blockquote>{{ pkg.description }}</blockquote>
 		</div>
 
 		<div class="span4">
@@ -63,13 +63,13 @@
 					<tr>
 						<td>{{ _("Homepage") }}</td>
 						<td>
-							<a href="{{ escape(pkg.url) }}" target="_blank">{{ escape(pkg.url) }}</a>
+							<a href="{{ pkg.url }}" target="_blank">{{ pkg.url }}</a>
 						</td>
 					</tr>
 					<tr>
 						<td>{{ _("License") }}</td>
 						<td>
-							{{ escape(pkg.license) }}
+							{{ pkg.license }}
 						</td>
 					</tr>
 					{% if pkg.maintainer %}
@@ -108,7 +108,7 @@
 						<tr>
 							<td>{{ _("Build") }}</td>
 							<td>
-								<a href="/build/{{ pkg.build.uuid }}">{{ escape(pkg.build.name) }}</a>
+								<a href="/build/{{ pkg.build.uuid }}">{{ pkg.build.name }}</a>
 							</td>
 						</tr>
 					{% end %}
@@ -117,7 +117,7 @@
 						<tr>
 							<td>{{ _("Job") }}</td>
 							<td>
-								<a href="/job/{{ pkg.job.uuid }}">{{ escape(pkg.job.name) }}</a>
+								<a href="/job/{{ pkg.job.uuid }}">{{ pkg.job.name }}</a>
 							</td>
 						</tr>
 					{% end %}
@@ -137,7 +137,7 @@
 							<td>{{ _("Commit") }}</td>
 							<td>
 								<a href="/distro/{{ pkg.commit.distro.identifier }}/source/{{ pkg.commit.source.identifier }}/commit/{{ pkg.commit.revision }}">{{ pkg.commit.revision[:7] }}</a>
-								<br />{{ escape(pkg.commit.subject) }}
+								<br />{{ pkg.commit.subject }}
 							</td>
 						</tr>
 					{% end %}
@@ -204,7 +204,7 @@
 								<ul>
 									{% for dep in pkg.provides %}
 										{% if not dep.startswith("uuid(") %}
-											<li>{{ escape(dep) }}</li>
+											<li>{{ dep }}</li>
 										{% end %}
 									{% end %}
 								</ul>
@@ -215,7 +215,7 @@
 							<div class="tab-pane {% if not pkg.provides %}active{% end %}" id="deps_requires">
 								<ul>
 									{% for dep in pkg.requires %}
-										<li>{{ escape(dep) }}</li>
+										<li>{{ dep }}</li>
 									{% end %}
 								</ul>
 
@@ -224,7 +224,7 @@
 
 									<ul>
 										{% for dep in pkg.prerequires %}
-											<li>{{ escape(dep) }}</li>
+											<li>{{ dep }}</li>
 										{% end %}
 									</ul>
 								{% end %}
@@ -235,7 +235,7 @@
 							<div class="tab-pane {% if not any((pkg.provides, pkg.requires, pkg.prerequires)) %}active{% end %}" id="deps_obsoletes">
 								<ul>
 									{% for dep in pkg.obsoletes %}
-										<li>{{ escape(dep) }}</li>
+										<li>{{ dep }}</li>
 									{% end %}
 								</ul>
 							</div>
@@ -245,7 +245,7 @@
 							<div class="tab-pane {% if not any((pkg.provides, pkg.requires, pkg.prerequires, pkg.obsoletes)) %}active{% end %}" id="deps_conflicts">
 								<ul>
 									{% for dep in pkg.conflicts %}
-										<li>{{ escape(dep) }}</li>
+										<li>{{ dep }}</li>
 									{% end %}
 								</ul>
 							</div>
@@ -262,7 +262,7 @@
 				<h2>{{ _("Build dependencies") }}</h2>
 				<ul>
 					{% for dep in pkg.requires %}
-						<li>{{ escape(dep) }}</li>
+						<li>{{ dep }}</li>
 					{% end %}
 				</ul>
 			</div>

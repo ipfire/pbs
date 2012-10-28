@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Impersonate user %s") % escape(user.realname) }}{% end block %}
+{% block title %}{{ _("Impersonate user %s") % user.realname }}{% end block %}
 
 {% block body %}
 	<div class="page-header">
-		<h1>{{ _("User impersonation") }}: {{ escape(user.realname) }}</h1>
+		<h1>{{ _("User impersonation") }}: {{ user.realname }}</h1>
 	</div>
 
 	<div class="row">
@@ -24,8 +24,8 @@
 
 			<form method="POST" action="">
 				{{ xsrf_form_html() }}
-				<input type="hidden" name="user" value="{{ escape(user.name) }}" />
-				<input class="btn btn-danger pull-right" type="submit" value="{{ _("Impersonate %s") % escape(user.realname) }}" />
+				<input type="hidden" name="user" value="{{ user.name }}" />
+				<input class="btn btn-danger pull-right" type="submit" value="{{ _("Impersonate %s") % user.realname }}" />
 			</form>
 		</div>
 	</div>

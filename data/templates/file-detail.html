@@ -38,7 +38,7 @@
 		{% if file.maintainer %}
 			<tr>
 				<td class="col1">{{ _("Maintainer") }}</td>
-				<td class="col2">{{ escape(file.maintainer or pkg.maintainer) }}</td>
+				<td class="col2">{{ file.maintainer or pkg.maintainer }}</td>
 			</tr>
 		{% end %}
 

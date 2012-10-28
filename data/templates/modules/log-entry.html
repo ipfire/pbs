@@ -13,7 +13,7 @@
 					{% if current_user == entry.user %}
 						<a href="/profile">{{ _("You") }}</a>
 					{% else %}
-						<a href="/user/{{ escape(entry.user.name) }}">{{ escape(entry.user.realname) }}</a>
+						<a href="/user/{{ entry.user.name }}">{{ entry.user.realname }}</a>
 					{% end %}
 				{% else %}
 					{{ _("Pakfire Build Service") }}
@@ -32,7 +32,7 @@
 		{% block footer %}
 			{% if entry.get_footer(current_user) %}
 				<p>
-					{{ escape(entry.get_footer(current_user)) }}
+					{{ entry.get_footer(current_user) }}
 				</p>
 			{% end %}
 		{% end block %}

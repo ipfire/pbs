@@ -13,11 +13,11 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
 		</li>
 	</ul>
 
@@ -70,7 +70,7 @@
 										<td>{{ _("Commit") }}</td>
 										<td>
 											<a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
-											- {{ escape(build.pkg.commit.subject) }}
+											- {{ build.pkg.commit.subject }}
 										</td>
 									</tr>
 								{% end %}
@@ -89,7 +89,7 @@
 										{% elif build.severity == "new package" %}
 											{{ _("New package") }}
 										{% else %}
-											{{ _("Unhandled: %s") % escape(build.severity) }}
+											{{ _("Unhandled: %s") % build.severity }}
 										{% end %}
 									</td>
 								</tr>
@@ -156,7 +156,7 @@
 						{% if build.repo %}
 							<tr>
 								<td>
-									{{ escape(build.distro.name) }} -
+									{{ build.distro.name }} -
 									<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
 									{{ _("since %s") % locale.format_date(build.repo_time, relative=False) }}
 								</td>
@@ -344,7 +344,7 @@
 										<tr>
 											<td>{{ _("Build dependencies") }}</td>
 											<td>
-												{{ locale.list(["<a href=\"/search?q=%(r)s\">%(r)s</a>" % { "r" : escape(r) } for r in build.pkg.requires]) }}
+												{{ locale.list(["<a href=\"/search?q=%(r)s\">%(r)s</a>" % { "r" : r } for r in build.pkg.requires]) }}
 											</td>
 										</tr>
 									{% end %}

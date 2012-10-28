@@ -38,15 +38,15 @@
 					{% for distro in distros %}
 						<tr>
 							<td>
-								<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
-								<br /><em>{{ escape(distro.slogan) }}</em>
+								<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
+								<br /><em>{{ distro.slogan }}</em>
 							</td>
 							<td>
 								<ul class="unstyled">
 									{% for repo in distro.repositories %}
 										<li>
-											<a href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}">{{ escape(repo.name) }}</a>
-											- {{ escape(repo.summary) }}
+											<a href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}">{{ repo.name }}</a>
+											- {{ repo.summary }}
 										</li>
 									{% end %}
 								</ul>

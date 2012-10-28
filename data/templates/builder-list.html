@@ -53,7 +53,7 @@
 								{{ locale.list([a.name for a in builder.arches]) }}
 							</td>
 							<td>
-								{{ escape(builder.load1 or _("N/A")) }}
+								{{ builder.load1 or _("N/A") }}
 							</td>
 							<td>
 								{{ len(builder.get_active_jobs()) }}/{{ builder.max_jobs }}

@@ -7,9 +7,9 @@
 	</h1>
 
 	<div class="update-description">
-		<strong>{{ _("Summary") }}: {{ escape(update.summary) }}</strong>
+		<strong>{{ _("Summary") }}: {{ update.summary }}</strong>
 
-		<pre>{{ escape(update.description) }}</pre>
+		<pre>{{ update.description }}</pre>
 	</div>
 
 	<table class="form form2">
@@ -26,7 +26,7 @@
 		<tr>
 			<td class="col1">{{ _("Maintainer") }}</td>
 			<td class="col2">
-				<a href="/user/{{ user.name }}">{{ escape(user.realname) }}</a>
+				<a href="/user/{{ user.name }}">{{ user.realname }}</a>
 			</td>
 		</tr>
 		<tr>

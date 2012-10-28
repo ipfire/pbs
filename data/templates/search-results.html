@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Search results for '%s'") % escape(pattern) }}{% end block %}
+{% block title %}{{ _("Search results for '%s'") % pattern }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -13,13 +13,13 @@
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/search?q={{ escape(pattern) }}">{{ escape(pattern) }}</a>
+			<a href="/search?q={{ pattern }}">{{ pattern }}</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
 		<h1>
-			{{ _("Search results for '%s'") % escape(pattern) }}
+			{{ _("Search results for '%s'") % pattern }}
 		</h1>
 	</div>
 
@@ -35,7 +35,7 @@
 	<div class="row">
 		<div class="span4 offset4">
 			<form class="well form-search" method="GET" action="/search">
-				<input type="text" class="input-medium search-query" name="q" value="{{ escape(pattern) }}">
+				<input type="text" class="input-medium search-query" name="q" value="{{ pattern }}">
 				<button type="submit" class="btn">{{ _("Search") }}</button>
 			</form>
 		</div>
@@ -54,11 +54,11 @@
 						{% for pkg in pkgs %}
 							<tr>
 								<td>
-									<a href="/package/{{ escape(pkg.name) }}">
-										{{ escape(pkg.name) }}
+									<a href="/package/{{ pkg.name }}">
+										{{ pkg.name }}
 									</a>
 								</td>
-								<td>{{ escape(pkg.summary) }}</td>
+								<td>{{ pkg.summary }}</td>
 							</tr>
 						{% end %}
 					</tbody>
@@ -76,7 +76,7 @@
 				</h2>
 
 				<p>
-					{{ _("%s was found in the following package.", "%s was found in the following packages.", len(files)) % escape(pattern) }}
+					{{ _("%s was found in the following package.", "%s was found in the following packages.", len(files)) % pattern }}
 				</p>
 
 				<table class="table table-striped">
@@ -87,7 +87,7 @@
 									<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
 								</td>
 								<td>
-									<pre>{{ format_filemode(file.type, file.mode) }} {{ file.user }}:{{ file.group }} {% if file.size %}{{ format_size(file.size) }}{% else %}-{% end %} {{ escape(file.name) }}</pre>
+									<pre>{{ format_filemode(file.type, file.mode) }} {{ file.user }}:{{ file.group }} {% if file.size %}{{ format_size(file.size) }}{% else %}-{% end %} {{ file.name }}</pre>
 								</td>
 							</tr>
 						{% end %}
@@ -110,9 +110,9 @@
 						{% for user in users %}
 							<tr>
 								<td>
-									<a href="/user/{{ escape(user.name) }}">{{ escape(user.realname) }}
+									<a href="/user/{{ user.name }}">{{ user.realname }}
 										{% if not user.name == user.realname %}
-											({{ escape(user.name) }})
+											({{ user.name }})
 										{% end %}
 									</a>
 								</td>

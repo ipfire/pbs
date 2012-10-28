@@ -6,7 +6,7 @@
 					{{ format_filemode(file.type, file.mode) }}
 				</td>
 				<td>
-					{{ escape(file.user) }}:{{ escape(file.group) }}
+					{{ file.user }}:{{ file.group }}
 				</td>
 				<td>
 					{% if file.size is None %}
@@ -16,7 +16,7 @@
 					{% end %}
 				</td>
 				<td>
-					{{ escape(file.name) }}
+					{{ file.name }}
 				</td>
 				<td>
 					<div class="btn-toolbar">

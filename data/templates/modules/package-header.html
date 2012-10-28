@@ -24,7 +24,7 @@
 					<tr>
 						<td>{{ _("License") }}</td>
 						<td>
-							{{ escape(pkg.license) }}
+							{{ pkg.license }}
 						</td>
 					</tr>
 				{% end %}
@@ -44,7 +44,7 @@
 	<div class="span6">
 		<div class="well">
 			<h3>{{ _("Description") }}</h3>
-			{{ escape(pkg.description) }}
+			{{ pkg.description }}
 		</div>
 	</div>
 </div>

@@ -41,15 +41,15 @@
 						{% for mirror in mirrors %}
 							<tr>
 								<td>
-									[{{ escape(mirror.country_code) }}]
+									[{{ mirror.country_code }}]
 								</td>
 								<td>
-									<a href="/mirror/{{ escape(mirror.hostname) }}">
-										{{ escape(mirror.hostname) }}
+									<a href="/mirror/{{ mirror.hostname }}">
+										{{ mirror.hostname }}
 									</a>
 								</td>
 								<td>
-									{{ escape(mirror.owner or _("N/A")) }}
+									{{ mirror.owner or _("N/A") }}
 								</td>
 								<td>
 									{{ mirror.check_status }}

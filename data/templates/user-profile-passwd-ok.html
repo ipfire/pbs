@@ -13,11 +13,11 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/user/{{ escape(user.name) }}">{{ escape(user.realname) }}</a>
+			<a href="/user/{{ user.name }}">{{ user.realname }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/user/{{ escape(user.name) }}/passwd">{{ _("Change password") }}</a>
+			<a href="/user/{{ user.name }}/passwd">{{ _("Change password") }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
@@ -38,12 +38,12 @@
 					</p>
 				{% else %}
 					<p>
-						{{ _("The password of %s has successfully been changed.") % escape(user.realname) }}
+						{{ _("The password of %s has successfully been changed.") % user.realname }}
 					</p>
 				{% end %}
 
 				<div class="pull-right">
-					<a class="btn btn-primary" href="/user/{{ escape(user.name) }}">{{ _("Ok") }}</a>
+					<a class="btn btn-primary" href="/user/{{ user.name }}">{{ _("Ok") }}</a>
 				</div>
 			</div>
 		</div>

@@ -11,12 +11,12 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+			<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li>
 			<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
-				{{ _("Source: %s") % escape(source.name) }}
+				{{ _("Source: %s") % source.name }}
 			</a>
 			<span class="divider">/</span>
 		</li>
@@ -29,10 +29,10 @@
 
 	<div class="page-header">
 		<h1>
-			{{ _("Source") }}: {{ escape(source.name) }}
+			{{ _("Source") }}: {{ source.name }}
 			<br />
 			<small>
-				{{ commit.revision[:7] }} - {{ escape(commit.subject) }}
+				{{ commit.revision[:7] }} - {{ commit.subject }}
 			</small>
 		</h1>
 	</div>
@@ -67,7 +67,7 @@
 								<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
 							</td>
 							<td>
-								{{ escape(pkg.summary) }}
+								{{ pkg.summary }}
 							</td>
 						</tr>
 					{% end %}

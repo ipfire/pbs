@@ -13,7 +13,7 @@
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/package/{{ escape(pkg.name) }}">{{ escape(pkg.name) }}</a>
+			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
 		</li>
 	</ul>
 
@@ -85,7 +85,7 @@
 				{% module BugsTable(pkg, bugs) %}
 			{% else %}
 				<blockquote>
-					{{ _("There are currently no open bugs for <em>%s</em>.") % escape(pkg.name) }}
+					{{ _("There are currently no open bugs for <em>%s</em>.") % pkg.name }}
 				</blockquote>
 			{% end %}
 

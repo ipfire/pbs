@@ -10,8 +10,8 @@
 		{% for source in sources %}
 			<tr>
 				<td>
-					<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">{{ escape(source.name) }}</a>
-					<br />{{ _("Branch: %s") % escape(source.branch) }}
+					<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">{{ source.name }}</a>
+					<br />{{ _("Branch: %s") % source.branch }}
 				</td>
 				<td>
 					{{ source.num_commits }}
@@ -20,7 +20,7 @@
 					<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/{{ source.head_revision.revision }}">
 						{{ source.head_revision.revision[:7] }}
 					</a> - {{ format_date(source.head_revision.date) }}
-					<br />{{ escape(source.head_revision.subject) }}
+					<br />{{ source.head_revision.subject }}
 				</td>
 			</tr>
 		{% end %}

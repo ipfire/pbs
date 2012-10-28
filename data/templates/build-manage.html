@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Manage build %s") % escape(build.name) }}{% end block %}
+{% block title %}{{ _("Manage build %s") % build.name }}{% end block %}
 
 {% block body %}
 	<div class="page-header">
 		<h1>
-			{{ _("Manage build") }}: {{ escape(build.name) }}
-			<small>- {{ _("Distribution") }}: {{ escape(distro.name) }}</small>
+			{{ _("Manage build") }}: {{ build.name }}
+			<small>- {{ _("Distribution") }}: {{ distro.name }}</small>
 		</h1>
 	</div>
 
@@ -55,7 +55,7 @@
 									{% for repo in distro.repositories %}
 										{% if not build.repo == repo %}
 											<option value="{{ repo.identifier }}" {% if repo == next_repo %}selected="selected"{% end %}>
-												{{ escape(repo.name) }} - {{ escape(repo.summary) }}
+												{{ repo.name }} - {{ repo.summary }}
 											</option>
 										{% end %}
 									{% end %}
@@ -63,8 +63,8 @@
 							{% elif next_repo %}
 								<input type="hidden" name="repo" value="{{ next_repo.identifier }}" />
 
-								<a href="/distro/{{ distro.identifier }}/repo/{{ next_repo.identifier }}">{{ escape(next_repo.name) }}</a>
-								- {{ escape(next_repo.summary) }}
+								<a href="/distro/{{ distro.identifier }}/repo/{{ next_repo.identifier }}">{{ next_repo.name }}</a>
+								- {{ next_repo.summary }}
 							{% end %}
 
 							<p class="help-block">

@@ -2,14 +2,14 @@
 
 {% block body %}
 	<h1>
-		{{ _("Distribution") }}: {{ escape(distro.name) }}
-		<span>- {{ _("Source") }}: {{ escape(source.name) }} - {{ _("Commits") }}</span>
+		{{ _("Distribution") }}: {{ distro.name }}
+		<span>- {{ _("Source") }}: {{ source.name }} - {{ _("Commits") }}</span>
 	</h1>
 
 	<p>
 		{{ _("Source repository") }}:
 		<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
-			{{ escape(source.name) }}
+			{{ source.name }}
 		</a>
 	</p>
 

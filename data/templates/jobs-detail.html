@@ -13,22 +13,22 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/job/{{ job.uuid }}">{{ escape(job.arch.name) }}</a>
+			<a href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
 		<h1>
-			{{ _("Build job") }}: {{ escape(job.name) }}<br />
-			<small>{{ escape(job.pkg.summary) }}</small>
+			{{ _("Build job") }}: {{ job.name }}<br />
+			<small>{{ job.pkg.summary }}</small>
 		</h1>
 	</div>
 

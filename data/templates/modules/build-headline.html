@@ -19,12 +19,12 @@
 		{% end %}
 
 		{% if shorter %}
-			{{ escape(pkg.name) }}
+			{{ pkg.name }}
 		{% else %}
-			{{ escape(build.name) }}
+			{{ build.name }}
 		{% end %}
 		<br>
 
-		<small>{{ escape(pkg.summary) }}</small>
+		<small>{{ pkg.summary }}</small>
 	</h1>
 </div>

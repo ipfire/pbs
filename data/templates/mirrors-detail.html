@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Mirror: %s") % escape(mirror.hostname) }}{% end block %}
+{% block title %}{{ _("Mirror: %s") % mirror.hostname }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -13,14 +13,14 @@
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/mirror/{{ escape(mirror.hostname) }}">{{ escape(mirror.hostname) }}</a>
+			<a href="/mirror/{{ mirror.hostname }}">{{ mirror.hostname }}</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
 		<h1>
-			{{ _("Mirror: %s") % escape(mirror.hostname) }}
-			<small>{{ _("hosted by %s") % escape(mirror.owner) }}</small>
+			{{ _("Mirror: %s") % mirror.hostname }}
+			<small>{{ _("hosted by %s") % mirror.owner }}</small>
 		</h1>
 	</div>
 
@@ -30,7 +30,7 @@
 				<tbody>
 					<tr>
 						<td>{{ _("Hostname") }}</td>
-						<td>{{ escape(mirror.hostname) }}</td>
+						<td>{{ mirror.hostname }}</td>
 					</tr>
 
 					{% if current_user and current_user.has_perm("manage_mirrors") %}
@@ -38,7 +38,7 @@
 							<td>{{ _("Contact") }}</td>
 							<td>
 								{% if mirror.contact %}
-									<a href="mailto:{{ escape(mirror.contact) }}">{{ escape(mirror.contact) }}</a>
+									<a href="mailto:{{ mirror.contact }}">{{ mirror.contact }}</a>
 								{% else %}
 									{{ _("N/A") }}
 								{% end %}
@@ -78,7 +78,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a href="/mirror/{{ escape(mirror.hostname) }}/edit">
+								<a href="/mirror/{{ mirror.hostname }}/edit">
 									<i class="icon-edit"></i>
 									{{ _("Edit settings") }}
 								</a>
@@ -86,7 +86,7 @@
 
 							<li class="divider"></li>
 							<li>
-								<a href="/mirror/{{ escape(mirror.hostname) }}/delete">
+								<a href="/mirror/{{ mirror.hostname }}/delete">
 									<i class="icon-trash"></i>
 									{{ _("Delete mirror") }}
 								</a>

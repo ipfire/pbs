@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Delete mirror %s") % escape(mirror.hostname) }}{% end block %}
+{% block title %}{{ _("Delete mirror %s") % mirror.hostname }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -13,30 +13,30 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/mirror/{{ escape(mirror.hostname) }}">{{ escape(mirror.hostname) }}</a>
+			<a href="/mirror/{{ mirror.hostname }}">{{ mirror.hostname }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/mirror/{{ escape(mirror.hostname) }}/delete">{{ _("Delete") }}</a>
+			<a href="/mirror/{{ mirror.hostname }}/delete">{{ _("Delete") }}</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
-		<h1>{{ _("Mirror") }}: {{ escape(mirror.hostname) }}</h1>
+		<h1>{{ _("Mirror") }}: {{ mirror.hostname }}</h1>
 	</div>
 
 	<div class="row">
 		<div class="span6 offset3">
 			<p>
-				{{ _("You are going to delete the mirror <strong>%s</strong>.") % escape(mirror.hostname) }}
+				{{ _("You are going to delete the mirror <strong>%s</strong>.") % mirror.hostname }}
 			</p>
 
 			<div class="btn-toolbar">
 				<div class="btn-group pull-right">
-					<a class="btn btn-danger" href="/mirror/{{ escape(mirror.hostname) }}/delete?confirmed=1">
-						{{ _("Delete %s") % escape(mirror.hostname) }}
+					<a class="btn btn-danger" href="/mirror/{{ mirror.hostname }}/delete?confirmed=1">
+						{{ _("Delete %s") % mirror.hostname }}
 					</a>
-					<a class="btn" href="/mirror/{{ escape(mirror.hostname) }}">{{ _("Cancel") }}</a>
+					<a class="btn" href="/mirror/{{ mirror.hostname }}">{{ _("Cancel") }}</a>
 				</div>
 			</div>
 		</div>

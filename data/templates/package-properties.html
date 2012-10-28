@@ -13,11 +13,11 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/package/{{ escape(pkg.name) }}">{{ escape(pkg.name) }}</a>
+			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/package/{{ escape(pkg.name) }}/properties">{{ _("Properties") }}</a>
+			<a href="/package/{{ pkg.name }}/properties">{{ _("Properties") }}</a>
 		</li>
 	</ul>
 
@@ -91,7 +91,7 @@
 
 				<div class="form-actions">
 					<button type="submit" class="btn btn-primary">{{ _("Save changes") }}</button>
-					<a class="btn" href="/package/{{ escape(pkg.name) }}">{{ _("Cancel") }}</a>
+					<a class="btn" href="/package/{{ pkg.name }}">{{ _("Cancel") }}</a>
 				</div>
 			</form>
 		</div>

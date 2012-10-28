@@ -13,11 +13,11 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/build/{{ escape(build.uuid) }}">{{ escape(build.name) }}</a>
+			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
@@ -75,7 +75,7 @@
 						<div class="control-group">
 							<label class="control-label">{{ _("User") }}</label>
 							<div class="controls">
-								<span class="input-xlarge uneditable-input">{{ escape(current_user.realname) }}</span>
+								<span class="input-xlarge uneditable-input">{{ current_user.realname }}</span>
 							</div>
 						</div>
 					{% end %}

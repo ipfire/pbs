@@ -13,7 +13,7 @@
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/builder/{{ escape(builder.name) }}">{{ escape(builder.name) }}</a>
+			<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
 		</li>
 	</ul>
 
@@ -43,7 +43,7 @@
 							{% elif builder.status == "deleted" %}
 								{{ _("Deleted") }}
 							{% else %}
-								{{ _("Unknown status: %s") % escape(builder.status) }}
+								{{ _("Unknown status: %s") % builder.status }}
 							{% end %}
 						</td>
 					</tr>
@@ -86,7 +86,7 @@
 					<tr>
 						<td>{{ _("Pakfire version") }}</td>
 						<td>
-							{{ escape(builder.pakfire_version) or _("N/A") }}
+							{{ builder.pakfire_version or _("N/A") }}
 						</td>
 					</tr>
 					<tr>
@@ -102,7 +102,7 @@
 					<tr>
 						<td>{{ _("CPU model") }}</td>
 						<td>
-							{{ escape(builder.cpu_model) or _("Unknown") }}
+							{{ builder.cpu_model or _("Unknown") }}
 						</td>
 					</tr>
 					<tr>
@@ -116,7 +116,7 @@
 					<tr>
 						<td>{{ _("Load average") }}</td>
 						<td>
-							{{ escape(builder.loadavg or _("N/A")) }}
+							{{ builder.loadavg or _("N/A") }}
 							{% if builder.overload %}
 									<span class="label label-important">{{ _("Overload") }}</span>
 							{% end %}

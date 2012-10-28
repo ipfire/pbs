@@ -11,19 +11,19 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+			<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
 			<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
-				{{ _("Source: %s") % escape(source.name) }}
+				{{ _("Source: %s") % source.name }}
 			</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
 		<h1>
-			{{ _("Source") }}: {{ escape(source.name) }}
+			{{ _("Source") }}: {{ source.name }}
 		</h1>
 	</div>
 
@@ -35,15 +35,15 @@
 						<tr>
 							<td>{{ _("Gitweb") }}</td>
 							<td>
-								<a href="{{ escape(source.gitweb) }}" target="_blank">
-									{{ escape(source.gitweb) }}
+								<a href="{{ source.gitweb }}" target="_blank">
+									{{ source.gitweb }}
 								</a>
 							</td>
 						</tr>
 					{% end %}
 					<tr>
 						<td>{{ _("Branch") }}</td>
-						<td>{{ escape(source.branch) }}</td>
+						<td>{{ source.branch }}</td>
 					</tr>
 					<tr>
 						<td>{{ _("Imported commits") }}</td>

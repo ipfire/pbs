@@ -15,7 +15,7 @@
 						<option value="">{{ _("Any") }}</option>
 
 						{% for distro in distros %}
-							<option value="{{ escape(distro.identifier) }}">{{ escape(distro.name) }}</option>
+							<option value="{{ distro.identifier }}">{{ distro.name }}</option>
 						{% end %}
 					</select>
 				</td>
@@ -54,7 +54,7 @@
 					<select name="builder">
 						<option value="">{{ _("Any") }}</option>
 						{% for builder in builders %}
-							<option value="{{ escape(builder.name) }}">{{ escape(builder.name) }}</option>
+							<option value="{{ builder.name }}">{{ builder.name }}</option>
 						{% end %}
 					</select>
 				</td>

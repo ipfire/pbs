@@ -129,15 +129,15 @@
 										</li>
 										<li>
 											<a href="/profile">
-												{{ escape(current_user.realname) }}
+												{{ current_user.realname }}
 											</a>
 										</li>
 										{% if session and session.impersonated_user %}
 											<li class="nav-header">{{ _("Impersonated by") }}</li>
 											<li>
-												<a href="/user/{{ escape(session.user.name) }}">
+												<a href="/user/{{ session.user.name }}">
 													<i class="icon-user"></i>
-													{{ escape(session.user.realname) }}
+													{{ session.user.realname }}
 												</a>
 											</li>
 										{% end %}

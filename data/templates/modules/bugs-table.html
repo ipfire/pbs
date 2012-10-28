@@ -4,10 +4,10 @@
 			<td>
 				<a href="{{ bug.url }}" target="_blank">#{{ bug.id }}</a>
 				<br />
-				{{ escape(bug.status) }}
+				{{ bug.status }}
 			</td>
 			<td>
-				{{ escape(bug.summary) }}
+				{{ bug.summary }}
 
 				{% if bug.assignee %}
 					<br />{{ format_email(bug.assignee) }}

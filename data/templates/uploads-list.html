@@ -43,15 +43,15 @@
 					<tbody>
 						{% for upload in uploads %}
 							<tr>
-								<td>{{ escape(upload.filename) }}</td>
+								<td>{{ upload.filename }}</td>
 								<td>
 									{% if upload.builder %}
-										<a href="/builder/{{ escape(upload.builder.name) }}">
-											{{ escape(upload.builder.name) }}
+										<a href="/builder/{{ upload.builder.name }}">
+											{{ upload.builder.name }}
 										</a>
 									{% elif upload.user %}
-										<a href="/user/{{ escape(upload.user.name) }}">
-											{{ escape(upload.user.realname) }}
+										<a href="/user/{{ upload.user.name }}">
+											{{ upload.user.realname }}
 										</a>
 									{% else %}
 										{{ _("No owner.") }}

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Edit repository %s") % escape(repo.name) }}{% end block %}
+{% block title %}{{ _("Edit repository %s") % repo.name }}{% end block %}
 
 {% block body %}
 	<h1>
-		{{ _("Edit repository %s") % escape(repo.name) }}
-		<span>- {{ _("Distribution") }}: {{ escape(distro.name) }}</span>
+		{{ _("Edit repository %s") % repo.name }}
+		<span>- {{ _("Distribution") }}: {{ distro.name }}</span>
 	</h1>
 
 	<form method="post" action="">
@@ -14,7 +14,7 @@
 			<tr>
 				<td class="col1">{{ _("Name") }}</td>
 				<td class="col2">
-					<input name="name" type="text" value="{{ escape(repo.name) }}" />
+					<input name="name" type="text" value="{{ repo.name }}" />
 				</td>
 				<td class="col3">
 					{{ _("The name of the repository.") }}
@@ -24,7 +24,7 @@
 			<tr>
 				<td class="col1">{{ _("Description") }}</td>
 				<td colspan="2">		
-					<textarea name="description">{{ escape(repo.description) }}</textarea>
+					<textarea name="description">{{ repo.description }}</textarea>
 				</td>
 			</tr>
 		</table>

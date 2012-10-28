@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-	{{ _("Repository") }}: {{ escape(repo.name) }} - {{ _("Distribution") }}: {{ escape(distro.name) }}
+	{{ _("Repository") }}: {{ repo.name }} - {{ _("Distribution") }}: {{ distro.name }}
 {% end block %}
 
 {% block body %}
@@ -15,11 +15,11 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+			<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}">{{ escape(repo.name) }}</a>
+			<a href="/distro/{{ distro.identifier }}/repo/{{ repo.identifier }}">{{ repo.name }}</a>
 		</li>
 	</ul>
 
@@ -47,8 +47,8 @@
 		</div>
 
 		<h1>
-			{{ _("Repository") }}: {{ escape(repo.name) }}
-			<small>{{ escape(distro.name) }}</small>
+			{{ _("Repository") }}: {{ repo.name }}
+			<small>{{ distro.name }}</small>
 		</h1>
 	</div>
 

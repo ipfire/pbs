@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ escape(user.realname) }}{% end block %}
+{% block title %}{{ user.realname }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -13,12 +13,12 @@
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/user/{{ escape(user.name) }}">{{ escape(user.realname) }}</a>
+			<a href="/user/{{ user.name }}">{{ user.realname }}</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
-		<h1>{{ _("User") }}: {{ escape(user.realname) }}</h1>
+		<h1>{{ _("User") }}: {{ user.realname }}</h1>
 	</div>
 
 	<div class="row">
@@ -27,12 +27,12 @@
 				<tbody>
 					<tr>
 						<td>{{ _("Username") }}</td>
-						<td>{{ escape(user.name) }}</td>
+						<td>{{ user.name }}</td>
 					</tr>
 					<tr>
 						<td>{{ _("Email") }}</td>
 						<td>
-							<a href="mailto:{{ escape(user.email) }}">{{ escape(user.email) }}</a>
+							<a href="mailto:{{ user.email }}">{{ user.email }}</a>
 						</td>
 					</tr>
 					<tr>
@@ -90,7 +90,7 @@
 										{% if not current_user == user and current_user.is_admin() %}
 											<li class="divider"></li>
 											<li>
-												<a href="/user/impersonate?user={{ escape(user.name) }}">{{ _("Impersonate user") }}</a>
+												<a href="/user/impersonate?user={{ user.name }}">{{ _("Impersonate user") }}</a>
 											</li>
 										{% end %}
 									</ul>
@@ -140,10 +140,10 @@
 	<!-- <h2>{{ _("Links") }}</h2>
 	<ul class="user-links">
 		<li>
-			<a href="#">{{ _("View all comments written %s.") % escape(user.realname) }}</a>
+			<a href="#">{{ _("View all comments written %s.") % user.realname }}</a>
 		</li>
 		<li>
-			<a href="#">{{ _("View all builds %s is linked to.") % escape(user.realname) }}</a>
+			<a href="#">{{ _("View all builds %s is linked to.") % user.realname }}</a>
 		</li>
 	</ul> -->
 

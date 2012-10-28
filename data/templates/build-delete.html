@@ -13,11 +13,11 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/package/{{ escape(build.pkg.name) }}">{{ escape(build.pkg.name) }}</a>
+			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/build/{{ build.uuid }}">{{ escape(build.name) }}</a>
+			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
@@ -31,7 +31,7 @@
 		<div class="span8">
 			<p>
 				<strong>
-					{{ _("You are about to delete build %s.") % escape(build.name) }}
+					{{ _("You are about to delete build %s.") % build.name }}
 				</strong>
 			</p>
 

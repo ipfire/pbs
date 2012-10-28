@@ -1,6 +1,6 @@
 {% extends "base-form1.html" %}
 
-{% block title %}{{ _("Edit builder %s") % escape(builder.hostname) }}{% end block %}
+{% block title %}{{ _("Edit builder %s") % builder.hostname }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -13,16 +13,16 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/builder/{{ escape(builder.name) }}">{{ escape(builder.name) }}</a>
+			<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/builder/{{ escape(builder.name) }}/edit">{{ _("Manage") }}</a>
+			<a href="/builder/{{ builder.name }}/edit">{{ _("Manage") }}</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
-		<h1>{{ _("Manage builder:") }} {{ escape(builder.hostname) }}</h1>
+		<h1>{{ _("Manage builder:") }} {{ builder.hostname }}</h1>
 	</div>
 
 	<div class="row">
@@ -33,7 +33,7 @@
 					<div class="control-group">
 						<label class="control-label">{{ _("Hostname") }}</label>
 						<div class="controls">
-							<span class="input-xlarge uneditable-input">{{ escape(builder.hostname) }}</span>
+							<span class="input-xlarge uneditable-input">{{ builder.hostname }}</span>
 							<p class="help-block">
 								{{ _("The hostname cannot be changed.") }}
 							</p>

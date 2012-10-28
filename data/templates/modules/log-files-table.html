@@ -10,7 +10,7 @@
 	<tbody>
 		{% for file in files %}
 			<tr>
-				<td>{{ escape(file.name) }}</td>
+				<td>{{ file.name }}</td>
 				<td>{{ format_size(file.filesize) }}</td>
 				<td>
 					<a class="btn btn-mini" href="{{ file.download_url }}">

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<h1>{{ _("Builds by %s") % escape(user.realname) }}</h1>
+	<h1>{{ _("Builds by %s") % user.realname }}</h1>
 
 	{% if builds %}
 

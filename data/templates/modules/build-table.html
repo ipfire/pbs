@@ -37,9 +37,9 @@
 					{% if show_repo %}
 						<td>
 							{% if build.repo %}
-								<a href="/distro/{{ escape(build.distro.identifier) }}">{{ escape(build.distro.name) }}</a>
+								<a href="/distro/{{ build.distro.identifier }}">{{ build.distro.name }}</a>
 								/
-								<a href="/distro/{{ escape(build.distro.identifier) }}/repo/{{ escape(build.repo.identifier) }}">{{ escape(build.repo.name) }}</a>
+								<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
 							{% else %}
 								&nbsp;
 							{% end %}

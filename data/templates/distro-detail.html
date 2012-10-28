@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Distribution") }}: {{ escape(distro.name) }}{% end block %}
+{% block title %}{{ _("Distribution") }}: {{ distro.name }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -13,22 +13,22 @@
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/distro/{{ distro.identifier }}">{{ escape(distro.name) }}</a>
+			<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
 		</li>
 	</ul>
 
 	<div class="page-header">
 		<h1>
-			{{ _("Distribution") }}: {{ escape(distro.name) }}
-			<small>{{ escape(distro.slogan) }}</small>
+			{{ _("Distribution") }}: {{ distro.name }}
+			<small>{{ distro.slogan }}</small>
 		</h1>
 	</div>
 
 	<div class="row">
 		<div class="span10 offset1">
 			<blockquote>
-				{{ escape(distro.description) }}
-				<small>{{ escape(distro.vendor) }}</small>
+				{{ distro.description }}
+				<small>{{ distro.vendor }}</small>
 			</blockquote>
 
 			<p>
