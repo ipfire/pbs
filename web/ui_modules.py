@@ -2,6 +2,7 @@
 
 import re
 import string
+import textile
 import tornado.escape
 import tornado.web
 
@@ -52,7 +53,7 @@ class TextModule(UIModule):
 		if pre:
 			return "<pre>%s</pre>" % o
 
-		return o.replace("\n", "<br />")
+		return textile.textile(o)
 
 
 class ModalModule(UIModule):
@@ -203,15 +204,19 @@ class LogModule(UIModule):
 
 
 class LogEntryModule(UIModule):
-	def render(self, entry, **args):
-		return self.render_string("modules/log-entry.html",
-			entry=entry, **args)
+	def render(self, entry, small=None, **args):
+		if small or entry.system_msg:
+			template = "modules/log-entry-small.html"
+		else:
+			template = "modules/log-entry.html"
+
+		return self.render_string(template, entry=entry, u=entry.user, **args)
 
 
 class LogEntryCommentModule(LogEntryModule):
 	def render(self, entry, **args):
 		return self.render_string("modules/log-entry-comment.html",
-			entry=entry, **args)
+			entry=entry, u=entry.user, **args)
 
 
 class MaintainerModule(UIModule):

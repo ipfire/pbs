@@ -1,4 +1,4 @@
-<div class="log">
+<ul class="media-list">
 	{% for entry in entries %}
 		{% if entry.type == "comment" %}
 			{% module LogEntryComment(entry, **args) %}
@@ -6,4 +6,4 @@
 			{% module LogEntry(entry, **args) %}
 		{% end %}
 	{% end %}
-</div>
+</ul>

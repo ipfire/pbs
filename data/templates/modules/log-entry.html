@@ -1,40 +1,34 @@
-<div class="well well-small">
+<li class="media">
+	<hr>
+
 	{% block body %}
-		{% block title %}
-			{% block extra-title %}{% end block %}
-			<h4>
-				{% if entry.system_msg %}
-					<i class="icon-star"></i>
-				{% else %}
-					<i class="icon-comment"></i>
-				{% end %}
+		{% if u %}
+			<a class="pull-left hidden-phone" href="/user/{{ u.name }}">
+				<img class="media-object" src="{{ u.gravatar_icon(96) }}" alt="{{ u.realname }}">
+			</a>
+		{% end %}
+
+		<div class="media-body">
+			{% block title %}
+				<p class="muted pull-right">
+					{% block extra-title %}{% end block %}
+					{{ format_date(entry.time) }}
+				</p>
 
 				{% if entry.user %}
-					{% if current_user == entry.user %}
-						<a href="/profile">{{ _("You") }}</a>
-					{% else %}
-						<a href="/user/{{ entry.user.name }}">{{ entry.user.realname }}</a>
-					{% end %}
-				{% else %}
-					{{ _("Pakfire Build Service") }}
+					<h4 class="media-heading">
+						{% if current_user == entry.user %}
+							<a href="/profile">{{ _("You") }}</a>
+						{% else %}
+							<a href="/user/{{ entry.user.name }}">{{ entry.user.realname }}</a>
+						{% end %}
+					</h4>
 				{% end %}
-				-
-				{{ format_date(entry.time) }}
-			</h4>
-		{% end block %}
+			{% end block %}
 
-		{% block message %}
-			<p>
+			{% block message %}
 				{% module Text(entry.get_message(current_user), pre=False) %}
-			</p>
-		{% end block %}
-
-		{% block footer %}
-			{% if entry.get_footer(current_user) %}
-				<p>
-					{{ entry.get_footer(current_user) }}
-				</p>
-			{% end %}
-		{% end block %}
+			{% end block %}
+		</div>
 	{% end block %}
-</div>
+</li>

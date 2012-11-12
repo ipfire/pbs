@@ -1,0 +1,11 @@
+<li class="media">
+	<hr>
+
+	<div class="media-body">
+		<p class="muted pull-right">
+			{{ format_date(entry.time) }}
+		</p>
+
+		{% module Text(entry.get_message(current_user), pre=False) %}
+	</div>
+</li>
