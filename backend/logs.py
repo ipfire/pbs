@@ -26,7 +26,12 @@ class LogEntry(base.Object):
 		return self.data.time
 
 	def get_user(self):
-		return None
+		user_id = getattr(self.data, "user_id", None)
+
+		if user_id is None:
+			return
+
+		return self.pakfire.users.get_by_id(self.data.user_id)
 
 	@property
 	def user(self):
@@ -65,14 +70,6 @@ class CommentLogEntry(LogEntry):
 			return "down"
 
 		return "none"
-
-	def get_user(self):
-		user_id = getattr(self.data, "user_id", None)
-
-		if user_id is None:
-			return
-
-		return self.pakfire.users.get_by_id(self.data.user_id)
 
 	def get_message(self, user=None):
 		return self.data.text
@@ -274,10 +271,6 @@ class JobLogEntry(LogEntry):
 
 class MirrorLogEntry(LogEntry):
 	type = "mirror"
-
-	def get_user(self):
-		if self.data.user_id:
-			return self.pakfire.users.get_by_id(self.data.user_id)
 
 	def get_mirror(self):
 		assert self.data.mirror_id
