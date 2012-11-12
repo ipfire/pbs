@@ -3,28 +3,26 @@
 {% block title %}{{ _("Welcome to the Pakfire Build Service") }}{% end block %}
 
 {% block body %}
-	<div class="hero-unit">
-		<h1>
-			{{ _("Pakfire Build Service") }}
-			<small>{{ random_slogan() }}</small>
-		</h1>
+	{% if current_user %}
+		<div class="page-header">
+			<h2>{{ _("Welcome, %s!") % current_user.firstname }}</h2>
+		</div>
 
-		{% if current_user %}
-			<p>
-				{{ _("Welcome %s! Great to see you again.") % current_user.firstname }}
-			</p>
-		{% else %}
-			<p>
-				{{ _("This is a service that organizes development and packaging for the IPFire distribution.") }}
-				<br />
-				{{ _("It is used to build and track packages as well as assembling images.") }}
-			</p>
-		{% end %}
 
-		<a class="btn btn-large pull-right" href="/documents">
-			{{ _("Documentation") }}
-		</a>
-	</div>
+	{% else %}
+		<div class="hero-unit ac" style="background-color: white">
+			<h1>
+				{{ _("Pakfire Build Service") }}<br>
+				<small>{{ _("Development powered by community!") }}</small>
+			</h1>
+
+			<br><br>
+
+			<a class="btn" href="/documents">{{ _("Learn more") }} &raquo;</a>
+		</div>
+
+		<hr>
+	{% end %}
 
 	{% if updates %}
 		<div class="row">

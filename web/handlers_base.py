@@ -67,11 +67,6 @@ class BaseHandler(tornado.web.RequestHandler):
 		# If no one of the cases above worked we use our default locale
 		return DEFAULT_LOCALE
 
-	def random_slogan(self):
-		slogan = self.pakfire.db.get("SELECT message FROM slogans ORDER BY RAND() LIMIT 1")
-		if slogan:
-			return slogan.message
-
 	@property
 	def remote_address(self):
 		"""
@@ -108,7 +103,6 @@ class BaseHandler(tornado.web.RequestHandler):
 			"format_filemode" : backend.misc.format_filemode,
 			"lang"            : self.locale.code[:2],
 			"pakfire_version" : pakfire.__version__,
-			"random_slogan"   : self.random_slogan,
 			"year"            : time.strftime("%Y"),
 		}
 
