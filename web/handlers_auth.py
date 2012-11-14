@@ -32,14 +32,9 @@ class LoginHandler(BaseHandler):
 			self._current_user = user
 
 			# If there is "next" given, we redirect the user accordingly.
-			# Otherwise we show a nice welcome message and tell the user, that
-			# the login was successful.
-			next = self.get_argument("next", None)
-
-			if next:
-				self.redirect(next)
-			else:
-				self.render("login-successful.html", user=user)
+			# Otherwise we redirect to the front page.
+			next = self.get_argument("next", "/")
+			self.redirect(next)
 
 		else:
 			# If the login failed we return an error message.
@@ -153,7 +148,6 @@ class LogoutHandler(BaseHandler):
 
 		# Destroy the user's session.
 		self.session.destroy()
-		self._current_user = None
 
-		# Show a message to the user.
-		self.render("logout.html")
+		# Redirect the user to the front page.
+		self.redirect("/")
