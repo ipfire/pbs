@@ -46,3 +46,18 @@ body {
 .ac {
 	text-align: center;
 }
+
+.dropdown-login {
+	padding: 15px;
+	padding-bottom: 0px;
+}
+
+.dropdown-login input[type="submit"] {
+	clear: left;
+	width: 100%;
+}
+
+.dropdown-login .links {
+	text-align: center;
+	margin-bottom: 15px;
+}

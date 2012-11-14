@@ -175,7 +175,26 @@
 								</li>
 							{% else %}
 								<li>
-									<a data-toggle="modal" href="#login">{{ _("Login") }}</a>
+									<a href="/register">{{ _("Register") }}</a>
+								</li>
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+										{{ _("Sign in") }} <b class="caret"></b>
+									</a>
+									<div class="dropdown-menu dropdown-login">
+										<form action="/login" method="POST">
+											{% raw xsrf_form_html() %}
+											<input class="span3" type="text" name="name" placeholder="{{ _("Username") }}">
+											<input class="span3" type="password" name="pass" placeholder="{{ _("Password") }}">
+											<input class="btn btn-primary span3" type="submit" value="{{ _("Sign In") }}">
+										</form>
+
+										<div class="links">
+											<a href="/password-recovery">
+												<small>{{ _("Forgot your password?") }}</small>
+											</a>
+										</div>
+									</div>
 								</li>
 							{% end %}
 						</ul>
@@ -195,61 +214,6 @@
 				{% module Footer() %}
 			</div>
 		{% end block %}
-
-		{% if not current_user %}
-			<div class="modal hide fade" id="login">
-				<form id="loginfrm" class="modal-form form-horizontal" method="POST" action="/login">
-					{% raw xsrf_form_html() %}
-
-					<div class="modal-header">
-						<a class="close" data-dismiss="modal">&times;</a>
-						<h3>{{ _("Welcome to Pakfire Build Service!") }}</h3>
-					</div>
-
-					<div class="modal-body">
-						<fieldset>
-							<div class="control-group">
-								<label class="control-label" for="name">{{ _("Username") }}</label>
-								<div class="controls">
-									<input type="text" class="input-xlarge" id="name" name="name" />
-								</div>
-							</div>
-
-							<div class="control-group">
-								<label class="control-label" for="pass">{{ _("Password") }}</label>
-								<div class="controls">
-									<input type="password" class="input-xlarge" id="pass" name="pass" />
-								</div>
-							</div>
-						</fieldset>
-
-						<p>
-							{{ _("Please type your credentials into the form above in order to login.") }}
-						</p>
-
-						<hr />
-
-						<ul>
-							<li>
-								<a href="/register">
-									{{ _("Register a new account") }}
-								</a>
-							</li>
-							<li>
-								<a href="/password-recovery">
-									{{ _("Forgot your password?") }}
-								</a>
-							</li>
-						</ul>
-					</div>
-
-					<div class="modal-footer">
-						<button class="btn btn-primary" type="submit">{{ _("Login") }}</button>
-						<a class="btn" href="#" data-dismiss="modal">{{ _("Cancel") }}</a>
-					</div>
-				</form>
-			</div>
-		{% end %}
 
 		<!-- include javascript files -->
 		<script src="{{ static_url("js/jquery.js") }}"></script>
