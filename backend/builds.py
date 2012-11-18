@@ -235,14 +235,14 @@ class Builds(base.Object):
 
 
 class Build(base.Object):
-	def __init__(self, pakfire, id):
+	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 
 		# ID of this build
 		self.id = id
 
 		# Cache data.
-		self._data = None
+		self._data = data
 		self._jobs = None
 		self._jobs_test = None
 		self._depends_on = None
