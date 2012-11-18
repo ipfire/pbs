@@ -20,43 +20,63 @@ class UIModule(tornado.web.UIModule):
 
 
 class TextModule(UIModule):
+	__cache = {}
+
+	LINK = """<a href="%s" target="_blank">%s</a>"""
+
+	@property
+	def bugzilla_url(self):
+		return self.settings.get("bugzilla_url", "")
+
+	@property
+	def bugzilla_pattern(self):
+		if not self.__cache.has_key("bugzilla_pattern"):
+			self.__cache["bugzilla_pattern"] = re.compile(BUGZILLA_PATTERN)
+
+		return self.__cache["bugzilla_pattern"]
+
+	@property
+	def bugzilla_repl(self):
+		return self.LINK % (self.bugzilla_url % { "bugid" : r"\2" }, r"\1\2")
+
+	@property
+	def cve_url(self):
+		return self.settings.get("cve_url", "")
+
+	@property
+	def cve_pattern(self):
+		if not self.__cache.has_key("cve_pattern"):
+			self.__cache["cve_pattern"] = re.compile(CVE_PATTERN)
+
+		return self.__cache["cve_pattern"]
+
+	@property
+	def cve_repl(self):
+		return self.LINK % (self.cve_url % r"\3", r"\1\2\3")
+
 	def render(self, text, pre=False, remove_linebreaks=True):
 		link = """<a href="%s" target="_blank">%s</a>"""
-
-		bz_url = self.settings.get("bugzilla_url", "")
-		bz_pattern = re.compile(r"(bug\s?|#)(\d+)")
-		bz_repl = link % (bz_url % { "bugid" : r"\2" }, r"\1\2")
-
-		cve_url = self.settings.get("cve_url", "")
-		cve_pattern = re.compile(r"(CVE)(\s|\-)(\d{4}\-\d{4})")
-		cve_repl = link % (cve_url % r"\3", r"\1\2\3")
 
 		if remove_linebreaks:
 			text = text.replace("\n", " ")
 
-		o = []
-		for p in text.splitlines():
-			# Escape the text and create make urls clickable.
-			p = tornado.escape.xhtml_escape(p)
-			p = tornado.escape.linkify(p, shorten=True,
-				extra_params='target="_blank"')
+		# Escape the text and create make urls clickable.
+		text = tornado.escape.xhtml_escape(text)
+		text = tornado.escape.linkify(text, shorten=True,
+			extra_params='target="_blank"')
 
-			# Search for bug ids that need to be linked to bugzilla.
-			if bz_url:
-				p = re.sub(bz_pattern, bz_repl, p, re.I|re.U)
+		# Search for bug ids that need to be linked to bugzilla.
+		if self.bugzilla_url:
+			text = re.sub(self.bugzilla_pattern, self.bugzilla_repl, text, re.I|re.U)
 
-			# Search for CVE numbers and create hyperlinks.
-			if cve_url:
-				p = re.sub(cve_pattern, cve_repl, p, re.I|re.U)
-
-			o.append(p)
-
-		o = "\n".join(o)
+		# Search for CVE numbers and create hyperlinks.
+		if self.cve_url:
+			text = re.sub(self.cve_pattern, self.cve_repl, text, re.I|re.U)
 
 		if pre:
-			return "<pre>%s</pre>" % o
+			return "<pre>%s</pre>" % text
 
-		return textile.textile(o)
+		return textile.textile(text)
 
 
 class ModalModule(UIModule):

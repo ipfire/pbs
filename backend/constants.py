@@ -16,6 +16,9 @@ UPLOADS_DIR  = "/var/tmp/pakfire/uploads"
 
 BUFFER_SIZE = 1024 * 100 # 100kb
 
+BUGZILLA_PATTERN = r"(bug\s?|#)(\d+)"
+CVE_PATTERN = r"(CVE)(\s|\-)(\d{4}\-\d{4})"
+
 N_ = lambda x: x
 
 MSG_BUILD_FAILED_SUBJECT = N_("[%(build_name)s] Build job failed.")
