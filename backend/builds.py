@@ -634,6 +634,9 @@ class Build(base.Object):
 	def state(self):
 		return self.data.state
 
+	def is_broken(self):
+		return self.state == "broken"
+
 	def obsolete_others(self):
 		if not self.type == "release":
 			return
@@ -1218,7 +1221,7 @@ class Jobs(base.Object):
 		"""
 			Get all jobs in the specifies build.
 		"""
-		query = "SELECT id FROM jobs WHERE build_id = %s"
+		query = "SELECT * FROM jobs WHERE build_id = %s"
 		args = [build_id,]
 
 		if type:
@@ -1228,7 +1231,7 @@ class Jobs(base.Object):
 		# Get IDs of all builds in this group.
 		jobs = []
 		for job in self.db.query(query, *args):
-			job = Job(self.pakfire, job.id)
+			job = Job(self.pakfire, job.id, job)
 
 			# If the Build object was set, we set it so it won't be retrieved
 			# from the database again.
@@ -1246,7 +1249,7 @@ class Jobs(base.Object):
 		if uploads:
 			running_states.append("uploading")
 
-		query = "SELECT id FROM jobs WHERE (%s)" % \
+		query = "SELECT * FROM jobs WHERE (%s)" % \
 			" OR ".join(["state = '%s'" % s for s in running_states])
 
 		if host_id:
@@ -1254,7 +1257,7 @@ class Jobs(base.Object):
 
 		query += " ORDER BY time_started DESC"
 
-		return [Job(self.pakfire, j.id) for j in self.db.query(query)]
+		return [Job(self.pakfire, j.id, j) for j in self.db.query(query)]
 
 	def get_next_iter(self, arches=None, limit=None, offset=None, type=None, states=["pending", "new"], max_tries=None):
 		args = []
@@ -1279,7 +1282,7 @@ class Jobs(base.Object):
 			conditions.append("jobs.tries <= %s")
 			args.append(max_tries)
 
-		query = "SELECT jobs.id AS id FROM jobs \
+		query = "SELECT jobs.* FROM jobs \
 			JOIN builds ON jobs.build_id = builds.id"
 
 		if conditions:
@@ -1303,7 +1306,7 @@ class Jobs(base.Object):
 				args += [limit]
 
 		for job in self.db.query(query, *args):
-			yield Job(self.pakfire, job.id)
+			yield Job(self.pakfire, job.id, job)
 
 	def get_next(self, *args, **kwargs):
 		jobs = []
@@ -1315,7 +1318,7 @@ class Jobs(base.Object):
 		return jobs
 
 	def get_latest(self, builder=None, limit=10):
-		query = "SELECT id FROM jobs"
+		query = "SELECT * FROM jobs"
 
 		#where = ["time_finished IS NOT NULL",]
 		where = ["(state = 'finished' OR state = 'failed')"]
@@ -1327,7 +1330,7 @@ class Jobs(base.Object):
 
 		query += " ORDER BY time_finished DESC LIMIT %s"
 
-		return [Job(self.pakfire, j.id) for j in self.db.query(query, limit)]
+		return [Job(self.pakfire, j.id, j) for j in self.db.query(query, limit)]
 
 	def get_average_build_time(self):
 		"""
@@ -1370,14 +1373,14 @@ class Jobs(base.Object):
 
 
 class Job(base.Object):
-	def __init__(self, pakfire, id):
+	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 
 		# The ID of this Job object.
 		self.id = id
 
 		# Cache the data of this object.
-		self._data = None
+		self._data = data
 		self._build = None
 		self._builder = None
 		self._packages = None

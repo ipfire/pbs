@@ -13,21 +13,21 @@ from repository import Repository, RepositoryAux
 
 class Distributions(base.Object):
 	def get_all(self):
-		distros = self.db.query("SELECT id FROM distributions ORDER BY name")
+		distros = self.db.query("SELECT * FROM distributions ORDER BY name")
 
-		return [Distribution(self.pakfire, d.id) for d in distros]
+		return [Distribution(self.pakfire, d.id, d) for d in distros]
 
 	def get_by_id(self, id):
-		distro = self.db.get("SELECT id FROM distributions WHERE id = %s LIMIT 1", id)
+		distro = self.db.get("SELECT * FROM distributions WHERE id = %s LIMIT 1", id)
 
 		if distro:
-			return Distribution(self.pakfire, distro.id)
+			return Distribution(self.pakfire, distro.id, distro)
 
 	def get_by_name(self, name):
-		distro = self.db.get("SELECT id FROM distributions WHERE sname = %s LIMIT 1", name)
+		distro = self.db.get("SELECT * FROM distributions WHERE sname = %s LIMIT 1", name)
 
 		if distro:
-			return Distribution(self.pakfire, distro.id)
+			return Distribution(self.pakfire, distro.id, distro)
 
 	def get_by_ident(self, ident):
 		return self.get_by_name(ident)
@@ -38,11 +38,11 @@ class Distributions(base.Object):
 
 
 class Distribution(base.Object):
-	def __init__(self, pakfire, id):
+	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 		self.id = id
 
-		self._data = None
+		self._data = data
 		self._arches = None
 		self._sources = None
 

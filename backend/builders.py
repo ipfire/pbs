@@ -38,9 +38,9 @@ class Builders(base.Object):
 		return builder
 
 	def get_all(self):
-		builders = self.db.query("SELECT id FROM builders WHERE NOT status = 'deleted' ORDER BY name")
+		builders = self.db.query("SELECT * FROM builders WHERE NOT status = 'deleted' ORDER BY name")
 
-		return [Builder(self.pakfire, b.id) for b in builders]
+		return [Builder(self.pakfire, b.id, b) for b in builders]
 
 	def get_by_id(self, id):
 		if not id:
@@ -49,10 +49,10 @@ class Builders(base.Object):
 		return Builder(self.pakfire, id)
 
 	def get_by_name(self, name):
-		builder = self.db.get("SELECT id FROM builders WHERE name = %s LIMIT 1", name)
+		builder = self.db.get("SELECT * FROM builders WHERE name = %s LIMIT 1", name)
 
 		if builder:
-			return Builder(self.pakfire, builder.id)
+			return Builder(self.pakfire, builder.id, builder)
 
 	def get_all_arches(self):
 		arches = set()
@@ -117,13 +117,13 @@ class Builders(base.Object):
 
 
 class Builder(base.Object):
-	def __init__(self, pakfire, id):
+	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 
 		self.id = id
 
 		# Cache.
-		self._data = None
+		self._data = data
 		self._active_jobs = None
 		self._arches = None
 		self._disabled_arches = None

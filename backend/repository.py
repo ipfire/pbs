@@ -9,15 +9,15 @@ import packages
 
 class Repositories(base.Object):
 	def get_all(self):
-		repos = self.db.query("SELECT id FROM repositories")
+		repos = self.db.query("SELECT * FROM repositories")
 
-		return [Repository(self.pakfire, r.id) for r in repos]
+		return [Repository(self.pakfire, r.id, r) for r in repos]
 
 	def get_by_id(self, repo_id):
-		repo = self.db.get("SELECT id FROM repositories WHERE id = %s", repo_id)
+		repo = self.db.get("SELECT * FROM repositories WHERE id = %s", repo_id)
 
 		if repo:
-			return Repository(self.pakfire, repo.id)
+			return Repository(self.pakfire, repo.id, repo)
 
 	def get_needs_update(self, limit=None):
 		query = "SELECT id FROM repositories WHERE needs_update = 'Y'"
@@ -54,12 +54,12 @@ class Repositories(base.Object):
 
 
 class Repository(base.Object):
-	def __init__(self, pakfire, id):
+	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 		self.id = id
 
 		# Cache.
-		self._data = None
+		self._data = data
 		self._next = None
 		self._prev = None
 		self._key  = None
@@ -68,8 +68,7 @@ class Repository(base.Object):
 	@property
 	def data(self):
 		if self._data is None:
-			self._data = \
-				self.db.get("SELECT * FROM repositories WHERE id = %s", self.id)
+			self._data = self.db.get("SELECT * FROM repositories WHERE id = %s", self.id)
 
 		return self._data
 
