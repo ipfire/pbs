@@ -1,35 +1,47 @@
 #!/usr/bin/python
 
 import base
+import cache
 
 class Settings(base.Object):
-	"""
-		The cache is not available here.
-	"""
+	def __init__(self, pakfire):
+		base.Object.__init__(self, pakfire)
+
+		# Private cache.
+		self._cache = cache.PermanentCache(self.pakfire)
 
 	def query(self, key):
 		return self.db.get("SELECT * FROM settings WHERE k = %s", key)
 
-	def get(self, key, default=None):
+	def get(self, key, default=None, cacheable=True):
+		if cacheable and self.cache.has_key(key):
+			return self.cache.get(key)
+
 		result = self.query(key)
 		if not result:
 			return default
 
-		return "%s" % result.v
+		result = result.v
+
+		# Put the item into the cache to access it later.
+		if cacheable:
+			self.cache.set(key, result)
+
+		return result
 
 	def get_id(self, key):
 		return self.query(key)["id"]
 
-	def get_int(self, key, default=None):
-		value = self.get(key, default)
+	def get_int(self, key, default=None, cacheable=True):
+		value = self.get(key, default, cacheable=cacheable)
 
 		if value is None:
 			return None
 
 		return int(value)
 
-	def get_float(self, key, default=None):
-		value = self.get(key, default)
+	def get_float(self, key, default=None, cacheable=True):
+		value = self.get(key, default, cacheable=cacheable)
 
 		if value is None:
 			return None

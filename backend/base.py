@@ -18,11 +18,17 @@ class Object(object):
 		if hasattr(self.pakfire, "settings"):
 			self.settings = self.pakfire.settings
 
+		# Private cache.
+		self._cache = None
+
 	@property
 	def cache(self):
 		"""
 			Shortcut to the cache.
 		"""
+		if self._cache:
+			return self._cache
+
 		return self.pakfire.cache
 
 	@property
