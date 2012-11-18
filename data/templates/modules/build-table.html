@@ -19,7 +19,7 @@
 			{% for build in builds %}
 			 	<tr class="build build_state_{{ build.state }}">
 			 		<td class="name">
-						<a class="build {{ build.type }} {{ build.state }}"
+						<a class="build {{ build.type }} {{ build.state }} {% if build.is_broken() %}line-through{% end %}"
 							href="/build/{{ build.uuid }}">{{ build.name }}</a>
 					</td>
 

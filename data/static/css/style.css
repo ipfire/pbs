@@ -65,3 +65,7 @@ body {
 .lead-small {
 	font-size: 21px;
 }
+
+.line-through {
+	text-decoration: line-through;
+}
