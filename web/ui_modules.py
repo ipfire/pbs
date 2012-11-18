@@ -20,7 +20,7 @@ class UIModule(tornado.web.UIModule):
 
 
 class TextModule(UIModule):
-	def render(self, text, pre=True):
+	def render(self, text, pre=False, remove_linebreaks=True):
 		link = """<a href="%s" target="_blank">%s</a>"""
 
 		bz_url = self.settings.get("bugzilla_url", "")
@@ -30,6 +30,9 @@ class TextModule(UIModule):
 		cve_url = self.settings.get("cve_url", "")
 		cve_pattern = re.compile(r"(CVE)(\s|\-)(\d{4}\-\d{4})")
 		cve_repl = link % (cve_url % r"\3", r"\1\2\3")
+
+		if remove_linebreaks:
+			text = text.replace("\n", " ")
 
 		o = []
 		for p in text.splitlines():

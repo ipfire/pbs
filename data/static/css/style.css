@@ -61,3 +61,7 @@ body {
 	text-align: center;
 	margin-bottom: 15px;
 }
+
+.lead-small {
+	font-size: 21px;
+}

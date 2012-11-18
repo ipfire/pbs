@@ -1,50 +1,30 @@
-<div class="row">
-	<div class="span6">
-		<table class="table">
-			<tbody>
-				{% if pkg.groups %}
-					<tr>
-						<td>{{ _("Group", "Groups", len(pkg.groups)) }}</td>
-						<td>
-							{{ locale.list(pkg.groups) }}
-						</td>
-					</tr>
-				{% end %}
+<div class="lead lead-small">
+	{% module Text(pkg.description) %}
+</div>
 
-				{% if pkg.url %}
-					<tr>
-						<td>{{ _("Homepage") }}</td>
-						<td>
-							{% raw linkify(pkg.url, shorten=True, extra_params='target="_blank"', permitted_protocols=["http", "https", "ftp"]) %}
-						</td>
-					</tr>
-				{% end %}
+<div class="muted">
+	<p class="pull-right">
+		{% if pkg.url %}
+			<i class="icon-home"></i>
+			<a href="{{ pkg.url }}" target="_blank">{{ _("Home") }}</a>
 
-				{% if pkg.license %}
-					<tr>
-						<td>{{ _("License") }}</td>
-						<td>
-							{{ pkg.license }}
-						</td>
-					</tr>
-				{% end %}
+			{% if pkg.license or pkg.groups %}&dash;{% end %}
+		{% end %}
 
-				{% if pkg.maintainer %}
-					<tr>
-						<td>{{ _("Maintainer") }}</td>
-						<td>
-							{% module Maintainer(pkg.maintainer) %}
-						</td>
-					</tr>
-				{% end %}
-			</tbody>
-		</table>
-	</div>
+		{% if pkg.license %}
+			{{ _("License") }}: {{ pkg.license }}
 
-	<div class="span6">
-		<div class="well">
-			<h3>{{ _("Description") }}</h3>
-			{{ pkg.description }}
-		</div>
-	</div>
+			{% if pkg.groups %}&dash;{% end %}
+		{% end %}
+
+		{% if pkg.groups %}
+			{{ _("Group", "Groups", len(pkg.groups)) }}: {{ locale.list(pkg.groups) }}
+		{% end %}
+	</p>
+
+	{% if pkg.maintainer %}
+		<p>
+			{{ _("This package is maintained by") }} {% module Maintainer(pkg.maintainer) %}.
+		</p>
+	{% end %}
 </div>
