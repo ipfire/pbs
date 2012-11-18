@@ -1,9 +1,12 @@
 
 PO_PATH = data/translations
 POTFILE = $(PO_PATH)/pakfire.pot
-POFILES = $(wildcard $(PO_PATH)/*/LC_MESSAGES/*.po)
+POFILES = $(wildcard $(PO_PATH)/*/LC_MESSAGES/pakfire.po)
 
 ALL_FILES = $(shell find . /usr/lib*/python*/site-packages/tornado -name "*.py" -or -name "*.html")
+
+.PHONY: all
+all: po
 
 .PHONY: pot
 pot: $(POTFILE)
@@ -15,10 +18,14 @@ $(POTFILE): $(ALL_FILES)
 .PHONY: po
 po: $(POTFILE) $(patsubst %.po, %.mo, $(POFILES))
 
+# Merge the POTFILE.
 %.po: $(POTFILE)
-	# Merge the POTFILE.
 	msgmerge $@ $(POTFILE) -o $@
 
+# Compile the translations.
 %.mo: %.po
-	# Compile the translations.
 	msgfmt $< -o $@
+
+.PHONY: po-update
+po-update:
+	tx pull --all
