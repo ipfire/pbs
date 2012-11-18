@@ -1,0 +1,9 @@
+<select name="{{ name }}" {% if id %}id="{{ id }}"{% end %}>
+	<option value="">- {{ _("Auto-select") }} -</option>
+
+	{% for code, name_en, name_loc in supported_locales %}
+		<option value="{{ code }}" {% if preselect and preselect == code %}selected="selected"{% end %}>
+			{{ name_en }} - {{ name_loc }}
+		</option>
+	{% end %}
+</select>

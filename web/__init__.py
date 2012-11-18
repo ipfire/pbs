@@ -65,6 +65,9 @@ class Application(tornado.web.Application):
 				"UpdatesTable"       : UpdatesTableModule,
 				"UsersTable"         : UsersTableModule,
 				"WatchersSidebarTable" : WatchersSidebarTableModule,
+
+				"SelectLocale"       : SelectLocaleModule,
+				"SelectTimezone"     : SelectTimezoneModule,
 			},
 			xsrf_cookies = True,
 		)

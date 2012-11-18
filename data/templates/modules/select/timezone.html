@@ -1,0 +1,9 @@
+<select name="{{ name }}" {% if id %}id="{{ id }}"{% end %}>
+	<option value="">- {{ _("Auto-select") }} -</option>
+
+	{% for tz in supported_timezones %}
+		<option value="{{ tz }}" {% if preselect and preselect == tz %}selected="selected"{% end %}>
+			{{ tz }}
+		</option>
+	{% end %}
+</select>

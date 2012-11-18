@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import datetime
-import pytz
 
 import tornado.locale
 import tornado.web
@@ -141,11 +140,6 @@ class UserPasswdHandler(UserActionHandler):
 
 
 class UserEditHandler(BaseHandler):
-	def prepare(self):
-		# Make list of all supported locales.
-		self.supported_locales = \
-			[tornado.locale.get(l) for l in tornado.locale.get_supported_locales(None)]
-
 	@tornado.web.authenticated
 	def get(self, name):
 		user = self.pakfire.users.get_by_name(name)
@@ -155,9 +149,7 @@ class UserEditHandler(BaseHandler):
 		if not self.current_user == user and not self.current_user.is_admin():
 			raise tornado.web.HTTPError(403)
 
-		self.render("user-profile-edit.html", user=user,
-			supported_timezones=pytz.common_timezones,
-			supported_locales=self.supported_locales)
+		self.render("user-profile-edit.html", user=user)
 
 	@tornado.web.authenticated
 	def post(self, name):
@@ -192,10 +184,6 @@ class UserEditHandler(BaseHandler):
 			msgs.append(_("Password has less than 8 characters."))
 		elif not pass1 == pass2:
 			msgs.append(_("Passwords do not match."))
-
-		# Check if locale is valid.
-		if locale and not locale in [l.code for l in self.supported_locales]:
-			msg.append(_("The choosen locale is invalid."))
 
 		if msgs:
 			self.render("user-profile-edit-fail.html", messages=msgs)

@@ -1,108 +1,154 @@
 {% extends "base.html" %}
 
+{% block title %}{{ _("Edit user profile: %s") % user.realname }}{% end block %}
+
 {% block body %}
-	<h1>{{ _("Edit user %s") % user.realname }}</h1>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/users">{{ _("Users") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/user/{{ user.name }}">{{ user.realname }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/user/{{ user.name }}/edit">{{ _("Edit") }}</a>
+		</li>
+	</ul>
 
-	<form method="post" action="">
+	<div class="page-header">
+		<h2>
+			{{ _("Edit user profile: %s") % user.realname }}
+		</h2>
+	</div>
+
+	<form class="form-horizontal" method="POST" action="">
 		{% raw xsrf_form_html() %}
-		<table class="form form3">
-			<tr>
-				<td class="col1">{{ _("Username") }}:</td>
-				<td class="col2">{{ user.name }}</td>
-				<td class="col3">{{ _("Cannot be changed.") }}</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Email") }}:</td>
-				<td class="col2">
-					<input name="email" type="text" length="100" value="{{ user.email }}" />
-				</td>
-				<td class="col3">
-					{{ _("If the email address is changed, your account will be disabled until you reconfirm the new email address.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Real name (optional)") }}:</td>
-				<td class="col2">
-					<input name="realname" type="text" length="200" value="{{ user.realname }}" />
-				</td>
-				<td class="col3">
-					{{ _("Your real name is used to identify you by others.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Password") }}:</td>
-				<td class="col2">
-					<input name="pass1" type="password" />
-				</td>
-				<td class="col3">
-					{{ _("The password is used to secure the login and must be at least 8 characters.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Confirm") }}:</td>
-				<td class="col2">
-					<input name="pass2" type="password" />
-				</td>
-				<td class="col3">
-					{{ _("Leave the password fields empty to keep the current password.") }}
-				</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Preferred language") }}:</td>
-				<td class="col2">
-					<select name="locale">
-						<option value="">{{ _("Auto-detect") }}</option>
-						{% for l in supported_locales %}
-							<option value="{{ l.code }}" {% if l.code == user.locale %}selected{% end %}>
-								{{ l.name }}
+
+		<fieldset>
+			<legend>{{ _("User Identity") }}</legend>
+
+			<div class="control-group">
+				<label class="control-label">{{ _("Username") }}</label>
+				<div class="controls">
+					<span class="input-xlarge uneditable-input">{{ user.name }}</span>
+
+					<span class="help-inline">
+						{{ _("Cannot be changed.") }}
+					</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="inputRealname">{{ _("Real name") }}</label>
+				<div class="controls">
+					<input type="text" class="input-xlarge" id="inputRealname" name="realname" placeholder="{{ _("Real name") }}"
+						value="{{ user.realname }}">
+
+					<span class="help-block">
+						{{ _("This field is optional, but we appreciate it very much if you type in your real name.") }}
+					</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="inputEmail">{{ _("Email address") }}</label>
+				<div class="controls">
+					<input type="text" class="input-xlarge" id="inputEmail" name="email" placeholder="{{ _("Email address") }}"
+						value="{{ user.email }}">
+
+					<span class="help-block">
+						{{ _("If the email address is changed, your account will be disabled until you confirm the new email address.") }}
+					</span>
+				</div>
+			</div>
+		</fieldset>
+
+		{% if current_user.is_admin() %}
+			<fieldset>
+				<legend>{{ _("Admin actions") }}</legend>
+
+				<div class="control-group">
+					<label class="control-label" for="inputState">{{ _("State") }}</label>
+					<div class="controls">
+						<select class="input-xlarge" id="inputState" name="state">
+							<option value="user">{{ _("User") }}</option>
+							<option value="tester" {% if user.is_tester() %}selected="selected"{% end %}>
+								{{ _("Tester") }}
 							</option>
-						{% end %}
-					</select>
-				</td>
-				<td class="col3">{{ _("Auto-detect will use the language transmitted by your browser.") }}</td>
-			</tr>
-			<tr>
-				<td class="col1">{{ _("Timezone") }}:</td>
-				<td class="col2">
-					<select name="timezone">
-						{% for tz in supported_timezones %}
-							<option value="{{ tz }}" {% if user.timezone.zone == tz %}selected{% end %}>{{ tz }}</option>
-						{% end %}
-					</select>
-				</td>
-				<td class="col3">{{ _("Auto-detect will use the language transmitted by your browser.") }}</td>
-			</tr>
+							<option value="admin" {% if user.is_admin() %}selected="selected"{% end %}>
+								{{ _("Admin") }}
+							</option>
+						</select>
 
-	{% if current_user.is_admin() and not current_user == user %}
-		</table>
-
-		<h2>{{ _("Admin actions") }}</h2>
-		<table class="form form3">
-			<tr>
-				<td class="col1">{{ _("State") }}</td>
-				<td class="col2">
-					<select name="state">
-						<option value="user">{{ _("User") }}</option>
-						<option value="tester"
-							{% if user.is_tester() %}selected{% end %}>
-							{{ _("Tester") }}
-						</option>
-						<option value="admin"
-							{% if user.is_admin() %}selected{% end %}>
-							{{ _("Admin") }}
-						</option>
-					</select>
-				</td>
-				<td class="col3">
-					{{ _("Define the permissions of the user.") }}
-				</td>
-			</tr>
+						<span class="help-block">
+							{{ _("Define the permissions of the user.") }}
+						</span>
+					</div>
+				</div>
+			</fieldset>
 		{% end %}
-			<tr>
-				<td colspan="3" class="buttons">
-					<input type="submit" value="{{ _("Save") }}" />
-				</td>
-			</tr>
-		</table>
+
+		<fieldset>
+			<legend>{{ _("Account security settings") }}</legend>
+
+			<div class="control-group">
+				<label class="control-label" for="inputPass1">{{ _("Password") }}</label>
+				<div class="controls">
+					<input type="password" class="input-xlarge" id="inputPass1" name="pass1" placeholder="{{ _("Password") }}">
+
+					<span class="help-block">
+						{{ _("The password is used to secure the login and must be at least 8 characters.") }}
+					</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="inputPass2">{{ _("Confirm") }}</label>
+				<div class="controls">
+					<input type="password" class="input-xlarge" id="inputPass2" name="pass2" placeholder="{{ _("Confirm password") }}">
+
+					<span class="help-block">
+						{{ _("Leave the password fields empty to keep the current password.") }}
+					</span>
+				</div>
+			</div>
+		</fieldset>
+
+		<fieldset>
+			<legend>{{ _("Locale & timezone settings") }}</legend>
+
+			<div class="control-group">
+				<label class="control-label" for="inputLocale">{{ _("Preferred language") }}</label>
+				<div class="controls">
+					{% module SelectLocale(name="locale", id="inputLocale", preselect=user.locale) %}
+
+					<span class="help-block">
+						{{ _("Auto-detect will use the language transmitted by your browser.") }}
+					</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="inputTimezone">{{ _("Timezone") }}</label>
+				<div class="controls">
+					{% module SelectTimezone(name="timezone", id="inputTimezone", preselect=user.timezone.zone) %}
+
+					<span class="help-block">
+						{{ _("Auto-detect will use the timezone transmitted by your browser.") }}
+					</span>
+				</div>
+			</div>
+		</fieldset>
+
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary">{{ _("Save") }}</button>
+			<a class="btn" href="/user/{{ user.name }}">{{ _("Cancel") }}</a>
+		</div>
 	</form>
 {% end block %}

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import pytz
 import re
 import string
 import textile
@@ -332,3 +333,34 @@ class WatchersSidebarTableModule(UIModule):
 
 		return self.render_string("modules/watchers-sidebar-table.html",
 			build=build, watchers=watchers, limit=limit)
+
+
+class SelectLocaleModule(UIModule):
+	LOCALE_NAMES = (
+		# local code, English name, name
+		("ca_ES", u"Catalan", "Catal\xc3\xa0"),
+		("da_DK", u"Danish", u"Dansk"),
+		("de_DE", u"German", u"Deutsch"),
+		("en_GB", u"English (UK)", u"English (UK)"),
+		("en_US", u"English (US)", u"English (US)"),
+		("es_ES", u"Spanish (Spain)", u"Espa\xf1ol (Espa\xf1a)"),
+		("es_LA", u"Spanish", u"Espa\xf1ol"),
+		("fr_CA", u"French (Canada)", u"Fran\xe7ais (Canada)"),
+		("fr_FR", u"French", u"Fran\xe7ais"),
+		("it_IT", u"Italian", u"Italiano"),
+		("km_KH", u"Khmer", u"\u1797\u17b6\u179f\u17b6\u1781\u17d2\u1798\u17c2\u179a"),
+		("pt_BR", u"Portuguese (Brazil)", u"Portugu\xeas (Brasil)"),
+		("pt_PT", u"Portuguese (Portugal)", u"Portugu\xeas (Portugal)"),
+		("ru_RU", u"Russian", u"\u0440\u0443\u0441\u0441\u043a\u0438\u0439"),
+	)
+
+	def render(self, name=None, id=None, preselect=None):
+		return self.render_string("modules/select/locale.html",
+			name=name, id=id, preselect=preselect, supported_locales=self.LOCALE_NAMES)
+
+
+class SelectTimezoneModule(UIModule):
+	def render(self, name=None, id=None, preselect=None):
+		return self.render_string("modules/select/timezone.html",
+			name=name, id=id, preselect=preselect,
+			supported_timezones=pytz.common_timezones)
