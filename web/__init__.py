@@ -42,6 +42,11 @@ class Application(tornado.web.Application):
 				"BuildLog"           : BuildLogModule,
 				"BuildOffset"        : BuildOffsetModule,
 				"BuildTable"         : BuildTableModule,
+
+				# Changelog
+				"Changelog"          : ChangelogModule,
+				"ChangelogEntry"     : ChangelogEntryModule,
+
 				"CommitsTable"       : CommitsTableModule,
 				"JobsTable"          : JobsTableModule,
 				"JobsList"           : JobsListModule,
@@ -107,6 +112,7 @@ class Application(tornado.web.Application):
 			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", PackageDetailHandler),
 			(r"/package/([\w\-\+]+)/properties", PackagePropertiesHandler),
 			(r"/package/([\w\-\+]+)", PackageNameHandler),
+			(r"/package/([\w\-\+]+)/changelog", PackageChangelogHandler),
 
 			# Files
 			(r"/file/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", FileDetailHandler),

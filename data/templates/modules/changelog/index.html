@@ -1,0 +1,5 @@
+<ul class="media-list">
+	{% for b in builds %}
+		{% module ChangelogEntry(b) %}
+	{% end %}
+</ul>

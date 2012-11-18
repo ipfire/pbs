@@ -1,0 +1,53 @@
+{% extends "../base.html" %}
+
+{% block title %}{{ _("Changelog of %s") % name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ name }}">{{ name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/package/{{ name }}/changelog">{{ _("Changelog") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h2>
+			{{ name }} <small>{{ _("Changelog") }}</small>
+		</h2>
+	</div>
+
+	{% module Changelog(builds=builds) %}
+
+	<ul class="pager">
+		{% if have_prev %}
+			<li class="previous">
+				<a href="?offset={{ offset - limit }}&limit={{ limit }}">&larr; {{ _("Older") }}</a>
+			</li>
+		{% else %}
+			<li class="previous disabled">
+				<a href="#">&larr; {{ _("Older") }}</a>
+			</li>
+		{% end %}
+
+		{% if have_next %}
+			<li class="next">
+				<a href="?offset={{ offset + limit }}&limit={{ limit }}">{{ _("Newer") }} &rarr;</a>
+			</li>
+		{% else %}
+			<li class="next disabled">
+				<a href="#">{{ _("Newer") }} &rarr;</a>
+			</li>
+		{% end %}
+	</ul>
+{% end block %}

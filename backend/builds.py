@@ -233,6 +233,41 @@ class Builds(base.Object):
 
 		return builds
 
+	def get_changelog(self, name, public=None, limit=5, offset=0):
+		query = "SELECT builds.* FROM builds \
+			JOIN packages ON builds.pkg_id = packages.id \
+			WHERE \
+				builds.type = %s \
+			AND \
+				packages.name = %s"
+		args = ["release", name,]
+
+		if public == True:
+			query += " AND builds.public = %s"
+			args.append("Y")
+		elif public == False:
+			query += " AND builds.public = %s"
+			args.append("N")
+
+		query += " ORDER BY builds.time_created DESC"
+
+		if limit:
+			if offset:
+				query += " LIMIT %s,%s"
+				args += [offset, limit]
+			else:
+				query += " LIMIT %s"
+				args.append(limit)
+
+		builds = []
+		for b in self.db.query(query, *args):
+			b = Build(self.pakfire, b.id, b)
+			builds.append(b)
+
+		builds.sort(reverse=True)
+
+		return builds
+
 
 class Build(base.Object):
 	def __init__(self, pakfire, id, data=None):

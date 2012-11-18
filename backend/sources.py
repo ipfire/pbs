@@ -138,6 +138,12 @@ class Commit(base.Object):
 		return self.data.body.strip()
 
 	@property
+	def message_full(self):
+		msg = [self.subject, ""] + self.message.splitlines()
+
+		return "\n".join(msg)
+
+	@property
 	def date(self):
 		return self.data.date
 

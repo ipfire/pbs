@@ -81,6 +81,19 @@ class BugsTableModule(UIModule):
 			pkg=pkg, bugs=bugs)
 
 
+class ChangelogModule(UIModule):
+	def render(self, name=None, builds=None, *args, **kwargs):
+		if not builds:
+			builds = self.pakfire.builds.get_changelog(name, *args, **kwargs)
+
+		return self.render_string("modules/changelog/index.html", builds=builds)
+
+
+class ChangelogEntryModule(UIModule):
+	def render(self, build):
+		return self.render_string("modules/changelog/entry.html", build=build)
+
+
 class CommitsTableModule(UIModule):
 	def render(self, distro, source, commits, full_format=True):
 		return self.render_string("modules/commits-table.html",

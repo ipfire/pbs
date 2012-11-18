@@ -87,9 +87,44 @@ class PackageNameHandler(BaseHandler):
 			"scratch_builds" : builds["scratch"],
 		}
 
-		self.render("package-detail-list.html", builds=builds,
+		self.render("package-detail-list.html", builds=builds, name=name,
 			latest_build=latest_build, pkg=latest_build.pkg,
 			build_times=build_times, bugs=bugs, **kwargs)
+
+
+class PackageChangelogHandler(BaseHandler):
+	def get(self, name):
+		limit = self.get_argument("limit", 10)
+		try:
+			limit = int(limit)
+		except ValueError:
+			limit = 10
+
+		offset = self.get_argument("offset", 0)
+		try:
+			offset = int(offset)
+		except ValueError:
+			offset = 0
+
+		# Get one more build than requested to find out if there are more items
+		# to display (next button).
+		builds = self.pakfire.builds.get_changelog(name, limit=limit + 1, offset=offset)
+
+		if len(builds) >= limit:
+			have_next = True
+		else:
+			have_next = False
+
+		if offset < limit:
+			have_prev = False
+		else:
+			have_prev = True
+
+		# Clip list to limit.
+		builds = builds[:limit]
+
+		self.render("packages/changelog.html", name=name, builds=builds,
+			limit=limit, offset=offset, have_prev=have_prev, have_next=have_next)
 
 
 class PackageDetailHandler(BaseHandler):
