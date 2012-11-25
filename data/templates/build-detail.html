@@ -23,7 +23,6 @@
 
 	{% module BuildHeadline(_("Build"), build) %}
 	{% module BuildStateWarnings(build) %}
-	{% module PackageHeader(pkg) %}
 
 	{% if build.type == "scratch" and build.has_perm(current_user) %}
 		<div class="btn-toolbar pull-right">
@@ -39,8 +38,6 @@
 			{% end %}
 		</div>
 	{% end %}
-
-	<hr>
 
 	{% if build.type == "release" %}
 		<div class="row">
