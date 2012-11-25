@@ -19,7 +19,7 @@
 		</h4>
 
 		{% if build.commit %}
-			{% module Text(build.commit.message_full) %}
+			{% module Text(build.commit.message_full, remove_linebreaks=False) %}
 
 			<p class="muted pull-right">
 				{{ _("Author") }} {% module Maintainer(build.commit.author) %}
