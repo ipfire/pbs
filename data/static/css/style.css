@@ -101,3 +101,14 @@ body {
 .jobs-boxes .well table td {
 	width: 50%;
 }
+
+.well-white {
+	background-color: white;
+}
+
+p.huge {
+	font-size: 4em;
+	font-weight: bold;
+	margin-top: 0.2em;
+	margin-bottom: 0.4em;
+}

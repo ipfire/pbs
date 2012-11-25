@@ -2,16 +2,15 @@
 	{% for bug in bugs %}
 		<tr>
 			<td>
-				<a href="{{ bug.url }}" target="_blank">#{{ bug.id }}</a>
-				<br />
-				{{ bug.status }}
-			</td>
-			<td>
 				{{ bug.summary }}
-
-				{% if bug.assignee %}
-					<br />{% raw format_email(bug.assignee) %}
-				{% end %}
+				<br>
+				<a href="{{ bug.url }}" target="_blank">#{{ bug.id }}</a>
+				<span class="muted">
+					&dash; {{ bug.status }}
+					{% if bug.resolution %}
+						{{ bug.resolution }}
+					{% end %}
+				</span>
 			</td>
 		</tr>
 	{% end %}
