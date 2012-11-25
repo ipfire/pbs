@@ -19,7 +19,7 @@
 		</div>
 	{% else %}
 		<div class="page-header">
-			<h1>{{ _("Advanced search") }}</h1>
+			<h2>{{ _("Search") }}</h2>
 		</div>
 
 		<p class="lead ac">
@@ -43,7 +43,7 @@
 	<div class="row">
 		<div class="span12">
 			<div class="well">
-				<h3>{{ _("Search for packages by name or description") }}</h3>
+				<h4>{{ _("Search for packages by name or description") }}</h4>
 				<p>
 					{{ _("If you type a package name to the search box you will get a link to the package.") }}
 					{{ _("The search is performed in case insensitive mode.") }}
@@ -55,13 +55,13 @@
 	<div class="row">
 		<div class="span6">
 			<div class="well">
-				<h3>{{ _("Search for UUIDs") }}</h3>
+				<h4>{{ _("Search for UUIDs") }}</h4>
 				<p>
 					{{ _("If you type a UUID to the search box, you will be directed to the job, build or package it belongs to.") }}
 					{{ _("This is a handy feature if you have a UUID and search for the corresponding package or build.") }}
 				</p>
 
-				<h4>{{ _("Examples") }}</h4>
+				<h5>{{ _("Examples") }}</h5>
 				<ul>
 					<li>fde110ca-f7d9-4ae5-a6c4-1e465a05662a</li>
 				</ul>
@@ -70,14 +70,14 @@
 
 		<div class="span6">
 			<div class="well">
-				<h3>{{ _("Search for files") }}</h3>
+				<h4>{{ _("Search for files") }}</h4>
 				<p>
 					{{ _("You may also search for file names.") }}
 					{{ _("You will get a list of packages that contain the file.") }}
 					{{ _("The search pattern must start with a slash that it will be recognized as a file.") }}
 				</p>
 
-				<h4>{{ _("Examples") }}</h4>
+				<h5>{{ _("Examples") }}</h5>
 				<ul>
 					<li>/bin/bash</li>
 					<li>/usr/bin/gcc</li>
