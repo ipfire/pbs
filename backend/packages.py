@@ -97,12 +97,13 @@ class Packages(base.Object):
 
 	def get_avg_build_times(self, name):
 		query = "SELECT jobs.arch_id AS arch_id, \
-				AVG(jobs.time_finished - jobs.time_started) AS build_time \
+				AVG(UNIX_TIMESTAMP(jobs.time_finished) - UNIX_TIMESTAMP(jobs.time_started)) AS build_time \
 			FROM jobs \
 				JOIN builds ON jobs.build_id = builds.id \
 				JOIN packages ON builds.pkg_id = packages.id \
 			WHERE packages.name = %s \
 				AND jobs.state = 'finished' \
+				AND jobs.type = 'build' \
 				AND NOT jobs.time_started IS NULL \
 				AND NOT jobs.time_finished IS NULL \
 			GROUP BY jobs.arch_id"
