@@ -8,7 +8,7 @@
 		&dash;
 	{% elif entry.vote == "down" %}
 		<span class="label label-important" title="{{ _("This build does not work for %s.") % entry.user.firstname }}">
-			-{{ entry.credit }}
+			{{ entry.credit }}
 		</span>
 		&dash;
 	{% end %}
