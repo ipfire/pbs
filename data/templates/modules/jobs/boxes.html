@@ -1,0 +1,33 @@
+<div class="jobs-boxes">
+	{% for j in jobs %}
+		<div class="well well-small">
+			<h4>		
+				<small>{% module JobState(j, cls="pull-right") %}</small>
+				<a href="/job/{{ j.uuid }}">{{ j.arch.name }}</a>
+			</h4>
+
+			<table class="table table-condensed table-hover">
+				<tbody>
+					<tr>
+						<td>
+							{{ _("Duration") }}
+						</td>
+						<td>
+							{{ friendly_time(j.duration) }}
+						</td>
+					</tr>
+					{% if j.builder %}
+						<tr>
+							<td>
+								{{ _("Builder") }}
+							</td>
+							<td>
+								<a href="/builder/{{ j.builder.name }}">{{ j.builder.name }}</a>
+							</td>
+						</tr>
+					{% end %}
+				</tbody>
+			</table>
+		</div>
+	{% end %}
+</div>

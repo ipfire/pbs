@@ -181,6 +181,65 @@ class BuildStateWarningsModule(UIModule):
 		return self.render_string("modules/build-state-warnings.html", build=build)
 
 
+class JobsBoxesModule(UIModule):
+	def render(self, build, jobs=None):
+		if jobs is None:
+			jobs = build.jobs
+
+		return self.render_string("modules/jobs/boxes.html",
+			build=build, jobs=jobs)
+
+
+class JobStateModule(UIModule):
+	def render(self, job, cls=None):
+		state = job.state
+
+		_ = self.locale.translate
+		classes = []
+
+		if state == "aborted":
+			text = _("Aborted")
+			classes.append("muted")
+
+		elif state == "dependency_error":
+			text = _("Dependency problem")
+			classes.append("text-warning")
+
+		elif state == "dispatching":
+			text = _("Dispatching")
+			classes.append("text-info")
+
+		elif state == "failed":
+			text = _("Failed")
+			classes.append("text-error")
+
+		elif state == "finished":
+			text = _("Finished")
+			classes.append("text-success")
+
+		elif state == "new":
+			text = _("New")
+			classes.append("muted")
+
+		elif state == "pending":
+			text = _("Pending")
+			classes.append("muted")
+
+		elif state == "running":
+			text = _("Running")
+			classes.append("text-info")
+
+		# Return just the string, is state is unknown.
+		else:
+			text = _("Unknown: %s") % state
+			classes.append("muted")
+
+		if cls:
+			classes.append(cls)
+
+		return """<p class="%s">%s</p>""" % (" ".join(classes), text)
+
+
 class JobsTableModule(UIModule):
 	def render(self, build, jobs=None, type="release"):
 		if jobs is None:

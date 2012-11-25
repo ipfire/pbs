@@ -69,3 +69,31 @@ body {
 .line-through {
 	text-decoration: line-through;
 }
+
+.jobs-boxes .well {
+	background: #fff;
+}
+
+.jobs-boxes h4 p {
+	font-weight: bold;
+}
+
+.jobs-boxes .warning {
+	background-color: #fcf8e3;
+}
+
+.jobs-boxes .error {
+	background-color: #f2dede;
+}
+
+.jobs-boxes .success {
+	background-color: #dff0d8;
+}
+
+.jobs-boxes .info {
+	background-color: #d9edf7;
+}
+
+.jobs-boxes .well table td {
+	width: 50%;
+}

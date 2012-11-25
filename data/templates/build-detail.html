@@ -40,11 +40,7 @@
 		</div>
 	{% end %}
 
-	<div class="row">
-		<div class="span12">
-			<hr />
-		</div>
-	</div>
+	<hr>
 
 	{% if build.type == "release" %}
 		<div class="row">
@@ -205,11 +201,7 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="span12">
-				<hr>
-			</div>
-		</div>
+		<hr>
 	{% end %}
 	
 	<div class="row">
@@ -232,128 +224,68 @@
 	</div>
 
 	<div class="row">
-		<div class="span12">
+		<div class="span8">
 			{% module Log(log) %}
+		</div>
+
+		<div class="span4">
+			{% module JobsBoxes(build) %}
+
+			<p class="ac">
+				<a href="/package/{{ build.pkg.uuid }}">{{ _("Source package") }}</a>
+			</p>
 		</div>
 	</div>
 
+	<hr>
+
 	<div class="row">
 		<div class="span12">
-			<hr>
+			<table class="table table-striped table-hover">
+				<tr>
+					<td>{{ _("Created") }}</td>
+					<td>{{ format_date(build.created, full_format=True) }}</td>
+				</tr>
 
-			<ul class="nav nav-pills">
-				<li class="active">
-					<a href="#buildjobs" data-toggle="tab">
-						{{ _("Build jobs") }}
-					</a>
-				</li>
-				{% if build.test_jobs %}
-					<li>
-						<a href="#testjobs" data-toggle="tab">
-							{{ _("Test jobs") }} ({{ len(build.test_jobs) }})
+				{% if build.owner %}
+					<tr>
+						<td>{{ _("Owner") }}</td>
+						<td>{{ build.owner.realname }}</td>
+					</tr>
+				{% end %}
+
+				{% if current_user and current_user.is_admin() %}
+					<tr>
+						<td>{{ _("Public?") }}</td>
+						<td>
+							{% if build.public %}
+								{{ _("Yes") }}
+							{% else %}
+								{{ _("No") }}
+							{% end %}
+						</td>
+					</tr>
+				{% end %}
+
+				<tr>
+					<td>{{ _("Priority") }}</td>
+					<td>
+						<a href="/build/{{ build.uuid }}/priority">
+							{% if build.priority >= 2 %}
+								{{ _("Very high") }}
+							{% elif build.priority == 1 %}
+								{{ _("High") }}
+							{% elif build.priority == 0 %}
+								{{ _("Medium") }}
+							{% elif build.priority == -1 %}
+								{{ _("Low") }}
+							{% elif build.priority <= -2 %}
+								{{ _("Very low") }}
+							{% end %}
 						</a>
-					</li>
-				{% end %}
-				<li>
-					<a href="#properties" data-toggle="tab">
-						{{ _("Properties") }}
-					</a>
-				</li>
-			</ul>
-
-			<div class="tab-content">
-				<div class="tab-pane active" id="buildjobs">
-					<div class="row">
-						<div class="span12">
-							{% module JobsTable(build) %}
-						</div>
-					</div>
-				</div>
-
-				{% if build.test_jobs %}
-					<div class="tab-pane" id="testjobs">
-						<div class="row">
-							<div class="span12">
-								{% module JobsTable(build, build.test_jobs, type="test") %}
-							</div>
-						</div>
-					</div>
-				{% end %}
-
-				<div class="tab-pane" id="properties">
-					<div class="row">
-						<div class="span4">
-							<table class="table table-striped table-hover">
-								<tr>
-									<td>{{ _("Created") }}</td>
-									<td>{{ format_date(build.created, full_format=True) }}</td>
-								</tr>
-								
-								{% if build.owner %}
-									<tr>
-										<td>{{ _("Owner") }}</td>
-										<td>{{ build.owner.realname }}</td>
-									</tr>
-								{% end %}
-
-								{% if current_user and current_user.is_admin() %}
-									<tr>
-										<td>{{ _("Public?") }}</td>
-										<td>
-											{% if build.public %}
-												{{ _("Yes") }}
-											{% else %}
-												{{ _("No") }}
-											{% end %}
-										</td>
-									</tr>
-								{% end %}
-
-								<tr>
-									<td>{{ _("Priority") }}</td>
-									<td>
-										<a href="/build/{{ build.uuid }}/priority">
-											{% if build.priority >= 2 %}
-												{{ _("Very high") }}
-											{% elif build.priority == 1 %}
-												{{ _("High") }}
-											{% elif build.priority == 0 %}
-												{{ _("Medium") }}
-											{% elif build.priority == -1 %}
-												{{ _("Low") }}
-											{% elif build.priority <= -2 %}
-												{{ _("Very low") }}
-											{% end %}
-										</a>
-									</td>
-								</tr>
-							</table>
-						</div>
-
-						<div class="span8">
-							<table class="table">
-								<tbody>
-									<tr>
-										<td>{{ _("Source package") }}</td>
-										<td>
-											<a href="/package/{{ build.pkg.uuid }}">{{ build.pkg.friendly_name }}</a>
-										</td>
-									</tr>
-
-									{% if build.pkg.requires %}
-										<tr>
-											<td>{{ _("Build dependencies") }}</td>
-											<td>
-												{{ locale.list(["<a href=\"/search?q=%(r)s\">%(r)s</a>" % { "r" : r } for r in build.pkg.requires]) }}
-											</td>
-										</tr>
-									{% end %}
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
+					</td>
+				</tr>
+			</table>
 		</div>
 	</div>
 {% end block %}
