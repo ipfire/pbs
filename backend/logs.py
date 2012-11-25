@@ -9,7 +9,6 @@ _ = lambda x: x
 
 class LogEntry(base.Object):
 	type = None
-	system_msg = True
 
 	def __init__(self, pakfire, data):
 		base.Object.__init__(self, pakfire)
@@ -71,7 +70,6 @@ class CreatedLogEntry(LogEntry):
 
 class CommentLogEntry(LogEntry):
 	type = "comment"
-	system_msg = False
 
 	@property
 	def time(self):

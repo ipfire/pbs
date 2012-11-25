@@ -301,7 +301,7 @@ class LogModule(UIModule):
 
 class LogEntryModule(UIModule):
 	def render(self, entry, small=None, **args):
-		if small or entry.system_msg:
+		if small or not entry.user:
 			template = "modules/log-entry-small.html"
 		else:
 			template = "modules/log-entry.html"
