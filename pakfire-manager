@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import logging
+import os.path
 import time
 import tornado.ioloop
 import tornado.options
@@ -10,13 +11,16 @@ from backend.managers import *
 
 tornado.options.parse_command_line()
 
+BASEDIR = os.path.dirname(__file__)
+
 class Daemon(object):
 	def __init__(self):
 		self._managers = []
 
 		self.ioloop.set_blocking_log_threshold(300)
 
-		self.pakfire = backend.Pakfire()
+		config_file = os.path.join(BASEDIR, "pbs.conf")
+		self.pakfire = backend.Pakfire(config_file=config_file)
 
 	@property
 	def ioloop(self):

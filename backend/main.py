@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import ConfigParser
 import logging
 import os
 import pakfire
@@ -25,15 +26,14 @@ import users
 
 from constants import *
 
-# Database access.
-MYSQL_SERVER   = "mysql-master.ipfire.org"
-MYSQL_USER     = "pakfire"
-MYSQL_DB       = "pakfire"
-MYSQL_GEOIP_DB = "geoip"
-
 class Pakfire(object):
-	def __init__(self):
-		self.db = database.Connection(MYSQL_SERVER, MYSQL_DB, user=MYSQL_USER)
+	def __init__(self, config_file):
+		# Read configuration file.
+		self.config = self.read_config(config_file)
+
+		# Connect to databases.
+		self.db = self.connect_database()
+		self.geoip_db = self.connect_database("geoip-database")
 
 		# Global pakfire settings (from database).
 		self.settings = settings.Settings(self)
@@ -41,8 +41,7 @@ class Pakfire(object):
 		self.arches      = arches.Arches(self)
 		self.builds      = builds.Builds(self)
 		self.cache       = cache.Cache(self)
-		self.geoip       = mirrors.GeoIP(self, MYSQL_SERVER, MYSQL_GEOIP_DB,
-								user=MYSQL_USER)
+		self.geoip       = mirrors.GeoIP(self)
 		self.jobs        = builds.Jobs(self)
 		self.builders    = builders.Builders(self)
 		self.distros     = distribution.Distributions(self)
@@ -66,6 +65,24 @@ class Pakfire(object):
 		if self.db:
 			self.db.close()
 			del self.db
+
+	def read_config(self, path):
+		c = ConfigParser.SafeConfigParser()
+		c.read(path)
+
+		return c
+
+	def connect_database(self, section="database"):
+		db = self.config.get(section, "db")
+		host = self.config.get(section, "host")
+		user = self.config.get(section, "user")
+
+		if self.config.has_option(section, "pass"):
+			pw = self.config.get(section, "pass")
+		else:
+			pw = None
+
+		return database.Connection(host, db, user=user, password=pw)
 
 	def cleanup_files(self):
 		query = self.db.query("SELECT * FROM queue_delete")

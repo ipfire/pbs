@@ -9,17 +9,10 @@ import base
 import logs
 
 class GeoIP(object):
-	db = None
-
-	def __init__(self, pakfire, server, name, user):
+	def __init__(self, pakfire):
 		self.pakfire = pakfire
 
-		if self.db is None:
-			self.db = tornado.database.Connection(
-				server, name, user=user
-			)
-
-			logging.info("Creating database connection to GeoIP database.")
+		self.db = self.pakfire.geoip_db
 
 	@property
 	def cache(self):
