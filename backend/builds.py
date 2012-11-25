@@ -984,6 +984,10 @@ class Build(base.Object):
 	def get_log(self, comments=True, repo=True, limit=None):
 		entries = []
 
+		# Created entry.
+		created_entry = logs.CreatedLogEntry(self.pakfire, self)
+		entries.append(created_entry)
+
 		if comments:
 			entries += self.get_comments(limit=limit)
 

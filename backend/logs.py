@@ -50,6 +50,25 @@ class LogEntry(base.Object):
 		return None
 
 
+class CreatedLogEntry(LogEntry):
+	type = "created"
+
+	@property
+	def build(self):
+		return self.data
+
+	@property
+	def time(self):
+		return self.build.created
+
+	def get_user(self):
+		if self.build.type == "scratch":
+			return self.build.owner
+
+	def get_message(self, user=None):
+		return _("Build has been created")
+
+
 class CommentLogEntry(LogEntry):
 	type = "comment"
 	system_msg = False
