@@ -115,6 +115,12 @@
 						</ul>
 					
 						<ul class="nav pull-right">
+							<li>
+								<a href="/search">
+									<i class="icon-search icon-white"></i>
+								</a>
+							</li>
+
 							<li class="divider-vertical"></li>
 
 							{% if current_user %}
@@ -185,10 +191,6 @@
 								</li>
 							{% end %}
 						</ul>
-
-						<form class="navbar-search pull-right" method="GET" action="/search">
-							<input type="text" class="search-query" placeholder="{{ _("Search...") }}" name="q">
-						</form>
 					</div>
 				</div>
 			</div>
