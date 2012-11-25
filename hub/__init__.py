@@ -39,13 +39,6 @@ class Application(tornado.web.Application):
 			(r"/user",    handlers.UserHandler),
 		])
 
-		# This is the deprecated version. It will be removed some time.
-		self.add_handlers(r"pakfire.ipfire.org", [
-			# API
-			(r"/pakfirehub/builder", handlers.BuilderHandler),
-			(r"/pakfirehub/user",    handlers.UserHandler),
-		])
-
 		logging.info("Successfully initialied application")
 
 	@property
