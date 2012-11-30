@@ -410,10 +410,11 @@ class Repository(base.Object):
 
 		times = []
 		for arch in self.pakfire.arches.get_all():
-			time = self.db.get("SELECT SUM(jobs.time_finished - jobs.time_started) AS time FROM jobs \
+			time = self.db.get("SELECT SUM(UNIX_TIMESTAMP(jobs.time_finished) - UNIX_TIMESTAMP(jobs.time_started)) AS time FROM jobs \
 				JOIN builds ON builds.id = jobs.build_id \
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
 				WHERE (jobs.arch_id = %s OR jobs.arch_id = %s) AND \
+				jobs.type = 'build' AND \
 				repositories_builds.repo_id = %s", arch.id, noarch.id, self.id)
 
 			times.append((arch, time.time))
