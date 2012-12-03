@@ -1,9 +1,8 @@
+// Activate Google Prettify for pretty-printing code.
+addEventListener('load', prettyPrint, false);
 
-$(document).ready(
-	function() {
-		$('.dropdown-toggle').dropdown();
-	}
-);
+$(document).ready(function() {
+});
 
 function getCookie(name) {
     var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
@@ -17,32 +16,3 @@ jQuery.postJSON = function(url, args, callback) {
         callback(eval("(" + response + ")"));
     }});
 };
-
-$(function() {
-	var $search = $('#search');
-	original_val = $search.val();
-
-	$search.focus(function() {
-		if($(this).val() === original_val) {
-			$(this).val('');
-		}
-	})
-
-	.blur(function() {
-		if($(this).val() === '') {
-			$(this).val(original_val);
-		}
-	});
-});
-
-action_run = function(action_id) {
-	$.postJSON("/api/action/run", { "id" : action_id }, function() {});
-
-	$("#action-" + action_id).hide();
-}
-
-action_remove = function(action_id) {
-	$.postJSON("/api/action/remove", { "id" : action_id }, function() {});
-
-	$("#action-" + action_id).hide();
-}
