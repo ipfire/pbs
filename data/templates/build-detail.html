@@ -73,13 +73,17 @@
 			<div class="{% if bugs %}span6{% else %}span10{% end %}">
 				<h4>{{ _("Changes") }}</h4>
 
-				{% module Text(build.commit.message_full, remove_linebreaks=False) %}
+				{% if build.commit %}
+					{% module Text(build.commit.message_full, remove_linebreaks=False) %}
 
-				<p class="muted pull-right">
-					{{ _("Author") }} {% module Maintainer(build.commit.author) %}
-					&dash;
-					{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
-				</p>
+					<p class="muted pull-right">
+						{{ _("Author") }} {% module Maintainer(build.commit.author) %}
+						&dash;
+						{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
+					</p>
+				{% else %}
+					<p class="muted">{{ _("No commit message.") }}</p>
+				{% end %}
 
 				<hr class="clear visible-phone">
 			</div>
