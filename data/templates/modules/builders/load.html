@@ -1,0 +1,21 @@
+<div class="well well-white">
+	<h5>{{ _("Current load of the build cluster") }}</h5>
+
+	<div class="row-fluid">
+		<div class="span10">
+			<div class="progress progress-striped active">
+				{% if load >= 90 %}
+					<div class="bar bar-danger" style="width: {{ "%.2f%%" % load }};"></div>
+				{% elif load >= 50 %}
+					<div class="bar bar-warning" style="width: {{ "%.2f%%" % load }};"></div>
+				{% else %}
+					<div class="bar bar-success" style="width: {{ "%.2f%%" % load }};"></div>
+				{% end %}
+			</div>
+		</div>
+
+		<div class="span2">
+			<p class="lead ac">{{ "%.1f%%" % load }}</p>
+		</div>
+	</div>
+</div>
