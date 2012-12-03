@@ -52,11 +52,11 @@ class Packages(base.Object):
 		return [(n.name, n.summary) for n in self.db.query(query, *args)]
 
 	def get_by_uuid(self, uuid):
-		pkg = self.db.get("SELECT id FROM packages WHERE uuid = %s LIMIT 1", uuid)
+		pkg = self.db.get("SELECT * FROM packages WHERE uuid = %s LIMIT 1", uuid)
 		if not pkg:
 			return
 
-		return Package(self.pakfire, pkg.id)
+		return Package(self.pakfire, pkg.id, pkg)
 
 	def search(self, pattern, limit=None):
 		"""
@@ -120,14 +120,14 @@ class Packages(base.Object):
 
 
 class Package(base.Object):
-	def __init__(self, pakfire, id):
+	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 
 		# The ID of the package.
 		self.id = id
 
 		# Cache.
-		self._data = None
+		self._data = data
 		self._deps = None
 		self._arch = None
 		self._filelist = None
