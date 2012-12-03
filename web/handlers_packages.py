@@ -51,30 +51,10 @@ class PackageNameHandler(BaseHandler):
 			"scratch" : [],
 		}
 
-		query = self.pakfire.builds.get_by_name(name, public=self.public,
-			user=self.current_user)
+		latest_build = self.pakfire.builds.get_latest_by_name(name, public=self.public)
 
-		if not query:
+		if not latest_build:
 			raise tornado.web.HTTPError(404, "Package '%s' was not found" % name)
-
-		for build in query:
-			try:
-				builds[build.type].append(build)
-			except KeyError:
-				logging.warning("Unknown build type: %s" % build.type)
-
-		latest_build = None
-		for type in builds.keys():
-			# Take info from the most recent package.
-			if builds[type]:
-				latest_build = builds[type][-1]
-				break
-
-		assert latest_build
-
-		# Move the latest builds to the top.
-		for type in builds.keys():
-			builds[type].reverse()
 
 		# Get the average build times of this package.
 		build_times = self.pakfire.packages.get_avg_build_times(name)
@@ -82,14 +62,9 @@ class PackageNameHandler(BaseHandler):
 		# Get the latest bugs from bugzilla.
 		bugs = self.pakfire.bugzilla.get_bugs_from_component(name)
 
-		kwargs = {
-			"release_builds" : builds["release"],
-			"scratch_builds" : builds["scratch"],
-		}
-
 		self.render("package-detail-list.html", builds=builds, name=name,
 			latest_build=latest_build, pkg=latest_build.pkg,
-			build_times=build_times, bugs=bugs, **kwargs)
+			build_times=build_times, bugs=bugs)
 
 
 class PackageChangelogHandler(BaseHandler):

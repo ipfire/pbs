@@ -17,62 +17,31 @@
 		</li>
 	</ul>
 
+	<div class="btn-group pull-right">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			{{ _("Actions") }} <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li class="nav-header">
+				{{ _("Bugs") }}
+			</li>
+			<li>
+				<a href="{{ bugtracker.buglist_url(pkg.name) }}" target="_blank">
+					{{ _("Show all bugs") }}
+				</a>
+			</li>
+			<li>
+				<a href="{{ bugtracker.enter_url(pkg.name) }}" target="_blank">
+					{{ _("File new bug") }}
+				</a>
+			</li>
+		</ul>
+	</div>
+
 	{% module BuildHeadline(_("Package"), latest_build, shorter=True) %}
 	{% module PackageHeader(pkg) %}
 
-	<div class="row">
-		<div class="span12">
-			<hr />
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="span12">
-			<ul class="nav nav-pills">
-				{% if release_builds %}
-					<li class="active">
-						<a href="#release" data-toggle="tab">
-							{{ _("Release builds") }}
-							<small>({{ len(release_builds) }})</small>
-						</a>
-					</li>
-				{% end %}
-
-				{% if scratch_builds %}
-					<li {% if not release_builds %}class="active"{% end %}>
-						<a href="#scratch" data-toggle="tab">
-							{{ _("Scratch builds") }}
-							<small>({{ len(scratch_builds) }})</small>
-						</a>
-					</li>
-				{% end %}
-			</ul>
-
-			<div class="tab-content">
-				{% if release_builds %}
-					<div class="tab-pane active" id="release">
-						<div class="row">
-							<div class="span12">
-								{% module BuildTable(release_builds, show_repo=True) %}
-							</div>
-						</div>
-					</div>
-				{% end %}
-
-				{% if scratch_builds %}
-					<div class="tab-pane {% if not release_builds %}active{% end %}" id="scratch">
-						<div class="row">
-							<div class="span12">
-								{% module BuildTable(scratch_builds, show_user=True) %}
-							</div>
-						</div>
-					</div>
-				{% end %}
-			</div>
-		</div>
-	</div>
-
-	<hr>
+	<hr class="clear">
 
 	<div class="row">
 		<div class="span8">
@@ -87,47 +56,27 @@
 		</div>
 
 		<div class="span4">
-			<h3>{{ _("Open bugs") }}</h3>
 			{% if bugs %}
+				<h4>{{ _("Open bugs") }}</h4>
+
 				{% module BugsTable(pkg, bugs) %}
-			{% else %}
-				<blockquote>
-					{{ _("There are currently no open bugs for %s.") % pkg.name }}
-				</blockquote>
 			{% end %}
 
-			<div class="ac">
-				<div class="btn-toolbar">
-					<div class="btn-group">
-						<a class="btn" href="{{ bugtracker.enter_url(pkg.name) }}" target="_blank">
-							{{ _("File new bug") }}
-						</a>
-						<a class="btn" href="{{ bugtracker.buglist_url(pkg.name) }}" target="_blank">
-							{{ _("Show all bugs") }}
-						</a>
-					</div>
-				</div>
-			</div>
-
 			{% if build_times %}
-				<hr>
-
-				<h3>{{ _("Build times") }}</h3>
+				<h4>{{ _("Average build time") }}</h4>
 
 				<table class="table table-striped table-hover">
 					<tbody>
 						{% for arch, build_time in build_times %}
 							<tr>
-								<td class="arch">{{ arch.name }}</td>
-								<td class="time">{{ friendly_time(build_time) }}</td>
+								<td>
+									<a href="/arch/{{ arch.name }}">{{ arch.name }}</a>
+								</td>
+								<td>{{ friendly_time(build_time) }}</td>
 							</tr>
 						{% end %}
 					</tbody>
 				</table>
-
-				<p>
-					{{ _("These are the average build times of this package for every architecture.") }}
-				</p>
 			{% end %}
 		</div>
 	</div>
