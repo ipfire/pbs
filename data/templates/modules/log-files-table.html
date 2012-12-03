@@ -1,23 +1,11 @@
 <table class="table table-striped table-hover">
-	<thead>
-		<tr>
-			<th>{{ _("Filename") }}</th>
-			<th>{{ _("Size") }}</th>
-			<th>&nbsp;</th>
-		</tr>
-	</thead>
-
 	<tbody>
 		{% for file in files %}
 			<tr>
-				<td>{{ file.name }}</td>
-				<td>{{ format_size(file.filesize) }}</td>
 				<td>
-					<a class="btn btn-mini" href="{{ file.download_url }}">
-						<i class="icon-download"></i>
-						{{ _("Download") }}
-					</a>
+					<a href="{{ file.download_url }}">{{ file.name }}</a>
 				</td>
+				<td>{{ format_size(file.filesize) }}</td>
 			</tr>
 		{% end %}
 	</tbody>

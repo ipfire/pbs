@@ -2,8 +2,7 @@
 	<thead>
 		<tr>
 			<th>{{ _("Name") }}</th>
-			<th>{{ _("Version") }}</th>
-			<th>{{ _("Arch") }}</th>
+			<th>{{ _("Summary") }}</th>
 			<th>{{ _("Size") }}</th>
 			<th>&nbsp;</th>
 		</tr>
@@ -12,10 +11,9 @@
 		{% for package in packages %}
 			<tr>
 				<td>
-					<a href="/package/{{ package.uuid }}">{{ package.name }}</a>
+					<a href="/package/{{ package.uuid }}">{{ package.friendly_name }}</a>
 				</td>
-				<td>{{ package.friendly_version }}</td>
-				<td>{{ package.arch.name }}</td>
+				<td>{{ package.summary }}</td>
 				<td>{{ format_size(package.filesize) }}</td>
 				<td>
 					<a class="btn btn-mini" href="{{ job.build.download_prefix }}/{{ package.path }}">

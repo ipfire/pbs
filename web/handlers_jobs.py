@@ -18,20 +18,28 @@ class JobDetailHandler(BaseHandler):
 
 
 class JobBuildrootHandler(BaseHandler):
-	def get_job(self, uuid):
+	def get(self, uuid):
 		job = self.pakfire.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
-		return job
-
-	def get(self, uuid):
-		job = self.get_job(uuid)
-
 		tries = self.get_argument("tries", None)
 		buildroot = job.get_buildroot(tries)
 
-		self.render("jobs-buildroot.html", job=job, buildroot=buildroot)
+		# Calculate the download size and buildroot size.
+		download_size = 0
+		buildroot_size = 0
+
+		for name, uuid, pkg in buildroot:
+			if not pkg:
+				continue
+
+			download_size += pkg.filesize
+			buildroot_size += pkg.size
+
+		self.render("jobs-buildroot.html", job=job, build=job.build,
+			buildroot=buildroot, download_size=download_size,
+			buildroot_size=buildroot_size)
 
 
 class JobScheduleHandler(BaseHandler):

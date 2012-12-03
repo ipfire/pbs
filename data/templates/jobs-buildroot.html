@@ -3,24 +3,92 @@
 {% block title %}{{ _("Job buildroot")}}: {{ job.name }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Job buildroot")}}: {{ job.name }}</h1>
-	<p>
-		{{ _("This is the buildroot of build job %s.") % job.name }}
-	</p>
-	<p>
-		{{ _("The packages listed below were used for the build.") }}
-	</p>
-
-	<ul class="buildroot">
-		{% for name, uuid, pkg in buildroot %}
-			<li class="package">
-				{% if pkg %}
-					<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
-				{% else %}
-					{{ name }} (<span>{{ uuid }}</span>)
-				{% end %}
-			</li>
-		{% end %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/job/{{ job.uuid }}/buildroot">{{ _("Buildroot") }}</a>
+		</li>
 	</ul>
 
+	<div class="page-header">
+		<h2>
+			{{ _("Build job")}}: {{ job.name }} <small>{{ _("Buildroot") }}</small>
+		</h2>
+	</div>
+
+	<div class="row">
+		<div class="span9">
+			<p>
+				{{ _("The packages listed below were used to build %s.") % job.name }}
+			</p>
+		</div>
+
+		<div class="span3">
+			<table class="table table-striped table-hover">
+				<tr>
+					<td>{{ _("Packages") }}</td>
+					<td>{{ len(buildroot) }}</td>
+				</tr>
+				<tr>
+					<td>{{ _("Buildroot size") }}</td>
+					<td>{{ format_size(buildroot_size) }}</td>
+				</tr>
+				<tr>
+					<td>{{ _("Download size") }}</td>
+					<td>{{ format_size(download_size) }}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<hr>
+
+	<table class="table table-striped table-hover">
+		<tbody>
+			{% for name, uuid, pkg in buildroot %}
+				<tr>
+					{% if pkg %}
+						<td>
+							<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
+						</td>
+						<td>
+							{{ pkg.summary }}
+						</td>
+						<td>
+							{{ format_size(pkg.filesize) }}
+						</td>
+					{% else %}
+						<td>
+							{{ name }}
+						</td>
+						<td>
+							({{ uuid }})
+						</td>
+						<td>
+							{{ _("N/A") }}
+						</td>
+					{% end %}
+				</tr>
+			{% end %}
+		</tbody>
+	</table>
 {% end block %}

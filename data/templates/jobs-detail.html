@@ -25,11 +25,39 @@
 		</li>
 	</ul>
 
+	<div class="btn-group pull-right">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			{{ _("Actions") }} <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			{% if job.state in ("dispatching", "running", "uploading") %}
+				<li>
+					<a href="/job/{{ job.uuid }}/abort">
+						{{ _("Abort job") }}
+					</a>
+				</li>
+			{% elif job.state in ("aborted", "failed") %}
+				<li>
+					<a href="/job/{{ job.uuid }}/schedule?type=rebuild">
+						{{ _("Restart job") }}
+					</a>
+				</li>
+			{% elif job.state == "finished" %}
+				<li>
+					<a href="/job/{{ job.uuid }}/schedule?type=test">
+						{{ _("Schedule test build") }}
+					</a>
+				</li>
+			{% end %}
+		</ul>
+	</div>
+
+
 	<div class="page-header">
-		<h1>
-			{{ _("Build job") }}: {{ job.name }}<br />
+		<h2>
+			{{ _("Build job") }}: {{ job.name }}<br>
 			<small>{{ job.pkg.summary }}</small>
-		</h1>
+		</h2>
 	</div>
 
 	{% if job.message %}
@@ -65,155 +93,81 @@
 	{% end %}
 
 	<div class="row">
-		<div class="span12">	
-			<ul class="nav nav-pills">
-				<li class="active">
-					<a href="#detail" data-toggle="tab">{{ _("Job details") }}</a>
-				</li>
-				<li>
-					<a href="#time" data-toggle="tab">{{ _("Time") }}</a>
-				</li>
+		<div class="span7">
+			<div class="well well-large well-white ac">
+				<div class="row-fluid">
+					<div class="span5">
+						{% module JobState(job, cls="lead") %}
 
-				{% if job.logfiles %}
-					<li>
-						<a href="#logs" data-toggle="tab">
-							{{ _("Log files") }} ({{ len(job.logfiles) }})
-						</a>
-					</li>
-				{% end %}
-			</ul>
+						<hr>
 
-			<div class="tab-content">
-				<div class="tab-pane active" id="detail">
-					<div class="row">
-						<div class="span4">
-							<table class="table table-striped table-hover">
-								<tbody>
-									<tr>
-										<td>{{ _("State") }}</td>
-										<td>
-											{{ job.state }}
+						<p>
+							<span class="lead">{{ friendly_time(job.duration) }}</span>
+							{% if job.builder %}
+								<br>
+								<a href="/builder/{{ job.builder.name }}">{{ job.builder.name }}</a>
+							{% else %}
+								<span class="muted">{{ _("No builder assigned.") }}</span>
+							{% end %}
+						</p>
+					</div>
 
-											{% if job.state in ("dispatching", "running", "uploading") %}
-												<a class="btn btn-mini btn-inverse pull-right" href="/job/{{ job.uuid }}/abort">
-													{{ _("Abort job") }}
-												</a>
-											{% elif job.state in ("aborted", "failed") %}
-												<a class="btn btn-mini btn-success pull-right" href="/job/{{ job.uuid }}/schedule?type=rebuild">
-													{{ _("Restart") }}
-												</a>
-											{% elif job.state == "finished" %}
-												<a class="btn btn-mini pull-right" href="/job/{{ job.uuid }}/schedule?type=test">
-													{{ _("Schedule test build") }}
-												</a>
-											{% end %}
-										</td>
-									</tr>
-									<tr>
-										<td>{{ _("Builder") }}</td>
-										<td>
-											{% if job.builder %}
-												<a href="/builder/{{ job.builder.name }}">{{ job.builder.name }}</a>
-											{% else %}
-												{{ _("No host assigned, yet.") }}
-											{% end %}
-										</td>
-									</tr>
-
-									{% if job.has_buildroot() %}
-										<tr>
-											<td>{{ _("Buildroot") }}</td>
-											<td>
-												<a href="/job/{{ job.uuid }}/buildroot?tries={{ job.tries }}">
-													{{ _("%s package", "%s packages", job.has_buildroot()) % job.has_buildroot() }}
-												</a>
-											</td>
-										</tr>
-									{% end %}
-								</tbody>
-							</table>
-						</div>
+					<div class="span7">
+							<p>
+								<strong>{{ _("Created") }}</strong><br>
+								{{ format_date(job.time_created, full_format=True) }}
+							</p>
+							{% if job.time_started %}
+								<p>
+									<strong>{{ _("Started") }}</strong><br>
+									{{ format_date(job.time_started, full_format=True) }}
+								</p>
+							{% end %}
+							{% if job.time_finished %}
+								<p>
+									<strong>{{ _("Finished") }}</strong><br>
+									{{ format_date(job.time_finished, full_format=True) }}
+								</p>
+							{% end %}
 					</div>
 				</div>
-
-				<div class="tab-pane" id="time">
-					<div class="row">				
-						<div class="span6">
-							<table class="table">
-								<tbody>
-									{% if job.duration %}
-										<tr>
-											<td>{{ _("Duration") }}</td>
-											<td>{{ friendly_time(job.duration) }}</td>
-										</tr>
-									{% end %}
-
-									<tr>
-										<td>{{ _("Job created") }}</td>
-										<td>{{ format_date(job.time_created, full_format=True) }}</td>
-									</tr>
-									<tr>
-										<td>{{ _("Job started") }}</td>
-										<td>
-											{% if job.time_started %}
-												{{ format_date(job.time_started, full_format=True) }}
-											{% else %}
-												{{ _("Not started, yet.") }}
-											{% end %}
-										</td>
-									</tr>
-									<tr>
-										<td>{{ _("Job finished") }}</td>
-										<td>
-											{% if job.time_finished %}
-												{{ format_date(job.time_finished, full_format=True) }}
-											{% else %}
-												{{ _("Not finished, yet.") }}
-											{% end %}
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-
-				{% if job.logfiles %}
-					<div class="tab-pane" id="logs">
-						<div class="row">
-							<div class="span12">
-								{% module LogFilesTable(job, job.logfiles) %}
-							</div>
-						</div>
-					</div>
-				{% end %}
 			</div>
+		</div>
+
+		<div class="span5">
+			<h4>{{ _("Build logs") }}</h4>
+			{% if job.logfiles %}
+				{% module LogFilesTable(job, job.logfiles) %}
+			{% else %}
+				<p class="muted">{{ _("No logs available, yet.") }}</p>
+			{% end %}
+
+			{% if job.has_buildroot() %}
+				<hr>
+				<p class="ac">
+					<a href="/job/{{ job.uuid }}/buildroot?tries={{ job.tries }}">{{ _("Buildroot") }}</a>
+					({{ _("%s package", "%s packages", job.has_buildroot()) % job.has_buildroot() }})
+				</p>
+			{% end %}
 		</div>
 	</div>
 
 	{% if job.packages %}
-		<div class="row">
-			<div class="span12">
-				<hr>
+		<hr>
 
-				<h2>
-					{{ _("Package files") }}
-					<small>({{ len(job.packages) }})</small>
-				</h2>
+		<h3>
+			{{ _("Package files") }}
+			<small>({{ len(job.packages) }})</small>
+		</h3>
 
-				{% module PackagesTable(job, job.packages) %}
-			</div>
-		</div>
+		{% module PackagesTable(job, job.packages) %}
 	{% end %}
 
 	{% if log %}
-		<div class="row">
-			<div class="span12">
-				<hr>
+		<hr>
 
-				<h2>{{ _("Log") }}</h2>
-				{% module Log(log) %}
-			</div>
-		</div>
+		<h3>{{ _("Log") }}</h3>
+
+		{% module Log(log) %}
 	{% end %}
 {% end block %}
