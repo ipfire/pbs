@@ -477,15 +477,19 @@ class Package(base.Object):
 	@property
 	def filelist(self):
 		if self._filelist is None:
-			self._filelist = \
-				self.db.query("SELECT * FROM filelists WHERE pkg_id = %s ORDER BY name",
-					self.id)
+			self._filelist = []
+
+			for f in self.db.query("SELECT * FROM filelists WHERE pkg_id = %s ORDER BY name", self.id):
+				f = File(self.pakfire, f)
+				self._filelist.append(f)
 
 		return self._filelist
 
 	def get_file(self):
-		if os.path.exists(self.path):
-			return pakfire.packages.open(self.path)
+		path = os.path.join(PACKAGES_DIR, self.path)
+
+		if os.path.exists(path):
+			return pakfire.packages.open(None, None, path)
 
 	## properties
 
@@ -515,9 +519,35 @@ class Package(base.Object):
 		return self.properties.get("critical_path", "N") == "Y"
 
 
+class File(base.Object):
+	def __init__(self, pakfire, data):
+		base.Object.__init__(self, pakfire)
+
+		self.data = data
+
+	def __getattr__(self, attr):
+		try:
+			return self.data[attr]
+		except KeyError:
+			raise AttributeError, attr
+
+	@property
+	def downloadable(self):
+		# All regular files are downloadable.
+		return self.type == 0
+
+	@property
+	def viewable(self):
+		for ext in FILE_EXTENSIONS_VIEWABLE:
+			if self.name.endswith(ext):
+				return True
+
+		return False
+
+
 # XXX DEAD CODE
 
-class File(base.Object):
+class __File(base.Object):
 	def __init__(self, pakfire, path):
 		base.Object.__init__(self, pakfire)
 

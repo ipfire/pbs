@@ -19,11 +19,17 @@
 					{{ file.name }}
 				</td>
 				<td>
-					<div class="btn-toolbar">
-						<div class="btn-group">
-							<a class="btn btn-mini" href="#">V</a>
-							<a class="btn btn-mini" href="#">D</a>
-						</div>
+					<div class="btn-group">
+						{% if file.viewable %}
+							<a class="btn btn-mini" href="#">
+								<i class="icon-file"></i>
+							</a>
+						{% end %}
+						{% if file.downloadable %}
+							<a class="btn btn-mini" href="/package/{{ pkg.uuid }}/download{{ file.name }}">
+								<i class="icon-download"></i>
+							</a>
+						{% end %}
 					</div>
 				</td>
 			</tr>

@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
+import mimetypes
+import os.path
 import tornado.web
 
 from handlers_base import BaseHandler
+
+from backend.constants import BUFFER_SIZE
 
 class PackageIDDetailHandler(BaseHandler):
 	def get(self, id):
@@ -162,3 +166,47 @@ class PackagePropertiesHandler(BaseHandler):
 		else:
 			critical_path = False
 		build.pkg.update_property("critical_path", critical_path)
+
+
+class PackageFileDownloadHandler(BaseHandler):
+	def get(self, pkg_uuid, filename):
+		# Fetch package.
+		pkg = self.pakfire.packages.get_by_uuid(pkg_uuid)
+		if not pkg:
+			raise tornado.web.HTTPError(404, "Package not found: %s" % pkg_uuid)
+
+		# Check if the package has got a file with the given name.
+		if not filename in [f.name for f in pkg.filelist]:
+			raise tornado.web.HTTPError(404, "Package %s does not contain file %s" % (pkg, filename))
+
+		# Open the package in the filesystem.
+		pkg_file = pkg.get_file()
+		if not pkg_file:
+			raise torando.web.HTTPError(404, "Could not open package %s" % pkg.path)
+
+		# Open the file to transfer it to the client.
+		f = pkg_file.open_file(filename)
+		if not f:
+			raise tornado.web.HTTPError(404, "Package %s does not contain file %s" % (pkg_file, filename))
+
+		# Send the filename in header.
+		self.set_header("Content-Disposition", "attachment; filename=%s" % os.path.basename(filename))
+
+		# Guess the MIME type of the file.
+		(type, encoding) = mimetypes.guess_type(filename)
+		if not type:
+			type = "text/plain"
+		self.set_header("Content-Type", type)
+
+		# Transfer the content chunk by chunk.
+		while True:
+			buf = f.read(BUFFER_SIZE)
+			if not buf:
+				break
+
+			self.write(buf)
+
+		f.close()
+
+		# Done.
+		self.finish()

@@ -19,6 +19,25 @@ BUFFER_SIZE = 1024 * 100 # 100kb
 BUGZILLA_PATTERN = r"(bug\s?|#)(\d+)"
 CVE_PATTERN = r"(CVE)(\s|\-)(\d{4}\-\d{4})"
 
+FILE_EXTENSIONS_VIEWABLE = (
+	".c",
+	".cfg",
+	".conf",
+	".config",
+	".h",
+	".nm",
+	".patch",
+	".pl",
+	".pm",
+	".py",
+	".S",
+	".s",
+	".sh",
+	".txt",
+	"Kconfig",
+	"Makefile",
+)
+
 N_ = lambda x: x
 
 MSG_BUILD_FAILED_SUBJECT = N_("[%(build_name)s] Build job failed.")

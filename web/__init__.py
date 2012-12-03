@@ -121,6 +121,7 @@ class Application(tornado.web.Application):
 			(r"/package/([\w\-\+]+)/properties", PackagePropertiesHandler),
 			(r"/package/([\w\-\+]+)", PackageNameHandler),
 			(r"/package/([\w\-\+]+)/changelog", PackageChangelogHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/download(.*)", PackageFileDownloadHandler),
 
 			# Files
 			(r"/file/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", FileDetailHandler),
