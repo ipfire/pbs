@@ -171,7 +171,7 @@ class Package(base.Object):
 			("url",         file.url),
 			("summary",     file.summary),
 			("description", file.description),
-			("size",        file.size),
+			("size",        file.inst_size),
 			("uuid",        file.uuid),
 
 			# Build information.
