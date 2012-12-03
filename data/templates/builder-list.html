@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Build servers") }}{% end block %}
+{% block title %}{{ _("Builders") }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -14,85 +14,65 @@
 	</ul>
 
 	<div class="page-header">
-		<h1>{{ _("Build servers") }}</h1>
+		<h2>{{ _("Builders") }}</h2>
 	</div>
+
+	{% module BuildersLoad() %}
+
+	<hr>
 
 	<div class="row">
 		<div class="span12">
-			<p>
-				{{ _("Builders are those, that do all the hard work.") }}
-				{{ _("Build jobs are scheduled to these hosts that they process and send back the result.") }}
-			</p>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="span6 offset3">
 			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
 						<th>&nbsp;</th>
 						<th>{{ _("Hostname") }}</th>
-						<th>{{ _("Load") }}</th>
-						<th>{{ _("Running jobs") }}</th>
+						<th>{{ _("Architectures") }}</th>
+						<th>{{ _("Jobs") }}</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for builder in builders %}
 						<tr>
-							<td>
-								<img src="{{ static_url("images/icons/builder-%s.png" % builder.state.lower()) }}"
-									alt="{{ _("State %s") % builder.state }}" />
+							<td class="lead">
+								{% if builder.state == "disabled" %}
+									<i class="icon-stop text-error"></i>
+								{% elif builder.state == "offline" %}
+									<i class="icon-pause text-warning"></i>
+								{% elif builder.state == "online" %}
+									<i class="icon-play text-success"></i>
+								{% end %}
 							</td>
 							<td>
 								<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
 								{% if builder.overload %}
-										<span class="label label-important">{{ _("Overload") }}</span>
+										<span class="label label-important pull-right">{{ _("Overload") }}</span>
 								{% end %}
-								<br />
-								{{ locale.list([a.name for a in builder.arches]) }}
+								<br>
+								{{ builder.cpu_model or _("Unknown CPU") }} - {{ format_size(builder.memory) }}
 							</td>
 							<td>
-								{{ builder.load1 or _("N/A") }}
+								{% if builder.arches %}
+									{{ locale.list([a.name for a in builder.arches]) }}
+								{% else %}
+									{{ _("N/A") }}
+								{% end %}
 							</td>
 							<td>
-								{{ len(builder.get_active_jobs()) }}/{{ builder.max_jobs }}
+								<p class="{% if builder.active_jobs == 0 %}text-success{% elif builder.active_jobs >= builder.max_jobs %}text-error{% else %}text-warning{% end %}">
+									{{ len(builder.get_active_jobs()) }}/{{ builder.max_jobs }}
+								</p>
 							</td>
 						</tr>
 					{% end %}
-
-					<tr>
-						<td colspan="3">
-							<div class="progress progress-info">
-								<div class="bar" style="width: {{ load }}%;"></div>
-							</div>
-						</td>
-						<td>
-							{% if current_user and current_user.is_admin() %}
-								<div class="btn-group pull-right">
-									<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-										{{ _("Action") }}
-										<span class="caret"></span>
-									</a>
-									<ul class="dropdown-menu">
-										<li>
-											<a href="/builder/new">{{ _("Create new builder") }}</a>
-										</li>
-									</ul>
-								</div>
-							{% end %}
-						</td>
-					</tr>
 				</tbody>
 			</table>
-		</div>
-	</div>
 
-	<div class="row">
-		<div class="span12">
-			{% if log %}
-				<h2>{{ _("Log") }}</h2>
-				{% module Log(log) %}
+			{% if current_user and current_user.is_admin() %}
+				<div class="btn-group pull-right">
+					<a class="btn" href="/builder/new">{{ _("Create new builder") }}</a>
+				</div>
 			{% end %}
 		</div>
 	</div>

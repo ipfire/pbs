@@ -9,11 +9,8 @@ from handlers_base import *
 class BuilderListHandler(BaseHandler):
 	def get(self):
 		builders = self.pakfire.builders.get_all()
-		load = self.pakfire.builders.get_load()
 
-		log = self.pakfire.builders.get_history(limit=10)
-
-		self.render("builder-list.html", builders=builders, load=load, log=log)
+		self.render("builder-list.html", builders=builders)
 
 
 class BuilderDetailHandler(BaseHandler):

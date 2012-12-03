@@ -35,6 +35,9 @@ class Application(tornado.web.Application):
 				"LogEntry"           : LogEntryModule,
 				"LogEntryComment"    : LogEntryCommentModule,
 
+				# Builders
+				"BuildersLoad"       : BuildersLoadModule,
+
 				"BuildHeadline"      : BuildHeadlineModule,
 				"BuildStateWarnings" : BuildStateWarningsModule,
 

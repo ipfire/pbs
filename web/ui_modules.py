@@ -96,6 +96,13 @@ class BuildHeadlineModule(UIModule):
 			prefix=prefix, build=build, pkg=build.pkg, short=short, shorter=shorter)
 
 
+class BuildersLoadModule(UIModule):
+	def render(self):
+		load = self.pakfire.builders.get_load()
+
+		return self.render_string("modules/builders/load.html", load=load)
+
+
 class BugsTableModule(UIModule):
 	def render(self, pkg, bugs):
 		return self.render_string("modules/bugs-table.html",

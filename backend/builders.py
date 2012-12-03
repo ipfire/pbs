@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import division
+
 import datetime
 import hashlib
 import logging
@@ -69,17 +71,17 @@ class Builders(base.Object):
 		return sorted(arches)
 
 	def get_load(self):
-		slots = 1
-		running_jobs = 0
+		res1 = self.db.get("SELECT SUM(max_jobs) AS max_jobs FROM builders \
+			WHERE status = 'enabled'")
+		if not res1:
+			return 0
 
-		for builder in self.get_all():
-			if not builder.state == "online":
-				continue
+		res2 = self.db.get("SELECT COUNT(*) AS count FROM jobs \
+			WHERE state = 'dispatching' OR state = 'running' OR state = 'uploading'")
+		if not res2:
+			return 0
 
-			slots += builder.max_jobs
-			running_jobs += len(builder.get_active_jobs(uploads=False))
-
-		return int(running_jobs * 100 / slots)
+		return (res2.count * 100 / res1.max_jobs)
 
 	def get_history(self, limit=None, offset=None, builder=None, user=None):
 		query = "SELECT * FROM builders_history"
@@ -134,9 +136,8 @@ class Builder(base.Object):
 	@property
 	def data(self):
 		if self._data is None:
-			self._data = \
-				self.db.get("SELECT *, NOW() - time_keepalive AS updated \
-					FROM builders WHERE id = %s", self.id)
+			self._data = self.db.get("SELECT * FROM builders WHERE id = %s", self.id)
+			assert self._data
 
 		return self._data
 
@@ -531,10 +532,16 @@ class Builder(base.Object):
 		if self.data.time_keepalive is None:
 			return "offline"
 
-		if self.data.updated >= 5*60:
-			return "offline"
+		#if self.data.updated >= 5*60:
+		#	return "offline"
 
 		return "online"
+
+	@property
+	def active_jobs(self):
+		jobs = self.get_active_jobs()
+
+		return len(jobs)
 
 	def get_active_jobs(self, uploads=True):
 		if self._active_jobs is None:
