@@ -43,11 +43,6 @@ class Error404Handler(BaseHandler):
 		raise tornado.web.HTTPError(404)
 
 
-class AdvancedHandler(BaseHandler):
-	def get(self):
-		self.render("advanced.html")
-
-
 class StatisticsMainHandler(BaseHandler):
 	def get(self):
 		args = {}

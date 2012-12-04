@@ -94,9 +94,6 @@ class Application(tornado.web.Application):
 			# Entry site that lead the user to index
 			(r"/", IndexHandler),
 
-			# Advanced options for logged in users.
-			(r"/advanced", AdvancedHandler),
-
 			# Handle all the users logins/logouts/registers and stuff.
 			(r"/login", LoginHandler),
 			(r"/logout", LogoutHandler),
