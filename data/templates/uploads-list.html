@@ -14,80 +14,64 @@
 	</ul>
 
 	<div class="page-header">
-		<h1>
-			{{ _("Uploads") }}
-			<small>({{ len(uploads) }})</small>
-		</h1>
-	</div>
-
-	<div class="row">
-		<div class="span12">
-			<p>
-				{{ _("On this page, you will see all running uploads.") }}
-			</p>
-		</div>
+		<h2>{{ _("Uploads") }}</h2>
 	</div>
 
 	{% if uploads %}
-		<div class="row">
-			<div class="span6 offset3">
-				<table class="table table-striped table-hover">
-					<thead>
-						<tr>
-							<th>{{ _("Filename") }}</th>
-							<th>{{ _("Owner") }}</th>
-							<th>{{ _("Filesize") }}</th>
-							<th>{{ _("Time running") }}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for upload in uploads %}
-							<tr>
-								<td>{{ upload.filename }}</td>
-								<td>
-									{% if upload.builder %}
-										<a href="/builder/{{ upload.builder.name }}">
-											{{ upload.builder.name }}
-										</a>
-									{% elif upload.user %}
-										<a href="/user/{{ upload.user.name }}">
-											{{ upload.user.realname }}
-										</a>
-									{% else %}
-										{{ _("No owner.") }}
-									{% end %}
-								</td>
-								<td>
-									{{ format_size(upload.size) }}
-								</td>
-								<td>
-									{% if upload.time_running %}
-										{{ friendly_time(upload.time_running) }} /
-										{{ format_size(upload.speed) }}b/s
-									{% else %}
-										{{ _("N/A") }}
-									{% end %}
-								</td>
-							</tr>
-							<tr>
-								<td colspan="3">
-									<div class="progress progress-striped active">
-										<div class="bar" style="width: {{ "%d" % (upload.progress * 100) }}%;"></div>
-									</div>
-								</td>
-								<td>
-									{{ "%.2f%%" % (upload.progress * 100) }}
-								</td>
-							</tr>
-						{% end %}
-					</tbody>
-				</table>
-			</div>
-		</div>
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th>{{ _("Filename") }}</th>
+					<th>{{ _("Owner") }}</th>
+					<th>{{ _("Filesize") }}</th>
+					<th>{{ _("Time running") }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for upload in uploads %}
+					<tr>
+						<td>{{ upload.filename }}</td>
+						<td>
+							{% if upload.builder %}
+								<a href="/builder/{{ upload.builder.name }}">
+									{{ upload.builder.name }}
+								</a>
+							{% elif upload.user %}
+								<a href="/user/{{ upload.user.name }}">
+									{{ upload.user.realname }}
+								</a>
+							{% else %}
+								{{ _("No owner.") }}
+							{% end %}
+						</td>
+						<td>
+							{{ format_size(upload.size) }}
+						</td>
+						<td>
+							{% if upload.time_running %}
+								{{ friendly_time(upload.time_running) }} /
+								{{ format_size(upload.speed) }}b/s
+							{% else %}
+								{{ _("N/A") }}
+							{% end %}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3">
+							<div class="progress progress-striped active">
+								<div class="bar" style="width: {{ "%d" % (upload.progress * 100) }}%;"></div>
+							</div>
+						</td>
+						<td>
+							{{ "%.2f%%" % (upload.progress * 100) }}
+						</td>
+					</tr>
+				{% end %}
+			</tbody>
+		</table>
 	{% else %}
-		<div class="alert alert-info alert-block">
-			<h4 class="alert-heading">{{ _("I'm sorry!") }}</h4>
+		<p class="muted">
 			{{ _("There are currently no uploads running.") }}
-		</div>
+		</p>
 	{% end %}
 {% end block %}
