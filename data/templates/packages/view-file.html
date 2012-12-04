@@ -1,0 +1,53 @@
+{% extends "../base.html" %}
+
+{% block title %}{{ _("View %(filename)s from %(pkg)s") % { "filename" : filename, "pkg" : pkg.friendly_name } }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		{% if pkg.build %}
+			<li>
+				<a href="/build/{{ pkg.build.uuid }}">{{ pkg.build.name }}</a>
+				<span class="divider">/</span>
+			</li>
+		{% end %}
+		{% if pkg.job %}
+			<li>
+				<a href="/job/{{ pkg.job.uuid }}">{{ pkg.job.arch.name }}</a>
+				<span class="divider">/</span>
+			</li>
+		{% end %}
+		<li>
+			<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			{{ _("View file") }}
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h2>
+			{{ filename }}<br>
+			<small><a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a> - {{ pkg.summary }}</small>
+		</h2>
+	</div>
+
+	<pre {% if not filesize >= 1024 ** 2 %}class="prettyprint linenums"{% end %}>{{ content }}</pre>
+
+	<p class="muted ac">
+		{{ _("Mimetype: %s") % mimetype }} - {{ _("Size: %s") % format_size(filesize) }} -
+		<a href="/package/{{ pkg.uuid }}/download{{ filename }}">{{ _("Download file") }}</a>
+	</p>
+{% end block %}

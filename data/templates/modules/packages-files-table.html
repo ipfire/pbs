@@ -21,7 +21,7 @@
 				<td>
 					<div class="btn-group">
 						{% if file.viewable %}
-							<a class="btn btn-mini" href="#">
+							<a class="btn btn-mini" href="/package/{{ pkg.uuid }}/view{{ file.name }}">
 								<i class="icon-file"></i>
 							</a>
 						{% end %}

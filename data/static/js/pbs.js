@@ -1,7 +1,6 @@
-// Activate Google Prettify for pretty-printing code.
-addEventListener('load', prettyPrint, false);
-
 $(document).ready(function() {
+	// Activate Google Prettify for pretty-printing code.
+	window.prettyPrint && prettyPrint()
 });
 
 function getCookie(name) {

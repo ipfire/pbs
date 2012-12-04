@@ -169,7 +169,7 @@ class PackagePropertiesHandler(BaseHandler):
 
 
 class PackageFileDownloadHandler(BaseHandler):
-	def get(self, pkg_uuid, filename):
+	def get_file(self, pkg_uuid, filename):
 		# Fetch package.
 		pkg = self.pakfire.packages.get_by_uuid(pkg_uuid)
 		if not pkg:
@@ -189,14 +189,19 @@ class PackageFileDownloadHandler(BaseHandler):
 		if not f:
 			raise tornado.web.HTTPError(404, "Package %s does not contain file %s" % (pkg_file, filename))
 
-		# Send the filename in header.
-		self.set_header("Content-Disposition", "attachment; filename=%s" % os.path.basename(filename))
-
 		# Guess the MIME type of the file.
 		(type, encoding) = mimetypes.guess_type(filename)
 		if not type:
 			type = "text/plain"
-		self.set_header("Content-Type", type)
+
+		return (pkg, f, type)
+
+	def get(self, pkg_uuid, filename):
+		pkg, f, mimetype = self.get_file(pkg_uuid, filename)
+
+		# Send the filename and mimetype in header.
+		self.set_header("Content-Disposition", "attachment; filename=%s" % os.path.basename(filename))
+		self.set_header("Content-Type", mimetype)
 
 		# Transfer the content chunk by chunk.
 		while True:
@@ -210,3 +215,15 @@ class PackageFileDownloadHandler(BaseHandler):
 
 		# Done.
 		self.finish()
+
+
+class PackageFileViewHandler(PackageFileDownloadHandler):
+	def get(self, pkg_uuid, filename):
+		pkg, f, mimetype = self.get_file(pkg_uuid, filename)
+
+		# Read in the data.
+		content = f.read()
+		f.close()
+
+		self.render("packages/view_file.html", pkg=pkg, filename=filename,
+			mimetype=mimetype, content=content, filesize=f.size)
