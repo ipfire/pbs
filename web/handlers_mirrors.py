@@ -25,7 +25,7 @@ class MirrorListHandler(BaseHandler):
 		}
 
 		# Get recent log messages.
-		kwargs["log"] = self.pakfire.mirrors.get_history(limit=10)
+		kwargs["log"] = self.pakfire.mirrors.get_history(limit=5)
 
 		self.render("mirrors-list.html", **kwargs)
 
@@ -36,7 +36,9 @@ class MirrorDetailHandler(BaseHandler):
 		if not mirror:
 			raise tornado.web.HTTPError(404, "Could not find mirror: %s" % hostname)
 
-		self.render("mirrors-detail.html", mirror=mirror)
+		log = self.pakfire.mirrors.get_history(mirror=mirror, limit=10)
+
+		self.render("mirrors-detail.html", mirror=mirror, log=log)
 
 
 class MirrorActionHandler(BaseHandler):
@@ -75,8 +77,6 @@ class MirrorNewHandler(MirrorActionHandler):
 			})
 			return self.get(**errors)
 
-		print hostname, path
-
 		mirror = backend.mirrors.Mirror.create(self.pakfire, hostname, path,
 			user=self.current_user)
 		assert mirror
@@ -106,9 +106,9 @@ class MirrorEditHandler(MirrorActionHandler):
 		enabled  = self.get_argument("enabled", None)
 
 		if enabled:
-			mirror.set_status("enabled")
+			mirror.set_status("enabled", user=self.current_user)
 		else:
-			mirror.set_status("disabled")
+			mirror.set_status("disabled", user=self.current_user)
 
 		mirror.hostname = hostname
 		mirror.path     = path

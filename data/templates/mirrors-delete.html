@@ -22,23 +22,19 @@
 	</ul>
 
 	<div class="page-header">
-		<h1>{{ _("Mirror") }}: {{ mirror.hostname }}</h1>
+		<h2>{{ _("Delete mirror: %s") % mirror.hostname }}</h2>
 	</div>
 
-	<div class="row">
-		<div class="span6 offset3">
-			<p>
-				{{ _("You are going to delete the mirror <strong>%s</strong>.") % mirror.hostname }}
-			</p>
+	<p>
+		{{ _("You are going to delete the mirror %s.") % mirror.hostname }}
+	</p>
 
-			<div class="btn-toolbar">
-				<div class="btn-group pull-right">
-					<a class="btn btn-danger" href="/mirror/{{ mirror.hostname }}/delete?confirmed=1">
-						{{ _("Delete %s") % mirror.hostname }}
-					</a>
-					<a class="btn" href="/mirror/{{ mirror.hostname }}">{{ _("Cancel") }}</a>
-				</div>
-			</div>
-		</div>
+	<div class="btn-toolbar pull-right">
+		<a class="btn btn-danger" href="/mirror/{{ mirror.hostname }}/delete?confirmed=1">
+			{{ _("Delete %s") % mirror.hostname }}
+		</a>
+		<a class="btn" href="/mirror/{{ mirror.hostname }}">{{ _("Cancel") }}</a>
 	</div>
+
+	<br class="clear">
 {% end block %}

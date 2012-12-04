@@ -13,82 +13,86 @@
 		</li>
 	</ul>
 
-	<div class="page-header">
-		<h1>
-			{{ _("Mirrors") }}
-			<small>({{ len(mirrors) }})</small>
-		</h1>
-	</div>
-
-	<div class="row">
-		<div class="span12">
-			<p>
-				{{ _("On this page, you will see a list of all mirror servers.") }}
-			</p>
-
-			{% if mirrors %}
-				<table class="table table-striped table-hover">
-					<thead>
-						<tr>
-							<th>&nbsp;</th>
-							<th>{{ _("Hostname") }}</th>
-							<th>{{ _("Owner") }}</th>
-							<th>{{ _("Status") }}</th>
-							<th>{{ _("Last check") }}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for mirror in mirrors %}
-							<tr>
-								<td>
-									[{{ mirror.country_code }}]
-								</td>
-								<td>
-									<a href="/mirror/{{ mirror.hostname }}">
-										{{ mirror.hostname }}
-									</a>
-								</td>
-								<td>
-									{{ mirror.owner or _("N/A") }}
-								</td>
-								<td>
-									{{ mirror.check_status }}
-								</td>
-								<td>
-									{% if mirror.last_check %}
-										{{ format_date(mirror.last_check, relative=True) }}
-									{% else %}
-										{{ _("Unknown") }}
-									{% end %}
-								</td>
-							</tr>
-						{% end %}
-					</tbody>
-				</table>
-			{% else %}
-				<div class="alert alert-block">
-					<h4 class="alert-heading">{{ _("No mirrors") }}</h4>
-					{{ _("There are no mirrors configured, yet.") }}
-				</div>
-			{% end %}
-		</div>
-	</div>
-
 	{% if current_user and current_user.has_perm("manage_mirrors") %}
-		<div class="row">
-			<div class="span12">
-				<a class="btn pull-right" href="/mirror/new">
-					<i class="icon-star"></i>
-					{{ _("Add new mirror") }}
-				</a>
-			</div>
+		<div class="btn-group pull-right">
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+				{{ _("Actions") }} <span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+				<li>
+					<a href="/mirror/new">
+						<i class="icon-asterisk"></i> {{ _("Add new mirror") }}
+					</a>
+				</li>
+			</ul>
 		</div>
 	{% end %}
 
-	<div class="row">
-		<div class="span12">
-			<h2>{{ _("Log") }}</h2>
-			{% module Log(log) %}
-		</div>
+	<div class="page-header">
+		<h2>{{ _("Mirrors") }}</h2>
 	</div>
+
+	<p>
+		{{ _("On this page, you will see a list of all mirror servers.") }}
+	</p>
+
+	{% if mirrors %}
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th>{{ _("Hostname") }} / {{ _("Owner") }}</th>
+					<th></th>
+					<th>{{ _("Last check") }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for mirror in mirrors %}
+					<tr>
+						<td>
+							<a href="/mirror/{{ mirror.hostname }}">
+								{{ mirror.hostname }}
+							</a>
+							<p class="muted">
+								{{ mirror.owner or _("N/A") }}
+							</p>
+						</td>
+						<td>
+							[{{ mirror.country_code }}] -
+
+							{% if mirror.check_status == "UP" %}
+								<span class="text-success">
+									{{ _("Up") }}
+								</span>
+							{% elif mirror.check_status == "DOWN" %}
+								<span class="text-error">
+									{{ _("Down") }}
+								</span>
+							{% else %}
+								<span class="muted">
+									{{ _("Unknown") }}
+								</span>
+							{% end %}
+						</td>
+
+						<td>
+							{% if mirror.last_check %}
+								{{ format_date(mirror.last_check, relative=True) }}
+							{% else %}
+								{{ _("N/A") }}
+							{% end %}
+						</td>
+					</tr>
+				{% end %}
+			</tbody>
+		</table>
+	{% else %}
+		<p class="muted">
+			{{ _("There are no mirrors configured, yet.") }}
+		</p>
+	{% end %}
+
+	{% if log %}
+		<h2>{{ _("Log") }}</h2>
+		{% module Log(log) %}
+	{% end %}
 {% end block %}
