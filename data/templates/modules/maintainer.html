@@ -1,12 +1,13 @@
-{% if type == "string" %}
+{% if type == "string" and maintainer %}
+	<i class="icon-envelope"></i>
 	{% raw format_email(maintainer) %}
 {% elif type == "user" %}
+	{% if maintainer.is_admin() %}
+		<i class="icon-star"></i>
+	{% else %}
+		<i class="icon-user"></i>
+	{% end %}
 	<a href="/user/{{ maintainer.name }}">
-		{% if maintainer.is_admin() %}
-			<i class="icon-star"></i>
-		{% else %}
-			<i class="icon-user"></i>
-		{% end %}
 		{{ maintainer.realname }}
 	</a>
 {% end %}
