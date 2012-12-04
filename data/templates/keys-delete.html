@@ -9,11 +9,11 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/keys">{{ _("Key management") }}</a>
+			<a href="/keys">{{ _("Key Management") }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/key/{{ key.fingerprint }}">{{ key.uids }}</a>
+			<a href="/key/{{ key.fingerprint }}">{{ key.fingerprint }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
@@ -22,26 +22,27 @@
 	</ul>
 
 	<div class="page-header">
-		<h1>
-			{{ _("Key") }}: {{ key.uids }}
-			<small>{{ key.fingerprint }}</small>
-		</h1>
+		<h2>{{ _("Key") }}: {{ key.fingerprint }}</h2>
 	</div>
 
-	<div class="row">
-		<div class="span6 offset3">
-			<p>
-				{{ _("You are going to delete the key <strong>%s</strong>.") % key.uids }}
-			</p>
+	<p>
+		{{ _("You are going to delete the key %s.") % key.fingerprint }}
+	</p>
 
-			<div class="btn-toolbar">
-				<div class="btn-group pull-right">
-					<a class="btn btn-danger" href="/key/{{ key.fingerprint }}/delete?confirmed=1">
-						{{ _("Delete key") }}
-					</a>
-					<a class="btn" href="/keys">{{ _("Cancel") }}</a>
-				</div>
-			</div>
+	<ul>
+		{% for uid in key.uids %}
+			<li>{{ uid }}</li>
+		{% end %}
+	</ul>
+
+	<div class="btn-toolbar">
+		<div class="btn-group pull-right">
+			<a class="btn btn-danger" href="/key/{{ key.fingerprint }}/delete?confirmed=1">
+				{{ _("Delete key") }}
+			</a>
+			<a class="btn" href="/keys">{{ _("Cancel") }}</a>
 		</div>
 	</div>
+
+	<br class="clear">
 {% end block %}

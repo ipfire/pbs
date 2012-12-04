@@ -9,7 +9,7 @@
 			<span class="divider">/</span>
 		</li>
 		<li>
-			<a href="/keys">{{ _("Key management") }}</a>
+			<a href="/keys">{{ _("Key Management") }}</a>
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
@@ -18,30 +18,26 @@
 	</ul>
 
 	<div class="page-header">
-		<h1>{{ _("Import a new key") }}</h1>
+		<h2>{{ _("Import a new key") }}</h2>
 	</div>
 
-	<div class="row">
-		<div class="span6 offset3">
-			<form class="form-horizontal" method="POST" action="">
-				{% raw xsrf_form_html() %}
-				<fieldset>
-					<div class="control-group">
-						<label class="control-label" for="data">{{ _("Key") }}</label>
-						<div class="controls">
-							<textarea name="data" id="data" rows="7"></textarea>
+	<form class="form-horizontal" method="POST" action="">
+		{% raw xsrf_form_html() %}
+		<fieldset>
+			<div class="control-group">
+				<label class="control-label" for="data">{{ _("Key") }}</label>
+				<div class="controls">
+					<textarea name="data" id="data" rows="7"></textarea>
 
-							<p class="help-block">
-								{{ _("Paste the key to import.") }}
-							</p>
-						</div>
-					</div>
+					<p class="help-block">
+						{{ _("Paste the key to import.") }}
+					</p>
+				</div>
+			</div>
 
-					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">{{ _("Import new key") }}</button>
-					</div>
-				</fieldset>
-			</form>
-		</div>
-	</div>
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary">{{ _("Import new key") }}</button>
+			</div>
+		</fieldset>
+	</form>
 {% end block %}
