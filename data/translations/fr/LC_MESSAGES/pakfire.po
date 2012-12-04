@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-28 22:38+0100\n"
-"PO-Revision-Date: 2012-11-13 08:36+0000\n"
+"POT-Creation-Date: 2012-11-18 20:13+0100\n"
+"PO-Revision-Date: 2012-11-19 08:33+0000\n"
 "Last-Translator: 1112daniel <1112daniel@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ipfire/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -19,18 +19,18 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: backend/logs.py:85 backend/logs.py:149 backend/logs.py:209
-#: backend/logs.py:288
+#: backend/logs.py:82 backend/logs.py:146 backend/logs.py:206
+#: backend/logs.py:281
 msgid "Unknown action."
 msgstr ""
 
-#: backend/logs.py:96 backend/logs.py:165 backend/logs.py:226
-#: backend/logs.py:304 data/templates/mirrors-list.html:61
+#: backend/logs.py:93 backend/logs.py:162 backend/logs.py:223
+#: backend/logs.py:297 data/templates/mirrors-list.html:61
 #: data/templates/builder-detail.html:105 data/templates/jobs-detail.html:54
 msgid "Unknown"
 msgstr ""
 
-#: backend/logs.py:103 backend/logs.py:109 data/templates/mirrors-list.html:52
+#: backend/logs.py:100 backend/logs.py:106 data/templates/mirrors-list.html:52
 #: data/templates/builder-list.html:56 data/templates/mirrors-detail.html:43
 #: data/templates/modules/jobs-table.html:42
 #: data/templates/modules/repository-table.html:14
@@ -40,241 +40,241 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-#: backend/logs.py:115
+#: backend/logs.py:112
 #, python-format
 msgid "This build was pushed to the repository '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:117
+#: backend/logs.py:114
 #, python-format
 msgid "You pushed this build to the repository '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:119
+#: backend/logs.py:116
 #, python-format
 msgid "%(user)s pushed this build to the repository '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:123
+#: backend/logs.py:120
 #, python-format
 msgid "This build was unpushed from the repository '%(from_repo)s'."
 msgstr ""
 
-#: backend/logs.py:125
+#: backend/logs.py:122
 #, python-format
 msgid "You unpushed this build from the repository '%(from_repo)s'."
 msgstr ""
 
-#: backend/logs.py:127
+#: backend/logs.py:124
 #, python-format
 msgid "%(user)s unpushed this build from the repository '%(from_repo)s'."
 msgstr ""
 
-#: backend/logs.py:131
+#: backend/logs.py:128
 #, python-format
 msgid ""
 "This build was pushed from the repository '%(from_repo)s' to '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:133
+#: backend/logs.py:130
 #, python-format
 msgid ""
 "You pushed this build from the repository '%(from_repo)s' to '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:135
+#: backend/logs.py:132
 #, python-format
 msgid ""
 "%(user)s pushed this build from the repository '%(from_repo)s' to "
 "'%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:171
+#: backend/logs.py:168
 #, python-format
 msgid "Builder '%(builder)s' has been enabled."
 msgstr ""
 
-#: backend/logs.py:173
+#: backend/logs.py:170
 #, python-format
 msgid "You enabled builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:175
+#: backend/logs.py:172
 #, python-format
 msgid "%(user)s enabled builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:179
+#: backend/logs.py:176
 #, python-format
 msgid "Builder '%(builder)s' was has been disabled."
 msgstr ""
 
-#: backend/logs.py:181
+#: backend/logs.py:178
 #, python-format
 msgid "You disabled builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:183
+#: backend/logs.py:180
 #, python-format
 msgid "%(user)s disabled builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:187
+#: backend/logs.py:184
 #, python-format
 msgid "You deleted builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:189
+#: backend/logs.py:186
 #, python-format
 msgid "%(user)s deleted builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:193
+#: backend/logs.py:190
 #, python-format
 msgid "You created builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:195
+#: backend/logs.py:192
 #, python-format
 msgid "%(user)s created builder '%(builder)s'."
 msgstr ""
 
-#: backend/logs.py:232
+#: backend/logs.py:229
 #, python-format
 msgid "Job '%(job)s' has been created."
 msgstr ""
 
-#: backend/logs.py:234
+#: backend/logs.py:231
 #, python-format
 msgid "You created job '%(job)s'."
 msgstr ""
 
-#: backend/logs.py:236
+#: backend/logs.py:233
 #, python-format
 msgid "%(user)s created job '%(job)s'."
 msgstr ""
 
-#: backend/logs.py:240
+#: backend/logs.py:237
 #, python-format
 msgid "Job '%(job)s' has changed its state to: %(state)s."
 msgstr ""
 
-#: backend/logs.py:242
+#: backend/logs.py:239
 #, python-format
 msgid "You changed the state of job '%(job)s' to: %(state)s."
 msgstr ""
 
-#: backend/logs.py:244
+#: backend/logs.py:241
 #, python-format
 msgid "%(user)s changed the state of job '%(job)s' to: %(state)s."
 msgstr ""
 
-#: backend/logs.py:248
+#: backend/logs.py:245
 #, python-format
 msgid "Job '%(job)s' has been reset."
 msgstr ""
 
-#: backend/logs.py:250
+#: backend/logs.py:247
 #, python-format
 msgid "You reset job '%(job)s'."
 msgstr ""
 
-#: backend/logs.py:252
+#: backend/logs.py:249
 #, python-format
 msgid "%(user)s has reset job '%(job)s'."
 msgstr ""
 
-#: backend/logs.py:256
+#: backend/logs.py:253
 #, python-format
 msgid "Job '%(job)s' has been scheduled for rebuild."
 msgstr ""
 
-#: backend/logs.py:258
+#: backend/logs.py:255
 #, python-format
 msgid "You scheduled job '%(job)s' for rebuild."
 msgstr ""
 
-#: backend/logs.py:260
+#: backend/logs.py:257
 #, python-format
 msgid "%(user)s scheduled job '%(job)s' for rebuild."
 msgstr ""
 
-#: backend/logs.py:266
+#: backend/logs.py:263
 #, python-format
 msgid "A test job for '%(job)s' has been scheduled."
 msgstr ""
 
-#: backend/logs.py:268
+#: backend/logs.py:265
 #, python-format
 msgid "You scheduled a test job for '%(job)s'."
 msgstr ""
 
-#: backend/logs.py:270
+#: backend/logs.py:267
 #, python-format
 msgid "%(user)s scheduled a test job for '%(job)s'."
 msgstr ""
 
-#: backend/logs.py:310
+#: backend/logs.py:303
 #, python-format
 msgid "Mirror '%(mirror)s' has been enabled."
 msgstr ""
 
-#: backend/logs.py:312
+#: backend/logs.py:305
 #, python-format
 msgid "You enabled mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/logs.py:314
+#: backend/logs.py:307
 #, python-format
 msgid "%(user)s enabled mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/logs.py:318
+#: backend/logs.py:311
 #, python-format
 msgid "Mirror '%(mirror)s' has been disabled."
 msgstr ""
 
-#: backend/logs.py:320
+#: backend/logs.py:313
 #, python-format
 msgid "You disabled mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/logs.py:322
+#: backend/logs.py:315
 #, python-format
 msgid "%(user)s disabled mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/logs.py:326
+#: backend/logs.py:319
 #, python-format
 msgid "You deleted mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/logs.py:328
+#: backend/logs.py:321
 #, python-format
 msgid "%(user)s deleted mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/logs.py:332
+#: backend/logs.py:325
 #, python-format
 msgid "You created mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/logs.py:334
+#: backend/logs.py:327
 #, python-format
 msgid "%(user)s created mirror '%(mirror)s'."
 msgstr ""
 
-#: backend/builds.py:941
+#: backend/builds.py:979
 #, python-format
 msgid "%(user_name)s commented on %(build_name)s"
 msgstr ""
 
-#: backend/constants.py:21
+#: backend/constants.py:24
 #, python-format
 msgid "[%(build_name)s] Build job failed."
 msgstr ""
 
-#: backend/constants.py:22
+#: backend/constants.py:25
 #, python-format
 msgid ""
 "The build job \"%(build_name)s\" has failed.\n"
@@ -293,12 +293,12 @@ msgid ""
 "    The Pakfire Build Service"
 msgstr ""
 
-#: backend/constants.py:39
+#: backend/constants.py:42
 #, python-format
 msgid "[%(build_name)s] Build job finished."
 msgstr ""
 
-#: backend/constants.py:40
+#: backend/constants.py:43
 #, python-format
 msgid ""
 "The build job \"%(build_name)s\" has finished.\n"
@@ -330,8 +330,7 @@ msgstr ""
 msgid "No title given"
 msgstr ""
 
-#: data/templates/base.html:27 data/templates/index.html:8
-#: data/templates/modules/log-entry.html:19
+#: data/templates/base.html:27 data/templates/index.html:15
 msgid "Pakfire Build Service"
 msgstr ""
 
@@ -348,7 +347,9 @@ msgstr ""
 #: data/templates/job-schedule-test.html:12
 #: data/templates/packages-list.html:12
 #: data/templates/builds-watchers-add.html:12
-#: data/templates/build-detail.html:12 data/templates/build-delete.html:12
+#: data/templates/build-detail.html:12
+#: data/templates/packages/changelog.html:12
+#: data/templates/build-delete.html:12
 #: data/templates/job-schedule-rebuild.html:12
 #: data/templates/jobs-detail.html:12
 msgid "Packages"
@@ -365,12 +366,12 @@ msgstr ""
 msgid "More"
 msgstr ""
 
-#: data/templates/base.html:46 data/templates/index.html:25
-#: data/templates/docs-index.html:12 data/templates/docs-users.html:3
-#: data/templates/docs-users.html:12 data/templates/docs-users.html:21
-#: data/templates/docs-whatsthis.html:3 data/templates/docs-whatsthis.html:12
-#: data/templates/docs-whatsthis.html:21 data/templates/docs-build.html:3
-#: data/templates/docs-build.html:12 data/templates/docs-build.html:21
+#: data/templates/base.html:46 data/templates/docs-index.html:12
+#: data/templates/docs-users.html:3 data/templates/docs-users.html:12
+#: data/templates/docs-users.html:21 data/templates/docs-whatsthis.html:3
+#: data/templates/docs-whatsthis.html:12 data/templates/docs-whatsthis.html:21
+#: data/templates/docs-build.html:3 data/templates/docs-build.html:12
+#: data/templates/docs-build.html:21
 msgid "Documentation"
 msgstr ""
 
@@ -437,86 +438,47 @@ msgstr ""
 msgid "Uploads"
 msgstr ""
 
-#: data/templates/base.html:128
-msgid "Logged in as"
-msgstr ""
-
-#: data/templates/base.html:136
-msgid "Impersonated by"
-msgstr ""
-
-#: data/templates/base.html:148
+#: data/templates/base.html:129
 msgid "My profile"
 msgstr ""
 
-#: data/templates/base.html:154
+#: data/templates/base.html:135
 msgid "My builds"
 msgstr ""
 
-#: data/templates/base.html:163
+#: data/templates/base.html:140
+msgid "Impersonated by"
+msgstr ""
+
+#: data/templates/base.html:150
 msgid "End impersonation"
 msgstr ""
 
-#: data/templates/base.html:170
+#: data/templates/base.html:157
 msgid "Logout"
 msgstr ""
 
-#: data/templates/base.html:178 data/templates/base.html:247
-#: data/templates/modules/modal-build-comment.html:56
-#: data/templates/login.html:3 data/templates/login.html:7
-#: data/templates/login.html:34
-msgid "Login"
+#: data/templates/base.html:165 data/templates/docs-users.html:56
+msgid "Register"
 msgstr ""
 
-#: data/templates/base.html:206
-msgid "Welcome to Pakfire Build Service!"
+#: data/templates/base.html:169
+msgid "Sign in"
 msgstr ""
 
-#: data/templates/base.html:212 data/templates/register.html:48
-#: data/templates/user-profile-edit.html:10 data/templates/login.html:22
-#: data/templates/user-profile.html:29
-msgid "Username"
-msgstr ""
-
-#: data/templates/base.html:219 data/templates/register.html:85
-#: data/templates/user-profile-edit.html:33 data/templates/login.html:28
-msgid "Password"
-msgstr ""
-
-#: data/templates/base.html:227
-msgid "Please type your credentials into the form above in order to login."
-msgstr ""
-
-#: data/templates/base.html:235 data/templates/register.html:3
-#: data/templates/register.html:18
-msgid "Register a new account"
-msgstr ""
-
-#: data/templates/base.html:240
+#: data/templates/base.html:181
 msgid "Forgot your password?"
-msgstr ""
-
-#: data/templates/base.html:248 data/templates/build-bugs.html:116
-#: data/templates/build-bugs.html:165
-#: data/templates/package-properties.html:94
-#: data/templates/keys-delete.html:42
-#: data/templates/modules/modal-base.html:28
-#: data/templates/modules/modal-build-comment.html:59
-#: data/templates/builder-delete.html:39
-#: data/templates/user-profile-passwd.html:96
-#: data/templates/build-delete.html:47 data/templates/mirrors-edit.html:84
-#: data/templates/build-manage.html:79 data/templates/mirrors-delete.html:39
-msgid "Cancel"
 msgstr ""
 
 #: data/templates/distro-source-detail.html:6
 #: data/templates/mirrors-list.html:8 data/templates/build-bugs.html:8
 #: data/templates/distro-list.html:8 data/templates/builder-list.html:8
 #: data/templates/keys-import.html:8 data/templates/docs-index.html:8
-#: data/templates/login-successful.html:8 data/templates/search-results.html:8
-#: data/templates/builder-new.html:8 data/templates/package-properties.html:8
+#: data/templates/search-results.html:8 data/templates/builder-new.html:8
+#: data/templates/package-properties.html:8
 #: data/templates/mirrors-detail.html:8 data/templates/keys-delete.html:8
-#: data/templates/register.html:8 data/templates/build-schedule-test.html:8
+#: data/templates/register.html:8 data/templates/modules/package-header.html:9
+#: data/templates/build-schedule-test.html:8
 #: data/templates/builder-delete.html:8
 #: data/templates/user-profile-passwd-ok.html:8
 #: data/templates/package-detail-list.html:8
@@ -529,13 +491,13 @@ msgstr ""
 #: data/templates/register-activation-fail.html:8
 #: data/templates/packages-list.html:8 data/templates/keys-list.html:8
 #: data/templates/distro-source-commit-reset.html:6
-#: data/templates/logout.html:8
 #: data/templates/register-activation-success.html:8
 #: data/templates/builds-watchers-add.html:8
 #: data/templates/builder-detail.html:8 data/templates/search-form.html:8
 #: data/templates/build-detail.html:8 data/templates/docs-build.html:8
-#: data/templates/builder-pass.html:6 data/templates/build-delete.html:8
-#: data/templates/mirrors-edit.html:8 data/templates/mirrors-delete.html:8
+#: data/templates/packages/changelog.html:8 data/templates/builder-pass.html:6
+#: data/templates/build-delete.html:8 data/templates/mirrors-edit.html:8
+#: data/templates/mirrors-delete.html:8
 #: data/templates/user-forgot-password.html:8
 #: data/templates/job-schedule-rebuild.html:8
 #: data/templates/user-profile.html:8 data/templates/builder-edit.html:8
@@ -627,8 +589,9 @@ msgid "Add new mirror"
 msgstr ""
 
 #: data/templates/mirrors-list.html:90 data/templates/builder-list.html:94
-#: data/templates/log.html:4 data/templates/builder-detail.html:202
-#: data/templates/user-profile.html:150 data/templates/jobs-detail.html:214
+#: data/templates/modules/log.html:1 data/templates/log.html:4
+#: data/templates/builder-detail.html:202 data/templates/user-profile.html:150
+#: data/templates/jobs-detail.html:214
 msgid "Log"
 msgstr "Journal"
 
@@ -761,6 +724,18 @@ msgstr ""
 msgid "Add bug"
 msgstr ""
 
+#: data/templates/build-bugs.html:116 data/templates/build-bugs.html:165
+#: data/templates/package-properties.html:94
+#: data/templates/keys-delete.html:42
+#: data/templates/modules/modal-base.html:28
+#: data/templates/modules/modal-build-comment.html:59
+#: data/templates/builder-delete.html:39
+#: data/templates/user-profile-passwd.html:96
+#: data/templates/build-delete.html:47 data/templates/mirrors-edit.html:84
+#: data/templates/build-manage.html:79 data/templates/mirrors-delete.html:39
+msgid "Cancel"
+msgstr ""
+
 #: data/templates/build-bugs.html:128
 msgid "Remove a bug"
 msgstr ""
@@ -797,53 +772,51 @@ msgstr ""
 msgid "Welcome to the Pakfire Build Service"
 msgstr "Bienvenue dans le Pakfire Build Service"
 
-#: data/templates/index.html:14
+#: data/templates/index.html:8
 #, python-format
-msgid "Welcome %s! Great to see you again."
+msgid "Welcome, %s!"
 msgstr ""
 
-#: data/templates/index.html:18
-msgid ""
-"This is a service that organizes development and packaging for the IPFire "
-"distribution."
+#: data/templates/index.html:16
+msgid "Development powered by community!"
 msgstr ""
 
-#: data/templates/index.html:20
-msgid "It is used to build and track packages as well as assembling images."
+#: data/templates/index.html:21
+msgid "Learn more"
 msgstr ""
 
-#: data/templates/index.html:38
+#: data/templates/index.html:36
 msgid "Latest stable updates"
 msgstr ""
 
-#: data/templates/index.html:40
+#: data/templates/index.html:38
 msgid "Unstable updates"
 msgstr ""
 
-#: data/templates/index.html:42
+#: data/templates/index.html:40
 msgid "Testing updates"
 msgstr ""
 
-#: data/templates/index.html:59
+#: data/templates/index.html:57
 msgid "View more updates..."
 msgstr ""
 
-#: data/templates/index.html:71
+#: data/templates/index.html:69
 msgid "Ongoing build jobs"
 msgstr ""
 
-#: data/templates/index.html:79
+#: data/templates/index.html:77
 #, python-format
 msgid "There is one job in the job queue."
 msgid_plural "There are %(num)s jobs in the job queue."
 msgstr[0] ""
 msgstr[1] ""
 
-#: data/templates/index.html:81
+#: data/templates/index.html:79
 msgid "There are no jobs in the job queue."
 msgstr ""
 
-#: data/templates/index.html:87
+#: data/templates/index.html:85
 msgid "Lately processed jobs"
 msgstr ""
 
@@ -977,25 +950,6 @@ msgstr ""
 
 #: data/templates/jobs-buildroot.html:11
 msgid "The packages listed below were used for the build."
-msgstr ""
-
-#: data/templates/login-successful.html:3
-#: data/templates/login-successful.html:12
-#: data/templates/login-successful.html:17
-msgid "Login successful"
-msgstr ""
-
-#: data/templates/login-successful.html:23
-#, python-format
-msgid "Welcome, %s."
-msgstr ""
-
-#: data/templates/login-successful.html:27
-msgid "Your login to the Pakfire Build Service was successful."
-msgstr ""
-
-#: data/templates/login-successful.html:30
-msgid "Start!"
 msgstr ""
 
 #: data/templates/search-results.html:3 data/templates/search-results.html:22
@@ -1226,6 +1180,10 @@ msgstr ""
 msgid "Coming soon..."
 msgstr ""
 
+#: data/templates/register.html:3 data/templates/register.html:18
+msgid "Register a new account"
+msgstr ""
+
 #: data/templates/register.html:12
 msgid "Register new account"
 msgstr ""
@@ -1235,76 +1193,66 @@ msgid "Join the community!"
 msgstr ""
 
 #: data/templates/register.html:26
-msgid "Signing up to the Pakfire Build Service is free."
-msgstr ""
-
-#: data/templates/register.html:30
-msgid ""
-"Please make sure you have read the guide about what Pakfire Build Service "
-"is, and what it is not:"
-msgstr ""
-
-#: data/templates/register.html:33 data/templates/docs-whatsthis.html:16
-#: data/templates/docs-whatsthis.html:21
-msgid "What is the Pakfire Build Service?"
-msgstr ""
-
-#: data/templates/register.html:44
 msgid "Registration form"
 msgstr ""
 
-#: data/templates/register.html:53
+#: data/templates/register.html:30 data/templates/user-profile-edit.html:10
+#: data/templates/login.html:22 data/templates/user-profile.html:29
+msgid "Username"
+msgstr ""
+
+#: data/templates/register.html:35
 msgid "Must be a unique name you login with."
 msgstr ""
 
-#: data/templates/register.html:59 data/templates/user-profile-edit.html:15
-#: data/templates/user-profile.html:33
-msgid "Email"
+#: data/templates/register.html:41
+msgid "Email address"
 msgstr ""
 
-#: data/templates/register.html:64
+#: data/templates/register.html:46
 msgid "Type in your email address, which is used to verify the account."
 msgstr ""
 
-#: data/templates/register.html:70 data/templates/user-profile-edit.html:24
+#: data/templates/register.html:52 data/templates/user-profile-edit.html:24
 msgid "Real name (optional)"
 msgstr ""
 
-#: data/templates/register.html:75
+#: data/templates/register.html:57
 msgid "Type you firstname and your lastname here."
 msgstr ""
 
-#: data/templates/register.html:82
+#: data/templates/register.html:64
 msgid "Account security"
 msgstr ""
 
-#: data/templates/register.html:90 data/templates/user-profile-edit.html:38
+#: data/templates/register.html:67 data/templates/user-profile-edit.html:33
+#: data/templates/login.html:28
+msgid "Password"
+msgstr ""
+
+#: data/templates/register.html:72 data/templates/user-profile-edit.html:38
 msgid ""
 "The password is used to secure the login and must be at least 8 characters."
 msgstr ""
 
-#: data/templates/register.html:96
+#: data/templates/register.html:78
 msgid "Confirm password"
 msgstr ""
 
-#: data/templates/register.html:101
-msgid "<strong>You</strong> are responsible for your account security!"
-msgstr ""
-
-#: data/templates/register.html:103
+#: data/templates/register.html:83
 msgid "Pick a password that is as strong as possible."
 msgstr ""
 
-#: data/templates/register.html:104
+#: data/templates/register.html:84
 msgid ""
 "Don't login at unsecure places where people could spy on your password."
 msgstr ""
 
-#: data/templates/register.html:111
+#: data/templates/register.html:91
 msgid "Sign up!"
 msgstr ""
 
-#: data/templates/modules/log-entry.html:14
+#: data/templates/modules/log-entry.html:21
 msgid "You"
 msgstr ""
 
@@ -1345,7 +1293,7 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: data/templates/modules/log-entry-comment.html:17
+#: data/templates/modules/log-entry-comment.html:22
 msgid "No comment given."
 msgstr ""
 
@@ -1415,6 +1363,12 @@ msgstr ""
 
 #: data/templates/modules/modal-build-comment.html:54
 msgid "Submit comment"
+msgstr ""
+
+#: data/templates/modules/modal-build-comment.html:56
+#: data/templates/login.html:3 data/templates/login.html:7
+#: data/templates/login.html:34
+msgid "Login"
 msgstr ""
 
 #: data/templates/modules/log-files-table.html:4
@@ -1650,6 +1604,7 @@ msgid "Push"
 msgstr ""
 
 #: data/templates/modules/commits-table.html:4
+#: data/templates/modules/changelog/entry.html:27
 #: data/templates/package-detail.html:137
 #: data/templates/distro-source-commit-detail.html:3
 #: data/templates/build-detail.html:70
@@ -1657,6 +1612,7 @@ msgid "Commit"
 msgstr "Commit"
 
 #: data/templates/modules/commits-table.html:5
+#: data/templates/modules/changelog/entry.html:25
 #: data/templates/distro-source-commit-detail.html:55
 msgid "Author"
 msgstr "Auteur"
@@ -1784,32 +1740,20 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: data/templates/modules/package-header.html:7
+#: data/templates/modules/package-header.html:15
+#: data/templates/package-detail.html:70 data/templates/file-detail.html:34
+msgid "License"
+msgstr "Licence"
+
+#: data/templates/modules/package-header.html:21
 msgid "Group"
 msgid_plural "Groups"
 msgstr[0] ""
 msgstr[1] ""
 
-#: data/templates/modules/package-header.html:16
-#: data/templates/package-detail.html:64
-msgid "Homepage"
+#: data/templates/modules/package-header.html:27
+msgid "This package is maintained by"
 msgstr ""
-
-#: data/templates/modules/package-header.html:25
-#: data/templates/package-detail.html:70 data/templates/file-detail.html:34
-msgid "License"
-msgstr "Licence"
-
-#: data/templates/modules/package-header.html:34
-#: data/templates/package-detail.html:77 data/templates/file-detail.html:40
-#: data/templates/distro-update-detail.html:27
-msgid "Maintainer"
-msgstr "Mainteneur"
-
-#: data/templates/modules/package-header.html:46
-#: data/templates/repository-edit.html:25 data/templates/file-detail.html:20
-msgid "Description"
-msgstr "Description"
 
 #: data/templates/modules/source-table.html:5
 msgid "No. of commits"
@@ -1847,6 +1791,24 @@ msgstr ""
 
 #: data/templates/modules/log-table.html:23
 msgid "No log entries, yet."
+msgstr ""
+
+#: data/templates/modules/changelog/entry.html:11
+#: data/templates/build-filter.html:42
+msgid "Stable"
+msgstr ""
+
+#: data/templates/modules/changelog/entry.html:13
+msgid "Unstable"
+msgstr ""
+
+#: data/templates/modules/changelog/entry.html:15
+#: data/templates/build-filter.html:41
+msgid "Testing"
+msgstr ""
+
+#: data/templates/modules/changelog/entry.html:31
+msgid "No commit message."
 msgstr ""
 
 #: data/templates/modules/jobs-list.html:33
@@ -2089,30 +2051,39 @@ msgstr ""
 msgid "Scratch builds"
 msgstr ""
 
-#: data/templates/package-detail-list.html:83
+#: data/templates/package-detail-list.html:79
+#: data/templates/packages/changelog.html:20
+#: data/templates/packages/changelog.html:26
+msgid "Changelog"
+msgstr ""
+
+#: data/templates/package-detail-list.html:85
+msgid "Full changelog"
+msgstr ""
+
+#: data/templates/package-detail-list.html:90
 msgid "Open bugs"
 msgstr ""
 
-#: data/templates/package-detail-list.html:88
-#, python-format
-msgid "There are currently no open bugs for <em>%s</em>."
-msgstr ""
-
 #: data/templates/package-detail-list.html:95
-#: data/templates/build-detail.html:141
-msgid "File a new bug"
+#, python-format
+msgid "There are currently no open bugs for %s."
 msgstr ""
 
-#: data/templates/package-detail-list.html:98
+#: data/templates/package-detail-list.html:103
+msgid "File new bug"
+msgstr ""
+
+#: data/templates/package-detail-list.html:106
 #: data/templates/build-detail.html:136
 msgid "Show all bugs"
 msgstr ""
 
-#: data/templates/package-detail-list.html:106
+#: data/templates/package-detail-list.html:115
 msgid "Build times"
 msgstr ""
 
-#: data/templates/package-detail-list.html:120
+#: data/templates/package-detail-list.html:129
 msgid ""
 "These are the average build times of this package for every architecture."
 msgstr ""
@@ -2120,6 +2091,11 @@ msgstr ""
 #: data/templates/user-profile-edit.html:4
 #, python-format
 msgid "Edit user %s"
+msgstr ""
+
+#: data/templates/user-profile-edit.html:15
+#: data/templates/user-profile.html:33
+msgid "Email"
 msgstr ""
 
 #: data/templates/user-profile-edit.html:20
@@ -2213,6 +2189,15 @@ msgstr ""
 #: data/templates/package-detail.html:45
 msgid "Debuginfo package"
 msgstr ""
+
+#: data/templates/package-detail.html:64
+msgid "Homepage"
+msgstr ""
+
+#: data/templates/package-detail.html:77 data/templates/file-detail.html:40
+#: data/templates/distro-update-detail.html:27
+msgid "Maintainer"
+msgstr "Mainteneur"
 
 #: data/templates/package-detail.html:82 data/templates/build-filter.html:52
 msgid "Build host"
@@ -2325,10 +2310,6 @@ msgstr ""
 msgid ""
 "After a successful activation you are able to leave comments on packages and"
 " give feedback to the developers about its status."
-msgstr ""
-
-#: data/templates/docs-users.html:56
-msgid "Register"
 msgstr ""
 
 #: data/templates/error.html:8
@@ -2483,6 +2464,10 @@ msgstr ""
 msgid "Legend of the build states"
 msgstr ""
 
+#: data/templates/docs-whatsthis.html:16 data/templates/docs-whatsthis.html:21
+msgid "What is the Pakfire Build Service?"
+msgstr ""
+
 #: data/templates/docs-whatsthis.html:27
 msgid ""
 "On this page, you will find out what the Pakfire Build Service really is."
@@ -2592,6 +2577,10 @@ msgstr ""
 #: data/templates/repository-edit.html:21
 msgid "Must only contain of the lowercase characters."
 msgstr ""
+
+#: data/templates/repository-edit.html:25 data/templates/file-detail.html:20
+msgid "Description"
+msgstr "Description"
 
 #: data/templates/repository-edit.html:33
 msgid "Score settings"
@@ -2820,23 +2809,6 @@ msgstr ""
 
 #: data/templates/distro-source-commit-reset.html:62
 msgid "These packages will be deleted"
-msgstr ""
-
-#: data/templates/logout.html:3 data/templates/logout.html:12
-#: data/templates/logout.html:17
-msgid "Logout successful"
-msgstr ""
-
-#: data/templates/logout.html:23
-msgid "You have successfully logged out from the Pakfire Build Server."
-msgstr ""
-
-#: data/templates/logout.html:24
-msgid "Have a nice day!"
-msgstr "Bonne journée !"
-
-#: data/templates/logout.html:27
-msgid "Goodbye!"
 msgstr ""
 
 #: data/templates/error-403.html:4
@@ -3187,6 +3159,10 @@ msgstr ""
 msgid "Modify bug list"
 msgstr ""
 
+#: data/templates/build-detail.html:141
+msgid "File a new bug"
+msgstr ""
+
 #: data/templates/build-detail.html:161 data/templates/build-state.html:119
 #, python-format
 msgid "since %s"
@@ -3276,6 +3252,21 @@ msgstr ""
 
 #: data/templates/docs-build.html:43
 msgid "Build has an unknown state"
+msgstr ""
+
+#: data/templates/packages/changelog.html:3
+#, python-format
+msgid "Changelog of %s"
+msgstr ""
+
+#: data/templates/packages/changelog.html:35
+#: data/templates/packages/changelog.html:39
+msgid "Older"
+msgstr ""
+
+#: data/templates/packages/changelog.html:45
+#: data/templates/packages/changelog.html:49
+msgid "Newer"
 msgstr ""
 
 #: data/templates/builder-pass.html:18 data/templates/mirrors-edit.html:20
@@ -3870,14 +3861,6 @@ msgstr ""
 msgid "Building"
 msgstr ""
 
-#: data/templates/build-filter.html:41
-msgid "Testing"
-msgstr ""
-
-#: data/templates/build-filter.html:42
-msgid "Stable"
-msgstr ""
-
 #: data/templates/build-filter.html:43
 msgid "Obsolete"
 msgstr ""
@@ -3989,35 +3972,35 @@ msgstr ""
 msgid "The user profile cannot be saved."
 msgstr ""
 
-#: web/handlers_auth.py:71
+#: web/handlers_auth.py:66
 msgid "No username provided."
 msgstr ""
 
-#: web/handlers_auth.py:73
+#: web/handlers_auth.py:68
 msgid "The given username is already taken."
 msgstr ""
 
-#: web/handlers_auth.py:76 web/handlers_users.py:186
+#: web/handlers_auth.py:71 web/handlers_users.py:186
 msgid "No email address provided."
 msgstr ""
 
-#: web/handlers_auth.py:78 web/handlers_users.py:188
+#: web/handlers_auth.py:73 web/handlers_users.py:188
 msgid "Email address is invalid."
 msgstr ""
 
-#: web/handlers_auth.py:80
+#: web/handlers_auth.py:75
 msgid "The given email address is already used for another account."
 msgstr ""
 
-#: web/handlers_auth.py:84
+#: web/handlers_auth.py:79
 msgid "No password provided."
 msgstr ""
 
-#: web/handlers_auth.py:86 web/handlers_users.py:194
+#: web/handlers_auth.py:81 web/handlers_users.py:194
 msgid "Passwords do not match."
 msgstr ""
 
-#: web/handlers_auth.py:90
+#: web/handlers_auth.py:85
 msgid "Your password is too weak."
 msgstr ""
 
