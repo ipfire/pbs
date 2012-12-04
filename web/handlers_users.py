@@ -211,18 +211,9 @@ class UserEditHandler(BaseHandler):
 class UsersHandler(BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
-		admins, testers, users = [], [], []
+		users = self.pakfire.users.get_all()
 
-		for user in self.pakfire.users.get_all():
-			if user.is_admin():
-				admins.append(user)
-			elif user.is_tester():
-				testers.append(user)
-			else:
-				users.append(user)
-
-		self.render("user-list.html", admins=admins, testers=testers,
-			users=users)
+		self.render("user-list.html", users=users)
 
 
 class UsersCommentsHandler(BaseHandler):

@@ -152,7 +152,7 @@ class Users(base.Object):
 
 	def get_all(self):
 		users = self.db.query("""SELECT id FROM users WHERE activated = 'Y' AND
-			deleted = 'N' ORDER BY realname, name""")
+			deleted = 'N' ORDER BY name ASC""")
 
 		return [User(self.pakfire, u.id) for u in users]
 

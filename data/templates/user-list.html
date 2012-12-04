@@ -13,32 +13,9 @@
 		</li>
 	</ul>
 
-	<h1>{{ _("Users") }}</h1>
-	<p>
-		{{ _("On this page you can see a list of all users that are known to the system.") }}
-	</p>
+	<div class="page-header">
+		<h2>{{ _("Users") }}</h2>
+	</div>
 
-	{% if admins %}
-		<h2>
-			{{ _("Developers") }}
-			<span>({{ len(admins) }})</span>
-		</h2>
-		{% module UsersTable(admins) %}
-	{% end %}
-
-	{% if testers %}
-		<h2>
-			{{ _("Testers") }}
-			<span>({{ len(testers) }})</span>
-		</h2>
-		{% module UsersTable(testers) %}
-	{% end %}
-
-	{% if users %}
-		<h2>
-			{{ _("Users") }}
-			<span>({{ len(admins) }})</span>
-		</h2>
-		{% module UsersTable(users) %}
-	{% end %}
+	{% module UsersTable(users) %}
 {% end block %}
