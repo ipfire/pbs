@@ -50,6 +50,9 @@ class Application(tornado.web.Application):
 				"Changelog"          : ChangelogModule,
 				"ChangelogEntry"     : ChangelogEntryModule,
 
+				# Packages
+				"PackagesDependencyTable" : PackagesDependencyTableModule,
+
 				"CommitsTable"       : CommitsTableModule,
 				"JobsBoxes"          : JobsBoxesModule,
 				"JobState"           : JobStateModule,

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Package") }}: {{ pkg.name }}{% end block %}
+{% block title %}{{ _("Package") }}: {{ pkg.friendly_name }}{% end block %}
 
 {% block body %}
 	<ul class="breadcrumb">
@@ -30,7 +30,7 @@
 		{% end %}
 		<li class="active">
 			<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
-		</li>			
+		</li>
 	</ul>
 
 	<div class="page-header">
@@ -46,15 +46,15 @@
 			{% end %}
 		</div>
 
-		<h1>
-			{{ _("Package") }}: {{ pkg.friendly_name }}
-			<br /><small>{{ pkg.summary }}</small>
-		</h1>
+		<h2>
+			{{ _("Package") }}: {{ pkg.friendly_name }}<br>
+			<small>{{ pkg.summary }}</small>
+		</h2>
 	</div>
 
 	<div class="row">
 		<div class="span4">
-			<blockquote>{{ pkg.description }}</blockquote>
+			{% module Text(pkg.description) %}
 		</div>
 
 		<div class="span4">
@@ -126,7 +126,7 @@
 						<td>{{ _("Size") }}</td>
 						<td>
 							{{ format_size(pkg.filesize) }}
-							{% if pkg.type == "binary" %}
+							{% if pkg.type == "binary" and not pkg.size == pkg.filesize %}
 								({{ _("%(size)s when installed") % { "size" : format_size(pkg.size) } }})
 							{% end %}
 						</td>
@@ -146,131 +146,32 @@
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="span12">
-			{% if pkg.build %}
-				<a class="btn pull-right" href="{{ pkg.build.download_prefix }}/{{ pkg.path }}">
-					<i class="icon-download"></i>
-					{{ _("Download") }}
-				</a>
-			{% end %}
-		</div>
-	</div>
-	<hr />
+	{% if pkg.build %}
+		<a class="btn pull-right" href="{{ pkg.build.download_prefix }}/{{ pkg.path }}">
+			<i class="icon-download"></i>
+			{{ _("Download") }}
+		</a>
 
-	{% if pkg.type == "binary" %}
-		<div class="row">
-			<div class="span12">
-				<h2>{{ _("Dependencies") }}</h2>
+		<br class="clear">
+	{% end %}
 
-				<div class="tabbable">
-					<ul class="nav nav-pills">
-						{% if pkg.provides %}
-							<li class="active">
-								<a href="#deps_provides" data-toggle="tab">
-									{{ _("Provides") }}
-								</a>
-							</li>
-						{% end %}
+	{% if pkg.has_deps() %}
+		<hr>
 
-						{% if pkg.requires or pkg.prerequires %}
-							<li {% if not pkg.provides %}class="active"{% end %}>
-								<a href="#deps_requires" data-toggle="tab">
-									{{ _("Requires") }}
-								</a>
-							</li>
-						{% end %}
+		{% if pkg.type == "source" %}
+			<h4>{{ _("Build dependencies") }}</h4>
+		{% else %}
+			<h3>{{ _("Dependencies") }}</h3>
+		{% end %}
 
-						{% if pkg.obsoletes %}
-							<li {% if not any((pkg.provides, pkg.requires, pkg.prerequires)) %}class="active"{% end %}>
-								<a href="#deps_obsoletes" data-toggle="tab">
-									{{ _("Obsoletes") }}
-								</a>
-							</li>
-						{% end %}
-
-						{% if pkg.conflicts %}
-							<li {% if not any((pkg.provides, pkg.requires, pkg.prerequires, pkg.obsoletes)) %}class="active"{% end %}>
-								<a href="#deps_conflicts" data-toggle="tab">
-									{{ _("Conflicts") }}
-								</a>
-							</li>
-						{% end %}
-					</ul>
-
-					<div class="tab-content">
-						{% if pkg.provides %}
-							<div class="tab-pane active" id="deps_provides">
-								<ul>
-									{% for dep in pkg.provides %}
-										{% if not dep.startswith("uuid(") %}
-											<li>{{ dep }}</li>
-										{% end %}
-									{% end %}
-								</ul>
-							</div>
-						{% end %}
-
-						{% if pkg.requires or pkg.prerequires %}
-							<div class="tab-pane {% if not pkg.provides %}active{% end %}" id="deps_requires">
-								<ul>
-									{% for dep in pkg.requires %}
-										<li>{{ dep }}</li>
-									{% end %}
-								</ul>
-
-								{% if pkg.prerequires %}
-									<h3>{{ _("Prerequires") }}</h3>
-
-									<ul>
-										{% for dep in pkg.prerequires %}
-											<li>{{ dep }}</li>
-										{% end %}
-									</ul>
-								{% end %}
-							</div>
-						{% end %}
-
-						{% if pkg.obsoletes %}
-							<div class="tab-pane {% if not any((pkg.provides, pkg.requires, pkg.prerequires)) %}active{% end %}" id="deps_obsoletes">
-								<ul>
-									{% for dep in pkg.obsoletes %}
-										<li>{{ dep }}</li>
-									{% end %}
-								</ul>
-							</div>
-						{% end %}
-
-						{% if pkg.conflicts %}
-							<div class="tab-pane {% if not any((pkg.provides, pkg.requires, pkg.prerequires, pkg.obsoletes)) %}active{% end %}" id="deps_conflicts">
-								<ul>
-									{% for dep in pkg.conflicts %}
-										<li>{{ dep }}</li>
-									{% end %}
-								</ul>
-							</div>
-						{% end %}
-					</div>
-				</div>
-
-				<hr>
-			</div>
-		</div>
-	{% elif pkg.type == "source" %}
-		<div class="row">
-			<div class="span12">
-				<h2>{{ _("Build dependencies") }}</h2>
-				<ul>
-					{% for dep in pkg.requires %}
-						<li>{{ dep }}</li>
-					{% end %}
-				</ul>
-			</div>
-		</div>
+		{% module PackagesDependencyTable(pkg) %}
 	{% end %}
 
 	{% if pkg.filelist %}
-		<h2>{{ _("Files") }}</h2>
+		<hr>
+
+		<h3>{{ _("Filelist") }}</h3>
+
 		{% module PackageFilesTable(pkg, pkg.filelist) %}
 	{% end %}
 {% end block %}

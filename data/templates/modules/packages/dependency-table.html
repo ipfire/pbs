@@ -1,0 +1,27 @@
+<div class="row">
+	{% for name, deps in dependencies %}
+		<div class="{{ "span%d" % span }}">
+			{% if name == "provides" %}
+				<h4>{{ _("Provides") }}</h4>
+			{% elif name == "requires" %}
+				<h4>{{ _("Requires") }}</h4>
+			{% elif name == "prerequires" %}
+				<h4>{{ _("Pre-requires") }}</h4>
+			{% elif name == "conflicts" %}
+				<h4>{{ _("Conflicts") }}</h4>
+			{% elif name == "obsoletes" %}
+				<h4>{{ _("Obsoletes") }}</h4>
+			{% elif name == "recommends" %}
+				<h4>{{ _("Recommends") }}</h4>
+			{% elif name == "suggests" %}
+				<h4>{{ _("Suggests") }}</h4>
+			{% end %}
+
+			<ul class="unstyled">
+				{% for d in deps %}
+					<li>{{ d }}</li>
+				{% end %}
+			</ul>
+		</div>
+	{% end %}
+</div>

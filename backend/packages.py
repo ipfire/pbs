@@ -352,6 +352,14 @@ class Package(base.Object):
 	def size(self):
 		return self.data.size
 
+	def has_deps(self):
+		"""
+			Returns True if the package has got dependencies.
+
+			Always filter out the uuid provides.
+		"""
+		return len(self.deps) > 1
+
 	@property
 	def deps(self):
 		if self._deps is None:
@@ -373,7 +381,7 @@ class Package(base.Object):
 
 	@property
 	def provides(self):
-		return [d[1] for d in self.deps if d[0] == "provides"]
+		return [d[1] for d in self.deps if d[0] == "provides" and not d[1].startswith("uuid(")]
 
 	@property
 	def conflicts(self):
@@ -382,6 +390,14 @@ class Package(base.Object):
 	@property
 	def obsoletes(self):
 		return [d[1] for d in self.deps if d[0] == "obsoletes"]
+
+	@property
+	def suggests(self):
+		return [d[1] for d in self.deps if d[0] == "suggests"]
+
+	@property
+	def recommends(self):
+		return [d[1] for d in self.deps if d[0] == "recommends"]
 
 	@property
 	def commit_id(self):
@@ -538,6 +554,10 @@ class File(base.Object):
 
 	@property
 	def viewable(self):
+		# Empty files cannot be viewed.
+		if self.size == 0:
+			return False
+
 		for ext in FILE_EXTENSIONS_VIEWABLE:
 			if self.name.endswith(ext):
 				return True

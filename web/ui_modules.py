@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+from __future__ import division
+
+import math
 import pytz
 import re
 import string
@@ -138,6 +141,40 @@ class PackagesTableModule(UIModule):
 	def render(self, job, packages):
 		return self.render_string("modules/packages-table.html", job=job,
 			packages=packages)
+
+
+class PackagesDependencyTableModule(UIModule):
+	def render(self, pkg):
+		if pkg.type == "source":
+			all_deps = [
+				(None, pkg.requires),
+			]
+		else:
+			all_deps = [
+				("provides", pkg.provides),
+				("requires", pkg.requires),
+				("prerequires", pkg.prerequires),
+				("conflicts", pkg.conflicts),
+				("obsoletes", pkg.obsoletes),
+				("recommends", pkg.recommends),
+				("suggests", pkg.suggests),
+			]
+
+		has_deps = []
+		for name, deps in all_deps:
+			if deps:
+				has_deps.append((name, deps))
+
+		if len(has_deps):
+			span = math.floor(12 / len(has_deps))
+
+			if span > 3:
+				span = 3
+		else:
+			span = 12
+
+		return self.render_string("modules/packages/dependency-table.html",
+			pkg=pkg, dependencies=has_deps, span=span)
 
 
 class PackageTable2Module(UIModule):

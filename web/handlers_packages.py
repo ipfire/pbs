@@ -225,5 +225,5 @@ class PackageFileViewHandler(PackageFileDownloadHandler):
 		content = f.read()
 		f.close()
 
-		self.render("packages/view_file.html", pkg=pkg, filename=filename,
+		self.render("packages/view-file.html", pkg=pkg, filename=filename,
 			mimetype=mimetype, content=content, filesize=f.size)
