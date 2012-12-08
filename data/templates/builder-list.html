@@ -37,11 +37,11 @@
 						<tr>
 							<td class="lead">
 								{% if builder.state == "disabled" %}
-									<i class="icon-stop text-error"></i>
+									<i class="icon-remove muted"></i>
 								{% elif builder.state == "offline" %}
-									<i class="icon-pause text-warning"></i>
+									<i class="icon-remove text-warning"></i>
 								{% elif builder.state == "online" %}
-									<i class="icon-play text-success"></i>
+									<i class="icon-ok text-success"></i>
 								{% end %}
 							</td>
 							<td>
