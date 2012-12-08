@@ -235,7 +235,7 @@ class JobsBoxesModule(UIModule):
 
 
 class JobStateModule(UIModule):
-	def render(self, job, cls=None):
+	def render(self, job, cls=None, show_icon=False):
 		state = job.state
 
 		_ = self.locale.translate
@@ -244,34 +244,47 @@ class JobStateModule(UIModule):
 		if state == "aborted":
 			text = _("Aborted")
 			classes.append("muted")
+			icon = "icon-warning-sign"
 
 		elif state == "dependency_error":
 			text = _("Dependency problem")
 			classes.append("text-warning")
+			icon = "icon-random"
 
 		elif state == "dispatching":
 			text = _("Dispatching")
 			classes.append("text-info")
+			icon = "icon-download-alt"
 
 		elif state == "failed":
 			text = _("Failed")
 			classes.append("text-error")
+			icon = "icon-remove"
 
 		elif state == "finished":
 			text = _("Finished")
 			classes.append("text-success")
+			icon = "icon-ok"
 
 		elif state == "new":
 			text = _("New")
 			classes.append("muted")
+			icon = "icon-asterisk"
 
 		elif state == "pending":
 			text = _("Pending")
 			classes.append("muted")
+			icon = "icon-time"
 
 		elif state == "running":
 			text = _("Running")
+			classes.append("text-success")
+			icon = "icon-cogs"
+
+		elif state == "uploading":
+			text = _("Uploading")
 			classes.append("text-info")
+			icon = "icon-upload-alt"
 
 		# Return just the string, is state is unknown.
 		else:
@@ -281,7 +294,10 @@ class JobStateModule(UIModule):
 		if cls:
 			classes.append(cls)
 
-		return """<p class="%s">%s</p>""" % (" ".join(classes), text)
+		if show_icon and icon:
+			text = """<i class="%s"></i> %s""" % (icon, text)
+
+		return """<span class="%s">%s</span>""" % (" ".join(classes), text)
 
 
 class JobsTableModule(UIModule):
