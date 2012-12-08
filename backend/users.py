@@ -313,7 +313,12 @@ class User(base.Object):
 
 	@property
 	def firstname(self):
-		firstname, rest = self.realname.split(" ", 1)
+		# Try to split the string into first and last name.
+		# If that is not successful, return the entire realname.
+		try:
+			firstname, rest = self.realname.split(" ", 1)
+		except:
+			return self.realname
 
 		return firstname
 
