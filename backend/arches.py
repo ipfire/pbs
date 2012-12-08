@@ -3,10 +3,19 @@
 import base
 
 class Arches(base.Object):
-	def get_all(self):
-		arches = self.db.query("SELECT id FROM arches WHERE `binary` = 'Y'")
+	def get_all(self, really=False):
+		query = "SELECT * FROM arches"
 
-		return sorted([Arch(self.pakfire, a.id) for a in arches])
+		if not really:
+			query += " WHERE `binary` = 'Y'"
+		else:
+			query += " WHERE NOT name = 'src'"
+
+		query += " ORDER BY prio ASC"
+
+		arches = self.db.query(query)
+
+		return [Arch(self.pakfire, a.id, a) for a in arches]
 
 	def get_name_by_id(self, id):
 		arch = self.db.get("SELECT name FROM arches WHERE id = %s", id)
@@ -54,14 +63,14 @@ class Arches(base.Object):
 
 
 class Arch(base.Object):
-	def __init__(self, pakfire, id):
+	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 
 		# The ID of this architecture.
 		self.id = id
 
 		# Cache data.
-		self._data = None
+		self._data = data
 
 	def __cmp__(self, other):
 		return cmp(self.prio, other.prio)

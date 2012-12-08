@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Filter jobs") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/jobs">{{ _("Jobs") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/jobs/filter">{{ _("Filter") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h2>{{ _("Filter jobs") }}</h2>
+	</div>
+
+	<form class="form-horizontal" method="GET" action="/jobs">
+		<fieldset>
+			<div class="control-group">
+				<label class="control-label">{{ _("Builder") }}</label>
+				<div class="controls">
+					<select name="builder">
+						<option value="">{{ _("[Choose one]") }}</option>
+						{% for b in builders %}
+							<option value="{{ b.name }}">{{ b.name }}</option>
+						{% end %}
+					</select>
+					<span class="help-block">
+						{{ _("Only show jobs, that have been built by this builder.") }}
+					</span>
+				</div>
+			</div>
+
+			<hr>
+
+			<div class="control-group">
+				<label class="control-label">{{ _("Architecture") }}</label>
+				<div class="controls">
+					<select name="arch">
+						<option value="">{{ _("[Choose one]") }}</option>
+						{% for a in arches %}
+							<option value="{{ a.name }}">{{ a.name }}</option>
+						{% end %}
+					</select>
+					<span class="help-block">
+						{{ _("Only show jobs, with this architecture.") }}
+					</span>
+				</div>
+			</div>
+
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary">{{ _("Go!") }}</button>
+			</div>
+		</fieldset>
+	</form>
+{% end block %}

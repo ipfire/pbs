@@ -17,6 +17,59 @@
 		</li>
 	</ul>
 
+	<div class="btn-group pull-right">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			{{ _("Actions") }} <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li>
+				<a href="/jobs?builder={{ builder.name }}">
+					{{ _("Show jobs by this builder") }}
+				</a>
+			</li>
+			{% if current_user and current_user.has_perm("maintain_builders") %}
+				<li class="divider"></li>
+
+				{% if builder.enabled %}
+					<li>
+						<a href="/builder/{{ builder.name }}/disable">
+							{{ _("Disable builder") }}
+						</a>
+					</li>
+				{% else %}
+					<li>
+						<a href="/builder/{{ builder.name }}/enable">
+							{{ _("Enable builder") }}
+						</a>
+					</li>
+				{% end %}
+
+				<li>
+					<a href="/builder/{{ builder.name }}/edit">
+						<i class="icon-edit"></i>
+						{{ _("Edit builder") }}
+					</a>
+				</li>
+
+				{% if not builder.enabled %}
+					<li>
+						<a href="/builder/{{ builder.name }}/renew">
+							<i class="icon-refresh"></i>
+							{{ _("Renew passphrase") }}
+						</a>
+					</li>
+				{% end %}
+
+				<li>
+					<a href="/builder/{{ builder.name }}/delete">
+						<i class="icon-trash"></i>
+						{{ _("Delete builder") }}
+					</a>
+				</li>
+			{% end %}
+		</ul>
+	</div>
+
 	<div class="page-header">
 		<h2>{{ _("Builder") }}: {{ builder.name }}</h2>
 	</div>
@@ -138,39 +191,6 @@
 			</table>
 		</div>
 	</div>
-
-	{% if current_user and current_user.has_perm("maintain_builders") %}
-		<hr>
-
-		<div class="btn-toolbar ac">
-			{% if builder.enabled %}
-				<a class="btn btn-danger" href="/builder/{{ builder.name }}/disable">
-					{{ _("Disable builder") }}
-				</a>
-			{% else %}
-				<a class="btn btn-success" href="/builder/{{ builder.name }}/enable">
-					{{ _("Enable builder") }}
-				</a>
-			{% end %}
-
-			<a class="btn" href="/builder/{{ builder.name }}/edit">
-				<i class="icon-edit"></i>
-				{{ _("Edit builder") }}
-			</a>
-
-			{% if not builder.enabled %}
-				<a class="btn" href="/builder/{{ builder.name }}/renew">
-					<i class="icon-refresh"></i>
-					{{ _("Renew passphrase") }}
-				</a>
-			{% end %}
-
-			<a class="btn" href="/builder/{{ builder.name }}/delete">
-				<i class="icon-trash"></i>
-				{{ _("Delete builder") }}
-			</a>
-		</div>
-	{% end %}
 
 	<hr>
 

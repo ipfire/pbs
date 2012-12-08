@@ -5,6 +5,41 @@ import tornado.web
 from handlers_base import BaseHandler
 
 
+class JobsIndexHandler(BaseHandler):
+	def get(self):
+		# Filter for a certain arch.
+		arch_name = self.get_argument("arch", None)
+		if arch_name:
+			arch = self.pakfire.arches.get_by_name(arch_name)
+		else:
+			arch = None
+
+		# Check if we need to filter for a certain builder.
+		builder_name = self.get_argument("builder", None)
+		if builder_name:
+			builder = self.pakfire.builders.get_by_name(builder_name)
+		else:
+			builder = None
+
+		# Filter for a certain date.
+		date = self.get_argument("date", None)
+
+		# Get all jobs, that fulfill the criteria.
+		jobs = self.pakfire.jobs.get_latest(limit=50, arch=arch, builder=builder,
+			date=date)
+
+		self.render("jobs-index.html", jobs=jobs, arch=arch, builder=builder,
+			date=date)
+
+
+class JobsFilterHandler(BaseHandler):
+	def get(self):
+		arches   = self.pakfire.arches.get_all(really=True)
+		builders = self.pakfire.builders.get_all()
+
+		self.render("jobs-filter.html", arches=arches, builders=builders)
+
+
 class JobDetailHandler(BaseHandler):
 	def get(self, uuid):
 		job = self.pakfire.jobs.get_by_uuid(uuid)

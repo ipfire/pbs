@@ -1328,30 +1328,30 @@ class Jobs(base.Object):
 
 		return jobs
 
-	def get_latest(self, builder=None, limit=None, age=None, date=None):
+	def get_latest(self, arch=None, builder=None, limit=None, age=None, date=None):
 		query = "SELECT * FROM jobs"
 		args  = []
 
 		where = ["(state = 'finished' OR state = 'failed' OR state = 'aborted')"]
+
+		if arch:
+			where.append("arch_id = %s")
+			args.append(arch.id)
+
 		if builder:
 			where.append("builder_id = %s")
 			args.append(builder.id)
 
 		if date:
-			year, month, day = date.split("-", 2)
-
 			try:
+				year, month, day = date.split("-", 2)
 				date = datetime.date(int(year), int(month), int(day))
 			except ValueError:
 				pass
-
 			else:
-				where.append("DATE(time_created) = %s")
-				args.append(date)
-				where.append("DATE(time_started) = %s")
-				args.append(date)
-				where.append("DATE(time_finished) = %s")
-				args.append(date)
+				where.append("(DATE(time_created) = %s OR \
+					DATE(time_started) = %s OR DATE(time_finished) = %s)")
+				args += (date, date, date)
 
 		if age:
 			where.append("time_finished >= DATE_SUB(NOW(), INTERVAL %s)" % age)
