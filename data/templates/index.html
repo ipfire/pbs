@@ -11,14 +11,16 @@
 
 	{% else %}
 		<div class="hero-unit ac" style="background-color: white">
+			<br>
 			<h1>
-				{{ _("Pakfire Build Service") }}<br>
-				<small>{{ _("Development powered by community!") }}</small>
+				{{ _("Pakfire Build Service") }}
 			</h1>
 
-			<br><br>
+			<hr>
 
-			<a class="btn" href="/documents">{{ _("Learn more") }} &raquo;</a>
+			<h2>
+				<small>{{ _("Development powered by community!") }}</small>
+			</h2>
 		</div>
 
 		<hr>
@@ -57,33 +59,17 @@
 					<a href="/updates">{{ _("View more updates...") }}</a>
 				</p>
 
-				<hr style="clear: both;">
+				<br style="clear: both;">
 			</div>
 		</div>
 	{% end %}
 
-	<div class="row">
-		<div class="span6">
-			{% if active_jobs %}
-				<h3>
-					{{ _("Ongoing build jobs") }}
-					<small>({{ len(active_jobs) }})</small>
-				</h3>
-				{% module JobsList(active_jobs, show_builder=True) %}
-			{% end %}
+	{% if jobs %}
+		<hr>
 
-			<a href="/builds/queue">
-				{% if job_queue %}
-					{{ _("There is one job in the job queue.", "There are %(num)s jobs in the job queue.", job_queue) % { "num" : job_queue } }}
-				{% else %}
-					{{ _("There are no jobs in the job queue.") }}
-				{% end %}
-			</a>
-		</div>
+		<h4>{{ _("Build jobs") }}</h4>
+		{% module JobsList(jobs) %}
+	{% end %}
 
-		<div class="span6">
-			<h3>{{ _("Lately processed jobs") }}</h3>
-			{% module JobsList(latest_jobs) %}
-		</div>
-	</div>
+	<a href="/jobs">{{ _("Show more build jobs") }}</a>
 {% end %}

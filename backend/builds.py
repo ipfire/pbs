@@ -1248,7 +1248,7 @@ class Jobs(base.Object):
 		return sorted(jobs)
 
 	def get_active(self, host_id=None, uploads=True):
-		running_states = ["dispatching", "running"]
+		running_states = ["dispatching", "new", "pending", "running"]
 
 		if uploads:
 			running_states.append("uploading")
@@ -1259,7 +1259,14 @@ class Jobs(base.Object):
 		if host_id:
 			query += " AND builder_id = %s" % host_id
 
-		query += " ORDER BY time_started DESC"
+		query += " ORDER BY \
+			CASE \
+				WHEN jobs.state = 'running'     THEN 0 \
+				WHEN jobs.state = 'uploading'   THEN 1 \
+				WHEN jobs.state = 'dispatching' THEN 2 \
+				WHEN jobs.state = 'pending'     THEN 3 \
+				WHEN jobs.state = 'new'         THEN 4 \
+			END, time_started ASC"
 
 		return [Job(self.pakfire, j.id, j) for j in self.db.query(query)]
 
@@ -1321,20 +1328,44 @@ class Jobs(base.Object):
 
 		return jobs
 
-	def get_latest(self, builder=None, limit=10):
+	def get_latest(self, builder=None, limit=None, age=None, date=None):
 		query = "SELECT * FROM jobs"
+		args  = []
 
-		#where = ["time_finished IS NOT NULL",]
-		where = ["(state = 'finished' OR state = 'failed')"]
+		where = ["(state = 'finished' OR state = 'failed' OR state = 'aborted')"]
 		if builder:
-			where.append("builder = '%s'" % builder)
+			where.append("builder_id = %s")
+			args.append(builder.id)
+
+		if date:
+			year, month, day = date.split("-", 2)
+
+			try:
+				date = datetime.date(int(year), int(month), int(day))
+			except ValueError:
+				pass
+
+			else:
+				where.append("DATE(time_created) = %s")
+				args.append(date)
+				where.append("DATE(time_started) = %s")
+				args.append(date)
+				where.append("DATE(time_finished) = %s")
+				args.append(date)
+
+		if age:
+			where.append("time_finished >= DATE_SUB(NOW(), INTERVAL %s)" % age)
 
 		if where:
 			query += " WHERE %s" % " AND ".join(where)
 
-		query += " ORDER BY time_finished DESC LIMIT %s"
+		query += " ORDER BY time_finished DESC"
 
-		return [Job(self.pakfire, j.id, j) for j in self.db.query(query, limit)]
+		if limit:
+			query += " LIMIT %s"
+			args.append(limit)
+
+		return [Job(self.pakfire, j.id, j) for j in self.db.query(query, *args)]
 
 	def get_average_build_time(self):
 		"""

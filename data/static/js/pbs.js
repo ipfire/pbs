@@ -1,6 +1,9 @@
 $(document).ready(function() {
 	// Activate Google Prettify for pretty-printing code.
 	window.prettyPrint && prettyPrint()
+
+	// Activate tooltips.
+	$("span[rel=tooltip]").tooltip();
 });
 
 function getCookie(name) {

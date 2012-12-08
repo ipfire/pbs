@@ -310,9 +310,8 @@ class JobsTableModule(UIModule):
 
 
 class JobsListModule(UIModule):
-	def render(self, jobs, show_builder=False):
-		return self.render_string("modules/jobs-list.html", jobs=jobs,
-			show_builder=show_builder)
+	def render(self, jobs):
+		return self.render_string("modules/jobs/list.html", jobs=jobs)
 
 
 class RepositoryTableModule(UIModule):

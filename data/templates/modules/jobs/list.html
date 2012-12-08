@@ -1,0 +1,54 @@
+<table class="table table-striped table-hover">
+	<thead>
+		<tr>
+			<th></th>
+			<th>{{ _("Build job") }}</th>
+			<th>{{ _("Builder") }}</th>
+			<th>{{ _("Runtime") }}</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for job in jobs %}
+			{% if job.state in ("running",) %}
+				<tr class="success">
+			{% elif job.state in ("dispatching", "uploading") %}
+				<tr class="info">
+			{% elif job.state in ("aborted", "dependency_error", "failed") %}
+				<tr class="error">
+			{% else %}
+				<tr>
+			{% end %}
+
+				<td>
+					{% module JobState(job, show_icon=True) %}
+				</td>
+
+				<td>
+					<a href="/build/{{ job.build.uuid }}">
+						{{ job.build.name }}</a>.<a href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
+
+					{% if job.build.type == "scratch" %}
+						<span class="label label-inverse pull-right" rel="tooltip" data-placement="top" title="{{ _("Scratch build") }}">S</span>
+					{% elif job.type == "test" %}
+						<span class="label label-inverse pull-right" rel="tooltip" data-placement="top" title="{{ _("Test build") }}">T</span>
+					{% end %}
+				</td>
+
+				<td>
+					{% if job.builder %}
+						<a href="/builder/{{ job.builder.name }}">
+							{{ job.builder.name }}
+						</a>
+					{% else %}
+						{{ _("N/A") }}
+					{% end %}
+				</td>
+
+				<td>
+					{{ friendly_time(job.duration) }}
+				</td>
+			</tr>
+		{% end %}
+	</tbody>
+</table>

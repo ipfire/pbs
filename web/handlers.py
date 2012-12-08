@@ -17,12 +17,8 @@ from handlers_users import *
 
 class IndexHandler(BaseHandler):
 	def get(self):
-		kwargs = {
-			"active_jobs" : self.pakfire.jobs.get_active(),
-			"latest_jobs" : self.pakfire.jobs.get_latest(limit=10),
-
-			"job_queue" : self.pakfire.jobs.count("pending"),
-		}
+		jobs = self.pakfire.jobs.get_active()
+		jobs += self.pakfire.jobs.get_latest(age="24 HOUR", limit=5)
 
 		# Updates
 		updates = []
@@ -33,9 +29,7 @@ class IndexHandler(BaseHandler):
 				updates.append((type, u, active))
 				active = False
 
-		kwargs["updates"] = updates
-
-		self.render("index.html", **kwargs)
+		self.render("index.html", jobs=jobs, updates=updates)
 
 
 class Error404Handler(BaseHandler):
