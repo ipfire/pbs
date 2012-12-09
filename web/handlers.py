@@ -52,12 +52,7 @@ class StatisticsMainHandler(BaseHandler):
 			"jobs_avg_build_time" : self.pakfire.jobs.get_average_build_time(),
 		})
 
-		# User statistics.
-		args.update({
-			"users_count" : self.pakfire.users.count(),
-		})
-
-		self.render("statistics-main.html", **args)
+		self.render("statistics/index.html", **args)
 
 
 class UploadsHandler(BaseHandler):

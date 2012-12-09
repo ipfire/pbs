@@ -71,5 +71,9 @@
 		{% module JobsList(jobs) %}
 	{% end %}
 
-	<a href="/jobs">{{ _("Show more build jobs") }}</a>
+	<ul class="nav nav-pills">
+		<li>
+			<a href="/jobs">{{ _("Show more build jobs") }}</a>
+		</li>
+	</ul>
 {% end %}
