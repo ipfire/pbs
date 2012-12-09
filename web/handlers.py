@@ -106,6 +106,30 @@ class LogHandler(BaseHandler):
 		self.render("log.html", log=self.pakfire.log)
 
 
+class SessionsHandler(BaseHandler):
+	def prepare(self):
+		# This is only accessible for administrators.
+		if not self.current_user.is_admin():
+			raise tornado.web.HTTPError(403)
+
+	@tornado.web.authenticated
+	def get(self):
+		sessions = self.pakfire.sessions.get_all()
+
+		# Sort the sessions by user.
+		users = {}
+
+		for s in sessions:
+			try:
+				users[s.user].append(s)
+			except KeyError:
+				users[s.user] = [s]
+
+		sessions = sorted(users.items())
+
+		self.render("sessions/index.html", sessions=sessions)
+
+
 class RepositoryDetailHandler(BaseHandler):
 	def get(self, distro, repo):
 		distro = self.pakfire.distros.get_by_name(distro)

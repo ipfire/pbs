@@ -1,0 +1,61 @@
+{% extends "../base.html" %}
+
+{% block title %}{{ _("Sessions") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/sessions">{{ _("Sessions") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h2>{{ _("Sessions") }}</h2>
+	</div>
+
+	<table class="table table-striped table-hover">
+		<tbody>
+			{% for user, user_sessions in sessions %}
+				<tr>
+					<td>
+						<div class="ac">
+							<img class="img-polaroid" src="{{ user.gravatar_icon(96) }}" alt="{{ user.realname }}">
+							<br><br>
+							<a href="/user/{{ user.name }}">{{ user.realname }}</a>
+						</div>
+					</td>
+					<td>
+						<table class="table table-striped table-hover">
+							<thead>
+								<tr>
+									<th>{{ _("Started") }}</th>
+									<th>{{ _("Valid until") }}</th>
+									<th>{{ _("Last seen at") }}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for s in user_sessions %}
+									<tr>
+										<td>
+											{{ format_date(s.creation_time) }}
+										</td>
+										<td>
+											{{ format_date(s.valid_until) }}
+										</td>
+										<td>
+											{{ s.from_address or _("N/A") }}
+										</td>
+									</tr>
+								{% end %}
+							</tbody>
+						</table>
+					</td>
+				</tr>
+			{% end %}
+		</tbody>
+	</table>
+{% end block %}

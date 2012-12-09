@@ -28,7 +28,7 @@ class LoginHandler(BaseHandler):
 			session = backend.sessions.Session.create(self.pakfire, user)
 
 			# Set a cookie and update the current user.
-			self.set_cookie("session_id", session.id)
+			self.set_cookie("session_id", session.id, expires=session.valid_until)
 			self._current_user = user
 
 			# If there is "next" given, we redirect the user accordingly.
@@ -117,7 +117,7 @@ class ActivationHandler(BaseHandler):
 				session = backend.sessions.Session.create(self.pakfire, user)
 
 				# Set a cookie and update the current user.
-				self.set_cookie("session_id", session.id)
+				self.set_cookie("session_id", session.id, expires=session.valid_until)
 				self._current_user = user
 
 			self.render("register-activation-success.html", user=user)

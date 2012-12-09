@@ -12,7 +12,6 @@ import traceback
 
 import backend
 import backend.misc
-import backend.sessions
 
 class BaseHandler(tornado.web.RequestHandler):
 	@property
@@ -24,21 +23,23 @@ class BaseHandler(tornado.web.RequestHandler):
 		if not session_id:
 			return
 
-		try:
-			self.session = backend.sessions.Session(self.pakfire, session_id)
-		except:
+		# Get the session from the database.
+		session = self.pakfire.sessions.get(session_id)
+
+		# Return nothing, if no session was found.
+		if not session:
 			return
 
 		# Update the session lifetime.
-		# XXX refresh cookie, too
-		self.session.refresh()
+		session.refresh(self.request.remote_ip)
+		self.set_cookie("session_id", session.id, expires=session.valid_until)
 
 		# If the session impersonated a user, we return that one.
-		if self.session.impersonated_user:
-			return self.session.impersonated_user
+		if session.impersonated_user:
+			return session.impersonated_user
 
 		# By default, we return the user of this session.
-		return self.session.user
+		return session.user
 
 	def get_user_locale(self):
 		DEFAULT_LOCALE = tornado.locale.get("en_US")
@@ -93,6 +94,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	@property
 	def render_args(self):
+		session = None
+		if self.current_user:
+			session = self.current_user.session
+
 		ret = {
 			"bugtracker"      : self.pakfire.bugzilla,
 			"hostname"        : self.request.host,
@@ -103,11 +108,9 @@ class BaseHandler(tornado.web.RequestHandler):
 			"format_filemode" : backend.misc.format_filemode,
 			"lang"            : self.locale.code[:2],
 			"pakfire_version" : pakfire.__version__,
+			"session"         : session,
 			"year"            : time.strftime("%Y"),
 		}
-
-		# Add session.
-		ret["session"] = getattr(self, "session", None)
 
 		return ret
 

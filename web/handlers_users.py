@@ -29,7 +29,8 @@ class UserImpersonateHandler(BaseHandler):
 		action = self.get_argument("action", "start")
 
 		if action == "stop":
-			self.session.stop_impersonation()
+			if self.current_user.session:
+				self.current_user.session.stop_impersonation()
 			self.redirect("/")
 			return
 
@@ -55,7 +56,8 @@ class UserImpersonateHandler(BaseHandler):
 		if not user:
 			raise tornado.web.HTTPError(404, "User does not exist: %s" % username)
 
-		self.session.start_impersonation(user)
+		if self.current_user.session:
+			self.current_user.session.start_impersonation(user)
 
 		# Redirect to start page.
 		self.redirect("/")

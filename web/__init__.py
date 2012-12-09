@@ -226,6 +226,9 @@ class Application(tornado.web.Application):
 			# Log
 			(r"/log", LogHandler),
 
+			# Sessions
+			(r"/sessions", SessionsHandler),
+
 		] + static_handlers + [
 
 			# Everything else is catched by the 404 handler.

@@ -922,3 +922,19 @@ class DeleteManager(Manager):
 
 
 managers.append(DeleteManager)
+
+class SessionsManager(Manager):
+	"""
+		Cleans up sessions that are not valid anymore.
+		Keeps the database smaller.
+	"""
+
+	@property
+	def timeout(self):
+		return 3600
+
+	def do(self):
+		self.pakfire.sessions.cleanup()
+
+
+managers.append(SessionsManager)

@@ -220,10 +220,19 @@ class User(base.Object):
 		base.Object.__init__(self, pakfire)
 		self.id = id
 
+		# A valid session of the user.
+		self.session = None
+
 		# Cache.
 		self._data = None
 		self._emails = None
 		self._perms = None
+
+	def __repr__(self):
+		return "<%s %s>" % (self.__class__.__name__, self.realname)
+
+	def __hash__(self):
+		return hash(self.id)
 
 	def __cmp__(self, other):
 		if other is None:

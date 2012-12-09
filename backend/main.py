@@ -19,6 +19,7 @@ import mirrors
 import packages
 import repository
 import settings
+import sessions
 import sources
 import updates
 import uploads
@@ -50,6 +51,7 @@ class Pakfire(object):
 		self.mirrors     = mirrors.Mirrors(self)
 		self.packages    = packages.Packages(self)
 		self.repos       = repository.Repositories(self)
+		self.sessions    = sessions.Sessions(self)
 		self.sources     = sources.Sources(self)
 		self.updates     = updates.Updates(self)
 		self.uploads     = uploads.Uploads(self)

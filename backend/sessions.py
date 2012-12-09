@@ -14,6 +14,21 @@ class Sessions(base.Object):
 
 		return session
 
+	def get_all(self):
+		query = "SELECT session_id FROM sessions WHERE valid_until >= NOW() \
+			ORDER BY valid_until DESC"
+
+		sessions = []
+		for s in self.db.query(query):
+			s = Session(self.pakfire, s.session_id)
+			sessions.append(s)
+
+		return sessions
+
+	def cleanup(self):
+		# Delete all sessions that are not valid any more.
+		self.db.execute("DELETE FROM sessions WHERE valid_until < NOW()")
+
 
 class Session(base.Object):
 	def __init__(self, pakfire, session_id):
@@ -32,9 +47,6 @@ class Session(base.Object):
 		self._user = None
 		self._impersonated_user = None
 
-		# Update the valid time of the session.
-		#self.update()
-
 	@staticmethod
 	def has_session(pakfire, session_id):
 		if self.db.get("SELECT session_id FROM sessions WHERE session_id = %s \
@@ -43,24 +55,33 @@ class Session(base.Object):
 
 		return False
 
-	def refresh(self):
-		self.db.execute("UPDATE sessions SET valid_until = DATE_ADD(NOW(), INTERVAL 3 DAY) \
-			WHERE session_id = %s", self.id)
+	def refresh(self, address=None):
+		self.db.execute("UPDATE sessions \
+			SET valid_until = DATE_ADD(NOW(), INTERVAL 3 DAY), from_address = %s \
+			WHERE session_id = %s", address, self.id)
 
 	def destroy(self):
 		self.db.execute("DELETE FROM sessions WHERE session_id = %s", self.id)
-
-	@staticmethod
-	def cleanup(pakfire):
-		# Remove all sessions that are no more valid.
-		pakfire.db.execute("DELETE FROM sessions WHERE valid_until < NOW()")
 
 	@property
 	def user(self):
 		if self._user is None:
 			self._user = users.User(self.pakfire, self.data.user_id)
+			self._user.session = self
 
 		return self._user
+
+	@property
+	def creation_time(self):
+		return self.data.creation_time
+
+	@property
+	def valid_until(self):
+		return self.data.valid_until
+
+	@property
+	def from_address(self):
+		return self.data.from_address
 
 	@property
 	def impersonated_user(self):
@@ -70,6 +91,7 @@ class Session(base.Object):
 		if self._impersonated_user is None:
 			self._impersonated_user = \
 				users.User(self.pakfire, self.data.impersonated_user_id)
+			self._impersonated_user.session = self
 
 		return self._impersonated_user
 
