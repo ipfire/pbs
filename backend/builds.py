@@ -181,6 +181,7 @@ class Builds(base.Object):
 			WHERE NOT EXISTS \
 				(SELECT * FROM jobs WHERE \
 					jobs.build_id = builds.id AND \
+					jobs.arch_id = %s AND \
 					(jobs.state != 'finished' OR \
 					jobs.time_finished >= %s) \
 				) \
@@ -193,7 +194,7 @@ class Builds(base.Object):
 					jobs.time_finished < %s \
 				) \
 			AND builds.type = 'release' AND NOT builds.state = 'broken'"
-		args  = [threshold, arch.id, threshold]
+		args  = [arch.id, threshold, arch.id, threshold]
 
 		if randomize:
 			query += " ORDER BY RAND()"
