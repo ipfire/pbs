@@ -32,21 +32,21 @@
 	<ul class="pager">
 		{% if have_prev %}
 			<li class="previous">
-				<a href="?offset={{ offset - limit }}&limit={{ limit }}">&larr; {{ _("Older") }}</a>
+				<a href="?offset={{ offset - limit }}&limit={{ limit }}">&larr; {{ _("Newer") }}</a>
 			</li>
 		{% else %}
 			<li class="previous disabled">
-				<a href="#">&larr; {{ _("Older") }}</a>
+				<a href="#">&larr; {{ _("Newer") }}</a>
 			</li>
 		{% end %}
 
 		{% if have_next %}
 			<li class="next">
-				<a href="?offset={{ offset + limit }}&limit={{ limit }}">{{ _("Newer") }} &rarr;</a>
+				<a href="?offset={{ offset + limit }}&limit={{ limit }}">{{ _("Older") }} &rarr;</a>
 			</li>
 		{% else %}
 			<li class="next disabled">
-				<a href="#">{{ _("Newer") }} &rarr;</a>
+				<a href="#">{{ _("Older") }} &rarr;</a>
 			</li>
 		{% end %}
 	</ul>
