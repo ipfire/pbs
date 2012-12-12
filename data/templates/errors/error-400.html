@@ -1,0 +1,17 @@
+{% extends "error.html" %}
+
+{% block bigbox_headline %}
+	{{ _("400 - Bad request") }}
+{% end block %}
+
+{% block bigbox_subtitle %}
+	<small>{{ _("Invalid data has been passed to the application.") }}</small>
+{% end block %}
+
+{% block explanation %}
+	<p>
+		{{ _("The application refused to go on with the provided data that was sent in this request.") }}
+	</p>
+{% end block %}
+
+{% block message %}{% end block %}

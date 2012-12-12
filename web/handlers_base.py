@@ -123,15 +123,15 @@ class BaseHandler(tornado.web.RequestHandler):
 		return tornado.web.RequestHandler.render_string(self, *args, **kwargs)
 
 	def get_error_html(self, status_code, exception=None, **kwargs):
-		error_document = "error.html"
+		error_document = "errors/error.html"
 
 		kwargs.update({
 			"code"      : status_code,
 			"message"   : httplib.responses[status_code],
 		})
 
-		if status_code in (403, 404):
-			error_document = "error-%s.html" % status_code
+		if status_code in (400, 403, 404):
+			error_document = "errors/error-%s.html" % status_code
 
 		# Collect more information about the exception if possible.
 		if exception:
