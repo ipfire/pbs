@@ -269,6 +269,39 @@ class Builds(base.Object):
 
 		return builds
 
+	def get_comments(self, limit=10, offset=None, user=None):
+		query = "SELECT * FROM builds_comments \
+			JOIN users ON builds_comments.user_id = users.id"
+		args = []
+
+		wheres = []
+		if user:
+			wheres.append("users.id = %s")
+			args.append(user.id)
+
+		if wheres:
+			query += " WHERE %s" % " AND ".join(wheres)
+
+		# Sort everything.
+		query += " ORDER BY time_created DESC"
+
+		# Limits.
+		if limit:
+			if offset:
+				query += " LIMIT %s,%s"
+				args.append(offset)
+			else:
+				query += " LIMIT %s"
+
+			args.append(limit)
+
+		comments = []
+		for comment in self.db.query(query, *args):
+			comment = logs.CommentLogEntry(self.pakfire, comment)
+			comments.append(comment)
+
+		return comments
+
 
 class Build(base.Object):
 	def __init__(self, pakfire, id, data=None):

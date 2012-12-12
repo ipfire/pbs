@@ -3,6 +3,25 @@
 {% block title %}{{ _("Builds") }}{% end block %}
 
 {% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/builds">{{ _("Builds") }}</a>
+		</li>
+	</ul>
+
+	<ul class="nav nav-pills pull-right">
+		<li>
+			<a href="/builds/comments">{{ _("Comments") }}</a>
+		</li>
+		<li>
+			<a href="/builds/filter">{{ _("Filter builds") }}</a>
+		</li>
+	</ul>
+
 	<div class="page-header">
 		<h2>{{ _("Builds") }}</h2>
 	</div>

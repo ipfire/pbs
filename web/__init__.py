@@ -110,7 +110,6 @@ class Application(tornado.web.Application):
 
 			# User profiles
 			(r"/users", UsersHandler),
-			(r"/users/comments", UsersCommentsHandler),
 			(r"/user/impersonate", UserImpersonateHandler),
 			(r"/user/(\w+)/passwd", UserPasswdHandler),
 			(r"/user/(\w+)/delete", UserDeleteHandler),
@@ -136,6 +135,8 @@ class Application(tornado.web.Application):
 			(r"/builds", BuildsHandler),
 			(r"/builds/filter", BuildFilterHandler),
 			(r"/builds/queue", BuildQueueHandler),
+			(r"/builds/comments", BuildsCommentsHandler),
+			(r"/builds/comments/(\w+)", BuildsCommentsHandler),
 			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", BuildDetailHandler),
 			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/bugs", BuildBugsHandler),
 			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/manage", BuildManageHandler),

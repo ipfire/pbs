@@ -407,13 +407,14 @@ class LogEntryModule(UIModule):
 		else:
 			template = "modules/log-entry.html"
 
-		return self.render_string(template, entry=entry, u=entry.user, **args)
+		return self.render_string(template, entry=entry, u=entry.user,
+			show_build=False, **args)
 
 
 class LogEntryCommentModule(LogEntryModule):
-	def render(self, entry, **args):
+	def render(self, entry, show_build=False, **args):
 		return self.render_string("modules/log-entry-comment.html",
-			entry=entry, u=entry.user, **args)
+			entry=entry, u=entry.user, show_build=show_build, **args)
 
 
 class MaintainerModule(UIModule):

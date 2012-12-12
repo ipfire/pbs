@@ -126,6 +126,37 @@ class BuildBugsHandler(BaseHandler):
 		self.redirect("/build/%s/bugs" % build.uuid)
 
 
+class BuildsCommentsHandler(BaseHandler):
+	def get(self, user_name=None):
+		user = None
+		if user_name:
+			user = self.pakfire.users.get_by_name(user_name)
+
+		limit  = self.get_argument("limit", 10)
+		offset = self.get_argument("offset", 0)
+
+		try:
+			limit  = int(limit)
+			offset = int(offset)
+		except:
+			raise tornado.web.HTTPError(400)
+
+		# Try to get one more comment than requested and check if there
+		# is a next page that it to be shown.
+		comments = self.pakfire.builds.get_comments(limit=limit + 1,
+			offset=offset, user=user)
+
+		# Set markers for next and prev pages.
+		have_next = len(comments) > limit
+		have_prev = offset > limit
+
+		# Remove the extra element from the list.
+		comments = comments[:limit]
+
+		self.render("builds/comments.html", comments=comments, limit=limit,
+			offset=offset + limit, user=user, have_prev=have_prev, have_next=have_next)
+
+
 class BuildStateHandler(BaseHandler):
 	def get(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)

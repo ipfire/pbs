@@ -22,6 +22,12 @@
 						{% else %}
 							<a href="/user/{{ entry.user.name }}">{{ entry.user.realname }}</a>
 						{% end %}
+
+						{% if show_build %}
+							<small>-
+								<a href="/build/{{ entry.build.uuid }}">{{ entry.build.name }}</a>
+							</small>
+						{% end %}
 					</h4>
 				{% end %}
 			{% end block %}

@@ -473,19 +473,6 @@ class User(base.Object):
 
 		self.pakfire.messages.add("%s <%s>" % (self.realname, self.email), subject, message)
 
-	def get_comments(self, limit=5):
-		comments = self.db.query("""SELECT * FROM builds_comments
-			WHERE user_id = %s ORDER BY time_created DESC LIMIT %s""", self.id, limit)
-
-		return comments
-
-	@property
-	def log(self):
-		return self.get_history(limit=15)
-
-	def get_history(self, limit=None):
-		return [] # XXX TODO
-
 
 # Some testing code.
 if __name__ == "__main__":

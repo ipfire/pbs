@@ -80,6 +80,14 @@ class CommentLogEntry(LogEntry):
 		return self.data.credit
 
 	@property
+	def build_id(self):
+		return self.data.build_id
+
+	@property
+	def build(self):
+		return self.pakfire.builds.get_by_id(self.build_id)
+
+	@property
 	def vote(self):
 		if self.credit > 0:
 			return "up"

@@ -1,0 +1,84 @@
+{% extends "../base.html" %}
+
+{% block title %}{{ _("Build comments") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/builds">{{ _("Builds") }}</a>
+			<span class="divider">/</span>
+		</li>
+		{% if user %}
+			<li>
+				<a href="/builds/comments">{{ _("Comments") }}</a>
+				<span class="divider">/</span>
+			</li>
+			<li class="active">
+				<a href="/builds/comments/{{ user.name }}">{{ user.realname }}</a>
+			</li>
+		{% else %}
+			<li class="active">
+				<a href="/builds/comments">{{ _("Comments") }}</a>
+			</li>
+		{% end %}
+	</ul>
+
+	{% if user %}
+		<ul class="nav nav-pills pull-right">
+			<li>
+				<a href="/builds/comments">{{ _("Show all comments") }}</a>
+			</li>
+		</ul>
+	{% end %}
+
+	<div class="page-header">
+		{% if user %}
+			<h2>{{ _("%s's latest comments") % user.firstname }}</h2>
+		{% else %}
+			<h2>{{ _("Build comments") }}</h2>
+		{% end %}
+	</div>
+
+	{% if comments %}	
+		<p>
+			{% if user %}
+				{{ _("This page shows %s's latest comments.") % user.firstname }}
+			{% else %}
+				{{ _("This page shows the latest comments on builds.") }}
+			{% end %}
+			{{ _("The Pakfire Build Service is all about social development and so, communicating with eath others is important. Please join.") }}
+		</p>
+
+		{% module Log(comments, show_build=True) %}
+
+		<ul class="pager">
+			{% if have_prev %}
+				<li class="previous">
+					<a href="?offset={{ offset - limit }}&limit={{ limit }}">&larr; {{ _("Newer") }}</a>
+				</li>
+			{% else %}
+				<li class="previous disabled">
+					<a href="#">&larr; {{ _("Newer") }}</a>
+				</li>
+			{% end %}
+
+			{% if have_next %}
+				<li class="next">
+					<a href="?offset={{ offset + limit }}&limit={{ limit }}">{{ _("Older") }} &rarr;</a>
+				</li>
+			{% else %}
+				<li class="next disabled">
+					<a href="#">{{ _("Older") }} &rarr;</a>
+				</li>
+			{% end %}
+		</ul>
+	{% elif not comments and user %}
+		<p class="muted">
+			{{ _("%s did not comment on anything, yet.") % user.firstname }}
+		</p>
+	{% end %}
+{% end block %}

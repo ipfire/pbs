@@ -17,10 +17,7 @@ class UserHandler(BaseHandler):
 			if not user:
 				raise tornado.web.HTTPError(404, "User does not exist: %s" % name)
 
-		log = user.get_history(limit=10)
-		comments = user.get_comments(limit=5)
-
-		self.render("user-profile.html", user=user, log=log, comments=comments)
+		self.render("user-profile.html", user=user)
 
 
 class UserImpersonateHandler(BaseHandler):
@@ -216,14 +213,6 @@ class UsersHandler(BaseHandler):
 		users = self.pakfire.users.get_all()
 
 		self.render("user-list.html", users=users)
-
-
-class UsersCommentsHandler(BaseHandler):
-	@tornado.web.authenticated
-	def get(self):
-		comments = self.pakfire.packages.get_comments(limit=20)
-
-		self.render("user-comments.html", comments=comments)
 
 
 class UsersBuildsHandler(BaseHandler):

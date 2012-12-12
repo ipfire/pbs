@@ -18,8 +18,8 @@
 	{% if entry.get_message(current_user) %}
 		{% module Text(entry.get_message(current_user), remove_linebreaks=False) %}
 	{% else %}
-		<p>
-			<em>{{ _("No comment given.") }}</em>
+		<p class="muted">
+			{{ _("No comment given.") }}
 		</p>
 	{% end %}
 {% end %}
