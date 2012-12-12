@@ -50,11 +50,6 @@ class PackageListHandler(BaseHandler):
 
 class PackageNameHandler(BaseHandler):
 	def get(self, name):
-		builds = {
-			"release" : [],
-			"scratch" : [],
-		}
-
 		latest_build = self.pakfire.builds.get_latest_by_name(name, public=self.public)
 
 		if not latest_build:
@@ -66,7 +61,7 @@ class PackageNameHandler(BaseHandler):
 		# Get the latest bugs from bugzilla.
 		bugs = self.pakfire.bugzilla.get_bugs_from_component(name)
 
-		self.render("package-detail-list.html", builds=builds, name=name,
+		self.render("package-detail-list.html", name=name,
 			latest_build=latest_build, pkg=latest_build.pkg,
 			build_times=build_times, bugs=bugs)
 
