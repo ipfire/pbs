@@ -1,16 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _("Build list") }}{% end block %}
+{% block title %}{{ _("Builds") }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Build list") }}</h1>
-	{% module BuildTable(builds, show_user=True) %}
-{% end block %}
+	<div class="page-header">
+		<h2>{{ _("Builds") }}</h2>
+	</div>
 
-{% block sidebar %}
-	<h1>{{ _("Actions") }}</h1>
-	<ul>
-		<li><a href="/builds/queue">{{ _("Job queue") }}</a></li>
-		<li><a href="/builds/filter">{{ _("Filter builds") }}</a></li>
-	</ul>
+	{% module BuildTable(builds, show_user=True) %}
 {% end block %}

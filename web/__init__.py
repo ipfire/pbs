@@ -52,6 +52,7 @@ class Application(tornado.web.Application):
 
 				# Jobs
 				"JobsList"           : JobsListModule,
+				"JobsStatus"         : JobsStatusModule,
 
 				# Packages
 				"PackagesDependencyTable" : PackagesDependencyTableModule,
@@ -75,6 +76,8 @@ class Application(tornado.web.Application):
 				"UpdatesTable"       : UpdatesTableModule,
 				"UsersTable"         : UsersTableModule,
 				"WatchersSidebarTable" : WatchersSidebarTableModule,
+
+				"HeadingDate"        : HeadingDateModule,
 
 				"SelectLocale"       : SelectLocaleModule,
 				"SelectTimezone"     : SelectTimezoneModule,

@@ -1,20 +1,12 @@
 {% extends "base.html" %}
 
+{% block title %}{{ _("Builds by %s") % user.realname }}{% end block %}
+
 {% block body %}
-	<h1>{{ _("Builds by %s") % user.realname }}</h1>
+	<div class="page-header">
+		<h2>{{ _("Builds by %s") % user.realname }}</h2>
+	</div>
 
-	{% if builds %}
-
-		{% for order, items in sorted(builds.items()) %}
-			{{ order }}
-
-			{% module BuildTable(items) %}
-		{% end %}
-
-	{% else %}
-
-		{{ _("No builds found matching your search criteria.") }}
-
-	{% end %}
+	{% module BuildTable(builds) %}
 {% end block %}
 

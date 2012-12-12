@@ -3,6 +3,7 @@ $(document).ready(function() {
 	window.prettyPrint && prettyPrint()
 
 	// Activate tooltips.
+	$("a[rel=tooltip]").tooltip();
 	$("span[rel=tooltip]").tooltip();
 });
 

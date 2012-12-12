@@ -1,88 +1,85 @@
-{% if builds %}
+{% if dates %}
 	<table class="table table-striped table-hover">
-		<thead>
-			<tr>
-				<th>{{ _("Build") }}</th>
-				<th>{{ _("Jobs") }}</th>
-				{% if show_repo %}
-					<th>{{ _("Repository") }}</th>
-				{% end %}
-				{% if show_user %}
-					<th>{{ _("User") }}</th>
-				{% end %}
-				{% if show_when %}
-					<th>{{ _("When") }}</th>
-				{% end %}
-			</tr>
-		</thead>
 		<tbody>
-			{% for build in builds %}
-			 	<tr class="build build_state_{{ build.state }}">
-			 		<td class="name">
-						<a class="build {{ build.type }} {{ build.state }} {% if build.is_broken() %}line-through{% end %}"
-							href="/build/{{ build.uuid }}">{{ build.name }}</a>
+			{% for date, builds in dates %}
+				<tr>
+					<td colspan="4">
+						<h4>
+							{% module HeadingDate(date) %}
+							<small>({{ len(builds) }})</small>
+						</h4>
 					</td>
-
-					<td class="jobs">
-						{% if build.jobs %}
-							{% for job in build.jobs %}
-									<a class="job {{ job.state }}" title="{{ job.state }}"
-										href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
-							{% end %}
-						{% else %}
-							{{ _("This build has got no jobs.") }}
-						{% end %}
-					</td>
-
+				</tr>
+				<tr>
+					<th>{{ _("Build") }}</th>
+					<th>{{ _("Jobs") }}</th>
 					{% if show_repo %}
-						<td>
-							{% if build.repo %}
-								<a href="/distro/{{ build.distro.identifier }}">{{ build.distro.name }}</a>
-								/
-								<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
-							{% else %}
-								&nbsp;
-							{% end %}
-						</td>
+						<th>{{ _("Repository") }}</th>
 					{% end %}
-
 					{% if show_user %}
-						{% if build.type == "scratch" and build.user %}
-							<td class="user">
-								{% module Maintainer(build.user) %}
-							</td>
-						{% elif build.type == "release" %}
-							<td>{% module Maintainer(build.pkg.maintainer) %}</td>
-						{% else %}
-							<td>&nbsp;</td>
-						{% end %}
+						<th>{{ _("User") }}</th>
 					{% end %}
-
 					{% if show_when %}
-						<td>
-							{{ format_date(build.created, relative=True) }}
-						</td>
-					{% end %}
-
-					{% if show_repo_time %}
-						<td class="time">
-							{{ format_date(build.repo_time, relative=False) }}
-						</td>
-					{% end %}
-
-					{% if show_can_move_forward %}
-						<td class="can-move-forward">
-							{{ build.can_move_forward }}
-						</td>
+						<th>{{ _("Created") }}</th>
 					{% end %}
 				</tr>
+
+				{% for build in builds %}
+				 	<tr>
+				 		<td class="name">
+							<a class="build {{ build.type }} {{ build.state }} {% if build.is_broken() %}line-through{% end %}"
+								href="/build/{{ build.uuid }}">{{ build.name }}</a>
+						</td>
+
+						<td>
+							{% module JobsStatus(build) %}
+						</td>
+
+						{% if show_repo %}
+							<td>
+								{% if build.repo %}
+									<a href="/distro/{{ build.distro.identifier }}">{{ build.distro.name }}</a> /
+									<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
+								{% end %}
+							</td>
+						{% end %}
+
+						{% if show_user %}
+							{% if build.type == "scratch" and build.user %}
+								<td>
+									{% module Maintainer(build.user) %}
+								</td>
+							{% elif build.type == "release" %}
+								<td>{% module Maintainer(build.pkg.maintainer) %}</td>
+							{% else %}
+								<td></td>
+							{% end %}
+						{% end %}
+
+						{% if show_when %}
+							<td>
+								{{ format_date(build.created, relative=True) }}
+							</td>
+						{% end %}
+
+						{% if show_repo_time %}
+							<td>
+								{{ format_date(build.repo_time, relative=False) }}
+							</td>
+						{% end %}
+
+						{% if show_can_move_forward %}
+							<td>
+								{{ build.can_move_forward }}
+							</td>
+						{% end %}
+					</tr>
+				{% end %}
 			{% end %}
 		</tbody>
 	</table>
 {% else %}
-	<div class="message message-warning">
-		<span>{{ _("No builds") }}</span>
-		{{ _("There are no builds to show at this place.") }}
-		{{ _("Possibly you need to adjust your search.") }}
-	</div>
+	<p class="muted ac">
+		{{ _("There are no builds to show at this place right now.") }}
+	</p>
 {% end %}

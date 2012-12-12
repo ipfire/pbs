@@ -6,7 +6,13 @@ from handlers_base import BaseHandler
 
 class BuildsHandler(BaseHandler):
 	def get(self):
-		builds = self.pakfire.builds.get_all(limit=50)
+		limit = self.get_argument("limit", None)
+		try:
+			limit = int(limit)
+		except (TypeError, ValueError):
+			limit = 25
+
+		builds = self.pakfire.builds.get_all(limit=limit)
 
 		self.render("build-index.html", builds=builds)
 

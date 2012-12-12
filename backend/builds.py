@@ -58,8 +58,8 @@ def import_from_package(_pakfire, filename, distro=None, commit=None, type="rele
 
 
 class Builds(base.Object):
-	def get_by_id(self, id):
-		return Build(self.pakfire, id)
+	def get_by_id(self, id, data=None):
+		return Build(self.pakfire, id, data=data)
 
 	def get_by_uuid(self, uuid):
 		build = self.db.get("SELECT id FROM builds WHERE uuid = %s LIMIT 1", uuid)
@@ -68,14 +68,14 @@ class Builds(base.Object):
 			return self.get_by_id(build.id)
 
 	def get_all(self, limit=50):
-		query = "SELECT id FROM builds ORDER BY time_created DESC"
+		query = "SELECT * FROM builds ORDER BY time_created DESC"
 
 		if limit:
 			query += " LIMIT %d" % limit
 
-		return [self.get_by_id(b.id) for b in self.db.query(query)]
+		return [self.get_by_id(b.id, b) for b in self.db.query(query)]
 
-	def get_by_user_iter(self, user, type=None, public=None, order_by="name"):
+	def get_by_user(self, user, type=None, public=None):
 		args = []
 		conditions = []
 
@@ -92,19 +92,20 @@ class Builds(base.Object):
 		elif public is False:
 			conditions.append("public = 'N'")
 
-		query = "SELECT builds.id AS id FROM builds \
+		query = "SELECT builds.* AS id FROM builds \
 			JOIN packages ON builds.pkg_id = packages.id"
 
 		if conditions:
 			query += " WHERE %s" % " AND ".join(conditions)
 
-		if order_by == "name":
-			query += " ORDER BY packages.name ASC"
-		elif order_by == "date":
-			query += " ORDER BY builds.time_created DESC"
+		query += " ORDER BY builds.time_created DESC"
 
+		builds = []
 		for build in self.db.query(query, *args):
-			yield Build(self.pakfire, build.id)
+			build = Build(self.pakfire, build.id, build)
+			builds.append(build)
+
+		return builds
 
 	def get_by_name(self, name, type=None, public=None, user=None):
 		args = [name,]
@@ -551,11 +552,31 @@ class Build(base.Object):
 		return self.data.time_created
 
 	@property
+	def date(self):
+		return self.created.date()
+
+	@property
 	def public(self):
 		"""
 			Is this build public?
 		"""
 		return self.data.public == "Y"
+
+	@property
+	def size(self):
+		"""
+			Returns the size on disk of this build.
+		"""
+		s = 0
+
+		# Add the source package.
+		if self.pkg:
+			s += self.pkg.size
+
+		# Add all jobs.
+		s += sum((j.size for j in self.jobs))
+
+		return s
 
 	#@property
 	#def state(self):
@@ -1619,6 +1640,10 @@ class Job(base.Object):
 	@property
 	def name(self):
 		return "%s-%s.%s" % (self.pkg.name, self.pkg.friendly_version, self.arch.name)
+
+	@property
+	def size(self):
+		return sum((p.size for p in self.packages))
 
 	def get_state(self):
 		return self.data.state

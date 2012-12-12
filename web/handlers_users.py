@@ -227,39 +227,13 @@ class UsersCommentsHandler(BaseHandler):
 
 
 class UsersBuildsHandler(BaseHandler):
-	def __chunk_by_name(self, _builds):
-		builds = {}
-
-		for build in _builds:
-			i = build.pkg.name[0]
-			try:
-				builds[i].append(build)
-			except KeyError:
-				builds[i] = [build,]
-		
-		return builds
-		#return [v for k,v in sorted(builds.items())]
-
-	def __chunk_by_date(self, _builds):
-		# XXX dummy function
-		builds = {
-			datetime.datetime.utcnow() : _builds,
-		}
-
-		return builds
-
-		for build in _builds:
-			builds.append([build,])
-
-		return builds
-
 	def get(self, name=None):
-		if name:
+		if name is None:
+			user = self.current_user
+		else:
 			user = self.pakfire.users.get_by_name(name)
 			if not user:
 				raise tornado.web.HTTPError(404, "User not found: %s" % name)
-		else:
-			user = self.current_user
 
 		# By default users see only public builds.
 		# Admins are allowed to see all builds.
@@ -267,24 +241,7 @@ class UsersBuildsHandler(BaseHandler):
 		if self.current_user and self.current_user.is_admin():
 			public = None
 
-		# Select the type of the builds that are shown.
-		# None for all.
-		type = self.get_argument("type", None)
-
-		# Select how to order the results. The default is by date.
-		order_by = self.get_argument("order_by", "date")
-		if not order_by in ("date", "name"):
-			order_by = "date"
-
 		# Get a list of the builds this user has built.
-		builds = self.pakfire.builds.get_by_user_iter(user, type=type,
-			public=public, order_by=order_by)
-
-		if builds:
-			# Chunk the list for a better presentation.
-			if order_by == "date":
-				builds = self.__chunk_by_date(builds)
-			elif order_by == "name":
-				builds = self.__chunk_by_name(builds)
+		builds = self.pakfire.builds.get_by_user(user, public=public)
 
 		self.render("user-profile-builds.html", user=user, builds=builds)

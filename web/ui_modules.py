@@ -2,6 +2,7 @@
 
 from __future__ import division
 
+import datetime
 import math
 import pytz
 import re
@@ -99,6 +100,12 @@ class BuildHeadlineModule(UIModule):
 			prefix=prefix, build=build, pkg=build.pkg, short=short, shorter=shorter)
 
 
+class JobsStatusModule(UIModule):
+	def render(self, build):
+		return self.render_string("modules/jobs/status.html",
+			build=build, jobs=build.jobs)
+
+
 class BuildersLoadModule(UIModule):
 	def render(self):
 		load = self.pakfire.builders.get_load()
@@ -135,6 +142,26 @@ class CommitsTableModule(UIModule):
 class FooterModule(UIModule):
 	def render(self):
 		return self.render_string("modules/footer.html")
+
+
+class HeadingDateModule(UIModule):
+	def render(self, date):
+		_ = self.locale.translate
+
+		# Check if this is today.
+		today = datetime.date.today()
+		if date == today:
+			return _("Today")
+
+		# Check if this was yesterday.
+		yesterday = today - datetime.timedelta(days=1)
+		if date == yesterday:
+			return _("Yesterday")
+
+		# Convert date to datetime.
+		date = datetime.datetime(date.year, date.month, date.day)
+
+		return self.locale.format_date(date, shorter=True, relative=False)
 
 
 class PackagesTableModule(UIModule):
@@ -216,8 +243,17 @@ class BuildTableModule(UIModule):
 		)
 		settings.update(kwargs)
 
-		return self.render_string("modules/build-table.html",
-			builds=builds, **settings)
+		dates = {}
+
+		for b in builds:
+			try:
+				dates[b.date].append(b)
+			except KeyError:
+				dates[b.date] = [b,]
+
+		dates = sorted(dates.items(), reverse=True)
+
+		return self.render_string("modules/build-table.html", dates=dates, **settings)
 
 
 class BuildStateWarningsModule(UIModule):
@@ -235,7 +271,7 @@ class JobsBoxesModule(UIModule):
 
 
 class JobStateModule(UIModule):
-	def render(self, job, cls=None, show_icon=False):
+	def render(self, job, cls=None, show_arch=False, show_icon=False, plain=False):
 		state = job.state
 
 		_ = self.locale.translate
@@ -291,8 +327,14 @@ class JobStateModule(UIModule):
 			text = _("Unknown: %s") % state
 			classes.append("muted")
 
+		if plain:
+			return text
+
 		if cls:
 			classes.append(cls)
+
+		if show_arch:
+			text = job.arch.name
 
 		if show_icon and icon:
 			text = """<i class="%s"></i> %s""" % (icon, text)
