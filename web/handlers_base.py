@@ -49,7 +49,7 @@ class BaseHandler(tornado.web.RequestHandler):
 	def get_user_locale(self):
 		DEFAULT_LOCALE = tornado.locale.get("en_US")
 		ALLOWED_LOCALES = \
-			[tornado.locale.get(l) for l in tornado.locale.get_supported_locales(None)]
+			[tornado.locale.get(l) for l in tornado.locale.get_supported_locales()]
 
 		# One can append "?locale=de" to mostly and URI on the site and
 		# another output that guessed.
