@@ -470,14 +470,14 @@ class Package(base.Object):
 
 	@property
 	def build(self):
+		if self.job:
+			return self.job.build
+
 		build = self.db.get("SELECT id FROM builds \
 			WHERE type = 'release' AND pkg_id = %s", self.id)
 
 		if build:
 			return builds.Build(self.pakfire, build.id)
-
-		if self.job:
-			return self.job.build
 
 	@property
 	def job(self):
