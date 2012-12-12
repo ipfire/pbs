@@ -41,6 +41,11 @@ class BaseHandler(tornado.web.RequestHandler):
 		# By default, we return the user of this session.
 		return session.user
 
+	@property
+	def session(self):
+		if self.current_user:
+			return self.current_user.session
+
 	def get_user_locale(self):
 		DEFAULT_LOCALE = tornado.locale.get("en_US")
 		ALLOWED_LOCALES = \
