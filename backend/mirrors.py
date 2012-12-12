@@ -14,37 +14,37 @@ class GeoIP(object):
 
 		self.db = self.pakfire.geoip_db
 
-	@property
-	def cache(self):
-		return self.pakfire.cache
-
 	def __encode_ip(self, addr):
 		# We get a tuple if there were proxy headers.
 		addr = addr.split(", ")
 		if addr:
 			addr = addr[-1]
 
-		# ip is calculated as described in http://ipinfodb.com/ip_database.php
-		a1, a2, a3, a4 = addr.split(".")
+		# ip is calculated as described in http://dev.maxmind.com/geoip/csv
+		try:
+			a1, a2, a3, a4 = addr.split(".")
 
-		return int(((int(a1) * 256 + int(a2)) * 256 + int(a3)) * 256 + int(a4) + 100)
+			a1 = int(a1)
+			a2 = int(a2)
+			a3 = int(a3)
+			a4 = int(a4)
+		except:
+			return 0
+
+		return (16777216 * a1) + (65536 * a2) + (256 * a3) + a4
 
 	def get_all(self, addr):
 		addr = self.__encode_ip(addr)
 
-		mem_id = "geoip-all-%s" % addr
-		ret = self.cache.get(mem_id)
-
-		if not ret:
-			ret = self.db.get("SELECT * FROM locations \
-				JOIN ip_group_city ON ip_group_city.location = locations.id \
-				WHERE ip_group_city.ip_start <= %s \
-				ORDER BY ip_group_city.ip_start DESC LIMIT 1", addr)
-
-			self.cache.set(mem_id, ret, 3600)
+		ret = self.db.get("\
+			SELECT * FROM locations \
+				JOIN addresses ON addresses.location = locations.id \
+			WHERE \
+				%s BETWEEN addresses.start_ip_num AND addresses.end_ip_num \
+			LIMIT 1", addr)
 
 		# If location was not determinable
-		if ret.latitude == 0 and ret.longitude == 0:
+		if ret and ret.latitude == 0 and ret.longitude == 0:
 			return None
 
 		return ret
