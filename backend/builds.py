@@ -1267,8 +1267,8 @@ class Build(base.Object):
 
 
 class Jobs(base.Object):
-	def get_by_id(self, id):
-		return Job(self.pakfire, id)
+	def get_by_id(self, id, data=None):
+		return Job(self.pakfire, id, data)
 
 	def get_by_uuid(self, uuid):
 		job = self.db.get("SELECT id FROM jobs WHERE uuid = %s", uuid)
