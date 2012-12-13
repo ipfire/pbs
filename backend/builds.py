@@ -193,7 +193,8 @@ class Builds(base.Object):
 					jobs.state = 'finished' AND \
 					jobs.time_finished < %s \
 				) \
-			AND builds.type = 'release' AND NOT builds.state = 'broken'"
+			AND builds.type = 'release' \
+			AND (builds.state = 'stable' OR builds.state = 'testing')"
 		args  = [arch.id, threshold, arch.id, threshold]
 
 		if randomize:
@@ -1302,8 +1303,11 @@ class Jobs(base.Object):
 		# Return sorted list of jobs.
 		return sorted(jobs)
 
-	def get_active(self, host_id=None, uploads=True):
-		running_states = ["dispatching", "new", "pending", "running"]
+	def get_active(self, host_id=None, uploads=True, running_only=False):
+		running_states = ["dispatching", "running"]
+
+		if not running_only:
+			running_states += ["new", "pending",]
 
 		if uploads:
 			running_states.append("uploading")
@@ -2152,7 +2156,7 @@ class Job(base.Object):
 
 		# Create a new pakfire instance with the configuration for
 		# this build.
-		p = pakfire.Pakfire(mode="server", config=config, arch=self.arch.name)
+		p = pakfire.PakfireServer(config=config, arch=self.arch.name)
 
 		# Try to solve the build dependencies.
 		try:

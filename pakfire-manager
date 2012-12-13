@@ -1,54 +1,39 @@
 #!/usr/bin/python
 
-import logging
-import os.path
-import time
-import tornado.ioloop
+import backend.main
+import backend.scheduler
+
+import manager
+
+# Use tornado's logging options.
 import tornado.options
-
-import backend
-from backend.managers import *
-
 tornado.options.parse_command_line()
 
-BASEDIR = os.path.dirname(__file__)
+# main
 
-class Daemon(object):
-	def __init__(self):
-		self._managers = []
+# Create Scheduler instance.
+s = backend.scheduler.Scheduler()
 
-		self.ioloop.set_blocking_log_threshold(300)
+# Create Pakfire instance.
+p = backend.main.Pakfire()
 
-		config_file = os.path.join(BASEDIR, "pbs.conf")
-		self.pakfire = backend.Pakfire(config_file=config_file)
+events = (
+	manager.BugsUpdateEvent,
+	manager.BuildsFailedRestartEvent,
+	manager.CheckBuildDependenciesEvent,
+	manager.CleanupFilesEvent,
+	manager.CreateTestBuildsEvent,
+	manager.MessagesSendEvent,
+	manager.RepositoriesUpdateEvent,
+	manager.SessionsCleanupEvent,
+	manager.SourcesPullEvent,
+	manager.UploadsCleanupEvent,
+)
 
-	@property
-	def ioloop(self):
-		return tornado.ioloop.IOLoop.instance()
+# Add all events to the scheduler.
+for e in events:
+	i = e(p)
+	s.add_event(i)
 
-	def add(self, manager_cls):
-		logging.info("Registering new manager: %s" % manager_cls.__name__)
-		manager = manager_cls(self.pakfire)
-		self._managers.append(manager)
-
-	def run(self):
-		"""
-			Main loop.
-		"""
-		for manager in self._managers:
-			manager.pc.start()
-
-		self.ioloop.start()
-
-	def shutdown(self):
-		self.ioloop.stop()
-
-
-
-
-if __name__ == "__main__":
-	d = Daemon()
-	for manager in managers:
-		d.add(manager)
-
-	d.run()
+# Run the scheduler.
+s.run()
