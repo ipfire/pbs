@@ -333,9 +333,9 @@ class Repository(base.Object):
 
 		return _builds
 
-	def get_packages(self, arch):
+	def _get_packages(self, arch):
 		if arch.name == "src":
-			pkgs = self.db.query("SELECT packages.id AS id FROM packages \
+			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
 				JOIN builds ON builds.pkg_id = packages.id \
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
 				WHERE packages.arch = %s AND repositories_builds.repo_id = %s",
@@ -345,7 +345,7 @@ class Repository(base.Object):
 			noarch = self.pakfire.arches.get_by_name("noarch")
 			assert noarch
 
-			pkgs = self.db.query("SELECT packages.id AS id FROM packages \
+			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
 				JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
 				JOIN jobs ON jobs_packages.job_id = jobs.id \
 				JOIN builds ON builds.id = jobs.build_id \
@@ -354,7 +354,19 @@ class Repository(base.Object):
 				repositories_builds.repo_id = %s",
 				arch.id, noarch.id, self.id)
 
-		return sorted([packages.Package(self.pakfire, p.id) for p in pkgs])
+		return pkgs
+
+	def get_packages(self, arch):
+		pkgs =  [packages.Package(self.pakfire, p.id) for p in self._get_packages(arch)]
+		pkgs.sort()
+
+		return pkgs
+
+	def get_paths(self, arch):
+		paths = [p.path for p in self._get_packages(arch)]
+		paths.sort()
+
+		return paths
 
 	@property
 	def packages(self):

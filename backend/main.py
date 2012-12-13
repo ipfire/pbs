@@ -28,7 +28,7 @@ import users
 from constants import *
 
 class Pakfire(object):
-	def __init__(self, config_file):
+	def __init__(self, config_file="pbs.conf"):
 		# Read configuration file.
 		self.config = self.read_config(config_file)
 
