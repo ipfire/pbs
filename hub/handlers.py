@@ -618,7 +618,7 @@ class BuilderHandler(BuilderAuthMixin, CommonAuthHandler):
 		#	return
 
 		# Check if host has already too many simultaneous jobs.
-		if len(self.builder.get_active_jobs(uploads=False)) >= self.builder.max_jobs:
+		if len(self.builder.get_active_jobs()) >= self.builder.max_jobs:
 			logging.debug("Host has already too many jobs: %s" % \
 				self.builder.name)
 			return
