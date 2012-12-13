@@ -60,8 +60,8 @@
 								{% end %}
 							</td>
 							<td>
-								<p class="{% if builder.active_jobs == 0 %}text-success{% elif builder.active_jobs >= builder.max_jobs %}text-error{% else %}text-warning{% end %}">
-									{{ len(builder.get_active_jobs()) }}/{{ builder.max_jobs }}
+								<p class="{% if builder.count_active_jobs() == 0 %}text-success{% elif builder.count_active_jobs() >= builder.max_jobs %}text-error{% else %}text-warning{% end %}">
+									{{ builder.count_active_jobs() }}/{{ builder.max_jobs }}
 								</p>
 							</td>
 						</tr>

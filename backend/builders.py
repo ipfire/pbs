@@ -537,16 +537,28 @@ class Builder(base.Object):
 
 		return "online"
 
-	@property
-	def active_jobs(self):
-		jobs = self.get_active_jobs()
+	def get_active_jobs(self, count=False):
+		query = self.db.query("\
+			SELECT * FROM jobs \
+			WHERE \
+				jobs.builder_id = %s AND \
+				(jobs.state = 'dispatching' OR jobs.state = 'running' OR jobs.state = 'uploading') \
+			ORDER BY time_started ASC",
+			self.id)
 
-		return len(jobs)
+		if count:
+			return len(query)
 
-	def get_active_jobs(self, uploads=True):
+		jobs = []
+		for job in query:
+			job = self.pakfire.jobs.get_by_id(job.id, job)
+			jobs.append(job)
+
+		return jobs
+
+	def count_active_jobs(self):
 		if self._active_jobs is None:
-			self._active_jobs = \
-				self.pakfire.jobs.get_active(host_id=self.id, uploads=uploads)
+			self._active_jobs = self.get_active_jobs(count=True)
 
 		return self._active_jobs
 
