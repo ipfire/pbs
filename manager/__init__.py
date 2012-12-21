@@ -4,7 +4,7 @@ import base
 
 from bugs         import BugsUpdateEvent
 from builds       import BuildsFailedRestartEvent, CheckBuildDependenciesEvent
-from builds       import CreateTestBuildsEvent
+from builds       import CreateTestBuildsEvent, DistEvent
 from messages     import MessagesSendEvent
 from repositories import RepositoriesUpdateEvent
 from sessions     import SessionsCleanupEvent

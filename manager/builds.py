@@ -2,8 +2,17 @@
 
 import datetime
 import logging
+import pakfire
+import pakfire.config
+import shutil
+import tempfile
+
+import backend.builds
+import backend.git
 
 import base
+
+from pakfire.constants import *
 
 class BuildsFailedRestartEvent(base.Event):
 	# Run when idle.
@@ -64,8 +73,12 @@ class CheckBuildDependencyEvent(base.Event):
 	priority = 3
 
 	def run(self, job_id):
+		self.run_subprocess(self._run, job_id)
+
+	@staticmethod
+	def _run(_pakfire, job_id):
 		# Get the build job we are working on.
-		job = self.pakfire.jobs.get_by_id(job_id)
+		job = _pakfire.jobs.get_by_id(job_id)
 		if not job:
 			logging.debug("Job %s does not exist." % job_id)
 			return
@@ -130,149 +143,77 @@ class CreateTestBuildsEvent(base.Event):
 						break
 
 
-class DistManager(object):
-	process = None
+class DistEvent(base.Event):
+	interval = 60
 
 	first_run = True
 
-	def get_next_commit(self):
-		commits = self.pakfire.sources.get_pending_commits(limit=1)
-
-		if not commits:
-			return
-
-		return commits[0]
-
-	@property
-	def timeout(self):
-		# If there are commits standing in line, we try to restart as soon
-		# as possible.
-		if self.get_next_commit():
-			return 0
-
-		# Otherwise we wait at least for a minute.
-		return 60
-
-	def do(self):
+	def run(self):
 		if self.first_run:
 			self.first_run = False
 
 			self.process = self.init_repos()
 
-		if self.process:
-			# If the process is still running, we check back in a couple of
-			# seconds.
-			if self.process.is_alive():
-				return 1
+		for commit in self.pakfire.sources.get_pending_commits():
+			commit.state = "running"
 
-			# The process has finished its work. Clear everything up and
-			# go on.
-			self.commit = self.process = None
+			logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
 
-		# Search for a new commit to proceed with.
-		self.commit = commit = self.get_next_commit()
+			# Get the repository of this commit.
+			repo = backend.git.Repo(self.pakfire, commit.source_id)
 
-		# If no commit is there, we just wait for a minute.
-		if not commit:
-			return 60
-
-		# Got a commit to process.
-		commit.state = "running"
-
-		logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
-
-		# Get the repository of this commit.
-		repo = backend.git.Repo(self.pakfire, commit.source_id)
-
-		# Make sure, it is checked out.
-		if not repo.cloned:
-			repo.clone()
-
-		# Navigate to the right revision.
-		repo.checkout(commit.revision)
-
-		# Get all changed makefiles.
-		deleted_files = []
-		updated_files = []
-
-		for file in repo.changed_files(commit.revision):
-			# Don't care about files that are not a makefile.
-			if not file.endswith(".%s" % MAKEFILE_EXTENSION):
-				continue
-
-			if os.path.exists(file):
-				updated_files.append(file)
-			else:
-				deleted_files.append(file)
-
-		self.process = self.fork(commit_id=commit.id, updated_files=updated_files,
-			deleted_files=deleted_files)
-
-		return 1
-
-	def fork(self, source_id=None, commit_id=None, updated_files=[], deleted_files=[]):
-		# Create the Process object.
-		process = multiprocessing.Process(
-			target=self._process,
-			args=(source_id, commit_id, updated_files, deleted_files)
-		)
-
-		# The process is running in daemon mode so it will try to kill
-		# all child processes when exiting.
-		process.daemon = True
-
-		# Start the process.
-		process.start()
-		logging.debug("Started new process pid=%s." % process.pid)
-
-		return process
-
-	def init_repos(self):
-		# Create the Process object.
-		process = multiprocessing.Process(
-			target=self._init_repos,
-		)
-
-		# The process is running in daemon mode so it will try to kill
-		# all child processes when exiting.
-		#process.daemon = True
-
-		# Start the process.
-		process.start()
-		logging.debug("Started new process pid=%s." % process.pid)
-
-		return process
-
-	def _init_repos(self):
-		_pakfire = main.Pakfire()
-		sources = _pakfire.sources.get_all()
-
-		for source in sources:
-			if source.revision:
-				continue
-
-			repo = GitRepo(_pakfire, source.id)
+			# Make sure, it is checked out.
 			if not repo.cloned:
 				repo.clone()
 
-			files = repo.get_all_files()
+			# Navigate to the right revision.
+			repo.checkout(commit.revision)
 
-			for file in files:
+			# Get all changed makefiles.
+			deleted_files = []
+			updated_files = []
+
+			for file in repo.changed_files(commit.revision):
+				# Don't care about files that are not a makefile.
 				if not file.endswith(".%s" % MAKEFILE_EXTENSION):
 					continue
 
-				#files = [f for f in files if f.endswith(".%s" % MAKEFILE_EXTENSION)]
+				if os.path.exists(file):
+					updated_files.append(file)
+				else:
+					deleted_files.append(file)
 
-				process = self.fork(source_id=source.id, updated_files=[file,], deleted_files=[])
+			e = DistFileEvent(self.pakfire, None, commit.id, updated_files, deleted_files)
+			self.scheduler.add_event(e)
 
-				while process.is_alive():
-					time.sleep(1)
-					continue
+	def init_repos(self):
+		"""
+			Initialize all repositories.
+		"""
+		for source in self.pakfire.sources.get_all():
+			# Skip those which already have a revision.
+			if source.revision:
+				continue
+
+			# Initialize the repository or and clone it if necessary.
+			repo = backend.git.Repo(self.pakfire, source.id)
+			if not repo.cloned:
+				repo.clone()
+
+			# Get a list of all files in the repository.
+			files = repo.get_all_files()
+
+			for file in [f for f in files if file.endswith(".%s" % MAKEFILE_EXTENSION)]:
+				e = DistFileEvent(self.pakfire, source.id, None, [file,], [])
+				self.scheduler.add_event(e)
+
+
+class DistFileEvent(base.Event):
+	def run(self, *args):
+		self.run_subprocess(self._run, *args)
 
 	@staticmethod
-	def _process(source_id, commit_id, updated_files, deleted_files):
-		_pakfire = main.Pakfire()
-
+	def _run(_pakfire, source_id, commit_id, updated_files, deleted_files):
 		commit = None
 		source = None
 
@@ -296,7 +237,7 @@ class DistManager(object):
 				config = pakfire.config.Config(["general.conf",])
 				config.parse(source.distro.get_config())
 
-				p = pakfire.Pakfire(mode="server", config=config)
+				p = pakfire.PakfireServer(config=config)
 
 				pkgs = []
 				for file in updated_files:
@@ -309,7 +250,7 @@ class DistManager(object):
 				# Import all packages in one swoop.
 				for pkg in pkgs:
 					# Import the package file and create a build out of it.
-					builds.import_from_package(_pakfire, pkg,
+					backend.builds.import_from_package(_pakfire, pkg,
 						distro=source.distro, commit=commit, type="release")
 
 			except:
@@ -322,13 +263,12 @@ class DistManager(object):
 				if os.path.exists(pkg_dir):
 					shutil.rmtree(pkg_dir)
 
-			for file in deleted_files:
-				# Determine the name of the package.
-				name = os.path.basename(file)
-				name = name[:len(MAKEFILE_EXTENSION) + 1]
+		for file in deleted_files:
+			# Determine the name of the package.
+			name = os.path.basename(file)
+			name = name[:len(MAKEFILE_EXTENSION) + 1]
 
-				if commit:
-					commit.distro.delete_package(name)
+			source.distro.delete_package(name)
 
-			if commit:
-				commit.state = "finished"
+		if commit:
+			commit.state = "finished"

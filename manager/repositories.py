@@ -12,8 +12,8 @@ class RepositoriesUpdateEvent(base.Event):
 	priority = 6
 
 	@property
-	def timeout(self):
-		return self.settings.get_int("repository_update_interval", 600)
+	def interval(self):
+		return self.pakfire.settings.get_int("repository_update_interval", 600)
 
 	def run(self):
 		for distro in self.pakfire.distros.get_all():
@@ -32,7 +32,12 @@ class RepositoryUpdateEvent(base.Event):
 	priority = 5
 
 	def run(self, repo_id):
-		repo = self.pakfire.repos.get_by_id(repo_id)
+		# Run this in a new process.
+		self.run_subprocess_background(self.update_repo, repo_id)
+
+	@staticmethod
+	def update_repo(_pakfire, repo_id):
+		repo = _pakfire.repos.get_by_id(repo_id)
 		assert repo
 
 		logging.info("Going to update repository %s..." % repo.name)
@@ -44,7 +49,7 @@ class RepositoryUpdateEvent(base.Event):
 		arches = repo.arches
 
 		# Add the source repository.
-		arches.append(self.pakfire.arches.get_by_name("src"))
+		arches.append(_pakfire.arches.get_by_name("src"))
 
 		for arch in arches:
 			changed = False
@@ -111,7 +116,7 @@ class RepositoryUpdateEvent(base.Event):
 
 			p.repo_create(repo_path, source_files,
 				name="%s - %s.%s" % (repo.distro.name, repo.name, arch.name),
-				key_id=key_id, type=arch.build_type)
+				key_id=key_id)
 
 			# Remove files afterwards.
 			for file in remove_files:
@@ -121,4 +126,3 @@ class RepositoryUpdateEvent(base.Event):
 					os.remove(file)
 				except OSError:
 					logging.warning("Could not remove %s." % file)
-

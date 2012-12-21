@@ -23,6 +23,7 @@ events = (
 	manager.CheckBuildDependenciesEvent,
 	manager.CleanupFilesEvent,
 	manager.CreateTestBuildsEvent,
+	manager.DistEvent,
 	manager.MessagesSendEvent,
 	manager.RepositoriesUpdateEvent,
 	manager.SessionsCleanupEvent,
