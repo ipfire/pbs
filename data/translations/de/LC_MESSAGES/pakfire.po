@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-11 15:58+0100\n"
-"PO-Revision-Date: 2012-12-09 14:08+0000\n"
+"POT-Creation-Date: 2012-12-21 16:54+0100\n"
+"PO-Revision-Date: 2012-12-20 14:11+0000\n"
 "Last-Translator: WhyTea <whytea@ipfire.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ipfire/language/"
 "de/)\n"
@@ -25,18 +25,18 @@ msgstr ""
 msgid "Build has been created"
 msgstr "Build wurde erstellt"
 
-#: backend/logs.py:99 backend/logs.py:163 backend/logs.py:223
-#: backend/logs.py:298
+#: backend/logs.py:107 backend/logs.py:171 backend/logs.py:231
+#: backend/logs.py:306
 msgid "Unknown action."
 msgstr "Unbekannte Aktion."
 
-#: backend/logs.py:110 backend/logs.py:179 backend/logs.py:240
-#: backend/logs.py:314 data/templates/mirrors-list.html:72
+#: backend/logs.py:118 backend/logs.py:187 backend/logs.py:248
+#: backend/logs.py:322 data/templates/mirrors-list.html:72
 #: data/templates/builder-detail.html:159 data/templates/jobs-detail.html:82
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: backend/logs.py:117 backend/logs.py:123
+#: backend/logs.py:125 backend/logs.py:131
 #: data/templates/sessions/index.html:50 data/templates/mirrors-list.html:56
 #: data/templates/mirrors-list.html:81 data/templates/builder-list.html:59
 #: data/templates/jobs-buildroot.html:87 data/templates/mirrors-detail.html:67
@@ -49,231 +49,231 @@ msgstr "Unbekannt"
 msgid "N/A"
 msgstr "n.V."
 
-#: backend/logs.py:129
+#: backend/logs.py:137
 #, python-format
 msgid "This build was pushed to the repository '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:131
+#: backend/logs.py:139
 #, python-format
 msgid "You pushed this build to the repository '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:133
+#: backend/logs.py:141
 #, python-format
 msgid "%(user)s pushed this build to the repository '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:137
+#: backend/logs.py:145
 #, python-format
 msgid "This build was unpushed from the repository '%(from_repo)s'."
 msgstr ""
 
-#: backend/logs.py:139
+#: backend/logs.py:147
 #, python-format
 msgid "You unpushed this build from the repository '%(from_repo)s'."
 msgstr ""
 
-#: backend/logs.py:141
+#: backend/logs.py:149
 #, python-format
 msgid "%(user)s unpushed this build from the repository '%(from_repo)s'."
 msgstr ""
 
-#: backend/logs.py:145
+#: backend/logs.py:153
 #, python-format
 msgid ""
 "This build was pushed from the repository '%(from_repo)s' to '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:147
+#: backend/logs.py:155
 #, python-format
 msgid ""
 "You pushed this build from the repository '%(from_repo)s' to '%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:149
+#: backend/logs.py:157
 #, python-format
 msgid ""
 "%(user)s pushed this build from the repository '%(from_repo)s' to "
 "'%(to_repo)s'."
 msgstr ""
 
-#: backend/logs.py:185
+#: backend/logs.py:193
 #, python-format
 msgid "Builder '%(builder)s' has been enabled."
 msgstr "Der Builder '%(builder)s' wurde aktiviert."
 
-#: backend/logs.py:187
+#: backend/logs.py:195
 #, python-format
 msgid "You enabled builder '%(builder)s'."
 msgstr "Du hast den Builder '%(builder)s' aktiviert."
 
-#: backend/logs.py:189
+#: backend/logs.py:197
 #, python-format
 msgid "%(user)s enabled builder '%(builder)s'."
 msgstr "%(user)s hat den Builder '%(builder)s' aktiviert."
 
-#: backend/logs.py:193
-#, python-format
-msgid "Builder '%(builder)s' was has been disabled."
+#: backend/logs.py:201
+#, fuzzy, python-format
+msgid "Builder '%(builder)s' has been disabled."
 msgstr "Der Builder '%(builder)s' wurde deaktiviert."
 
-#: backend/logs.py:195
+#: backend/logs.py:203
 #, python-format
 msgid "You disabled builder '%(builder)s'."
 msgstr "Du hast den Builder '%(builder)s' deaktiviert."
 
-#: backend/logs.py:197
+#: backend/logs.py:205
 #, python-format
 msgid "%(user)s disabled builder '%(builder)s'."
 msgstr "%(user)s hat den Builder '%(builder)s' deaktiviert."
 
-#: backend/logs.py:201
-#, python-format
-msgid "You deleted builder '%(builder)s'."
-msgstr ""
-
-#: backend/logs.py:203
-#, python-format
-msgid "%(user)s deleted builder '%(builder)s'."
-msgstr ""
-
-#: backend/logs.py:207
-#, python-format
-msgid "You created builder '%(builder)s'."
-msgstr ""
-
 #: backend/logs.py:209
 #, python-format
-msgid "%(user)s created builder '%(builder)s'."
-msgstr ""
+msgid "You deleted builder '%(builder)s'."
+msgstr "Du hast den Builder '%(builder)s' entfernt."
 
-#: backend/logs.py:246
+#: backend/logs.py:211
+#, python-format
+msgid "%(user)s deleted builder '%(builder)s'."
+msgstr "%(user)s hat '%(builder)s' gelöscht."
+
+#: backend/logs.py:215
+#, python-format
+msgid "You created builder '%(builder)s'."
+msgstr "Du hast den Builder '%(builder)s' erstellt."
+
+#: backend/logs.py:217
+#, python-format
+msgid "%(user)s created builder '%(builder)s'."
+msgstr "%(user)s hat '%(builder)s' erstellt."
+
+#: backend/logs.py:254
 #, python-format
 msgid "Job '%(job)s' has been created."
 msgstr "Job '%(job)s' wurde erstellt."
 
-#: backend/logs.py:248
+#: backend/logs.py:256
 #, python-format
 msgid "You created job '%(job)s'."
 msgstr "Du hast den Job '%(job)s' erstellt."
 
-#: backend/logs.py:250
+#: backend/logs.py:258
 #, python-format
 msgid "%(user)s created job '%(job)s'."
 msgstr "%(user)s hat den Job '%(job)s' erstellt."
 
-#: backend/logs.py:254
+#: backend/logs.py:262
 #, python-format
 msgid "Job '%(job)s' has changed its state to: %(state)s."
 msgstr ""
 
-#: backend/logs.py:256
+#: backend/logs.py:264
 #, python-format
 msgid "You changed the state of job '%(job)s' to: %(state)s."
 msgstr ""
 
-#: backend/logs.py:258
+#: backend/logs.py:266
 #, python-format
 msgid "%(user)s changed the state of job '%(job)s' to: %(state)s."
 msgstr ""
 
-#: backend/logs.py:262
+#: backend/logs.py:270
 #, python-format
 msgid "Job '%(job)s' has been reset."
-msgstr ""
+msgstr "Job '%(job)s' wurde resettet."
 
-#: backend/logs.py:264
+#: backend/logs.py:272
 #, python-format
 msgid "You reset job '%(job)s'."
-msgstr ""
+msgstr "Du hast den Job '%(job)s' zurückgesetzt."
 
-#: backend/logs.py:266
+#: backend/logs.py:274
 #, python-format
 msgid "%(user)s has reset job '%(job)s'."
-msgstr ""
+msgstr "%(user)s hat den Job '%(job)s' resettet."
 
-#: backend/logs.py:270
+#: backend/logs.py:278
 #, python-format
 msgid "Job '%(job)s' has been scheduled for rebuild."
 msgstr ""
 
-#: backend/logs.py:272
+#: backend/logs.py:280
 #, python-format
 msgid "You scheduled job '%(job)s' for rebuild."
-msgstr ""
+msgstr "Du hast einen Rebuild des '%(job)s'  Jobs geplant."
 
-#: backend/logs.py:274
+#: backend/logs.py:282
 #, python-format
 msgid "%(user)s scheduled job '%(job)s' for rebuild."
 msgstr ""
 
-#: backend/logs.py:280
+#: backend/logs.py:288
 #, python-format
 msgid "A test job for '%(job)s' has been scheduled."
 msgstr "Für '%(job)s' wurde ein Testjob geplant."
 
-#: backend/logs.py:282
+#: backend/logs.py:290
 #, python-format
 msgid "You scheduled a test job for '%(job)s'."
-msgstr ""
+msgstr "Du hast einen Testjob für '%(job)s' geplant."
 
-#: backend/logs.py:284
+#: backend/logs.py:292
 #, python-format
 msgid "%(user)s scheduled a test job for '%(job)s'."
 msgstr ""
 
-#: backend/logs.py:320
+#: backend/logs.py:328
 #, python-format
 msgid "Mirror '%(mirror)s' has been enabled."
 msgstr "Mirrorserver '%(mirror)s' wurde aktiviert."
 
-#: backend/logs.py:322
+#: backend/logs.py:330
 #, python-format
 msgid "You enabled mirror '%(mirror)s'."
 msgstr "Du hast Mirrorserver '%(mirror)s' aktiviert."
 
-#: backend/logs.py:324
+#: backend/logs.py:332
 #, python-format
 msgid "%(user)s enabled mirror '%(mirror)s'."
 msgstr "%(user)s aktivierte Mirrorserver '%(mirror)s'."
 
-#: backend/logs.py:328
+#: backend/logs.py:336
 #, python-format
 msgid "Mirror '%(mirror)s' has been disabled."
 msgstr "Mirrorserver '%(mirror)s' wurde deaktiviert."
 
-#: backend/logs.py:330
+#: backend/logs.py:338
 #, python-format
 msgid "You disabled mirror '%(mirror)s'."
 msgstr "Du hast Mirrorserver '%(mirror)s' deaktiviert."
 
-#: backend/logs.py:332
+#: backend/logs.py:340
 #, python-format
 msgid "%(user)s disabled mirror '%(mirror)s'."
 msgstr "%(user)s deaktivierte Mirrorserver '%(mirror)s'."
 
-#: backend/logs.py:336
+#: backend/logs.py:344
 #, python-format
 msgid "You deleted mirror '%(mirror)s'."
 msgstr "Du hast Mirrorserver '%(mirror)s' gelöscht."
 
-#: backend/logs.py:338
+#: backend/logs.py:346
 #, python-format
 msgid "%(user)s deleted mirror '%(mirror)s'."
 msgstr "%(user)s hat Mirrorserver '%(mirror)s' gelöscht."
 
-#: backend/logs.py:342
+#: backend/logs.py:350
 #, python-format
 msgid "You created mirror '%(mirror)s'."
 msgstr "Du hast Mirrorserver '%(mirror)s' erstellt."
 
-#: backend/logs.py:344
+#: backend/logs.py:352
 #, python-format
 msgid "%(user)s created mirror '%(mirror)s'."
 msgstr "%(user)s erstellte Mirrorserver '%(mirror)s'."
 
-#: backend/builds.py:1000
+#: backend/builds.py:1034
 #, python-format
 msgid "%(user_name)s commented on %(build_name)s"
 msgstr "%(user_name)s kommentierte %(build_name)s"
@@ -340,9 +340,8 @@ msgstr "Um Ihren Account zu aktivieren, klicken Sie auf den Link."
 
 #: data/templates/sessions/index.html:3 data/templates/sessions/index.html:12
 #: data/templates/sessions/index.html:17 data/templates/base.html:106
-#, fuzzy
 msgid "Sessions"
-msgstr "Revision"
+msgstr ""
 
 #: data/templates/sessions/index.html:8
 #: data/templates/distro-source-detail.html:6
@@ -359,9 +358,10 @@ msgstr "Revision"
 #: data/templates/user-profile-passwd-ok.html:8
 #: data/templates/package-detail-list.html:8
 #: data/templates/user-profile-edit.html:8
-#: data/templates/package-detail.html:8 data/templates/docs-users.html:8
-#: data/templates/mirrors-new.html:8 data/templates/distro-detail.html:8
-#: data/templates/user-list.html:8 data/templates/job-schedule-test.html:8
+#: data/templates/package-detail.html:8 data/templates/builds/comments.html:8
+#: data/templates/docs-users.html:8 data/templates/mirrors-new.html:8
+#: data/templates/distro-detail.html:8 data/templates/user-list.html:8
+#: data/templates/job-schedule-test.html:8
 #: data/templates/docs-whatsthis.html:8
 #: data/templates/user-profile-passwd.html:8
 #: data/templates/distro-source-commit-detail.html:8
@@ -375,7 +375,7 @@ msgstr "Revision"
 #: data/templates/packages/changelog.html:8
 #: data/templates/packages/view-file.html:8 data/templates/builder-pass.html:6
 #: data/templates/build-delete.html:8 data/templates/mirrors-edit.html:8
-#: data/templates/mirrors-delete.html:8
+#: data/templates/build-index.html:8 data/templates/mirrors-delete.html:8
 #: data/templates/user-forgot-password.html:8
 #: data/templates/job-schedule-rebuild.html:8 data/templates/jobs-index.html:8
 #: data/templates/user-profile.html:8 data/templates/builder-edit.html:8
@@ -424,10 +424,11 @@ msgid "Packages"
 msgstr "Pakete"
 
 #: data/templates/base.html:37 data/templates/distro-update-edit.html:20
-#: data/templates/docs-index.html:43 data/templates/build-queue.html:3
-#: data/templates/build-queue.html:6 data/templates/docs-base.html:33
-#: data/templates/statistics/index.html:15 data/templates/docs-build.html:16
-#: data/templates/build-index.html:3 data/templates/build-index.html:7
+#: data/templates/docs-index.html:43 data/templates/builds/comments.html:12
+#: data/templates/build-queue.html:3 data/templates/build-queue.html:6
+#: data/templates/docs-base.html:33 data/templates/statistics/index.html:15
+#: data/templates/docs-build.html:16 data/templates/build-index.html:3
+#: data/templates/build-index.html:12 data/templates/build-index.html:26
 msgid "Builds"
 msgstr "Builds"
 
@@ -504,35 +505,35 @@ msgstr "Administration"
 msgid "Uploads"
 msgstr "Uploads"
 
-#: data/templates/base.html:138
+#: data/templates/base.html:132
 msgid "My profile"
 msgstr "Mein Profil"
 
-#: data/templates/base.html:144
+#: data/templates/base.html:138
 msgid "My builds"
 msgstr "Meine Builds"
 
-#: data/templates/base.html:149
+#: data/templates/base.html:143
 msgid "Impersonated by"
-msgstr ""
+msgstr "vertreten durch"
 
-#: data/templates/base.html:159
+#: data/templates/base.html:153
 msgid "End impersonation"
 msgstr "Beende Impersonierung"
 
-#: data/templates/base.html:166
+#: data/templates/base.html:160
 msgid "Logout"
 msgstr "Ausloggen"
 
-#: data/templates/base.html:174 data/templates/docs-users.html:56
+#: data/templates/base.html:168 data/templates/docs-users.html:56
 msgid "Register"
 msgstr "Registrieren"
 
-#: data/templates/base.html:178
+#: data/templates/base.html:172
 msgid "Sign in"
 msgstr ""
 
-#: data/templates/base.html:190
+#: data/templates/base.html:184
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
 
@@ -569,20 +570,6 @@ msgstr "Neueste Commits"
 #: data/templates/distro-source-detail.html:63
 msgid "Show all commits"
 msgstr "Alle Commits anzeigen"
-
-#: data/templates/error-404.html:4
-msgid "404 - Not Found"
-msgstr "404 - nicht gefunden"
-
-#: data/templates/error-404.html:8
-msgid "I could not find what you were searching for."
-msgstr "Ich konnte nicht finden wonach Du gesucht hast."
-
-#: data/templates/error-404.html:13
-msgid "You may have clicked an expired link or mistyped the address."
-msgstr ""
-"Du hast vielleicht einen veralteten Link verwendet oder die Adresse falsch "
-"geschrieben."
 
 #: data/templates/mirrors-list.html:19 data/templates/mirrors-detail.html:23
 #: data/templates/package-detail-list.html:22
@@ -632,9 +619,8 @@ msgid "There are no mirrors configured, yet."
 msgstr "Es wurden noch keine Mirrorserver eingerichtet."
 
 #: data/templates/mirrors-list.html:95 data/templates/mirrors-detail.html:119
-#: data/templates/log.html:4 data/templates/builder-detail.html:197
-#: data/templates/build-detail.html:194 data/templates/user-profile.html:150
-#: data/templates/jobs-detail.html:169
+#: data/templates/log.html:4 data/templates/builder-detail.html:205
+#: data/templates/build-detail.html:194 data/templates/jobs-detail.html:169
 msgid "Log"
 msgstr "Log"
 
@@ -649,7 +635,7 @@ msgstr "Du kannst einen laufenden Build abbrechen."
 
 #: data/templates/jobs-abort.html:9
 msgid "The build server will eventually stop to build the package."
-msgstr ""
+msgstr "Eventuell wird der Build-Server das Erstellen des Pakets stoppen."
 
 #: data/templates/jobs-abort.html:16 data/templates/jobs-buildroot.html:34
 #: data/templates/modules/jobs/list.html:5 data/templates/jobs-detail.html:58
@@ -732,7 +718,7 @@ msgstr "Aktuell sind keine Bugs vorhanden."
 
 #: data/templates/build-bugs.html:34
 msgid "Click below, to add one."
-msgstr ""
+msgstr "Klicke unten um einen hinzuzufügen."
 
 #: data/templates/build-bugs.html:45
 msgid "Add"
@@ -764,7 +750,7 @@ msgstr ""
 
 #: data/templates/build-bugs.html:96
 msgid "Maybe you want to pick one of these."
-msgstr ""
+msgstr "Vielleicht möchtest Du einen von diesen auswählen."
 
 #: data/templates/build-bugs.html:115
 msgid "Add bug"
@@ -789,7 +775,7 @@ msgstr "Bug entfernen"
 
 #: data/templates/build-bugs.html:141
 msgid "Enter a bug ID from the list below."
-msgstr ""
+msgstr "Trage eine Bug-ID aus der unten stehenden Liste ein."
 
 #: data/templates/build-bugs.html:164
 msgid "Remove bug"
@@ -845,14 +831,12 @@ msgid "View more updates..."
 msgstr ""
 
 #: data/templates/index.html:70
-#, fuzzy
 msgid "Build jobs"
-msgstr "Buildjob"
+msgstr ""
 
 #: data/templates/index.html:76
-#, fuzzy
 msgid "Show more build jobs"
-msgstr "Alle Builds anzeigen"
+msgstr ""
 
 #: data/templates/builder-list.html:31 data/templates/distro-edit.html:66
 msgid "Architectures"
@@ -1075,7 +1059,7 @@ msgstr ""
 
 #: data/templates/package-properties.html:43
 msgid "You may set a default priority for all builds of this package."
-msgstr ""
+msgstr "Du kannst eine Standardpriorität für Builds dieses Pakets einstellen."
 
 #: data/templates/package-properties.html:51
 #: data/templates/build-priority.html:14
@@ -1228,7 +1212,7 @@ msgid "Registration form"
 msgstr "Registrierungsformular"
 
 #: data/templates/register.html:30 data/templates/user-profile-edit.html:37
-#: data/templates/login.html:22 data/templates/user-profile.html:29
+#: data/templates/login.html:22 data/templates/user-profile.html:37
 msgid "Username"
 msgstr "Benutzername"
 
@@ -1324,7 +1308,7 @@ msgstr ""
 #: data/templates/modules/modal-base.html:25
 #: data/templates/user-forgot-password.html:49
 msgid "Submit"
-msgstr ""
+msgstr "Bereitstellen"
 
 #: data/templates/modules/log-entry-comment.html:22
 msgid "No comment given."
@@ -1332,7 +1316,7 @@ msgstr ""
 
 #: data/templates/modules/build-state-warnings.html:3
 msgid "This build is broken!"
-msgstr ""
+msgstr "Dieses Build ist defekt!"
 
 #: data/templates/modules/build-state-warnings.html:5
 msgid ""
@@ -1457,7 +1441,7 @@ msgstr "Arch"
 
 #: data/templates/modules/jobs-table.html:5
 #: data/templates/user-profile-edit.html:77
-#: data/templates/builder-detail.html:91 data/templates/user-profile.html:39
+#: data/templates/builder-detail.html:91 data/templates/user-profile.html:47
 #: data/templates/build-filter.html:27
 msgid "State"
 msgstr "Status"
@@ -1677,13 +1661,14 @@ msgstr "Repositorium"
 #: data/templates/modules/build-table.html:20
 #: data/templates/user-profile-edit.html:80
 #: data/templates/builds-watchers-add.html:76
-#: data/templates/user-profile.html:21 data/templates/user-profile.html:46
+#: data/templates/user-profile.html:29 data/templates/user-profile.html:54
 msgid "User"
 msgstr "Benutzer"
 
-#: data/templates/modules/build-table.html:23
-msgid "When"
-msgstr "Wann"
+#: data/templates/modules/build-table.html:23 data/templates/keys-list.html:32
+#: data/templates/jobs-detail.html:117
+msgid "Created"
+msgstr "Erstellt"
 
 #: data/templates/modules/build-table.html:83
 msgid "There are no builds to show at this place right now."
@@ -1836,13 +1821,13 @@ msgid "Enabled for builds"
 msgstr ""
 
 #: data/templates/modules/repository-table.html:21
-#: data/templates/user-profile.html:128
+#: data/templates/user-profile.html:136
 #: data/templates/repository-detail.html:68
 msgid "Yes"
 msgstr "Ja"
 
 #: data/templates/modules/repository-table.html:23
-#: data/templates/user-profile.html:130
+#: data/templates/user-profile.html:138
 #: data/templates/repository-detail.html:70
 msgid "No"
 msgstr "Nein"
@@ -1903,6 +1888,83 @@ msgstr ""
 #: data/templates/modules/jobs/status.html:9
 msgid "This build has got no jobs."
 msgstr "Dieser Build hat keine Jobs."
+
+#: data/templates/errors/error-404.html:4
+msgid "404 - Not Found"
+msgstr "404 - nicht gefunden"
+
+#: data/templates/errors/error-404.html:8
+msgid "I could not find what you were searching for."
+msgstr "Ich konnte nicht finden wonach Du gesucht hast."
+
+#: data/templates/errors/error-404.html:13
+msgid "You may have clicked an expired link or mistyped the address."
+msgstr ""
+"Du hast vielleicht einen veralteten Link verwendet oder die Adresse falsch "
+"geschrieben."
+
+#: data/templates/errors/error.html:8
+msgid "Oops! Don't panic."
+msgstr "Huch! Keine Panik."
+
+#: data/templates/errors/error.html:13
+msgid "An unexpected error happened."
+msgstr "Ein unerwarteter Fehler ist aufgetreten."
+
+#: data/templates/errors/error.html:19
+msgid "Stay calm and read the text below to find out what went wrong."
+msgstr ""
+
+#: data/templates/errors/error.html:31
+msgid "Error code"
+msgstr "Fehlercode"
+
+#: data/templates/errors/error.html:38
+msgid "Exception (traceback):"
+msgstr "Ausnahme (traceback):"
+
+#: data/templates/errors/error.html:49
+msgid ""
+"Please try going back to the previous page and try the action you did again "
+"in a moment."
+msgstr ""
+
+#: data/templates/errors/error.html:50
+msgid ""
+"If the error persists, you should consider to get in touch with an "
+"administrator."
+msgstr ""
+
+#: data/templates/errors/error-400.html:4
+msgid "400 - Bad request"
+msgstr ""
+
+#: data/templates/errors/error-400.html:8
+msgid "Invalid data has been passed to the application."
+msgstr ""
+
+#: data/templates/errors/error-400.html:13
+msgid ""
+"The application refused to go on with the provided data that was sent in "
+"this request."
+msgstr ""
+
+#: data/templates/errors/error-403.html:4
+#, fuzzy
+msgid "403 - Access forbidden"
+msgstr "Zugriff verboten"
+
+#: data/templates/errors/error-403.html:8
+msgid "You are not allowed to access this ressource."
+msgstr "Es ist dir nicht erlaubt auf diese Ressource zuzugreifen."
+
+#: data/templates/errors/error-403.html:13
+msgid ""
+"Access to the requested page has been denied because you do not have "
+"sufficient rights."
+msgstr ""
+"Der Zugang zu der angeforderten Seite wurde verweigert weil Du nicht im "
+"Besitz ausreichender Rechte bist. "
 
 #: data/templates/build-schedule-test.html:3
 #: data/templates/build-schedule-test.html:29
@@ -2029,55 +2091,50 @@ msgstr "%s löschen"
 
 #: data/templates/jobs-filter.html:3 data/templates/jobs-filter.html:21
 #: data/templates/jobs-index.html:18
-#, fuzzy
 msgid "Filter jobs"
-msgstr "Builds filtern"
+msgstr ""
 
 #: data/templates/jobs-filter.html:16
-#, fuzzy
 msgid "Filter"
-msgstr "Builds filtern"
+msgstr ""
 
 #: data/templates/jobs-filter.html:30 data/templates/jobs-filter.html:47
-#, fuzzy
 msgid "[Choose one]"
-msgstr "Wähle Benutzer aus"
+msgstr ""
 
 #: data/templates/jobs-filter.html:36
 msgid "Only show jobs, that have been built by this builder."
 msgstr ""
 
 #: data/templates/jobs-filter.html:44
-#, fuzzy
 msgid "Architecture"
-msgstr "Architekturen"
+msgstr ""
 
 #: data/templates/jobs-filter.html:53
-#, fuzzy
 msgid "Only show jobs, with this architecture."
-msgstr "Nur Builds mit diesem Status anzeigen."
+msgstr ""
 
 #: data/templates/user-profile-passwd-ok.html:3
 #: data/templates/user-profile-passwd-ok.html:29
 msgid "Password changed"
-msgstr ""
+msgstr "Passwort verändert"
 
 #: data/templates/user-profile-passwd-ok.html:20
 #: data/templates/user-profile-passwd.html:3
 #: data/templates/user-profile-passwd.html:20
 #: data/templates/user-profile-passwd.html:25
 #: data/templates/user-profile-passwd.html:95
-#: data/templates/user-profile.html:78
+#: data/templates/user-profile.html:86
 msgid "Change password"
-msgstr ""
+msgstr "Verändere das Passwort"
 
 #: data/templates/user-profile-passwd-ok.html:24
 msgid "Done!"
-msgstr ""
+msgstr "Erledigt!"
 
 #: data/templates/user-profile-passwd-ok.html:37
 msgid "Your password has successfully been changed."
-msgstr ""
+msgstr "Das Passwort wurde erfolgreich geändert."
 
 #: data/templates/user-profile-passwd-ok.html:41
 #, python-format
@@ -2155,12 +2212,12 @@ msgid "Admin actions"
 msgstr "Administrator-Aktionen"
 
 #: data/templates/user-profile-edit.html:82
-#: data/templates/user-profile.html:44
+#: data/templates/user-profile.html:52
 msgid "Tester"
 msgstr "Tester"
 
 #: data/templates/user-profile-edit.html:85
-#: data/templates/user-profile.html:42
+#: data/templates/user-profile.html:50
 msgid "Admin"
 msgstr "Admin"
 
@@ -2225,7 +2282,7 @@ msgstr ""
 #: data/templates/user-impersonation.html:21
 #: data/templates/repository-edit.html:82
 msgid "Use with caution!"
-msgstr ""
+msgstr "Mit Vorsicht zu benutzen!"
 
 #: data/templates/user-impersonation.html:22
 msgid ""
@@ -2281,6 +2338,63 @@ msgstr "Abhängigkeiten"
 
 #: data/templates/package-detail.html:173
 msgid "Filelist"
+msgstr ""
+
+#: data/templates/builds/comments.html:3
+#: data/templates/builds/comments.html:42
+#, fuzzy
+msgid "Build comments"
+msgstr "Kommentar abschicken"
+
+#: data/templates/builds/comments.html:17
+#: data/templates/builds/comments.html:25 data/templates/build-index.html:18
+#, fuzzy
+msgid "Comments"
+msgstr "Kommentar"
+
+#: data/templates/builds/comments.html:33
+#, fuzzy
+msgid "Show all comments"
+msgstr "Alle Commits anzeigen"
+
+#: data/templates/builds/comments.html:40
+#, fuzzy, python-format
+msgid "%s's latest comments"
+msgstr "Neueste Commits"
+
+#: data/templates/builds/comments.html:49
+#, python-format
+msgid "This page shows %s's latest comments."
+msgstr ""
+
+#: data/templates/builds/comments.html:51
+#, fuzzy
+msgid "This page shows the latest comments on builds."
+msgstr "Es ist möglich Kommentare und Bewertungen für Builds zu hinterlassen."
+
+#: data/templates/builds/comments.html:53
+msgid ""
+"The Pakfire Build Service is all about social development and so, "
+"communicating with eath others is important. Please join."
+msgstr ""
+
+#: data/templates/builds/comments.html:61
+#: data/templates/builds/comments.html:65
+#: data/templates/packages/changelog.html:35
+#: data/templates/packages/changelog.html:39
+msgid "Newer"
+msgstr "Neuere"
+
+#: data/templates/builds/comments.html:71
+#: data/templates/builds/comments.html:75
+#: data/templates/packages/changelog.html:45
+#: data/templates/packages/changelog.html:49
+msgid "Older"
+msgstr "Ältere"
+
+#: data/templates/builds/comments.html:81
+#, python-format
+msgid "%s did not comment on anything, yet."
 msgstr ""
 
 #: data/templates/docs-users.html:3 data/templates/docs-users.html:16
@@ -2365,38 +2479,6 @@ msgstr ""
 "bewerten bzw. Kommentare abzugeben, um die Entwickler über den Paket Status "
 "zu informieren."
 
-#: data/templates/error.html:8
-msgid "Oops! Don't panic."
-msgstr "Huch! Keine Panik."
-
-#: data/templates/error.html:13
-msgid "An unexpected error happened."
-msgstr "Ein unerwarteter Fehler ist aufgetreten."
-
-#: data/templates/error.html:19
-msgid "Stay calm and read the text below to find out what went wrong."
-msgstr ""
-
-#: data/templates/error.html:31
-msgid "Error code"
-msgstr "Fehlercode"
-
-#: data/templates/error.html:38
-msgid "Exception (traceback):"
-msgstr "Ausnahme (traceback):"
-
-#: data/templates/error.html:49
-msgid ""
-"Please try going back to the previous page and try the action you did again "
-"in a moment."
-msgstr ""
-
-#: data/templates/error.html:50
-msgid ""
-"If the error persists, you should consider to get in touch with an "
-"administrator."
-msgstr ""
-
 #: data/templates/user-profile-builds.html:3
 #: data/templates/user-profile-builds.html:7
 #, python-format
@@ -2437,11 +2519,11 @@ msgstr ""
 
 #: data/templates/build-queue.html:9
 msgid "They one at the top is next."
-msgstr ""
+msgstr "Der oben Stehende ist der Nächste."
 
 #: data/templates/build-queue.html:15
 msgid "No jobs to do."
-msgstr ""
+msgstr "Kein Job zu erledigen."
 
 #: data/templates/docs-base.html:27
 msgid "All Documents"
@@ -2483,7 +2565,7 @@ msgstr "Quell-Repositories"
 
 #: data/templates/distro-detail.html:80
 #: data/templates/distro-source-commit-detail.html:90
-#: data/templates/user-profile.html:65
+#: data/templates/user-profile.html:73
 msgid "Action"
 msgstr "Aktion"
 
@@ -2545,7 +2627,7 @@ msgstr ""
 
 #: data/templates/docs-whatsthis.html:44
 msgid "It is possible to leave comments and rate builds."
-msgstr ""
+msgstr "Es ist möglich Kommentare und Bewertungen für Builds zu hinterlassen."
 
 #: data/templates/docs-whatsthis.html:50
 msgid "PBS is <strong>NOT</strong> a bugtracker."
@@ -2563,7 +2645,7 @@ msgstr "Bugtracker"
 
 #: data/templates/user-profile-passwd.html:32
 msgid "You are going to change your password."
-msgstr ""
+msgstr "Du wirst Dein Passwort ändern."
 
 #: data/templates/user-profile-passwd.html:35
 msgid ""
@@ -2573,7 +2655,7 @@ msgstr ""
 #: data/templates/user-profile-passwd.html:39
 #, python-format
 msgid "In this dialog, you may change the password of %s."
-msgstr ""
+msgstr "In diesem Dialog kannst Du das Passwort von %s ändern."
 
 #: data/templates/user-profile-passwd.html:51
 #: data/templates/builds-watchers-add.html:43
@@ -2631,7 +2713,7 @@ msgstr ""
 
 #: data/templates/repository-edit.html:21
 msgid "Must only contain of the lowercase characters."
-msgstr ""
+msgstr "Darf nur kleine Buchstaben enthalten."
 
 #: data/templates/repository-edit.html:25 data/templates/file-detail.html:20
 msgid "Description"
@@ -2676,7 +2758,7 @@ msgstr ""
 #: data/templates/repository-edit.html:56
 #: data/templates/repository-edit.html:67
 msgid "Enter zero to disable the feature."
-msgstr ""
+msgstr "Trage eine Null ein um die Funktion zu deaktivieren."
 
 #: data/templates/repository-edit.html:60
 msgid "Maximum time"
@@ -2823,10 +2905,6 @@ msgstr ""
 msgid "Fingerprint"
 msgstr "Fingerabdruck"
 
-#: data/templates/keys-list.html:32 data/templates/jobs-detail.html:117
-msgid "Created"
-msgstr "Erstellt"
-
 #: data/templates/keys-list.html:33
 msgid "Expires"
 msgstr "Läuft ab"
@@ -2871,22 +2949,6 @@ msgstr ""
 msgid "These packages will be deleted"
 msgstr "Dieses Paket wird gelöscht werden"
 
-#: data/templates/error-403.html:4
-msgid "Access forbidden"
-msgstr "Zugriff verboten"
-
-#: data/templates/error-403.html:8
-msgid "You are not allowed to access this ressource."
-msgstr "Es ist dir nicht erlaubt auf diese Ressource zuzugreifen."
-
-#: data/templates/error-403.html:13
-msgid ""
-"Access to the requested page has been denied because you do not have "
-"sufficient rights."
-msgstr ""
-"Der Zugang zu der angeforderten Seite wurde verweigert weil Du nicht im "
-"Besitz ausreichender Rechte bist. "
-
 #: data/templates/statistics/index.html:11
 msgid ""
 "On this page, you will find a lot of information bundled in graphs and "
@@ -2929,7 +2991,7 @@ msgstr "Viel Spaß!"
 #: data/templates/builds-watchers-add.html:29
 #, python-format
 msgid "Watch build %s"
-msgstr ""
+msgstr "Build %s anzeigen"
 
 #: data/templates/builds-watchers-add.html:24
 msgid "Watch"
@@ -2937,7 +2999,7 @@ msgstr "Beobachten"
 
 #: data/templates/builds-watchers-add.html:35
 msgid "You may here add yourself to the list of watchers of this build."
-msgstr ""
+msgstr "Du kannst Dich hier in die Beobachterliste dieses Builds eintragen."
 
 #: data/templates/builds-watchers-add.html:36
 msgid ""
@@ -3090,6 +3152,10 @@ msgstr ""
 msgid "Host key"
 msgstr ""
 
+#: data/templates/builder-detail.html:198
+msgid "Active and pending jobs"
+msgstr ""
+
 #: data/templates/search-form.html:3
 msgid "Advanced search"
 msgstr "Erweiterte Suche"
@@ -3143,11 +3209,11 @@ msgstr ""
 
 #: data/templates/search-form.html:75
 msgid "You may also search for file names."
-msgstr ""
+msgstr "Du kannst ebenfalls nach Dateinamen suchen."
 
 #: data/templates/search-form.html:76
 msgid "You will get a list of packages that contain the file."
-msgstr ""
+msgstr "Du wirst eine Liste von Paketen erhalten, welche die Datei beinhalten."
 
 #: data/templates/search-form.html:77
 msgid ""
@@ -3310,16 +3376,6 @@ msgstr "Der Build hat einen unbekannten Status"
 msgid "Changelog of %s"
 msgstr ""
 
-#: data/templates/packages/changelog.html:35
-#: data/templates/packages/changelog.html:39
-msgid "Older"
-msgstr "Ältere"
-
-#: data/templates/packages/changelog.html:45
-#: data/templates/packages/changelog.html:49
-msgid "Newer"
-msgstr "Neuere"
-
 #: data/templates/packages/view-file.html:3
 #, python-format
 msgid "View %(filename)s from %(pkg)s"
@@ -3453,6 +3509,8 @@ msgid ""
 "You do not have the permission to update packages that belong to the "
 "<em>critical path</em>."
 msgstr ""
+"Dir fehlt die nötige Berechtigung zum updaten von Paketen welche zum "
+"<em>critical path</em> gehören."
 
 #: data/templates/build-manage.html:22
 msgid "Not all jobs are finished"
@@ -3497,6 +3555,11 @@ msgstr ""
 #: data/templates/build-manage.html:92
 msgid "Switch to admin mode"
 msgstr ""
+
+#: data/templates/build-index.html:21 data/templates/build-list.html:15
+#: data/templates/build-filter.html:6
+msgid "Filter builds"
+msgstr "Builds filtern"
 
 #: data/templates/source-list.html:3
 msgid "Sources repositories"
@@ -3608,7 +3671,7 @@ msgstr "In Arbeit!"
 
 #: data/templates/user-forgot-password.html:28
 msgid "You have forgotten you password, eh? Shame on you."
-msgstr ""
+msgstr "Hast Du Dein Passwort vergessen? Schäme Dich!"
 
 #: data/templates/user-forgot-password.html:29
 msgid "However, we allow to re-activate your account."
@@ -3616,7 +3679,7 @@ msgstr ""
 
 #: data/templates/user-forgot-password.html:32
 msgid "You need to enter your username below."
-msgstr ""
+msgstr "Du musst deinen Benutzernamen unten eingeben."
 
 #: data/templates/user-forgot-password.html:33
 msgid "After that, you will receive an email with intructions how to go on."
@@ -3728,60 +3791,42 @@ msgstr ""
 msgid "Build job list"
 msgstr "Build-Job-Liste"
 
-#: data/templates/build-list.html:15 data/templates/build-filter.html:6
-msgid "Filter builds"
-msgstr "Builds filtern"
+#: data/templates/user-profile.html:23
+#, fuzzy
+msgid "View comments"
+msgstr "Kommentar abschicken"
 
-#: data/templates/user-profile.html:33
+#: data/templates/user-profile.html:41
 msgid "Email"
 msgstr "Email"
 
-#: data/templates/user-profile.html:53
+#: data/templates/user-profile.html:61
 msgid "Registered"
 msgstr "Registriert"
 
-#: data/templates/user-profile.html:72
+#: data/templates/user-profile.html:80
 msgid "Edit profile"
 msgstr ""
 
-#: data/templates/user-profile.html:86
+#: data/templates/user-profile.html:94
 msgid "Delete account"
 msgstr "Account löschen"
 
-#: data/templates/user-profile.html:93
+#: data/templates/user-profile.html:101
 msgid "Impersonate user"
 msgstr ""
 
-#: data/templates/user-profile.html:113
+#: data/templates/user-profile.html:121
 msgid "Permissions"
 msgstr ""
 
-#: data/templates/user-profile.html:117
+#: data/templates/user-profile.html:125
 msgid "This user has administration rights."
 msgstr ""
 
-#: data/templates/user-profile.html:124
+#: data/templates/user-profile.html:132
 msgid "User is allowed to create scratch builds?"
 msgstr ""
-
-#: data/templates/user-profile.html:140
-msgid "Links"
-msgstr ""
-
-#: data/templates/user-profile.html:143
-#, python-format
-msgid "View all comments written %s."
-msgstr ""
-
-#: data/templates/user-profile.html:146
-#, python-format
-msgid "View all builds %s is linked to."
-msgstr ""
-
-#: data/templates/user-profile.html:153
-#, python-format
-msgid "Comments written by %s"
-msgstr "Kommentare von %s"
 
 #: data/templates/builder-edit.html:3
 #, python-format
@@ -3993,7 +4038,7 @@ msgstr ""
 
 #: data/templates/jobs-detail.html:88
 msgid "You may resubmit the job to try again:"
-msgstr ""
+msgstr "Für einen weiteren Versuch kannst Du den Job erneut bereitstellen."
 
 #: data/templates/jobs-detail.html:89
 msgid "Re-submit build"
@@ -4035,9 +4080,8 @@ msgid "Today"
 msgstr ""
 
 #: web/ui_modules.py:159
-#, fuzzy
 msgid "Yesterday"
-msgstr "gestern"
+msgstr ""
 
 #: web/ui_modules.py:286
 msgid "Dependency problem"
@@ -4056,11 +4100,11 @@ msgstr "Kein Benutzername angegeben."
 msgid "The given username is already taken."
 msgstr "Der gewählte Benutzername ist bereits belegt."
 
-#: web/handlers_auth.py:71 web/handlers_users.py:180
+#: web/handlers_auth.py:71 web/handlers_users.py:177
 msgid "No email address provided."
 msgstr "Keine Email-Adresse angegeben."
 
-#: web/handlers_auth.py:73 web/handlers_users.py:182
+#: web/handlers_auth.py:73 web/handlers_users.py:179
 msgid "Email address is invalid."
 msgstr "Die Email-Adresse ist ungültig."
 
@@ -4074,7 +4118,7 @@ msgstr ""
 msgid "No password provided."
 msgstr "Kein Passwort angegeben."
 
-#: web/handlers_auth.py:81 web/handlers_users.py:188
+#: web/handlers_auth.py:81 web/handlers_users.py:185
 msgid "Passwords do not match."
 msgstr "Passwörter stimmen nicht überein."
 
@@ -4082,31 +4126,31 @@ msgstr "Passwörter stimmen nicht überein."
 msgid "Your password is too weak."
 msgstr "Dein Passwort ist zu einfach."
 
-#: web/handlers_builds.py:337
+#: web/handlers_builds.py:368
 msgid "User not found."
 msgstr "Benutzer nicht gefunden."
 
-#: web/handlers_users.py:115
+#: web/handlers_users.py:112
 msgid "You need to enter you current password."
-msgstr ""
+msgstr "Du musst dein aktuelles Passwort eingeben."
 
-#: web/handlers_users.py:118
+#: web/handlers_users.py:115
 msgid "The provided account password is wrong."
 msgstr ""
 
-#: web/handlers_users.py:127
+#: web/handlers_users.py:124
 msgid "The given passwords do not match."
 msgstr ""
 
-#: web/handlers_users.py:129
+#: web/handlers_users.py:126
 msgid "The password was blank."
 msgstr ""
 
-#: web/handlers_users.py:133
+#: web/handlers_users.py:130
 msgid "The given password is too weak."
 msgstr ""
 
-#: web/handlers_users.py:186
+#: web/handlers_users.py:183
 msgid "Password has less than 8 characters."
 msgstr "Das Passwort hat weniger als 8 Zeichen."
 
@@ -4262,14 +4306,8 @@ msgstr "%(weekday)s, %(month_name)s %(day)s"
 msgid "%(commas)s and %(last)s"
 msgstr "%(commas)s und %(last)s"
 
-#~ msgid "Ongoing build jobs"
-#~ msgstr "Laufende Build-Jobs"
+#~ msgid "When"
+#~ msgstr "Wann"
 
-#~ msgid "There are no jobs in the job queue."
-#~ msgstr "Es sind keine Jobs in der Warteschlange."
-
-#~ msgid "No builds"
-#~ msgstr "Keine Builds."
-
-#~ msgid "Build list"
-#~ msgstr "Build-Liste"
+#~ msgid "Comments written by %s"
+#~ msgstr "Kommentare von %s"

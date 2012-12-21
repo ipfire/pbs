@@ -497,7 +497,7 @@ class WatchersSidebarTableModule(UIModule):
 
 
 class SelectLocaleModule(UIModule):
-	LOCALE_NAMES = (
+	LOCALE_NAMES = [
 		# local code, English name, name
 		("ca_ES", u"Catalan", "Catal\xc3\xa0"),
 		("da_DK", u"Danish", u"Dansk"),
@@ -513,7 +513,11 @@ class SelectLocaleModule(UIModule):
 		("pt_BR", u"Portuguese (Brazil)", u"Portugu\xeas (Brasil)"),
 		("pt_PT", u"Portuguese (Portugal)", u"Portugu\xeas (Portugal)"),
 		("ru_RU", u"Russian", u"\u0440\u0443\u0441\u0441\u043a\u0438\u0439"),
-	)
+		("uk_UA", u"Ukrainian", u"\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430"),
+	]
+
+	# Sort the list of locales by their English name.
+	LOCALE_NAMES.sort(key=lambda x: x[1])
 
 	def render(self, name=None, id=None, preselect=None):
 		return self.render_string("modules/select/locale.html",
