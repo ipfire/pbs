@@ -663,7 +663,6 @@ class Build(base.Object):
 
 		if self._data:
 			self._data["state"] = state
-		self.clear_cache()
 
 		# In broken state, the removal from the repository is forced and
 		# all jobs that are not finished yet will be aborted.
@@ -1303,17 +1302,15 @@ class Jobs(base.Object):
 		# Return sorted list of jobs.
 		return sorted(jobs)
 
-	def get_active(self, host_id=None, uploads=True, running_only=False):
-		running_states = ["dispatching", "running"]
+	def get_active(self, host_id=None, builder=None, states=None):
+		if builder:
+			host_id = builder.id
 
-		if not running_only:
-			running_states += ["new", "pending",]
+		if states is None:
+			states = ["dispatching", "running", "uploading"]
 
-		if uploads:
-			running_states.append("uploading")
-
-		query = "SELECT * FROM jobs WHERE (%s)" % \
-			" OR ".join(["state = '%s'" % s for s in running_states])
+		query = "SELECT * FROM jobs WHERE state IN (%s)" % ", ".join(["%s"] * len(states))
+		args = states
 
 		if host_id:
 			query += " AND builder_id = %s" % host_id
@@ -1327,40 +1324,72 @@ class Jobs(base.Object):
 				WHEN jobs.state = 'new'         THEN 4 \
 			END, time_started ASC"
 
-		return [Job(self.pakfire, j.id, j) for j in self.db.query(query)]
+		return [Job(self.pakfire, j.id, j) for j in self.db.query(query, *args)]
 
-	def get_next_iter(self, arches=None, limit=None, offset=None, type=None, states=["pending", "new"], max_tries=None):
-		args = []
-		conditions = [
-			"(start_not_before IS NULL OR start_not_before <= NOW())",
-		]
+	def get_next_iter(self, *args, **kwargs):
+		return iter(self.get_next(*args, **kwargs))
 
-		if type:
-			conditions.append("jobs.type = %s")
-			args.append(type)
+	def get_next(self, arches=None, builder=None, limit=None, offset=None, type=None,
+			state=None, states=None, max_tries=None):
 
-		if states:
-			conditions.append("(%s)" % " OR ".join(["jobs.state = %s" for state in states]))
-			args += states
+		if state is None and states is None:
+			states = ["pending", "new"]
 
-		if arches:
-			conditions.append("(%s)" % " OR ".join(["jobs.arch_id = %s" for a in arches]))
-			args += [a.id for a in arches]
-
-		# Only return jobs with up to max_tries tries.
-		if max_tries:
-			conditions.append("jobs.tries <= %s")
-			args.append(max_tries)
+		if builder and arches is None:
+			arches = builder.get_arches()
 
 		query = "SELECT jobs.* FROM jobs \
-			JOIN builds ON jobs.build_id = builds.id"
+					JOIN builds ON jobs.build_id = builds.id \
+				WHERE \
+					(start_not_before IS NULL OR start_not_before <= NOW())"
+		args = []
 
-		if conditions:
-			query += " WHERE %s" % " AND ".join(conditions)
+		if arches:
+			query += " AND jobs.arch_id IN (%s)" % ", ".join(["%s"] * len(arches))
+			args.extend([a.id for a in arches])
 
-		# Choose the oldest one at first, but prefer real builds instead of
-		# test builds.
+		if builder:
+			#query += " AND (jobs.builder_id = %s OR jobs.builder_id IS NULL)"
+			#args.append(builder.id)
+
+			# Check out which types of builds this builder builds.
+			build_types = []
+			for build_type in builder.build_types:
+				if build_type == "release":
+					build_types.append("(builds.type = 'release' AND jobs.type = 'build')")
+				elif build_type == "scratch":
+					build_types.append("(builds.type = 'scratch' AND jobs.type = 'build')")
+				elif build_type == "test":
+					build_types.append("jobs.type = 'test'")
+
+			if build_types:
+				query += " AND (%s)" % " OR ".join(build_types)
+
+		if max_tries:
+			query += " AND jobs.max_tries <= %s"
+			args.append(max_tries)
+
+		if state:
+			query += " AND jobs.state = %s"
+			args.append(state)
+
+		if states:
+			query += " AND jobs.state IN (%s)" % ", ".join(["%s"] * len(states))
+			args.extend(states)
+
+		if type:
+			query += " AND jobs.type = %s"
+			args.append(type)
+
+		# Order builds.
+		#  Release builds and scratch builds are more important than test builds.
+		#  Builds are sorted by priority and older builds are preferred.
+
 		query += " ORDER BY \
+			CASE \
+				WHEN jobs.state = 'pending' THEN 0 \
+				WHEN jobs.state = 'new'     THEN 1 \
+			END, \
 			CASE \
 				WHEN jobs.type = 'build' THEN 0 \
 				WHEN jobs.type = 'test'  THEN 1 \
@@ -1368,21 +1397,12 @@ class Jobs(base.Object):
 			builds.priority DESC, jobs.time_created ASC"
 
 		if limit:
-			if offset:
-				query += " LIMIT %s,%s"
-				args += [limit, offset]
-			else:
-				query += " LIMIT %s"
-				args += [limit]
+			query += " LIMIT %s"
+			args.append(limit)
 
-		for job in self.db.query(query, *args):
-			yield Job(self.pakfire, job.id, job)
-
-	def get_next(self, *args, **kwargs):
 		jobs = []
-
-		# Fetch all objects right now.
-		for job in self.get_next_iter(*args, **kwargs):
+		for row in self.db.query(query, *args):
+			job = self.pakfire.jobs.get_by_id(row.id, row)
 			jobs.append(job)
 
 		return jobs
@@ -1580,12 +1600,7 @@ class Job(base.Object):
 	@property
 	def data(self):
 		if self._data is None:
-			data = self.cache.get(self.cache_key)
-			if not data:
-				data = self.db.get("SELECT * FROM jobs WHERE id = %s", self.id)
-				self.cache.set(self.cache_key, data)
-
-			self._data = data
+			self._data = self.db.get("SELECT * FROM jobs WHERE id = %s", self.id)
 			assert self._data
 
 		return self._data
@@ -1714,9 +1729,8 @@ class Job(base.Object):
 				time_finished = NULL WHERE id = %s", self.id)
 
 		elif state in ("aborted", "dependency_error", "finished", "failed"):
-			# Set finish time.
-			self.db.execute("UPDATE jobs SET time_finished = NOW() WHERE id = %s",
-				self.id)
+			# Set finish time and reset builder..
+			self.db.execute("UPDATE jobs SET time_finished = NOW() WHERE id = %s", self.id)
 
 			# Send messages to the user.
 			if state == "finished":

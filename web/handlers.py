@@ -18,6 +18,7 @@ from handlers_users import *
 class IndexHandler(BaseHandler):
 	def get(self):
 		jobs = self.pakfire.jobs.get_active()
+		jobs += self.pakfire.jobs.get_next()
 		jobs += self.pakfire.jobs.get_latest(age="24 HOUR", limit=5)
 
 		# Updates

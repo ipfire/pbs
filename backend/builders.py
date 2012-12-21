@@ -539,30 +539,36 @@ class Builder(base.Object):
 
 		return "online"
 
-	def get_active_jobs(self, count=False):
-		query = self.db.query("\
-			SELECT * FROM jobs \
-			WHERE \
-				jobs.builder_id = %s AND \
-				(jobs.state = 'dispatching' OR jobs.state = 'running' OR jobs.state = 'uploading') \
-			ORDER BY time_started ASC",
-			self.id)
-
-		if count:
-			return len(query)
-
-		jobs = []
-		for job in query:
-			job = self.pakfire.jobs.get_by_id(job.id, job)
-			jobs.append(job)
-
-		return jobs
-
-	def count_active_jobs(self):
+	def get_active_jobs(self, *args, **kwargs):
 		if self._active_jobs is None:
-			self._active_jobs = self.get_active_jobs(count=True)
+			self._active_jobs = self.pakfire.jobs.get_active(builder=self, *args, **kwargs)
 
 		return self._active_jobs
+
+	def count_active_jobs(self):
+		return len(self.get_active_jobs())
+
+	@property
+	def too_many_jobs(self):
+		"""
+			Tell if this host is already running enough or too many jobs.
+		"""
+		return self.count_active_jobs() >= self.max_jobs
+
+	def get_next_jobs(self, arches=None, limit=None):
+		if arches is None:
+			arches = self.get_arches()
+
+		return self.pakfire.jobs.get_next(arches=arches, builder=self,
+			state="pending", limit=limit)
+
+	def get_next_job(self, *args, **kwargs):
+		kwargs["limit"] = 1
+
+		jobs = self.get_next_jobs(*args, **kwargs)
+
+		if jobs:
+			return jobs[0]
 
 	def get_history(self, *args, **kwargs):
 		kwargs["builder"] = self

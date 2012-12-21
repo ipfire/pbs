@@ -17,7 +17,14 @@ class BuilderDetailHandler(BaseHandler):
 	def get(self, hostname):
 		builder = self.pakfire.builders.get_by_name(hostname)
 
-		self.render("builder-detail.html", builder=builder)
+		# Get running and pending jobs.
+		jobs = self.pakfire.jobs.get_active(builder=builder)
+		jobs += self.pakfire.jobs.get_next(builder=builder)
+
+		# Get log.
+		log = builder.get_history(limit=5)
+
+		self.render("builder-detail.html", builder=builder, jobs=jobs, log=log)
 
 	@tornado.web.authenticated
 	def post(self, hostname):

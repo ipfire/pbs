@@ -607,20 +607,12 @@ class BuilderHandler(BuilderAuthMixin, CommonAuthHandler):
 	def build_get_job(self, arches):
 		# Disabled buildes do not get any jobs.
 		if self.builder.disabled:
-			logging.debug("Host requested job but is disabled: %s" \
-				% self.builder.name)
+			logging.debug("Host requested job but is disabled: %s" % self.builder.name)
 			return
 
-		# So do hosts where the metadata is not up to date.
-		#if self.builder.needs_update():
-		#	logging.debug("Host requested job but needs metadata update: %s" \
-		#		% self.builder.name)
-		#	return
-
 		# Check if host has already too many simultaneous jobs.
-		if len(self.builder.get_active_jobs()) >= self.builder.max_jobs:
-			logging.debug("Host has already too many jobs: %s" % \
-				self.builder.name)
+		if self.builder.too_many_jobs:
+			logging.debug("Host has already too many jobs: %s" % self.builder.name)
 			return
 
 		# Automatically add noarch if not already present.
@@ -642,26 +634,11 @@ class BuilderHandler(BuilderAuthMixin, CommonAuthHandler):
 			supported_arches.append(arch)
 
 		if not supported_arches:
-			logging.warning("Host does not support any arches: %s" % \
-				self.builder.name)
+			logging.warning("Host does not support any arches: %s" % self.builder.name)
 			return
 
-		# Get all jobs from the database that can be built by this host.
-		jobs = self.pakfire.jobs.get_next_iter(states=["pending"],
-			arches=supported_arches)
-
-		job = None
-		for _job in jobs:
-			# Skip jobs that should not be built here.
-			if _job.type == "test" and not "test" in self.builder.build_types:
-				continue
-
-			if not _job.build.type in self.builder.build_types:
-				continue
-
-			job = _job
-			break
-
+		# Get the next job for this builder.
+		job = self.builder.get_next_job(supported_arches)
 		if not job:
 			logging.debug("Could not find a buildable job for %s" % self.builder.name)
 			return
