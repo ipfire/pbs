@@ -130,6 +130,9 @@ class Builder(base.Object):
 		self._disabled_arches = None
 
 	def __cmp__(self, other):
+		if other is None:
+			return -1
+
 		return cmp(self.id, other.id)
 
 	@property
