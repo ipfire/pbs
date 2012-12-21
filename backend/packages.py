@@ -144,14 +144,15 @@ class Package(base.Object):
 			self.friendly_name, other.friendly_name)
 
 	@classmethod
-	def open(cls, pakfire, path):
+	def open(cls, _pakfire, path):
 		# Just check if the file really does exist.
 		assert os.path.exists(path)
 
-		file = packages.open(None, None, path)
+		p = pakfire.PakfireServer()
+		file = packages.open(p, None, path)
 
 		# Get architecture from the database.
-		arch = pakfire.arches.get_by_name(file.arch)
+		arch = _pakfire.arches.get_by_name(file.arch)
 		assert arch, "Unknown architecture: %s" % file.arch
 
 		hash_sha512 = misc.calc_hash(path, "sha512")
@@ -198,7 +199,7 @@ class Package(base.Object):
 		_query += " VALUES(%s)" % ", ".join("%s" for v in vals)
 
 		# Create package entry in the database.
-		id = pakfire.db.execute(_query, *vals)
+		id = _pakfire.db.execute(_query, *vals)
 
 		# Dependency information.
 		deps = []
@@ -218,7 +219,7 @@ class Package(base.Object):
 			deps.append((id, "obsoletes", d))
 
 		if deps:
-			pakfire.db.executemany("INSERT INTO packages_deps(pkg_id, type, what) \
+			_pakfire.db.executemany("INSERT INTO packages_deps(pkg_id, type, what) \
 				VALUES(%s, %s, %s)", deps)
 
 		# Add all files to filelists table.
@@ -239,12 +240,12 @@ class Package(base.Object):
 				f.user, f.group, datetime.datetime.utcfromtimestamp(mtime),
 				f.capabilities))
 
-		pakfire.db.executemany("INSERT INTO filelists(pkg_id, name, size, hash_sha512, \
+		_pakfire.db.executemany("INSERT INTO filelists(pkg_id, name, size, hash_sha512, \
 			type, config, mode, user, `group`, mtime, capabilities) \
 			VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", filelist)
 
 		# Return the newly created object.
-		return cls(pakfire, id)
+		return cls(_pakfire, id)
 
 	def delete(self):
 		self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", self.path)
