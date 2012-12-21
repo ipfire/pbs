@@ -198,7 +198,7 @@ class BuilderLogEntry(LogEntry):
 
 		elif action == "disabled":
 			if not self.user:
-				msg = _("Builder '%(builder)s' was has been disabled.")
+				msg = _("Builder '%(builder)s' has been disabled.")
 			elif you:
 				msg = _("You disabled builder '%(builder)s'.")
 			else:
