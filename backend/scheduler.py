@@ -1,16 +1,20 @@
 #!/usr/bin/python
 
 import logging
+import multiprocessing
 import time
 import traceback
+
+import backend.main
 
 class Event(object):
 	interval = None
 
 	priority = 0
 
-	def __init__(self, *arguments):
-		self.arguments = arguments
+	def __init__(self, *args, **kwargs):
+		self.args = args
+		self.kwargs = kwargs
 
 		self._next_start_time = 0
 
@@ -25,6 +29,30 @@ class Event(object):
 
 	def run(self, *args, **kwargs):
 		raise NotImplemented
+
+	def run_subprocess_background(self, method, *args):
+		arguments = [method,] + list(args)
+
+		process = multiprocessing.Process(target=self.fork, args=arguments)
+		process.daemon = False
+
+		# Start the process.
+		process.start()
+
+		return process
+
+	def run_subprocess(self, *args):
+		process = self.run_subprocess_background(*args)
+
+		# Wait until process has finished.
+		process.join()
+
+	@staticmethod
+	def fork(method, *args, **kwargs):
+		# Create new pakfire instance.
+		_pakfire = backend.main.Pakfire()
+
+		return method(_pakfire, *args, **kwargs)
 
 
 class Scheduler(object):
@@ -48,6 +76,7 @@ class Scheduler(object):
 	def run(self):
 		while self._queue:
 			self.sort_queue()
+			print self._queue
 
 			for event in self._queue:
 				# If the event has to be started some time in
@@ -56,7 +85,7 @@ class Scheduler(object):
 					try:
 						logging.info("Running %s..." % event)
 
-						event.run(*event.arguments)
+						event.run(*event.args, **event.kwargs)
 
 					# In case the user interrupts the scheduler.
 					except KeyboardInterrupt:
