@@ -5,13 +5,13 @@
 # Translators:
 # Michael Tremer <michael.tremer@ipfire.org>, 2011-2012.
 #   <roman.kornfeld@gmail.com>, 2011.
-#   <whytea@ipfire.org>, 2012.
+#   <whytea@ipfire.org>, 2012-2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-21 16:54+0100\n"
-"PO-Revision-Date: 2012-12-20 14:11+0000\n"
+"POT-Creation-Date: 2013-01-12 11:38+0100\n"
+"PO-Revision-Date: 2013-01-11 15:00+0000\n"
 "Last-Translator: WhyTea <whytea@ipfire.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ipfire/language/"
 "de/)\n"
@@ -52,17 +52,17 @@ msgstr "n.V."
 #: backend/logs.py:137
 #, python-format
 msgid "This build was pushed to the repository '%(to_repo)s'."
-msgstr ""
+msgstr "Dieser Build wurde in das Repository '%(to_repo)s' veröffentlicht."
 
 #: backend/logs.py:139
 #, python-format
 msgid "You pushed this build to the repository '%(to_repo)s'."
-msgstr ""
+msgstr "Du hast diesen Build in das Repository '%(to_repo)s' veröffentlicht."
 
 #: backend/logs.py:141
 #, python-format
 msgid "%(user)s pushed this build to the repository '%(to_repo)s'."
-msgstr ""
+msgstr "%(user)s hat diesen Build in das Repository '%(to_repo)s' verschoben."
 
 #: backend/logs.py:145
 #, python-format
@@ -114,9 +114,9 @@ msgid "%(user)s enabled builder '%(builder)s'."
 msgstr "%(user)s hat den Builder '%(builder)s' aktiviert."
 
 #: backend/logs.py:201
-#, fuzzy, python-format
+#, python-format
 msgid "Builder '%(builder)s' has been disabled."
-msgstr "Der Builder '%(builder)s' wurde deaktiviert."
+msgstr ""
 
 #: backend/logs.py:203
 #, python-format
@@ -799,7 +799,7 @@ msgstr "Repositorien"
 
 #: data/templates/distro-list.html:66
 msgid "New distribution"
-msgstr ""
+msgstr "Neue Distribution"
 
 #: data/templates/index.html:3
 msgid "Welcome to the Pakfire Build Service"
@@ -816,19 +816,19 @@ msgstr ""
 
 #: data/templates/index.html:38
 msgid "Latest stable updates"
-msgstr ""
+msgstr "Letzte Stable-Updates"
 
 #: data/templates/index.html:40
 msgid "Unstable updates"
-msgstr ""
+msgstr "Unstable-Updates"
 
 #: data/templates/index.html:42
 msgid "Testing updates"
-msgstr ""
+msgstr "Testing-Updates"
 
 #: data/templates/index.html:59
 msgid "View more updates..."
-msgstr ""
+msgstr "Mehr Updates..."
 
 #: data/templates/index.html:70
 msgid "Build jobs"
@@ -878,7 +878,7 @@ msgstr "Schlüssel"
 
 #: data/templates/keys-import.html:33
 msgid "Paste the key to import."
-msgstr ""
+msgstr "Füge den zu importierenden Schlüssel ein."
 
 #: data/templates/docs-index.html:3
 msgid "Documentation index"
@@ -902,15 +902,15 @@ msgstr "Was ist der Pakfire Build Service?"
 
 #: data/templates/docs-index.html:34
 msgid "General pakfire documentation"
-msgstr ""
+msgstr "Allgemeine Pakfire Dokumentation"
 
 #: data/templates/docs-index.html:39
 msgid "Packaging guidelines"
-msgstr ""
+msgstr "Paketierungsrichtlinien"
 
 #: data/templates/docs-index.html:51
 msgid "This documentation you find at this place is not completed yet."
-msgstr ""
+msgstr "D"
 
 #: data/templates/docs-index.html:52
 msgid "Feel free to make any suggestions."
@@ -943,6 +943,7 @@ msgstr "Fehlerberichte"
 msgid ""
 "Please visit Bugzilla to create bug reports on the Pakfire Build System."
 msgstr ""
+"Bitte benutze Bugzilla um Bugreports für Pakfire Build System zu erstellen."
 
 #: data/templates/jobs-buildroot.html:3
 msgid "Job buildroot"
@@ -969,7 +970,7 @@ msgstr ""
 #: data/templates/search-results.html:3 data/templates/search-results.html:22
 #, python-format
 msgid "Search results for '%s'"
-msgstr ""
+msgstr "Suchergebnisse für '%s'"
 
 #: data/templates/search-results.html:12
 msgid "Search results"
@@ -1950,9 +1951,8 @@ msgid ""
 msgstr ""
 
 #: data/templates/errors/error-403.html:4
-#, fuzzy
 msgid "403 - Access forbidden"
-msgstr "Zugriff verboten"
+msgstr ""
 
 #: data/templates/errors/error-403.html:8
 msgid "You are not allowed to access this ressource."
@@ -2342,25 +2342,22 @@ msgstr ""
 
 #: data/templates/builds/comments.html:3
 #: data/templates/builds/comments.html:42
-#, fuzzy
 msgid "Build comments"
-msgstr "Kommentar abschicken"
+msgstr ""
 
 #: data/templates/builds/comments.html:17
 #: data/templates/builds/comments.html:25 data/templates/build-index.html:18
-#, fuzzy
 msgid "Comments"
-msgstr "Kommentar"
+msgstr ""
 
 #: data/templates/builds/comments.html:33
-#, fuzzy
 msgid "Show all comments"
-msgstr "Alle Commits anzeigen"
+msgstr ""
 
 #: data/templates/builds/comments.html:40
-#, fuzzy, python-format
+#, python-format
 msgid "%s's latest comments"
-msgstr "Neueste Commits"
+msgstr ""
 
 #: data/templates/builds/comments.html:49
 #, python-format
@@ -2368,9 +2365,8 @@ msgid "This page shows %s's latest comments."
 msgstr ""
 
 #: data/templates/builds/comments.html:51
-#, fuzzy
 msgid "This page shows the latest comments on builds."
-msgstr "Es ist möglich Kommentare und Bewertungen für Builds zu hinterlassen."
+msgstr ""
 
 #: data/templates/builds/comments.html:53
 msgid ""
@@ -3792,9 +3788,8 @@ msgid "Build job list"
 msgstr "Build-Job-Liste"
 
 #: data/templates/user-profile.html:23
-#, fuzzy
 msgid "View comments"
-msgstr "Kommentar abschicken"
+msgstr ""
 
 #: data/templates/user-profile.html:41
 msgid "Email"
@@ -4305,9 +4300,3 @@ msgstr "%(weekday)s, %(month_name)s %(day)s"
 #, python-format
 msgid "%(commas)s and %(last)s"
 msgstr "%(commas)s und %(last)s"
-
-#~ msgid "When"
-#~ msgstr "Wann"
-
-#~ msgid "Comments written by %s"
-#~ msgstr "Kommentare von %s"

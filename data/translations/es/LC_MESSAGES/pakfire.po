@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-21 16:54+0100\n"
-"PO-Revision-Date: 2012-12-12 08:38+0000\n"
+"POT-Creation-Date: 2013-01-12 11:38+0100\n"
+"PO-Revision-Date: 2012-12-22 08:34+0000\n"
 "Last-Translator: Andrés Reyes <andres.rt@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/ipfire/language/"
 "es/)\n"
@@ -2330,25 +2330,22 @@ msgstr ""
 
 #: data/templates/builds/comments.html:3
 #: data/templates/builds/comments.html:42
-#, fuzzy
 msgid "Build comments"
-msgstr "Host de construcción"
+msgstr ""
 
 #: data/templates/builds/comments.html:17
 #: data/templates/builds/comments.html:25 data/templates/build-index.html:18
-#, fuzzy
 msgid "Comments"
-msgstr "Confirmar cambios."
+msgstr ""
 
 #: data/templates/builds/comments.html:33
-#, fuzzy
 msgid "Show all comments"
-msgstr "Mostrar todos los usuarios"
+msgstr ""
 
 #: data/templates/builds/comments.html:40
-#, fuzzy, python-format
+#, python-format
 msgid "%s's latest comments"
-msgstr "Últimos comentarios de los usuarios"
+msgstr ""
 
 #: data/templates/builds/comments.html:49
 #, python-format
@@ -3772,9 +3769,8 @@ msgid "Build job list"
 msgstr "Lista de trabajos de construcción"
 
 #: data/templates/user-profile.html:23
-#, fuzzy
 msgid "View comments"
-msgstr "Últimos comentarios de los usuarios"
+msgstr ""
 
 #: data/templates/user-profile.html:41
 msgid "Email"
@@ -4287,6 +4283,3 @@ msgstr "%(weekday)s, %(day)s de %(month_name)s "
 #, python-format
 msgid "%(commas)s and %(last)s"
 msgstr "%(commas)s y %(last)s"
-
-#~ msgid "Comments written by %s"
-#~ msgstr "Comentarios escritos por %s"

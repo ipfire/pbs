@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-21 16:54+0100\n"
-"PO-Revision-Date: 2012-12-12 08:39+0000\n"
-"Last-Translator: 1112daniel <1112daniel@gmail.com>\n"
+"POT-Creation-Date: 2013-01-12 11:38+0100\n"
+"PO-Revision-Date: 2013-01-08 09:59+0000\n"
+"Last-Translator: xni <xavier@nicolovici.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ipfire/language/"
 "fr/)\n"
 "Language: fr\n"
@@ -22,18 +22,18 @@ msgstr ""
 
 #: backend/logs.py:68
 msgid "Build has been created"
-msgstr ""
+msgstr "Compilation créée"
 
 #: backend/logs.py:107 backend/logs.py:171 backend/logs.py:231
 #: backend/logs.py:306
 msgid "Unknown action."
-msgstr ""
+msgstr "Action inconnue."
 
 #: backend/logs.py:118 backend/logs.py:187 backend/logs.py:248
 #: backend/logs.py:322 data/templates/mirrors-list.html:72
 #: data/templates/builder-detail.html:159 data/templates/jobs-detail.html:82
 msgid "Unknown"
-msgstr ""
+msgstr "Inconnu"
 
 #: backend/logs.py:125 backend/logs.py:131
 #: data/templates/sessions/index.html:50 data/templates/mirrors-list.html:56
@@ -46,37 +46,37 @@ msgstr ""
 #: data/templates/builder-detail.html:173
 #: data/templates/builder-detail.html:187 data/templates/uploads-list.html:55
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: backend/logs.py:137
 #, python-format
 msgid "This build was pushed to the repository '%(to_repo)s'."
-msgstr ""
+msgstr "Cette compilation a été déplacée dans le dépôt '%(to_repo)s'."
 
 #: backend/logs.py:139
 #, python-format
 msgid "You pushed this build to the repository '%(to_repo)s'."
-msgstr ""
+msgstr "Vous avez déposé cette compilation dans le dépôt '%(to_repo)s'."
 
 #: backend/logs.py:141
 #, python-format
 msgid "%(user)s pushed this build to the repository '%(to_repo)s'."
-msgstr ""
+msgstr "%(user)s a déplacé cette compilation dans le dépôt '%(to_repo)s'."
 
 #: backend/logs.py:145
 #, python-format
 msgid "This build was unpushed from the repository '%(from_repo)s'."
-msgstr ""
+msgstr "Cette compilation a été retirée du dépôt '%(from_repo)s'."
 
 #: backend/logs.py:147
 #, python-format
 msgid "You unpushed this build from the repository '%(from_repo)s'."
-msgstr ""
+msgstr "Vous avez retiré cette compilation du dépôt '%(from_repo)s'."
 
 #: backend/logs.py:149
 #, python-format
 msgid "%(user)s unpushed this build from the repository '%(from_repo)s'."
-msgstr ""
+msgstr "%(user)s a retiré cette compilation du dépôt '%(from_repo)s'."
 
 #: backend/logs.py:153
 #, python-format
@@ -100,72 +100,72 @@ msgstr ""
 #: backend/logs.py:193
 #, python-format
 msgid "Builder '%(builder)s' has been enabled."
-msgstr ""
+msgstr "Le compilateur '%(builder)s' est maintenant activé."
 
 #: backend/logs.py:195
 #, python-format
 msgid "You enabled builder '%(builder)s'."
-msgstr ""
+msgstr "Vous avez activé le compilateur '%(builder)s'."
 
 #: backend/logs.py:197
 #, python-format
 msgid "%(user)s enabled builder '%(builder)s'."
-msgstr ""
+msgstr "Le compilateur '%(builder)s' a été activé par %(user)s."
 
 #: backend/logs.py:201
 #, python-format
 msgid "Builder '%(builder)s' has been disabled."
-msgstr ""
+msgstr "Le compilateur '%(builder)s' est maintenant désactivé."
 
 #: backend/logs.py:203
 #, python-format
 msgid "You disabled builder '%(builder)s'."
-msgstr ""
+msgstr "Vous avez désactivé le compilateur '%(builder)s'."
 
 #: backend/logs.py:205
 #, python-format
 msgid "%(user)s disabled builder '%(builder)s'."
-msgstr ""
+msgstr "Le compilateur '%(builder)s' a été désactivé par %(user)s."
 
 #: backend/logs.py:209
 #, python-format
 msgid "You deleted builder '%(builder)s'."
-msgstr ""
+msgstr "Vous avez supprimé le compilateur '%(builder)s'."
 
 #: backend/logs.py:211
 #, python-format
 msgid "%(user)s deleted builder '%(builder)s'."
-msgstr ""
+msgstr "Le compilateur '%(builder)s' a été supprimé par %(user)s."
 
 #: backend/logs.py:215
 #, python-format
 msgid "You created builder '%(builder)s'."
-msgstr ""
+msgstr "Vous avez créé le compilateur '%(builder)s'."
 
 #: backend/logs.py:217
 #, python-format
 msgid "%(user)s created builder '%(builder)s'."
-msgstr ""
+msgstr "Le compilateur '%(builder)s' a été créé par %(user)s."
 
 #: backend/logs.py:254
 #, python-format
 msgid "Job '%(job)s' has been created."
-msgstr ""
+msgstr "La tâche '%(job)s' a été créé."
 
 #: backend/logs.py:256
 #, python-format
 msgid "You created job '%(job)s'."
-msgstr ""
+msgstr "Vous avez créé la tâche '%(job)s'."
 
 #: backend/logs.py:258
 #, python-format
 msgid "%(user)s created job '%(job)s'."
-msgstr ""
+msgstr "L'utilisateur %(user)s a créé la tâche '%(job)s'."
 
 #: backend/logs.py:262
 #, python-format
 msgid "Job '%(job)s' has changed its state to: %(state)s."
-msgstr ""
+msgstr "La tâche '%(job)s' est maintenant dans le statut: %(state)s."
 
 #: backend/logs.py:264
 #, python-format
@@ -323,7 +323,7 @@ msgstr ""
 
 #: backend/users.py:462
 msgid "Account Activation"
-msgstr ""
+msgstr "Activation de compte"
 
 #: backend/users.py:464
 msgid ""
@@ -379,7 +379,7 @@ msgstr ""
 #: data/templates/repository-detail.html:10 data/templates/uploads-list.html:8
 #: data/templates/jobs-detail.html:8
 msgid "Home"
-msgstr ""
+msgstr "Accueil"
 
 #: data/templates/sessions/index.html:35 data/templates/jobs-detail.html:122
 msgid "Started"
@@ -504,7 +504,7 @@ msgstr ""
 
 #: data/templates/base.html:132
 msgid "My profile"
-msgstr ""
+msgstr "Mon profil"
 
 #: data/templates/base.html:138
 msgid "My builds"
@@ -520,7 +520,7 @@ msgstr ""
 
 #: data/templates/base.html:160
 msgid "Logout"
-msgstr ""
+msgstr "Déconnexion"
 
 #: data/templates/base.html:168 data/templates/docs-users.html:56
 msgid "Register"
@@ -532,7 +532,7 @@ msgstr ""
 
 #: data/templates/base.html:184
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Mot de passe oublié?"
 
 #: data/templates/distro-source-detail.html:19
 #: data/templates/distro-source-commit-detail.html:21
@@ -637,20 +637,20 @@ msgstr ""
 #: data/templates/jobs-abort.html:16 data/templates/jobs-buildroot.html:34
 #: data/templates/modules/jobs/list.html:5 data/templates/jobs-detail.html:58
 msgid "Build job"
-msgstr ""
+msgstr "Tâche de compilation"
 
 #: data/templates/jobs-abort.html:25
 #: data/templates/modules/build-offset.html:5
 msgid "Start time"
-msgstr ""
+msgstr "Heure de démarrage"
 
 #: data/templates/jobs-abort.html:30
 msgid "No started, yet."
-msgstr ""
+msgstr "Pas encore démarré"
 
 #: data/templates/jobs-abort.html:38
 msgid "Build server"
-msgstr ""
+msgstr "Serveur de compilation"
 
 #: data/templates/distro-update-edit.html:3 data/templates/distro-edit.html:3
 #: data/templates/distro-edit.html:6
@@ -680,7 +680,7 @@ msgstr "Distribution"
 
 #: data/templates/register-fail.html:4
 msgid "Registration failed"
-msgstr ""
+msgstr "Création du compte impossible"
 
 #: data/templates/register-fail.html:6
 #: data/templates/register-activation-fail.html:23
@@ -690,7 +690,7 @@ msgstr "Nous sommes désolés."
 
 #: data/templates/register-fail.html:7
 msgid "We could not create your requested account."
-msgstr ""
+msgstr "Nous ne pouvons pas finaliser la création de votre compte."
 
 #: data/templates/register-fail.html:17
 #: data/templates/user-profile-edit-fail.html:17
@@ -698,6 +698,8 @@ msgid ""
 "Use the back button on your web browser to go back to the previous page and "
 "correct your submission."
 msgstr ""
+"Utilisez le boutton de retour arrière de votre navigateur pour retrouver "
+"votre formulaire et le corriger."
 
 #: data/templates/build-bugs.html:3 data/templates/build-bugs.html:24
 msgid "Bug list"
@@ -803,39 +805,39 @@ msgstr "Bienvenue dans le Pakfire Build Service"
 #: data/templates/index.html:8
 #, python-format
 msgid "Welcome, %s!"
-msgstr ""
+msgstr "Bienvenue, %s!"
 
 #: data/templates/index.html:22
 msgid "Development powered by community!"
-msgstr ""
+msgstr "Développement par et pour la communauté!"
 
 #: data/templates/index.html:38
 msgid "Latest stable updates"
-msgstr ""
+msgstr "Dernières mises à jour stables"
 
 #: data/templates/index.html:40
 msgid "Unstable updates"
-msgstr ""
+msgstr "Mises à jour instables"
 
 #: data/templates/index.html:42
 msgid "Testing updates"
-msgstr ""
+msgstr "Mises à jour en test"
 
 #: data/templates/index.html:59
 msgid "View more updates..."
-msgstr ""
+msgstr "Voir plus de mises à jour..."
 
 #: data/templates/index.html:70
 msgid "Build jobs"
-msgstr ""
+msgstr "Tâches de compilation"
 
 #: data/templates/index.html:76
 msgid "Show more build jobs"
-msgstr ""
+msgstr "Afficher plus de tâches de compilation..."
 
 #: data/templates/builder-list.html:31 data/templates/distro-edit.html:66
 msgid "Architectures"
-msgstr ""
+msgstr "Architectures"
 
 #: data/templates/builder-list.html:32
 #: data/templates/modules/build-table.html:15
@@ -843,7 +845,7 @@ msgstr ""
 #: data/templates/jobs-index.html:3 data/templates/jobs-index.html:12
 #: data/templates/jobs-index.html:23
 msgid "Jobs"
-msgstr ""
+msgstr "Tâches"
 
 #: data/templates/builder-list.html:50 data/templates/builder-detail.html:175
 msgid "Overload"
@@ -851,7 +853,7 @@ msgstr ""
 
 #: data/templates/builder-list.html:53
 msgid "Unknown CPU"
-msgstr ""
+msgstr "Processeur inconnu"
 
 #: data/templates/builder-list.html:74 data/templates/builder-new.html:3
 #: data/templates/builder-new.html:16 data/templates/builder-new.html:41
@@ -979,7 +981,7 @@ msgstr ""
 #: data/templates/search-results.html:40 data/templates/jobs-filter.html:59
 #: data/templates/search-form.html:35
 msgid "Go!"
-msgstr ""
+msgstr "Afficher!"
 
 #: data/templates/search-results.html:71 data/templates/file-detail.html:111
 msgid "Files"
@@ -1002,18 +1004,20 @@ msgstr ""
 
 #: data/templates/register-success.html:4
 msgid "Registration successful"
-msgstr ""
+msgstr "Enregistrement terminée avec succès"
 
 #: data/templates/register-success.html:6
 #, python-format
 msgid "Your new account has been created, %s."
-msgstr ""
+msgstr "Votre compte a été créé, %s."
 
 #: data/templates/register-success.html:7
 msgid ""
 "To complete the activation, follow the instructions that were sent to you in "
 "an activation email."
 msgstr ""
+"Pour valider définitivement ce dernier, suivez les instructions qui vous ont "
+"été transmises par email à l'adresse mentionnée lors de votre inscription."
 
 #: data/templates/package-properties.html:3
 #: data/templates/modules/log-table.html:12
@@ -1138,7 +1142,7 @@ msgstr ""
 
 #: data/templates/mirrors-detail.html:79
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
 #: data/templates/mirrors-detail.html:89
 msgid "Never"
@@ -1182,78 +1186,84 @@ msgstr ""
 
 #: data/templates/updates-index.html:6
 msgid "Coming soon..."
-msgstr ""
+msgstr "Bientôt disponible..."
 
 #: data/templates/register.html:3 data/templates/register.html:18
 msgid "Register a new account"
-msgstr ""
+msgstr "Création d'un nouveau compte"
 
 #: data/templates/register.html:12
 msgid "Register new account"
-msgstr ""
+msgstr "Création de compte"
 
 #: data/templates/register.html:19
 msgid "Join the community!"
-msgstr ""
+msgstr "Rejoignez la communauté!"
 
 #: data/templates/register.html:26
 msgid "Registration form"
-msgstr ""
+msgstr "Formulaire d'enregistrement"
 
 #: data/templates/register.html:30 data/templates/user-profile-edit.html:37
 #: data/templates/login.html:22 data/templates/user-profile.html:37
 msgid "Username"
-msgstr ""
+msgstr "Nom d'utilisateur"
 
 #: data/templates/register.html:35
 msgid "Must be a unique name you login with."
-msgstr ""
+msgstr "Doit être un nom unique pour vous identifier"
 
 #: data/templates/register.html:41 data/templates/user-profile-edit.html:60
 msgid "Email address"
-msgstr ""
+msgstr "Adresse électronique"
 
 #: data/templates/register.html:46
 msgid "Type in your email address, which is used to verify the account."
 msgstr ""
+"Saisissez une adresse électronique valable, elle sera utilisée pour valider "
+"votre compte."
 
 #: data/templates/register.html:52
 msgid "Real name (optional)"
-msgstr ""
+msgstr "Votre nom complet (optionnel)"
 
 #: data/templates/register.html:57
 msgid "Type you firstname and your lastname here."
-msgstr ""
+msgstr "Saisissez ici vos nom et prénom"
 
 #: data/templates/register.html:64
 msgid "Account security"
-msgstr ""
+msgstr "Sécurité du compte"
 
 #: data/templates/register.html:67 data/templates/user-profile-edit.html:101
 #: data/templates/login.html:28
 msgid "Password"
-msgstr ""
+msgstr "Mot de passe"
 
 #: data/templates/register.html:72 data/templates/user-profile-edit.html:106
 msgid ""
 "The password is used to secure the login and must be at least 8 characters."
 msgstr ""
+"Le mot de passe est nécessaire pour protéger votre compte, il doit comporter "
+"au minimum 8 caractères."
 
 #: data/templates/register.html:78
 msgid "Confirm password"
-msgstr ""
+msgstr "Confirmation du mot de passe"
 
 #: data/templates/register.html:83
 msgid "Pick a password that is as strong as possible."
-msgstr ""
+msgstr "Saisissez un mot de passe aussi compliqué que possible."
 
 #: data/templates/register.html:84
 msgid "Don't login at unsecure places where people could spy on your password."
 msgstr ""
+"Ne vous connectez pas depuis un endroit publique, certaines personnes "
+"malveillantes pourraient récupérer votre mot de passe."
 
 #: data/templates/register.html:91
 msgid "Sign up!"
-msgstr ""
+msgstr "Enregistré !"
 
 #: data/templates/modules/log-entry.html:21
 msgid "You"
@@ -1295,7 +1305,7 @@ msgstr ""
 #: data/templates/modules/modal-base.html:25
 #: data/templates/user-forgot-password.html:49
 msgid "Submit"
-msgstr ""
+msgstr "Soumettre"
 
 #: data/templates/modules/log-entry-comment.html:22
 msgid "No comment given."
@@ -1373,7 +1383,7 @@ msgstr ""
 #: data/templates/login.html:3 data/templates/login.html:7
 #: data/templates/login.html:34
 msgid "Login"
-msgstr ""
+msgstr "Connexion"
 
 #: data/templates/modules/build-offset.html:8
 msgid "As soon as possible"
@@ -1444,50 +1454,50 @@ msgstr "Durée"
 
 #: data/templates/modules/jobs-table.html:19 web/ui_modules.py:306
 msgid "New"
-msgstr ""
+msgstr "Nouveau"
 
 #: data/templates/modules/jobs-table.html:21
 #: data/templates/build-filter.html:32 web/ui_modules.py:311
 msgid "Pending"
-msgstr ""
+msgstr "En attente"
 
 #: data/templates/modules/jobs-table.html:23
 #: data/templates/build-filter.html:34 web/ui_modules.py:296
 msgid "Failed"
-msgstr ""
+msgstr "Erreur"
 
 #: data/templates/modules/jobs-table.html:25
 #: data/templates/build-filter.html:36 web/ui_modules.py:291
 msgid "Dispatching"
-msgstr ""
+msgstr "En préparation"
 
 #: data/templates/modules/jobs-table.html:27
 #: data/templates/build-filter.html:33 data/templates/jobs-detail.html:128
 #: web/ui_modules.py:301
 msgid "Finished"
-msgstr ""
+msgstr "Terminé"
 
 #: data/templates/modules/jobs-table.html:29
 #: data/templates/build-filter.html:31 web/ui_modules.py:316
 msgid "Running"
-msgstr ""
+msgstr "En cours"
 
 #: data/templates/modules/jobs-table.html:31 web/ui_modules.py:281
 msgid "Aborted"
-msgstr ""
+msgstr "Annulé"
 
 #: data/templates/modules/jobs-table.html:33
 msgid "Dependency error"
-msgstr ""
+msgstr "Erreur de dépendance"
 
 #: data/templates/modules/jobs-table.html:47
 #, python-format
 msgid "Running since %s"
-msgstr ""
+msgstr "En cours depuis %s"
 
 #: data/templates/modules/jobs-table.html:51
 msgid "Not finished, yet."
-msgstr "Non terminé pour l'instant."
+msgstr "Pas terminé pour l'instant."
 
 #: data/templates/modules/jobs-table.html:60
 #, python-format
@@ -1496,7 +1506,7 @@ msgstr ""
 
 #: data/templates/modules/jobs-table.html:66
 msgid "No jobs, yet."
-msgstr ""
+msgstr "Pas encore de tâches"
 
 #: data/templates/modules/footer.html:5
 msgid ""
@@ -1633,7 +1643,7 @@ msgstr ""
 #: data/templates/builds-watchers-list.html:31
 #: data/templates/build-state.html:3 data/templates/build-state.html:6
 msgid "Build"
-msgstr "Build"
+msgstr "Compilation"
 
 #: data/templates/modules/build-table.html:17
 #: data/templates/repository-detail.html:4
@@ -1646,7 +1656,7 @@ msgstr ""
 #: data/templates/builds-watchers-add.html:76
 #: data/templates/user-profile.html:29 data/templates/user-profile.html:54
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 #: data/templates/modules/build-table.html:23 data/templates/keys-list.html:32
 #: data/templates/jobs-detail.html:117
@@ -1860,11 +1870,11 @@ msgstr ""
 #: data/templates/builder-detail.html:3 data/templates/builder-detail.html:74
 #: data/templates/builder-pass.html:23
 msgid "Builder"
-msgstr ""
+msgstr "Compilateur"
 
 #: data/templates/modules/jobs/list.html:7
 msgid "Runtime"
-msgstr ""
+msgstr "Durée d'exécution"
 
 #: data/templates/modules/jobs/status.html:9
 msgid "This build has got no jobs."
@@ -2060,7 +2070,7 @@ msgstr ""
 #: data/templates/jobs-filter.html:3 data/templates/jobs-filter.html:21
 #: data/templates/jobs-index.html:18
 msgid "Filter jobs"
-msgstr ""
+msgstr "Filter les tâches"
 
 #: data/templates/jobs-filter.html:16
 msgid "Filter"
@@ -2072,20 +2082,20 @@ msgstr ""
 
 #: data/templates/jobs-filter.html:36
 msgid "Only show jobs, that have been built by this builder."
-msgstr ""
+msgstr "Afficher seulement les tâches prises en charge par ce compilateur."
 
 #: data/templates/jobs-filter.html:44
 msgid "Architecture"
-msgstr ""
+msgstr "Architecture"
 
 #: data/templates/jobs-filter.html:53
 msgid "Only show jobs, with this architecture."
-msgstr ""
+msgstr "Afficher seulement les tâches relatives à cette architecture."
 
 #: data/templates/user-profile-passwd-ok.html:3
 #: data/templates/user-profile-passwd-ok.html:29
 msgid "Password changed"
-msgstr ""
+msgstr "Mot de passe changé"
 
 #: data/templates/user-profile-passwd-ok.html:20
 #: data/templates/user-profile-passwd.html:3
@@ -2313,9 +2323,8 @@ msgstr ""
 
 #: data/templates/builds/comments.html:17
 #: data/templates/builds/comments.html:25 data/templates/build-index.html:18
-#, fuzzy
 msgid "Comments"
-msgstr "Commit"
+msgstr ""
 
 #: data/templates/builds/comments.html:33
 msgid "Show all comments"
@@ -2786,12 +2795,12 @@ msgstr ""
 
 #: data/templates/register-activation-fail.html:3
 msgid "Account activation failed"
-msgstr ""
+msgstr "Erreur lors de l'activation du compte"
 
 #: data/templates/register-activation-fail.html:12
 #: data/templates/register-activation-success.html:12
 msgid "Account activation"
-msgstr ""
+msgstr "Activation de compte"
 
 #: data/templates/register-activation-fail.html:17
 msgid "Activation failed"
@@ -2912,20 +2921,20 @@ msgstr ""
 
 #: data/templates/register-activation-success.html:3
 msgid "Account activation successful"
-msgstr ""
+msgstr "Activation du compte terminée avec succès"
 
 #: data/templates/register-activation-success.html:17
 msgid "Activation successful"
-msgstr ""
+msgstr "Activation terminée"
 
 #: data/templates/register-activation-success.html:23
 #, python-format
 msgid "Your account has been activated, %s."
-msgstr ""
+msgstr "Votre compte a été activé avec succès, %s."
 
 #: data/templates/register-activation-success.html:24
 msgid "Have fun!"
-msgstr ""
+msgstr "Bienvenue!"
 
 #: data/templates/builds-watchers-add.html:3
 #: data/templates/builds-watchers-add.html:29
@@ -3163,27 +3172,29 @@ msgstr ""
 
 #: data/templates/login.html:12
 msgid "Login failed!"
-msgstr ""
+msgstr "Erreur de connexion!"
 
 #: data/templates/login.html:13
 msgid "Username and/or password was wrong. Login failed."
 msgstr ""
+"Le nom d'utilisateur et/ou le mot de passe saisis sont invalides. Connexion "
+"impossible."
 
 #: data/templates/login.html:41
 msgid "You also might want to..."
-msgstr ""
+msgstr "Vous pouvez aussi..."
 
 #: data/templates/login.html:44
 msgid "Register a new account."
-msgstr ""
+msgstr "Enregistrer un nouveau compte utilisateur."
 
 #: data/templates/login.html:47
 msgid "Recover your password."
-msgstr ""
+msgstr "Récupérer un mot de passe perdu."
 
 #: data/templates/build-detail.html:41
 msgid "Score"
-msgstr ""
+msgstr "Score"
 
 #: data/templates/build-detail.html:44
 msgid "(broken)"
@@ -3216,7 +3227,7 @@ msgstr ""
 
 #: data/templates/build-detail.html:74
 msgid "Changes"
-msgstr ""
+msgstr "Modifications"
 
 #: data/templates/build-detail.html:114
 msgid "Change state"
@@ -3586,31 +3597,33 @@ msgstr "Allez voir vos e-mails - vous savez déjà quoi faire."
 #: data/templates/user-forgot-password.html:12
 #: data/templates/user-forgot-password.html:17
 msgid "Forgot password"
-msgstr ""
+msgstr "Mot de passe oublié"
 
 #: data/templates/user-forgot-password.html:22
 msgid "Work in progress!"
-msgstr ""
+msgstr "Développement en cours"
 
 #: data/templates/user-forgot-password.html:28
 msgid "You have forgotten you password, eh? Shame on you."
-msgstr ""
+msgstr "Vous avez oublié votre mot de passe? Honte à vous."
 
 #: data/templates/user-forgot-password.html:29
 msgid "However, we allow to re-activate your account."
-msgstr ""
+msgstr "Heureusement, vous pouvez demander à réactiver votre compte."
 
 #: data/templates/user-forgot-password.html:32
 msgid "You need to enter your username below."
-msgstr ""
+msgstr "Il vous suffit de soumettre votre nom d'utilisateur."
 
 #: data/templates/user-forgot-password.html:33
 msgid "After that, you will receive an email with intructions how to go on."
 msgstr ""
+"Vous recevrez par la suite un email contenant les instructions nécessaires "
+"pour réinitialiser votre mot de passe."
 
 #: data/templates/user-forgot-password.html:42
 msgid "Your username"
-msgstr ""
+msgstr "Votre nom d'utilisateur"
 
 #: data/templates/job-schedule-rebuild.html:3
 #: data/templates/job-schedule-rebuild.html:29
@@ -3681,12 +3694,12 @@ msgstr ""
 #: data/templates/jobs-index.html:30
 #, python-format
 msgid "Showing only jobs from %s."
-msgstr ""
+msgstr "Affiche seulement les compilation réalisées sur le compilateur %s."
 
 #: data/templates/jobs-index.html:37
 #, python-format
 msgid "Showing only builds that have been built on %s."
-msgstr ""
+msgstr "Affiche seulement les tâches de compilation pour l'architecture %s."
 
 #: data/templates/jobs-index.html:45
 #, python-format
@@ -3699,7 +3712,7 @@ msgstr ""
 
 #: data/templates/distro-update-detail.html:33
 msgid "Time created"
-msgstr ""
+msgstr "Heure de création"
 
 #: data/templates/distro-update-detail.html:41
 msgid "Builds in this update"
@@ -3712,23 +3725,23 @@ msgstr ""
 
 #: data/templates/user-profile.html:23
 msgid "View comments"
-msgstr ""
+msgstr "Voir les commentaires"
 
 #: data/templates/user-profile.html:41
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: data/templates/user-profile.html:61
 msgid "Registered"
-msgstr ""
+msgstr "Date d'enregistrement"
 
 #: data/templates/user-profile.html:80
 msgid "Edit profile"
-msgstr ""
+msgstr "Modifier le profil"
 
 #: data/templates/user-profile.html:94
 msgid "Delete account"
-msgstr ""
+msgstr "Supprimer le compte"
 
 #: data/templates/user-profile.html:101
 msgid "Impersonate user"
@@ -3736,7 +3749,7 @@ msgstr ""
 
 #: data/templates/user-profile.html:121
 msgid "Permissions"
-msgstr ""
+msgstr "Permissions"
 
 #: data/templates/user-profile.html:125
 msgid "This user has administration rights."
@@ -3859,11 +3872,11 @@ msgstr ""
 
 #: data/templates/uploads-list.html:24
 msgid "Filename"
-msgstr ""
+msgstr "Nom du fichier"
 
 #: data/templates/uploads-list.html:26
 msgid "Filesize"
-msgstr ""
+msgstr "Taille du fichier"
 
 #: data/templates/uploads-list.html:27
 msgid "Time running"
@@ -3880,7 +3893,7 @@ msgstr ""
 #: data/templates/build-filter.html:15 data/templates/build-filter.html:39
 #: data/templates/build-filter.html:55
 msgid "Any"
-msgstr ""
+msgstr "Tous"
 
 #: data/templates/build-filter.html:23
 msgid "Show only builds in that distribution."
@@ -3888,7 +3901,7 @@ msgstr ""
 
 #: data/templates/build-filter.html:30
 msgid "All"
-msgstr ""
+msgstr "Tout"
 
 #: data/templates/build-filter.html:35
 msgid "Permanently failed"
@@ -3896,7 +3909,7 @@ msgstr ""
 
 #: data/templates/build-filter.html:37 web/ui_modules.py:321
 msgid "Uploading"
-msgstr ""
+msgstr "En cours de chargement"
 
 #: data/templates/build-filter.html:40
 msgid "Building"
@@ -3904,7 +3917,7 @@ msgstr ""
 
 #: data/templates/build-filter.html:43
 msgid "Obsolete"
-msgstr ""
+msgstr "Obsolète"
 
 #: data/templates/build-filter.html:44
 msgid "Broken"
@@ -3995,20 +4008,20 @@ msgstr ""
 
 #: web/ui_modules.py:154
 msgid "Today"
-msgstr ""
+msgstr "Aujourd'hui"
 
 #: web/ui_modules.py:159
 msgid "Yesterday"
-msgstr ""
+msgstr "Hier"
 
 #: web/ui_modules.py:286
 msgid "Dependency problem"
-msgstr ""
+msgstr "Problème de dépendance"
 
 #: web/ui_modules.py:327
 #, python-format
 msgid "Unknown: %s"
-msgstr ""
+msgstr "Inconnu: %s"
 
 #: web/handlers_auth.py:66
 msgid "No username provided."
@@ -4016,15 +4029,15 @@ msgstr ""
 
 #: web/handlers_auth.py:68
 msgid "The given username is already taken."
-msgstr ""
+msgstr "Le nom d'utilisateur choisi existe déjà."
 
 #: web/handlers_auth.py:71 web/handlers_users.py:177
 msgid "No email address provided."
-msgstr ""
+msgstr "Vous n'avez pas fourni d'adresse électronique."
 
 #: web/handlers_auth.py:73 web/handlers_users.py:179
 msgid "Email address is invalid."
-msgstr ""
+msgstr "L'adresse électronique est invalide."
 
 #: web/handlers_auth.py:75
 msgid "The given email address is already used for another account."
@@ -4036,19 +4049,19 @@ msgstr ""
 
 #: web/handlers_auth.py:81 web/handlers_users.py:185
 msgid "Passwords do not match."
-msgstr ""
+msgstr "Les mots de passe ne correspondent pas."
 
 #: web/handlers_auth.py:85
 msgid "Your password is too weak."
-msgstr ""
+msgstr "Votre mot de passe est trop simple."
 
 #: web/handlers_builds.py:368
 msgid "User not found."
-msgstr ""
+msgstr "Utilisateur inconnu."
 
 #: web/handlers_users.py:112
 msgid "You need to enter you current password."
-msgstr ""
+msgstr "Vous devez saisir votre mot de passe"
 
 #: web/handlers_users.py:115
 msgid "The provided account password is wrong."
@@ -4060,91 +4073,91 @@ msgstr ""
 
 #: web/handlers_users.py:126
 msgid "The password was blank."
-msgstr ""
+msgstr "Le mot de passe est vide"
 
 #: web/handlers_users.py:130
 msgid "The given password is too weak."
-msgstr ""
+msgstr "Le mot de passe fourni est trop simple"
 
 #: web/handlers_users.py:183
 msgid "Password has less than 8 characters."
-msgstr ""
+msgstr "Le mot de passe contient moins de 8 caractères"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "January"
-msgstr ""
+msgstr "Janvier"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "February"
-msgstr ""
+msgstr "Février"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "March"
-msgstr ""
+msgstr "Mars"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "April"
-msgstr ""
+msgstr "Avril"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "May"
-msgstr ""
+msgstr "Mai"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "June"
-msgstr ""
+msgstr "Juin"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "July"
-msgstr ""
+msgstr "Juillet"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "August"
-msgstr ""
+msgstr "Août"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "September"
-msgstr ""
+msgstr "Septembre"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "October"
-msgstr ""
+msgstr "Octobre"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "November"
-msgstr ""
+msgstr "Novembre"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "December"
-msgstr ""
+msgstr "Décembre"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Monday"
-msgstr ""
+msgstr "Lundi"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Tuesday"
-msgstr ""
+msgstr "Mardi"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Wednesday"
-msgstr ""
+msgstr "Mercredi"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Thursday"
-msgstr ""
+msgstr "Jeudi"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:240
 msgid "Friday"
-msgstr ""
+msgstr "Vendredi"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:240
 msgid "Saturday"
-msgstr ""
+msgstr "Samedi"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:240
 msgid "Sunday"
-msgstr ""
+msgstr "Dimanche"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:290
 #, python-format
@@ -4164,58 +4177,58 @@ msgstr[1] ""
 #, python-format
 msgid "1 hour ago"
 msgid_plural "%(hours)d hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Il y a une heure"
+msgstr[1] "Il y a %(hours)d heures"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:303
 #, python-format
 msgid "%(time)s"
-msgstr ""
+msgstr "%(time)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:306
 msgid "yesterday"
-msgstr ""
+msgstr "hier"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:307
 #, python-format
 msgid "yesterday at %(time)s"
-msgstr ""
+msgstr "hier à %(time)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:309
 #, python-format
 msgid "%(weekday)s"
-msgstr ""
+msgstr "%(weekday)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:310
 #, python-format
 msgid "%(weekday)s at %(time)s"
-msgstr ""
+msgstr "%(weekday)s à %(time)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:312
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:354
 #, python-format
 msgid "%(month_name)s %(day)s"
-msgstr ""
+msgstr "%(day)s %(month_name)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:313
 #, python-format
 msgid "%(month_name)s %(day)s at %(time)s"
-msgstr ""
+msgstr "%(day)s %(month_name)s à %(time)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:316
 #, python-format
 msgid "%(month_name)s %(day)s, %(year)s"
-msgstr ""
+msgstr "%(day)s %(month_name)s %(year)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:317
 #, python-format
 msgid "%(month_name)s %(day)s, %(year)s at %(time)s"
-msgstr ""
+msgstr "%(day)s %(month_name)s %(year)s à %(time)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:348
 #, python-format
 msgid "%(weekday)s, %(month_name)s %(day)s"
-msgstr ""
+msgstr "%(weekday)s %(day)s %(month_name)s"
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:369
 #, python-format

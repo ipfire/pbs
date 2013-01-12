@@ -3,17 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-#   <compworm@ya.ru>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-12 11:38+0100\n"
-"PO-Revision-Date: 2012-12-22 08:34+0000\n"
-"Last-Translator: CompWorm <compworm@ya.ru>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/ipfire/language/"
-"ru/)\n"
-"Language: ru\n"
+"PO-Revision-Date: 2011-05-19 22:47+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Ukrainian (http://www.transifex.com/projects/p/ipfire/"
+"language/uk/)\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -33,7 +32,7 @@ msgstr ""
 #: backend/logs.py:322 data/templates/mirrors-list.html:72
 #: data/templates/builder-detail.html:159 data/templates/jobs-detail.html:82
 msgid "Unknown"
-msgstr "Неизвестно"
+msgstr ""
 
 #: backend/logs.py:125 backend/logs.py:131
 #: data/templates/sessions/index.html:50 data/templates/mirrors-list.html:56
@@ -323,19 +322,17 @@ msgstr ""
 
 #: backend/users.py:462
 msgid "Account Activation"
-msgstr "Активация учётной записи"
+msgstr ""
 
 #: backend/users.py:464
 msgid ""
 "You, or somebody using you email address, has registered an account on the "
 "Pakfire Build Service."
 msgstr ""
-"Вы или кто-то использующий Ваш e-mail, зарегистрировал аккаунт на Службе "
-"Сборки Pakfire."
 
 #: backend/users.py:466
 msgid "To activate your account, please click on the link below."
-msgstr "Чтобы активировать учетную запись, нажмите на ссылку ниже."
+msgstr ""
 
 #: data/templates/sessions/index.html:3 data/templates/sessions/index.html:12
 #: data/templates/sessions/index.html:17 data/templates/base.html:106
@@ -397,7 +394,7 @@ msgstr ""
 
 #: data/templates/base.html:4
 msgid "No title given"
-msgstr "Заголовок не указан"
+msgstr ""
 
 #: data/templates/base.html:29 data/templates/index.html:16
 msgid "Pakfire Build Service"
@@ -420,7 +417,7 @@ msgstr ""
 #: data/templates/job-schedule-rebuild.html:12
 #: data/templates/jobs-detail.html:12
 msgid "Packages"
-msgstr "Пакеты"
+msgstr ""
 
 #: data/templates/base.html:37 data/templates/distro-update-edit.html:20
 #: data/templates/docs-index.html:43 data/templates/builds/comments.html:12
@@ -429,7 +426,7 @@ msgstr "Пакеты"
 #: data/templates/docs-build.html:16 data/templates/build-index.html:3
 #: data/templates/build-index.html:12 data/templates/build-index.html:26
 msgid "Builds"
-msgstr "Сборки"
+msgstr ""
 
 #: data/templates/base.html:41
 msgid "More"
@@ -442,7 +439,7 @@ msgstr ""
 #: data/templates/docs-build.html:3 data/templates/docs-build.html:12
 #: data/templates/docs-build.html:21
 msgid "Documentation"
-msgstr "Документация"
+msgstr ""
 
 #: data/templates/base.html:53 data/templates/search-form.html:12
 #: data/templates/search-form.html:22
@@ -456,7 +453,7 @@ msgstr ""
 #: data/templates/distro-source-commit-reset.html:10
 #: data/templates/repository-detail.html:14
 msgid "Distributions"
-msgstr "Дистрибутивы"
+msgstr ""
 
 #: data/templates/base.html:66 data/templates/builder-list.html:3
 #: data/templates/builder-list.html:12 data/templates/builder-list.html:17
@@ -488,12 +485,12 @@ msgstr ""
 #: data/templates/user-profile-passwd.html:12
 #: data/templates/user-profile.html:12
 msgid "Users"
-msgstr "Пользователи"
+msgstr ""
 
 #: data/templates/base.html:94 data/templates/statistics/index.html:3
 #: data/templates/statistics/index.html:7
 msgid "Statistics"
-msgstr "Статистика"
+msgstr ""
 
 #: data/templates/base.html:101
 msgid "Administration"
@@ -522,11 +519,11 @@ msgstr ""
 
 #: data/templates/base.html:160
 msgid "Logout"
-msgstr "Выход"
+msgstr ""
 
 #: data/templates/base.html:168 data/templates/docs-users.html:56
 msgid "Register"
-msgstr "Зарегистрироваться"
+msgstr ""
 
 #: data/templates/base.html:172
 msgid "Sign in"
@@ -548,7 +545,7 @@ msgstr ""
 #: data/templates/distro-source-commit-reset.html:32
 #: data/templates/distro-source-commits.html:6
 msgid "Source"
-msgstr "Источник"
+msgstr ""
 
 #: data/templates/distro-source-detail.html:36
 msgid "Gitweb"
@@ -556,7 +553,7 @@ msgstr ""
 
 #: data/templates/distro-source-detail.html:45
 msgid "Branch"
-msgstr "Ветвь"
+msgstr ""
 
 #: data/templates/distro-source-detail.html:49
 msgid "Imported commits"
@@ -579,7 +576,7 @@ msgstr ""
 #: data/templates/build-list.html:13 data/templates/build-filter.html:75
 #: data/templates/jobs-detail.html:30
 msgid "Actions"
-msgstr "Действия"
+msgstr ""
 
 #: data/templates/mirrors-list.html:24 data/templates/mirrors-new.html:3
 msgid "Add new mirror"
@@ -621,7 +618,7 @@ msgstr ""
 #: data/templates/log.html:4 data/templates/builder-detail.html:205
 #: data/templates/build-detail.html:194 data/templates/jobs-detail.html:169
 msgid "Log"
-msgstr "Журнал"
+msgstr ""
 
 #: data/templates/jobs-abort.html:3 data/templates/jobs-abort.html:6
 #, python-format
@@ -644,7 +641,7 @@ msgstr ""
 #: data/templates/jobs-abort.html:25
 #: data/templates/modules/build-offset.html:5
 msgid "Start time"
-msgstr "Время старта"
+msgstr ""
 
 #: data/templates/jobs-abort.html:30
 msgid "No started, yet."
@@ -678,21 +675,21 @@ msgstr ""
 #: data/templates/distro-source-commits.html:5
 #: data/templates/build-filter.html:11
 msgid "Distribution"
-msgstr "Дистрибутив"
+msgstr ""
 
 #: data/templates/register-fail.html:4
 msgid "Registration failed"
-msgstr "Регистрация не удалось"
+msgstr ""
 
 #: data/templates/register-fail.html:6
 #: data/templates/register-activation-fail.html:23
 #: data/templates/user-profile-edit-fail.html:6
 msgid "We are sorry."
-msgstr "Приносим свои извинения."
+msgstr ""
 
 #: data/templates/register-fail.html:7
 msgid "We could not create your requested account."
-msgstr "Мы не смогли создать запрашиваемую учётную запись."
+msgstr ""
 
 #: data/templates/register-fail.html:17
 #: data/templates/user-profile-edit-fail.html:17
@@ -700,8 +697,6 @@ msgid ""
 "Use the back button on your web browser to go back to the previous page and "
 "correct your submission."
 msgstr ""
-"Используйте кнопку возврата в вашем веб-браузере, чтобы вернуться на "
-"предыдущую страницу для исправления вашей заявки."
 
 #: data/templates/build-bugs.html:3 data/templates/build-bugs.html:24
 msgid "Bug list"
@@ -729,7 +724,7 @@ msgstr ""
 
 #: data/templates/build-bugs.html:57 data/templates/user-delete.html:18
 msgid "Back"
-msgstr "Назад"
+msgstr ""
 
 #: data/templates/build-bugs.html:71
 msgid "Add a bug"
@@ -802,7 +797,7 @@ msgstr ""
 
 #: data/templates/index.html:3
 msgid "Welcome to the Pakfire Build Service"
-msgstr "Добро пожаловать в Службу Сборки Pakfire"
+msgstr ""
 
 #: data/templates/index.html:8
 #, python-format
@@ -860,7 +855,7 @@ msgstr ""
 #: data/templates/builder-list.html:74 data/templates/builder-new.html:3
 #: data/templates/builder-new.html:16 data/templates/builder-new.html:41
 msgid "Create new builder"
-msgstr "Создание новую систему сборки"
+msgstr ""
 
 #: data/templates/keys-import.html:3 data/templates/keys-import.html:16
 #: data/templates/keys-import.html:39 data/templates/keys-list.html:106
@@ -881,19 +876,17 @@ msgstr ""
 
 #: data/templates/docs-index.html:3
 msgid "Documentation index"
-msgstr "Список документации"
+msgstr ""
 
 #: data/templates/docs-index.html:17
 msgid "Documents"
-msgstr "Документация"
+msgstr ""
 
 #: data/templates/docs-index.html:23
 msgid ""
 "This is a collection of documents that should be read by everybody who is "
 "using this system."
 msgstr ""
-"Это сборник документации, которую должны прочитать все, кто пользуется этой "
-"системой."
 
 #: data/templates/docs-index.html:29
 msgid "What is the pakfire build service?"
@@ -989,7 +982,7 @@ msgstr ""
 
 #: data/templates/search-results.html:71 data/templates/file-detail.html:111
 msgid "Files"
-msgstr "Файлы"
+msgstr ""
 
 #: data/templates/search-results.html:75
 #, python-format
@@ -1001,7 +994,7 @@ msgstr[2] ""
 
 #: data/templates/builder-new.html:21
 msgid "Create a new builder"
-msgstr "Создайте новую систему сборки"
+msgstr ""
 
 #: data/templates/builder-new.html:35
 msgid "Enter the canonical hostname of the machine."
@@ -1009,20 +1002,18 @@ msgstr ""
 
 #: data/templates/register-success.html:4
 msgid "Registration successful"
-msgstr "Регистрация успешна"
+msgstr ""
 
 #: data/templates/register-success.html:6
 #, python-format
 msgid "Your new account has been created, %s."
-msgstr "Ваша новая учётная запись была создана, %s."
+msgstr ""
 
 #: data/templates/register-success.html:7
 msgid ""
 "To complete the activation, follow the instructions that were sent to you in "
 "an activation email."
 msgstr ""
-"Для завершения активации, следуйте инструкциям, которые были отправлены по "
-"электронной почте."
 
 #: data/templates/package-properties.html:3
 #: data/templates/modules/log-table.html:12
@@ -1031,7 +1022,7 @@ msgstr ""
 #: data/templates/package-detail.html:3 data/templates/package-detail.html:50
 #: data/templates/file-detail.html:13
 msgid "Package"
-msgstr "Пакет"
+msgstr ""
 
 #: data/templates/package-properties.html:20
 msgid "Properties"
@@ -1064,27 +1055,27 @@ msgstr ""
 #: data/templates/package-properties.html:51
 #: data/templates/build-priority.html:14
 msgid "Very high"
-msgstr "Очень высокий"
+msgstr ""
 
 #: data/templates/package-properties.html:54
 #: data/templates/build-priority.html:15
 msgid "High"
-msgstr "Высокий"
+msgstr ""
 
 #: data/templates/package-properties.html:57
 #: data/templates/build-priority.html:16
 msgid "Medium"
-msgstr "Средний"
+msgstr ""
 
 #: data/templates/package-properties.html:60
 #: data/templates/build-priority.html:17
 msgid "Low"
-msgstr "Низкий"
+msgstr ""
 
 #: data/templates/package-properties.html:63
 #: data/templates/build-priority.html:18
 msgid "Very low"
-msgstr "Очень низкий"
+msgstr ""
 
 #: data/templates/package-properties.html:71
 #: data/templates/package-properties.html:82
@@ -1147,7 +1138,7 @@ msgstr ""
 
 #: data/templates/mirrors-detail.html:79
 msgid "Status"
-msgstr "Статус"
+msgstr ""
 
 #: data/templates/mirrors-detail.html:89
 msgid "Never"
@@ -1199,7 +1190,7 @@ msgstr ""
 
 #: data/templates/register.html:12
 msgid "Register new account"
-msgstr "Зарегистрировать учётную запись"
+msgstr ""
 
 #: data/templates/register.html:19
 msgid "Join the community!"
@@ -1212,11 +1203,11 @@ msgstr ""
 #: data/templates/register.html:30 data/templates/user-profile-edit.html:37
 #: data/templates/login.html:22 data/templates/user-profile.html:37
 msgid "Username"
-msgstr "Имя пользователя"
+msgstr ""
 
 #: data/templates/register.html:35
 msgid "Must be a unique name you login with."
-msgstr "Должно быть уникальное имя, по которому осуществляется вход в систему."
+msgstr ""
 
 #: data/templates/register.html:41 data/templates/user-profile-edit.html:60
 msgid "Email address"
@@ -1228,27 +1219,25 @@ msgstr ""
 
 #: data/templates/register.html:52
 msgid "Real name (optional)"
-msgstr "Настоящее имя (не обязательно)"
+msgstr ""
 
 #: data/templates/register.html:57
 msgid "Type you firstname and your lastname here."
-msgstr "Укажите Ваше имя и фамилию."
+msgstr ""
 
 #: data/templates/register.html:64
 msgid "Account security"
-msgstr "Безопасность учётной записи"
+msgstr ""
 
 #: data/templates/register.html:67 data/templates/user-profile-edit.html:101
 #: data/templates/login.html:28
 msgid "Password"
-msgstr "Пароль"
+msgstr ""
 
 #: data/templates/register.html:72 data/templates/user-profile-edit.html:106
 msgid ""
 "The password is used to secure the login and must be at least 8 characters."
 msgstr ""
-"Пароль используется для безопасности входа и должен быть не короче 8 "
-"символов."
 
 #: data/templates/register.html:78
 msgid "Confirm password"
@@ -1354,7 +1343,7 @@ msgstr ""
 
 #: data/templates/modules/modal-build-comment.html:26
 msgid "Vote"
-msgstr "Голосовать"
+msgstr ""
 
 #: data/templates/modules/modal-build-comment.html:30
 msgid "Not tested."
@@ -1384,31 +1373,31 @@ msgstr ""
 #: data/templates/login.html:3 data/templates/login.html:7
 #: data/templates/login.html:34
 msgid "Login"
-msgstr "Воход"
+msgstr ""
 
 #: data/templates/modules/build-offset.html:8
 msgid "As soon as possible"
-msgstr "Как можно скорее"
+msgstr ""
 
 #: data/templates/modules/build-offset.html:9
 msgid "After 5 minutes"
-msgstr "Через 5 минут"
+msgstr ""
 
 #: data/templates/modules/build-offset.html:10
 msgid "After 15 minutes"
-msgstr "Через 15 минут"
+msgstr ""
 
 #: data/templates/modules/build-offset.html:11
 msgid "After one hour"
-msgstr "Через час"
+msgstr ""
 
 #: data/templates/modules/build-offset.html:12
 msgid "After one day"
-msgstr "Через день"
+msgstr ""
 
 #: data/templates/modules/build-offset.html:17
 msgid "Set the time after which the build job starts."
-msgstr "Установить время, после которого выполнится задание."
+msgstr ""
 
 #: data/templates/modules/build-offset.html:22
 msgid "Schedule build"
@@ -1427,11 +1416,11 @@ msgstr ""
 #: data/templates/modules/packages-table.html:21
 #: data/templates/package-detail.html:152 data/templates/keys-list.html:55
 msgid "Download"
-msgstr "Скачать"
+msgstr ""
 
 #: data/templates/modules/files-table.html:7
 msgid "Info"
-msgstr "Информация"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:4
 msgid "Arch"
@@ -1442,16 +1431,16 @@ msgstr ""
 #: data/templates/builder-detail.html:91 data/templates/user-profile.html:47
 #: data/templates/build-filter.html:27
 msgid "State"
-msgstr "Состояние"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:6 data/templates/file-detail.html:99
 msgid "Host"
-msgstr "Хост"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:7
 #: data/templates/modules/jobs/boxes.html:13
 msgid "Duration"
-msgstr "Продолжительность"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:19 web/ui_modules.py:306
 msgid "New"
@@ -1460,28 +1449,28 @@ msgstr ""
 #: data/templates/modules/jobs-table.html:21
 #: data/templates/build-filter.html:32 web/ui_modules.py:311
 msgid "Pending"
-msgstr "В ожидании"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:23
 #: data/templates/build-filter.html:34 web/ui_modules.py:296
 msgid "Failed"
-msgstr "Ошибка"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:25
 #: data/templates/build-filter.html:36 web/ui_modules.py:291
 msgid "Dispatching"
-msgstr "Отправляется"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:27
 #: data/templates/build-filter.html:33 data/templates/jobs-detail.html:128
 #: web/ui_modules.py:301
 msgid "Finished"
-msgstr "Завершается"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:29
 #: data/templates/build-filter.html:31 web/ui_modules.py:316
 msgid "Running"
-msgstr "Работает"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:31 web/ui_modules.py:281
 msgid "Aborted"
@@ -1498,7 +1487,7 @@ msgstr ""
 
 #: data/templates/modules/jobs-table.html:51
 msgid "Not finished, yet."
-msgstr "Ещё не завершено"
+msgstr ""
 
 #: data/templates/modules/jobs-table.html:60
 #, python-format
@@ -1514,12 +1503,10 @@ msgid ""
 "Pakfire is the buildsystem that is used to build the IPFire Linux firewall "
 "distribution."
 msgstr ""
-"Pakfire является системой сборки пакетов и используется для создания "
-"дистрибутива межсетевого экрана IPFire."
 
 #: data/templates/modules/footer.html:6
 msgid "It also installs and updates packages on the IPFire systems."
-msgstr "Она также устанавливает и обновляет пакеты системы IPFire."
+msgstr ""
 
 #: data/templates/modules/footer.html:11
 msgid "Code licensed under the GNU General Public License v3."
@@ -1624,14 +1611,14 @@ msgstr ""
 #: data/templates/distro-source-commit-detail.html:3
 #: data/templates/build-detail.html:82
 msgid "Commit"
-msgstr "Подтвердить"
+msgstr ""
 
 #: data/templates/modules/commits-table.html:5
 #: data/templates/modules/changelog/entry.html:25
 #: data/templates/distro-source-commit-detail.html:55
 #: data/templates/build-detail.html:80
 msgid "Author"
-msgstr "Автор"
+msgstr ""
 
 #: data/templates/modules/commits-table.html:6
 #: data/templates/distro-source-commit-detail.html:63
@@ -1647,20 +1634,20 @@ msgstr ""
 #: data/templates/builds-watchers-list.html:31
 #: data/templates/build-state.html:3 data/templates/build-state.html:6
 msgid "Build"
-msgstr "Сборка"
+msgstr ""
 
 #: data/templates/modules/build-table.html:17
 #: data/templates/repository-detail.html:4
 #: data/templates/repository-detail.html:50
 msgid "Repository"
-msgstr "Репозиторий"
+msgstr ""
 
 #: data/templates/modules/build-table.html:20
 #: data/templates/user-profile-edit.html:80
 #: data/templates/builds-watchers-add.html:76
 #: data/templates/user-profile.html:29 data/templates/user-profile.html:54
 msgid "User"
-msgstr "Пользователь"
+msgstr ""
 
 #: data/templates/modules/build-table.html:23 data/templates/keys-list.html:32
 #: data/templates/jobs-detail.html:117
@@ -1676,17 +1663,17 @@ msgstr ""
 #: data/templates/modules/repository-table.html:4
 #: data/templates/distro-edit.html:12 data/templates/repository-edit.html:15
 msgid "Name"
-msgstr "Имя"
+msgstr ""
 
 #: data/templates/modules/packages-table.html:5
 #: data/templates/distro-update-detail.html:10
 msgid "Summary"
-msgstr "Резюме"
+msgstr ""
 
 #: data/templates/modules/packages-table.html:6
 #: data/templates/package-detail.html:126 data/templates/file-detail.html:46
 msgid "Size"
-msgstr "Размер"
+msgstr ""
 
 #: data/templates/modules/watchers-sidebar-table.html:2
 msgid "Watchers"
@@ -1750,7 +1737,7 @@ msgstr ""
 #: data/templates/modules/package-header.html:16
 #: data/templates/package-detail.html:70 data/templates/file-detail.html:34
 msgid "License"
-msgstr "Лицензия"
+msgstr ""
 
 #: data/templates/modules/package-header.html:22
 msgid "Group"
@@ -1766,12 +1753,12 @@ msgstr ""
 #: data/templates/modules/packages/dependency-table.html:5
 #: data/templates/file-detail.html:57
 msgid "Provides"
-msgstr "Обеспечивает"
+msgstr ""
 
 #: data/templates/modules/packages/dependency-table.html:7
 #: data/templates/file-detail.html:63 data/templates/file-detail.html:69
 msgid "Requires"
-msgstr "Требует"
+msgstr ""
 
 #: data/templates/modules/packages/dependency-table.html:9
 msgid "Pre-requires"
@@ -1780,12 +1767,12 @@ msgstr ""
 #: data/templates/modules/packages/dependency-table.html:11
 #: data/templates/file-detail.html:83
 msgid "Conflicts"
-msgstr "Конфликтует"
+msgstr ""
 
 #: data/templates/modules/packages/dependency-table.html:13
 #: data/templates/file-detail.html:76
 msgid "Obsoletes"
-msgstr "Устаревает"
+msgstr ""
 
 #: data/templates/modules/packages/dependency-table.html:15
 msgid "Recommends"
@@ -1821,17 +1808,17 @@ msgstr ""
 #: data/templates/user-profile.html:136
 #: data/templates/repository-detail.html:68
 msgid "Yes"
-msgstr "Да"
+msgstr ""
 
 #: data/templates/modules/repository-table.html:23
 #: data/templates/user-profile.html:138
 #: data/templates/repository-detail.html:70
 msgid "No"
-msgstr "Нет"
+msgstr ""
 
 #: data/templates/modules/log-table.html:23
 msgid "No log entries, yet."
-msgstr "Пока нет записей в журнале."
+msgstr ""
 
 #: data/templates/modules/changelog/entry.html:11
 #: data/templates/build-filter.html:42
@@ -1855,12 +1842,12 @@ msgstr ""
 #: data/templates/modules/comments-table.html:8
 #, python-format
 msgid "on %s"
-msgstr "на %s"
+msgstr ""
 
 #: data/templates/modules/comments-table.html:11
 #, python-format
 msgid "by %s"
-msgstr "с помощью %s."
+msgstr ""
 
 #: data/templates/modules/comments-table.html:16
 msgid "Updated"
@@ -1868,7 +1855,7 @@ msgstr ""
 
 #: data/templates/modules/comments-table.html:22
 msgid "No comments so far."
-msgstr "Комментариев пока нет."
+msgstr ""
 
 #: data/templates/modules/jobs/list.html:6
 #: data/templates/modules/jobs/boxes.html:22
@@ -1876,7 +1863,7 @@ msgstr "Комментариев пока нет."
 #: data/templates/builder-detail.html:3 data/templates/builder-detail.html:74
 #: data/templates/builder-pass.html:23
 msgid "Builder"
-msgstr "Сборщик"
+msgstr ""
 
 #: data/templates/modules/jobs/list.html:7
 msgid "Runtime"
@@ -1964,12 +1951,12 @@ msgstr ""
 #: data/templates/job-schedule-test.html:29
 #, python-format
 msgid "Schedule test build for %s"
-msgstr "Расписание тестов сборки для %s"
+msgstr ""
 
 #: data/templates/build-schedule-test.html:24
 #: data/templates/job-schedule-test.html:24 data/templates/jobs-detail.html:48
 msgid "Schedule test build"
-msgstr "Проверка сборки по расписанию"
+msgstr ""
 
 #: data/templates/build-schedule-test.html:35
 #: data/templates/job-schedule-test.html:35
@@ -1977,8 +1964,6 @@ msgid ""
 "A test build is used to check if a package builds with the current package "
 "set."
 msgstr ""
-"Тестовая сборка используется для проверки, может ли она в принципе собраться "
-"при данных настройках."
 
 #: data/templates/build-schedule-test.html:36
 #: data/templates/job-schedule-test.html:36
@@ -1986,8 +1971,6 @@ msgid ""
 "In this way, developers are able to find quality issues fast and without "
 "actively searching for them."
 msgstr ""
-"Таким образом, разработчики смогут обнаружить проблемы быстро и без "
-"детального исследования."
 
 #: data/templates/build-schedule-test.html:39
 #: data/templates/job-schedule-test.html:39
@@ -1995,13 +1978,11 @@ msgid ""
 "As this build platform only has a limited amount of performance, test builds "
 "only have a very less priority."
 msgstr ""
-"Тестовые сборки имеют очень низкий приоритет, так как производительность "
-"этой сборочной платформы ограничена."
 
 #: data/templates/build-schedule-test.html:40
 #: data/templates/job-schedule-test.html:40
 msgid "However, you can manually request to run a test."
-msgstr "Тем не менее, вы можете вручную запустить тест."
+msgstr ""
 
 #: data/templates/build-schedule-test.html:43
 #: data/templates/job-schedule-test.html:43
@@ -2010,8 +1991,6 @@ msgid ""
 "The build job will be started when a build slot is available but not before "
 "the given time."
 msgstr ""
-"Работа по сборке запустится, когда освободится сборочный слот, но не раньше "
-"заданного времени."
 
 #: data/templates/distro-edit.html:17
 msgid "The fancy name of the distribution."
@@ -2023,7 +2002,7 @@ msgstr ""
 
 #: data/templates/distro-edit.html:26 data/templates/user-profile-edit.html:42
 msgid "Cannot be changed."
-msgstr "Не может быть изменен."
+msgstr ""
 
 #: data/templates/distro-edit.html:30
 msgid "Tag"
@@ -2059,7 +2038,7 @@ msgstr ""
 
 #: data/templates/distro-edit.html:79
 msgid "Sources"
-msgstr "Исходники"
+msgstr ""
 
 #: data/templates/distro-edit.html:88
 msgid "Which sources should be imported to the distribution?"
@@ -2068,18 +2047,18 @@ msgstr ""
 #: data/templates/builder-delete.html:3
 #, python-format
 msgid "Delete builder %s"
-msgstr "Удалить сборщик %s"
+msgstr ""
 
 #: data/templates/builder-delete.html:31
 #, python-format
 msgid "You are going to delete the build host <strong>%s</strong>."
-msgstr "Вы собираетесь удалить хост сборки <strong>%s</strong>."
+msgstr ""
 
 #: data/templates/builder-delete.html:37 data/templates/user-delete.html:16
 #: data/templates/mirrors-delete.html:34
 #, python-format
 msgid "Delete %s"
-msgstr "Удалить %s."
+msgstr ""
 
 #: data/templates/jobs-filter.html:3 data/templates/jobs-filter.html:21
 #: data/templates/jobs-index.html:18
@@ -2201,21 +2180,21 @@ msgstr ""
 
 #: data/templates/user-profile-edit.html:74
 msgid "Admin actions"
-msgstr "Действия администратора"
+msgstr ""
 
 #: data/templates/user-profile-edit.html:82
 #: data/templates/user-profile.html:52
 msgid "Tester"
-msgstr "Тестировщик"
+msgstr ""
 
 #: data/templates/user-profile-edit.html:85
 #: data/templates/user-profile.html:50
 msgid "Admin"
-msgstr "Администратор"
+msgstr ""
 
 #: data/templates/user-profile-edit.html:90
 msgid "Define the permissions of the user."
-msgstr "Определить права доступа пользователя."
+msgstr ""
 
 #: data/templates/user-profile-edit.html:98
 msgid "Account security settings"
@@ -2224,11 +2203,11 @@ msgstr ""
 #: data/templates/user-profile-edit.html:112
 #: data/templates/user-profile-passwd.html:84
 msgid "Confirm"
-msgstr "Подтвердить"
+msgstr ""
 
 #: data/templates/user-profile-edit.html:117
 msgid "Leave the password fields empty to keep the current password."
-msgstr "Оставьте поля пароля пустыми, чтобы сохранить текущий пароль."
+msgstr ""
 
 #: data/templates/user-profile-edit.html:124
 msgid "Locale & timezone settings"
@@ -2236,11 +2215,11 @@ msgstr ""
 
 #: data/templates/user-profile-edit.html:127
 msgid "Preferred language"
-msgstr "Предпочитаемый язык"
+msgstr ""
 
 #: data/templates/user-profile-edit.html:132
 msgid "Auto-detect will use the language transmitted by your browser."
-msgstr "Автоматическое определение будет использовать язык  вашего браузера."
+msgstr ""
 
 #: data/templates/user-profile-edit.html:138
 msgid "Timezone"
@@ -2299,11 +2278,11 @@ msgstr ""
 #: data/templates/package-detail.html:77 data/templates/file-detail.html:40
 #: data/templates/distro-update-detail.html:27
 msgid "Maintainer"
-msgstr "Сопровождающий"
+msgstr ""
 
 #: data/templates/package-detail.html:82 data/templates/build-filter.html:52
 msgid "Build host"
-msgstr "Хост сборки"
+msgstr ""
 
 #: data/templates/package-detail.html:88
 msgid "Build time"
@@ -2393,76 +2372,61 @@ msgid ""
 "All users can join the Pakfire Build Service and are separated into three "
 "groups:"
 msgstr ""
-"Все пользователи могут присоединиться к Службе Сборки Pakfire и разделены на "
-"три группы:"
 
 #: data/templates/docs-users.html:29
 msgid "Developers"
-msgstr "Разработчики"
+msgstr ""
 
 #: data/templates/docs-users.html:31
 msgid ""
 "Developers manage this build service and have access to all parts of it."
 msgstr ""
-"Разработчики, управляющие этой сборкой и имеющие доступ ко всем её частям."
 
 #: data/templates/docs-users.html:32
 msgid ""
 "They are responsible to keep the system running and able to push package "
 "updates to the repostories."
 msgstr ""
-"Они несут ответственность за поддержку системы в работоспособном состоянии и "
-"имеют возможность помещать обновления пакетов в репозиторий."
 
 #: data/templates/docs-users.html:35
 msgid "Guidelines for developers"
-msgstr "Руководство для разработчиков"
+msgstr ""
 
 #: data/templates/docs-users.html:38
 msgid "Testers"
-msgstr "Тестеры"
+msgstr ""
 
 #: data/templates/docs-users.html:40
 msgid ""
 "Testers are like users but have the right to vote on packages, which is used "
 "to figure out the quality of the package."
 msgstr ""
-"Тестировщики, как пользователи, но имеют право голосовать за пакеты, что "
-"используется для контроля их качества."
 
 #: data/templates/docs-users.html:41
 msgid ""
 "Everyone can become a tester after he or she has proven to know the IPFire "
 "system very well."
 msgstr ""
-"Любой может стать тестировщиком после того как продемонстрирует хорошее "
-"знание устройства системы IPFire."
 
 #: data/templates/docs-users.html:42
 msgid ""
 "On these people depends a very huge amount of the quality of the "
 "distribution that is made out of the feedback they give."
 msgstr ""
-"От работы этих людей в огромной степени зависит качество каждого выпуска "
-"дистрибутива."
 
 #: data/templates/docs-users.html:45
 msgid "Guidelines for testers"
-msgstr "Руководство для тестировщиков"
+msgstr ""
 
 #: data/templates/docs-users.html:50
 msgid "Everybody can join the Pakfire Build Service by registering an account."
 msgstr ""
-"Любой желающий может присоединиться к службе Сборки Pakfire, зарегистрировав "
-"учетную запись."
 
 #: data/templates/docs-users.html:51
 msgid ""
 "After a successful activation you are able to leave comments on packages and "
 "give feedback to the developers about its status."
 msgstr ""
-"После успешной активации вы сможете оставлять комментарии к пакетам и "
-"отсылать информацию разработчикам."
 
 #: data/templates/user-profile-builds.html:3
 #: data/templates/user-profile-builds.html:7
@@ -2512,23 +2476,23 @@ msgstr ""
 
 #: data/templates/docs-base.html:27
 msgid "All Documents"
-msgstr "Вся документация"
+msgstr ""
 
 #: data/templates/docs-base.html:31
 msgid "Topics"
-msgstr "Темы"
+msgstr ""
 
 #: data/templates/distro-detail.html:35 data/templates/builder-detail.html:147
 msgid "Supported architectures"
-msgstr "Поддерживаемые архитектуры"
+msgstr ""
 
 #: data/templates/distro-detail.html:36
 msgid "None"
-msgstr "Ни один"
+msgstr ""
 
 #: data/templates/distro-detail.html:46
 msgid "Binary repositories"
-msgstr "Бинарные репозитории"
+msgstr ""
 
 #: data/templates/distro-detail.html:51
 msgid ""
@@ -2546,7 +2510,7 @@ msgstr ""
 
 #: data/templates/distro-detail.html:66 data/templates/source-list.html:6
 msgid "Source repositories"
-msgstr "Репозитории исходников"
+msgstr ""
 
 #: data/templates/distro-detail.html:80
 #: data/templates/distro-source-commit-detail.html:90
@@ -2583,7 +2547,7 @@ msgstr ""
 #: data/templates/docs-whatsthis.html:3 data/templates/docs-build.html:3
 #: data/templates/docs-build.html:21
 msgid "Legend of the build states"
-msgstr "Журнал состояний сборки"
+msgstr ""
 
 #: data/templates/docs-whatsthis.html:16 data/templates/docs-whatsthis.html:21
 msgid "What is the Pakfire Build Service?"
@@ -2670,20 +2634,20 @@ msgstr ""
 #: data/templates/user-delete.html:4
 #, python-format
 msgid "Delete user %s"
-msgstr "Удалить пользователя %s."
+msgstr ""
 
 #: data/templates/user-delete.html:8
 msgid "Do you really want to delete your own account?"
-msgstr "Вы действительно хотите удалить свою учётную запись?"
+msgstr ""
 
 #: data/templates/user-delete.html:9
 msgid "You won't be able to login and use this service any more."
-msgstr "Вы больше не сможете войти и использовать данный сервис."
+msgstr ""
 
 #: data/templates/user-delete.html:11
 #, python-format
 msgid "Do you really want to delete the user %s?"
-msgstr "Вы действительно хотите удалить пользователя %s?"
+msgstr ""
 
 #: data/templates/repository-edit.html:3 data/templates/repository-edit.html:7
 #, python-format
@@ -2700,7 +2664,7 @@ msgstr ""
 
 #: data/templates/repository-edit.html:25 data/templates/file-detail.html:20
 msgid "Description"
-msgstr "Описание"
+msgstr ""
 
 #: data/templates/repository-edit.html:33
 msgid "Score settings"
@@ -2771,40 +2735,39 @@ msgstr ""
 
 #: data/templates/build-priority.html:3 data/templates/build-priority.html:6
 msgid "Edit build priority"
-msgstr "Изменить приоритет сборки"
+msgstr ""
 
 #: data/templates/build-priority.html:11
 msgid "Priority"
-msgstr "Приоритет"
+msgstr ""
 
 #: data/templates/build-priority.html:22
 msgid "Set the priority of the build process."
-msgstr "Установить приоритет процесса сборки."
+msgstr ""
 
 #: data/templates/build-priority.html:28
 msgid "Beware"
-msgstr "Осторожно"
+msgstr ""
 
 #: data/templates/build-priority.html:29
 msgid "Shuffeling build jobs can cause problems with the dependency solving."
 msgstr ""
-"Смешивание заданий по сборке может привести к проблемам с зависимостями."
 
 #: data/templates/build-priority.html:30
 msgid "Don't do this if you are not totally sure you won't break anything."
-msgstr "Не делайте этого, если точно не уверены, что ничего не испортите."
+msgstr ""
 
 #: data/templates/distro-source-commit-detail.html:47
 msgid "Revision"
-msgstr "Ревизия"
+msgstr ""
 
 #: data/templates/distro-source-commit-detail.html:51
 msgid "Date"
-msgstr "Дата"
+msgstr ""
 
 #: data/templates/distro-source-commit-detail.html:59
 msgid "Committer"
-msgstr "Подтверждено"
+msgstr ""
 
 #: data/templates/distro-source-commit-detail.html:81
 msgid "Open in gitweb"
@@ -2834,28 +2797,28 @@ msgstr ""
 
 #: data/templates/register-activation-fail.html:17
 msgid "Activation failed"
-msgstr "Активация не удалась"
+msgstr ""
 
 #: data/templates/register-activation-fail.html:24
 msgid "The activation of your account has failed."
-msgstr "Активации вашей учетной записи не удалась."
+msgstr ""
 
 #: data/templates/register-activation-fail.html:25
 msgid "Possibly the registration code is wrong or your registration timed out."
-msgstr "Возможно, регистрационный код неверен или время сессии истекло."
+msgstr ""
 
 #: data/templates/packages-list.html:3 data/templates/packages-list.html:17
 msgid "Package list"
-msgstr "Список пакетов"
+msgstr ""
 
 #: data/templates/packages-list.html:23
 msgid ""
 "This is an alphabetically ordered list of all packages in the distribution."
-msgstr "Это алфавитный список всех пакетов дистрибутива."
+msgstr ""
 
 #: data/templates/packages-list.html:24
 msgid "Click on a link to see further information about the package."
-msgstr "Нажмите на ссылку, чтобы увидеть дополнительную информацию о пакете."
+msgstr ""
 
 #: data/templates/packages-list.html:31
 msgid "Selection"
@@ -2954,16 +2917,16 @@ msgstr ""
 
 #: data/templates/register-activation-success.html:17
 msgid "Activation successful"
-msgstr "Активация прошла успешно"
+msgstr ""
 
 #: data/templates/register-activation-success.html:23
 #, python-format
 msgid "Your account has been activated, %s."
-msgstr "Ваша учетная запись была активирована,%s."
+msgstr ""
 
 #: data/templates/register-activation-success.html:24
 msgid "Have fun!"
-msgstr "Удачи!"
+msgstr ""
 
 #: data/templates/builds-watchers-add.html:3
 #: data/templates/builds-watchers-add.html:29
@@ -3024,11 +2987,11 @@ msgstr ""
 
 #: data/templates/builder-detail.html:58
 msgid "Renew passphrase"
-msgstr "Обновить ключевую фразу"
+msgstr ""
 
 #: data/templates/builder-detail.html:66
 msgid "Delete builder"
-msgstr "Удалить сборщика"
+msgstr ""
 
 #: data/templates/builder-detail.html:79
 msgid "Warning"
@@ -3051,7 +3014,7 @@ msgstr ""
 #: data/templates/builder-detail.html:94 data/templates/mirrors-edit.html:43
 #: data/templates/builder-edit.html:42
 msgid "Enabled"
-msgstr "Включено"
+msgstr ""
 
 #: data/templates/builder-detail.html:96
 msgid "Disabled"
@@ -3109,7 +3072,7 @@ msgstr ""
 
 #: data/templates/builder-detail.html:157
 msgid "CPU model"
-msgstr "Модель CPU"
+msgstr ""
 
 #: data/templates/builder-detail.html:163
 msgid "CPU count"
@@ -3117,11 +3080,11 @@ msgstr ""
 
 #: data/templates/builder-detail.html:167
 msgid "Memory"
-msgstr "Память"
+msgstr ""
 
 #: data/templates/builder-detail.html:171
 msgid "Load average"
-msgstr "Средняя скорость"
+msgstr ""
 
 #: data/templates/builder-detail.html:180
 msgid "Free disk space"
@@ -3206,7 +3169,7 @@ msgstr ""
 
 #: data/templates/login.html:13
 msgid "Username and/or password was wrong. Login failed."
-msgstr "Комбинация пользователь-пароль не верна. Войти не удалось."
+msgstr ""
 
 #: data/templates/login.html:41
 msgid "You also might want to..."
@@ -3214,7 +3177,7 @@ msgstr ""
 
 #: data/templates/login.html:44
 msgid "Register a new account."
-msgstr "Регистрация новой учётной записи."
+msgstr ""
 
 #: data/templates/login.html:47
 msgid "Recover your password."
@@ -3284,70 +3247,60 @@ msgid ""
 "Every build that is done by the Pakfire Build Service has to go through "
 "several states:"
 msgstr ""
-"Каждая сборка, созданная Системой Сборки Pakfire должена пройти через "
-"несколько этапов:"
 
 #: data/templates/docs-build.html:28
 msgid ""
 "After checking out the source from the source repository a source package is "
 "created and submitted to the build server."
 msgstr ""
-"После проверки исходников из репозитория исходного кода, создаётся пакет "
-"исходного кода, который отправляется на Сервер Сборки."
 
 #: data/templates/docs-build.html:29
 msgid ""
 "Starting from inserting a source file to the build service, there are binary "
 "build jobs created for every supported architecture."
 msgstr ""
-"После загрузки файла с исходником на Сервер Сборки, создаются задания на "
-"сборку бинарных пакетов для всех поддерживаемых архитектур."
 
 #: data/templates/docs-build.html:32
 msgid ""
 "These get assigned to a build host which has to compile or assemble the "
 "package and return it back to the build server."
 msgstr ""
-"Задания отдаются на сборочный хост, который создаёт пакет и возвращает его "
-"обратно на Сервер Сборки."
 
 #: data/templates/docs-build.html:33
 msgid "In the table below, there are all states that a build job goes through:"
 msgstr ""
-"В приведенной ниже таблице находится список состояний, через которые "
-"проходит задание:"
 
 #: data/templates/docs-build.html:36
 msgid "Build is running"
-msgstr "Сборка запущена"
+msgstr ""
 
 #: data/templates/docs-build.html:37
 msgid "Build has failed"
-msgstr "Сборка не удалось"
+msgstr ""
 
 #: data/templates/docs-build.html:38
 msgid "Build is waiting to be processed"
-msgstr "Сборка ожидает обработки"
+msgstr ""
 
 #: data/templates/docs-build.html:39
 msgid "There was a dependency error when the package was built"
-msgstr "Во время сборки пакета была обнаружена проблема с зависимостями"
+msgstr ""
 
 #: data/templates/docs-build.html:40
 msgid "Build is waiting for source to go to pending state"
-msgstr "Сборка ждёт перехода исходников в состоянии ожидания."
+msgstr ""
 
 #: data/templates/docs-build.html:41
 msgid "Files of this build are transferred to the build server"
-msgstr "Файлы этой сборки передаются на Сервер Сборки"
+msgstr ""
 
 #: data/templates/docs-build.html:42
 msgid "Files are being uploaded to the service"
-msgstr "Файлы загружаются на сервис"
+msgstr ""
 
 #: data/templates/docs-build.html:43
 msgid "Build has an unknown state"
-msgstr "Сборка находится в неизвестном состоянии"
+msgstr ""
 
 #: data/templates/packages/changelog.html:3
 #, python-format
@@ -3376,7 +3329,7 @@ msgstr ""
 #: data/templates/packages/view-file.html:51
 #: data/templates/file-detail.html:118
 msgid "Download file"
-msgstr "Скачать файл"
+msgstr ""
 
 #: data/templates/builder-pass.html:18 data/templates/mirrors-edit.html:20
 #: data/templates/builder-edit.html:20 data/templates/builder-edit.html:25
@@ -3386,36 +3339,34 @@ msgstr ""
 #: data/templates/builder-pass.html:30
 #, python-format
 msgid "The new host <strong>%s</strong> has been successfully created."
-msgstr "Новый хост <strong>%s</strong> успешно создан."
+msgstr ""
 
 #: data/templates/builder-pass.html:32
 #, python-format
 msgid "The passphrase for <strong>%s</strong> has been regenerated."
-msgstr "Ключевая фраза для <strong>%s</strong> была заново сгенерирована."
+msgstr ""
 
 #: data/templates/builder-pass.html:35
 msgid ""
 "For authorization to the Pakfire Master Server there is a passphrase "
 "required which must be configured to the host."
 msgstr ""
-"Для авторизации на Главном Сервере Pakfire используется ключевая фраза, "
-"которая задана на сервере."
 
 #: data/templates/builder-pass.html:39
 msgid "This passphrase is:"
-msgstr "Это ключевая фраза:"
+msgstr ""
 
 #: data/templates/builder-pass.html:43
 msgid "Next"
-msgstr "Далее"
+msgstr ""
 
 #: data/templates/user-comments.html:4
 msgid "Latest user comments"
-msgstr "Последние комментарии пользователей"
+msgstr ""
 
 #: data/templates/user-comments.html:12
 msgid "Show all users"
-msgstr "Показать всех пользователей"
+msgstr ""
 
 #: data/templates/build-delete.html:34
 #, python-format
@@ -3534,19 +3485,19 @@ msgstr ""
 #: data/templates/build-index.html:21 data/templates/build-list.html:15
 #: data/templates/build-filter.html:6
 msgid "Filter builds"
-msgstr "Сортировка сборок"
+msgstr ""
 
 #: data/templates/source-list.html:3
 msgid "Sources repositories"
-msgstr "Репозитории исходников"
+msgstr ""
 
 #: data/templates/source-list.html:17
 msgid "Add source repository"
-msgstr "Добавить репозиторий исходников"
+msgstr ""
 
 #: data/templates/source-list.html:18
 msgid "Blah 123"
-msgstr "трололо 123"
+msgstr ""
 
 #: data/templates/builds-watchers-list.html:11
 msgid "This is a list of all users who watch this build."
@@ -3577,27 +3528,27 @@ msgstr ""
 
 #: data/templates/file-detail.html:5
 msgid "File"
-msgstr "Файл"
+msgstr ""
 
 #: data/templates/file-detail.html:27
 msgid "URL"
-msgstr "URL"
+msgstr ""
 
 #: data/templates/file-detail.html:51
 msgid "Hash"
-msgstr "Хэш"
+msgstr ""
 
 #: data/templates/file-detail.html:90
 msgid "Build information"
-msgstr "Информация о сборке"
+msgstr ""
 
 #: data/templates/file-detail.html:93
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #: data/templates/file-detail.html:105
 msgid "Time"
-msgstr "Время"
+msgstr ""
 
 #: data/templates/mirrors-delete.html:3
 #, python-format
@@ -3616,23 +3567,21 @@ msgstr ""
 
 #: data/templates/user-profile-need-activation.html:4
 msgid "Edit successful"
-msgstr "Изменения успешно внесены"
+msgstr ""
 
 #: data/templates/user-profile-need-activation.html:6
 msgid "The user profile was successfully altered."
-msgstr "Профиль пользователя был успешно изменен."
+msgstr ""
 
 #: data/templates/user-profile-need-activation.html:7
 msgid ""
 "But as you have changed the email address, you need to re-activate the "
 "account."
 msgstr ""
-"Но, так как вы изменили адрес электронной почты, вам нужно повторно "
-"активировать учетную запись."
 
 #: data/templates/user-profile-need-activation.html:8
 msgid "Have a look at you mailbox - you already do know what to do."
-msgstr "Загляните в Ваш почтовый ящик - вы уже знаете, что делать."
+msgstr ""
 
 #: data/templates/user-forgot-password.html:3
 #: data/templates/user-forgot-password.html:12
@@ -3760,7 +3709,7 @@ msgstr ""
 #: data/templates/build-list.html:3 data/templates/build-list.html:8
 #: data/templates/build-filter.html:3
 msgid "Build job list"
-msgstr "Список заданий на сборку"
+msgstr ""
 
 #: data/templates/user-profile.html:23
 msgid "View comments"
@@ -3768,11 +3717,11 @@ msgstr ""
 
 #: data/templates/user-profile.html:41
 msgid "Email"
-msgstr "Email"
+msgstr ""
 
 #: data/templates/user-profile.html:61
 msgid "Registered"
-msgstr "Зарегистрирован"
+msgstr ""
 
 #: data/templates/user-profile.html:80
 msgid "Edit profile"
@@ -3780,7 +3729,7 @@ msgstr ""
 
 #: data/templates/user-profile.html:94
 msgid "Delete account"
-msgstr "Удалить аккаунт"
+msgstr ""
 
 #: data/templates/user-profile.html:101
 msgid "Impersonate user"
@@ -3810,15 +3759,15 @@ msgstr ""
 
 #: data/templates/builder-edit.html:36
 msgid "The hostname cannot be changed."
-msgstr "Имя хоста нельзя изменить"
+msgstr ""
 
 #: data/templates/builder-edit.html:46
 msgid "The builder must be enabled in order to process build jobs."
-msgstr "Сборщик должен быть включен, чтобы была возможность сборки."
+msgstr ""
 
 #: data/templates/builder-edit.html:53
 msgid "Build job settings"
-msgstr "Параметры задания на сборку"
+msgstr ""
 
 #: data/templates/builder-edit.html:56
 msgid "Maximum number of parallel build jobs"
@@ -3932,7 +3881,7 @@ msgstr ""
 #: data/templates/build-filter.html:15 data/templates/build-filter.html:39
 #: data/templates/build-filter.html:55
 msgid "Any"
-msgstr "Любой"
+msgstr ""
 
 #: data/templates/build-filter.html:23
 msgid "Show only builds in that distribution."
@@ -3940,15 +3889,15 @@ msgstr ""
 
 #: data/templates/build-filter.html:30
 msgid "All"
-msgstr "Все"
+msgstr ""
 
 #: data/templates/build-filter.html:35
 msgid "Permanently failed"
-msgstr "Постоянно не удаётся"
+msgstr ""
 
 #: data/templates/build-filter.html:37 web/ui_modules.py:321
 msgid "Uploading"
-msgstr "Загружается"
+msgstr ""
 
 #: data/templates/build-filter.html:40
 msgid "Building"
@@ -3964,15 +3913,15 @@ msgstr ""
 
 #: data/templates/build-filter.html:48
 msgid "Only show builds with given state."
-msgstr "Показывать только сборки с указанным состоянием."
+msgstr ""
 
 #: data/templates/build-filter.html:62
 msgid "Display only builds by selected host."
-msgstr "Показывать только сборки на указанном хосте."
+msgstr ""
 
 #: data/templates/build-filter.html:77
 msgid "Show all builds"
-msgstr "Показать все сборки"
+msgstr ""
 
 #: data/templates/jobs-detail.html:36
 msgid "Abort job"
@@ -4012,7 +3961,7 @@ msgstr ""
 
 #: data/templates/jobs-detail.html:89
 msgid "Re-submit build"
-msgstr "Повторно подтвердить сборку"
+msgstr ""
 
 #: data/templates/jobs-detail.html:110
 msgid "No builder assigned."
@@ -4036,15 +3985,15 @@ msgstr[2] ""
 
 #: data/templates/jobs-detail.html:159
 msgid "Package files"
-msgstr "Файлы пакетов"
+msgstr ""
 
 #: data/templates/user-profile-edit-fail.html:4
 msgid "Edit failed"
-msgstr "Изменить не удалось"
+msgstr ""
 
 #: data/templates/user-profile-edit-fail.html:7
 msgid "The user profile cannot be saved."
-msgstr "Профиль пользователя не может быть сохранён."
+msgstr ""
 
 #: web/ui_modules.py:154
 msgid "Today"
@@ -4065,32 +4014,31 @@ msgstr ""
 
 #: web/handlers_auth.py:66
 msgid "No username provided."
-msgstr "Нет имени пользователя."
+msgstr ""
 
 #: web/handlers_auth.py:68
 msgid "The given username is already taken."
-msgstr "Данное имя пользователя уже занято."
+msgstr ""
 
 #: web/handlers_auth.py:71 web/handlers_users.py:177
 msgid "No email address provided."
-msgstr "Не указан электронный адрес."
+msgstr ""
 
 #: web/handlers_auth.py:73 web/handlers_users.py:179
 msgid "Email address is invalid."
-msgstr "Адрес электронной почты является недействительным."
+msgstr ""
 
 #: web/handlers_auth.py:75
 msgid "The given email address is already used for another account."
 msgstr ""
-"Указанный адрес электронной почты уже используется другим пользователем."
 
 #: web/handlers_auth.py:79
 msgid "No password provided."
-msgstr "Не указан пароль"
+msgstr ""
 
 #: web/handlers_auth.py:81 web/handlers_users.py:185
 msgid "Passwords do not match."
-msgstr "Пароли не совпадают."
+msgstr ""
 
 #: web/handlers_auth.py:85
 msgid "Your password is too weak."
@@ -4122,159 +4070,159 @@ msgstr ""
 
 #: web/handlers_users.py:183
 msgid "Password has less than 8 characters."
-msgstr "Пароль менее 8 символов."
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "January"
-msgstr "Январь"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "February"
-msgstr "Февраль"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "March"
-msgstr "Март"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:235
 msgid "April"
-msgstr "Апрель"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "May"
-msgstr "Май"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "June"
-msgstr "Июнь"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "July"
-msgstr "Июль"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:236
 msgid "August"
-msgstr "Август"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "September"
-msgstr "Сентябрь"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "October"
-msgstr "Октябрь"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "November"
-msgstr "Ноябрь"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:237
 msgid "December"
-msgstr "Декабрь"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Monday"
-msgstr "Понедельник"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Tuesday"
-msgstr "Вторник"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Wednesday"
-msgstr "Среда"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:239
 msgid "Thursday"
-msgstr "Четверг"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:240
 msgid "Friday"
-msgstr "Пятница"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:240
 msgid "Saturday"
-msgstr "Суббота"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:240
 msgid "Sunday"
-msgstr "Воскресенье"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:290
 #, python-format
 msgid "1 second ago"
 msgid_plural "%(seconds)d seconds ago"
-msgstr[0] "1 секунду назад"
-msgstr[1] "%(seconds)d секунд назад"
-msgstr[2] "%(seconds)d секунд назад"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:295
 #, python-format
 msgid "1 minute ago"
 msgid_plural "%(minutes)d minutes ago"
-msgstr[0] "1 минуту назад"
-msgstr[1] "%(minutes)d минут назад"
-msgstr[2] "%(minutes)d минут назад"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:299
 #, python-format
 msgid "1 hour ago"
 msgid_plural "%(hours)d hours ago"
-msgstr[0] "1 час назад"
-msgstr[1] "%(hours)d часов назад"
-msgstr[2] "%(hours)d часов назад"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:303
 #, python-format
 msgid "%(time)s"
-msgstr "%(time)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:306
 msgid "yesterday"
-msgstr "вчера"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:307
 #, python-format
 msgid "yesterday at %(time)s"
-msgstr "вчера в %(time)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:309
 #, python-format
 msgid "%(weekday)s"
-msgstr "%(weekday)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:310
 #, python-format
 msgid "%(weekday)s at %(time)s"
-msgstr "%(weekday)s в %(time)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:312
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:354
 #, python-format
 msgid "%(month_name)s %(day)s"
-msgstr "%(month_name)s %(day)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:313
 #, python-format
 msgid "%(month_name)s %(day)s at %(time)s"
-msgstr "%(month_name)s %(day)s в %(time)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:316
 #, python-format
 msgid "%(month_name)s %(day)s, %(year)s"
-msgstr "%(month_name)s %(day)s, %(year)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:317
 #, python-format
 msgid "%(month_name)s %(day)s, %(year)s at %(time)s"
-msgstr "%(month_name)s %(day)s, %(year)s в %(time)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:348
 #, python-format
 msgid "%(weekday)s, %(month_name)s %(day)s"
-msgstr "%(weekday)s, %(month_name)s %(day)s"
+msgstr ""
 
 #: /usr/lib/python2.7/site-packages/tornado/locale.py:369
 #, python-format
 msgid "%(commas)s and %(last)s"
-msgstr "%(commas)s и %(last)s"
+msgstr ""

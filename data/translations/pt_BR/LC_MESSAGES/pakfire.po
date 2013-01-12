@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-21 16:54+0100\n"
-"PO-Revision-Date: 2012-12-13 14:38+0000\n"
+"POT-Creation-Date: 2013-01-12 11:38+0100\n"
+"PO-Revision-Date: 2012-12-22 08:34+0000\n"
 "Last-Translator: André Morro <andre@andremorro.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
 "ipfire/language/pt_BR/)\n"
@@ -2312,20 +2312,17 @@ msgstr ""
 
 #: data/templates/builds/comments.html:3
 #: data/templates/builds/comments.html:42
-#, fuzzy
 msgid "Build comments"
-msgstr "Builds"
+msgstr ""
 
 #: data/templates/builds/comments.html:17
 #: data/templates/builds/comments.html:25 data/templates/build-index.html:18
-#, fuzzy
 msgid "Comments"
-msgstr "Commit"
+msgstr ""
 
 #: data/templates/builds/comments.html:33
-#, fuzzy
 msgid "Show all comments"
-msgstr "Exibir todos os builds"
+msgstr ""
 
 #: data/templates/builds/comments.html:40
 #, python-format
@@ -4238,6 +4235,3 @@ msgstr ""
 #, python-format
 msgid "%(commas)s and %(last)s"
 msgstr ""
-
-#~ msgid "Comments written by %s"
-#~ msgstr "Comentários escritos por %s"
