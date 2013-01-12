@@ -26,6 +26,7 @@ FILE_EXTENSIONS_VIEWABLE = (
 	".conf",
 	".config",
 	".cpp",
+	".diff",
 	".h",
 	".nm",
 	".patch",
