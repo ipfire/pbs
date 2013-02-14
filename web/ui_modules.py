@@ -277,6 +277,7 @@ class JobStateModule(UIModule):
 		_ = self.locale.translate
 		classes = []
 
+		icon = None
 		if state == "aborted":
 			text = _("Aborted")
 			classes.append("muted")
@@ -314,7 +315,7 @@ class JobStateModule(UIModule):
 
 		elif state == "running":
 			text = _("Running")
-			classes.append("text-success")
+			classes.append("text-info")
 			icon = "icon-cogs"
 
 		elif state == "uploading":
