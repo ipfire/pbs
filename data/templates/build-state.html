@@ -3,20 +3,30 @@
 {% block title %}{{ _("Build") }}: {{ build.name }}{% end block %}
 
 {% block body %}
-	<h1>{{ _("Build") }}:
-		<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>-{{ build.pkg.friendly_version }}
-		{% if build.type == "scratch" %}
-			<span>{{ _("Scratch build") }}</span>
-		{% end %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/build/{{ build.uuid }}/state">{{ _("State") }}</a>
+		</li>
+	</ul>
 
-		{% if build.distro %}
-			- <span>{{ _("Distribution") }}: {{ build.distro.name }}</span>
-		{% end %}
-	</h1>
-
-	<div class="pkg-summary">
-		{{ build.pkg.summary }}
-	</div>
+	{% module BuildHeadline(build) %}
+	{% module BuildStateWarnings(build) %}
 
 	<table class="form form2">
 		<tr>
@@ -25,7 +35,6 @@
 			</td>
 		</tr>
 	</table>
-	<div style="clear: both;">&nbsp;</div>
 
 	<!-- XXX add some more information about what every single state means -->
 
@@ -122,11 +131,3 @@
 		</table>
 	{% end %}
 {% end block %}
-
-{% block sidebar %}
-	<h1>{{ _("Actions") }}</h1>
-	<ul>
-		<li><a href="/build/{{ build.uuid }}">{{ _("Back to build") }}</a></li>
-	</ul>
-	<div style="clear: both;">&nbsp;</div>
-{% end %}

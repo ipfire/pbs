@@ -92,12 +92,12 @@ class ModalModule(UIModule):
 
 
 class BuildHeadlineModule(UIModule):
-	def render(self, prefix, build, short=False, shorter=False):
+	def render(self, build, short=False, shorter=False):
 		if shorter:
 			short = True
 
 		return self.render_string("modules/build-headline.html",
-			prefix=prefix, build=build, pkg=build.pkg, short=short, shorter=shorter)
+			build=build, pkg=build.pkg, short=short, shorter=shorter)
 
 
 class JobsStatusModule(UIModule):
