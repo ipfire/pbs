@@ -10,7 +10,7 @@ class BuilderListHandler(BaseHandler):
 	def get(self):
 		builders = self.pakfire.builders.get_all()
 
-		self.render("builder-list.html", builders=builders)
+		self.render("builders/list.html", builders=builders)
 
 
 class BuilderDetailHandler(BaseHandler):
@@ -24,7 +24,7 @@ class BuilderDetailHandler(BaseHandler):
 		# Get log.
 		log = builder.get_history(limit=5)
 
-		self.render("builder-detail.html", builder=builder, jobs=jobs, log=log)
+		self.render("builders/detail.html", builder=builder, jobs=jobs, log=log)
 
 	@tornado.web.authenticated
 	def post(self, hostname):
@@ -41,7 +41,7 @@ class BuilderDetailHandler(BaseHandler):
 
 class BuilderNewHandler(BaseHandler):
 	def get(self):
-		self.render("builder-new.html")
+		self.render("builders/new.html")
 
 	@tornado.web.authenticated
 	def post(self):
@@ -54,7 +54,7 @@ class BuilderNewHandler(BaseHandler):
 		builder, passphrase = \
 			backend.builders.Builder.create(self.pakfire, name, user=self.current_user)
 
-		self.render("builder-pass.html", action="new", builder=builder,
+		self.render("builders/pass.html", action="new", builder=builder,
 			passphrase=passphrase)
 
 
@@ -65,7 +65,7 @@ class BuilderEditHandler(BaseHandler):
 		if not builder:
 			raise tornado.web.HTTPError(404, "Builder not found")
 
-		self.render("builder-edit.html", builder=builder)
+		self.render("builders/edit.html", builder=builder)
 
 	@tornado.web.authenticated
 	def post(self, hostname):
@@ -114,7 +114,7 @@ class BuilderRenewPassphraseHandler(BaseHandler):
 
 		passphrase = builder.regenerate_passphrase()
 
-		self.render("builder-pass.html", action="update", builder=builder,
+		self.render("builders/pass.html", action="update", builder=builder,
 			passphrase=passphrase)
 
 
@@ -136,7 +136,7 @@ class BuilderDeleteHandler(BaseHandler):
 			self.redirect("/builders")
 			return
 
-		self.render("builder-delete.html", builder=builder)
+		self.render("builders/delete.html", builder=builder)
 
 
 class BuilderStatusChangeHandler(BaseHandler):
