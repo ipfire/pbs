@@ -17,7 +17,7 @@
 			<span class="divider">/</span>
 		</li>
 		<li class="active">
-			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
+			<a href="/build/{{ build.uuid }}">{{ build.pkg.friendly_version }}</a>
 		</li>
 	</ul>
 
@@ -25,85 +25,115 @@
 	{% module BuildStateWarnings(build) %}
 
 	<div class="row">
-		<div class="span2">
-			<div class="well well-large well-white ac">
-				<p class="huge {% if build.credits >= 0 %}text-success{% else %}text-error{% end %}">
-					{% if build.credits > 0 %}
-						+{{ build.credits }}
-					{% else %}
-						{{ build.credits }}
+		<div class="span8">
+			<div class="row-fluid">
+				<div class="span3">
+					<div class="well well-large well-white ac">
+						<p class="huge {% if build.credits >= 0 %}text-success{% else %}text-error{% end %}">
+							{% if build.credits > 0 %}
+								+{{ build.credits }}
+							{% else %}
+								{{ build.credits }}
+							{% end %}
+						</p>
+
+						<hr>
+
+						<p>
+							{{ _("Score") }}
+
+							{% if build.state == "broken" %}
+								<span class="text-error">{{ _("(broken)") }}</span>
+							{% elif build.state == "obsolete" %}
+								<span class="text-warning">{{ _("(obsolete)") }}</span>
+							{% end %}
+						</p>
+
+						{% if build.severity %}
+							<hr>
+
+							{% if build.severity == "security update" %}
+								<i class="icon-bolt"></i>
+								{{ _("Security update") }}
+							{% elif build.severity == "bugfix update" %}
+								<i class="icon-wrench"></i>
+								{{ _("Bug fix update") }}
+							{% elif build.severity == "enhancement" %}
+								<i class="icon-plus"></i>
+								{{ _("Enhancement") }}
+							{% elif build.severity == "new package" %}
+								<i class="icon-asterisk"></i>
+								{{ _("New package") }}
+							{% else %}
+								{{ _("Unhandled: %s") % build.severity }}
+							{% end %}
+						{% end %}
+
+						{% if bugs %}
+							<hr>
+
+							<h5>{{ _("Fixed bugs") }}</h5>
+
+							<ul class="unstyled">
+								{% for b in bugs %}
+									<li>
+										<a href="{{ b.url }}" rel="tooltip" title="{{ b.summary }}" target="_blank">
+											#{{ b.id }}
+										</a>
+									</li>
+								{% end %}
+							</ul>
+						{% end %}
+					</div>
+				</div>
+
+				<div class="span9">
+					{% if build.type == "release" %}
+						{% if build.commit %}
+							{% module CommitMessage(build.commit) %}
+
+							<hr>
+
+							<p class="muted">
+								{{ _("Author") }} {% module Maintainer(build.commit.author) %}
+								&dash;
+								{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
+							</p>
+						{% else %}
+							<p class="muted">{{ _("No commit message.") }}</p>
+						{% end %}
+					{% elif build.type == "scratch" %}
+							...
 					{% end %}
-				</p>
-
-				<hr>
-
-				<p>
-					{{ _("Score") }}
-
-					{% if build.state == "broken" %}
-						<span class="text-error">{{ _("(broken)") }}</span>
-					{% elif build.state == "obsolete" %}
-						<span class="text-warning">{{ _("(obsolete)") }}</span>
-					{% end %}
-				</p>
-
-				{% if build.severity %}
-					<hr>
-
-					{% if build.severity == "security update" %}
-						<i class="icon-bolt"></i>
-						{{ _("Security update") }}
-					{% elif build.severity == "bugfix update" %}
-						<i class="icon-wrench"></i>
-						{{ _("Bug fix update") }}
-					{% elif build.severity == "enhancement" %}
-						<i class="icon-plus"></i>
-						{{ _("Enhancement") }}
-					{% elif build.severity == "new package" %}
-						<i class="icon-asterisk"></i>
-						{{ _("New package") }}
-					{% else %}
-						{{ _("Unhandled: %s") % build.severity }}
-					{% end %}
-				{% end %}
+				</div>
 			</div>
+
+			<hr>
+
+			<h3>
+				<div class="pull-right">
+					<a class="btn btn-small btn-primary" data-toggle="modal" href="#comment" >
+						<i class="icon-comment icon-white"></i>
+						{{ _("Comment") }}
+					</a>
+				</div>
+
+				{{ _("Log") }}
+			</h3>
+
+			{% module Log(log) %}
+
+			<hr class="visible-phone">
 		</div>
 
-		{% if build.type == "release" %}
-			<div class="{% if bugs %}span6{% else %}span10{% end %}">
-				<h4>{{ _("Changes") }}</h4>
+		<div class="span4">
+			<h4 class="visible-phone">{{ _("Jobs") }}</h4>
+			{% module JobsBoxes(build) %}
 
-				{% if build.commit %}
-					{% module Text(build.commit.message_full, remove_linebreaks=False) %}
-
-					<p class="muted pull-right">
-						{{ _("Author") }} {% module Maintainer(build.commit.author) %}
-						&dash;
-						{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
-					</p>
-				{% else %}
-					<p class="muted">{{ _("No commit message.") }}</p>
-				{% end %}
-
-				<hr class="clear visible-phone">
-			</div>
-
-			{% if bugs %}
-				<div class="span4">
-					<h4>
-						{{ _("Fixed bugs") }}
-						<small>({{ len(bugs) }})</small>
-					</h4>
-
-					{% module BugsTable(pkg, bugs) %}
-				</div>
-			{% end %}
-
-		{% elif build.type == "scratch" %}
-			<div class="span10">
-				...
-			</div>
-		{% end %}
+			<p class="ac">
+				<a href="/package/{{ build.pkg.uuid }}">{{ _("Source package") }}</a>
+			</p>
+		</div>
 	</div>
 
 	{% if current_user and build.has_perm(current_user) %}
@@ -180,33 +210,6 @@
 
 		<hr>
 	{% end %}
-
-	<div class="row">
-		<div class="span8">
-			<h3>
-				<div class="pull-right">
-					<a class="btn btn-primary" data-toggle="modal" href="#comment" >
-						<i class="icon-comment icon-white"></i>
-						{{ _("Comment") }}
-					</a>
-				</div>
-
-				{{ _("Log") }}
-			</h3>
-
-			{% module Log(log) %}
-		</div>
-
-		<div class="span4">
-			<h3>{{ _("Jobs") }}</h3>
-
-			{% module JobsBoxes(build) %}
-
-			<p class="ac">
-				<a href="/package/{{ build.pkg.uuid }}">{{ _("Source package") }}</a>
-			</p>
-		</div>
-	</div>
 
 	{% module Modal("build-comment", build=build) %}
 

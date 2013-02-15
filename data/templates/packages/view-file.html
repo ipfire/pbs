@@ -18,7 +18,7 @@
 		</li>
 		{% if pkg.build %}
 			<li>
-				<a href="/build/{{ pkg.build.uuid }}">{{ pkg.build.name }}</a>
+				<a href="/build/{{ pkg.build.uuid }}">{{ pkg.friendly_version }}</a>
 				<span class="divider">/</span>
 			</li>
 		{% end %}

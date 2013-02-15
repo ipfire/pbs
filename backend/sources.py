@@ -131,7 +131,7 @@ class Commit(base.Object):
 
 	@property
 	def subject(self):
-		return self.data.subject
+		return self.data.subject.strip()
 
 	@property
 	def message(self):

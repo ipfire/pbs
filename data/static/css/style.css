@@ -47,6 +47,10 @@ body {
 	text-align: center;
 }
 
+.ar {
+	text-align: right;
+}
+
 .clear {
 	clear: both;
 }
@@ -102,7 +106,7 @@ body {
 	width: 50%;
 }
 
-.well-white {
+.well {
 	background-color: white;
 }
 

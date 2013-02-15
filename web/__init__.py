@@ -57,6 +57,7 @@ class Application(tornado.web.Application):
 				# Packages
 				"PackagesDependencyTable" : PackagesDependencyTableModule,
 
+				"CommitMessage"      : CommitMessageModule,
 				"CommitsTable"       : CommitsTableModule,
 				"JobsBoxes"          : JobsBoxesModule,
 				"JobState"           : JobStateModule,

@@ -3,6 +3,7 @@
 from __future__ import division
 
 import datetime
+import itertools
 import math
 import pytz
 import re
@@ -59,6 +60,14 @@ class TextModule(UIModule):
 	def cve_repl(self):
 		return self.LINK % (self.cve_url % r"\3", r"\1\2\3")
 
+	def split_paragraphs(self, s):
+		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=unicode.isspace):
+			if group_seperator:
+				continue
+
+			paragraph = "".join(line_iteration)
+			yield paragraph.replace("\n", " ")
+
 	def render(self, text, pre=False, remove_linebreaks=True):
 		link = """<a href="%s" target="_blank">%s</a>"""
 
@@ -82,6 +91,16 @@ class TextModule(UIModule):
 			return "<pre>%s</pre>" % text
 
 		return textile.textile(text)
+
+
+class CommitMessageModule(TextModule):
+	def render(self, commit):
+		s = "h5. %s\n\n" % commit.subject
+
+		paragraphs = self.split_paragraphs(commit.message)
+		s += "\n\n".join(paragraphs)
+
+		return TextModule.render(self, s, remove_linebreaks=False)
 
 
 class ModalModule(UIModule):

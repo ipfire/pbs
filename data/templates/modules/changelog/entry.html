@@ -1,35 +1,45 @@
 <li class="media">
 	<div class="media-body">
-		<h4>
-			<a href="/build/{{ build.uuid }}">{{ build.name }}</a>
-
-			<small>
-				{{ locale.format_date(build.created) }}
+		<div class="well">
+			<h4>
+				<a class="{% if build.is_broken() %}line-through{% end %}" href="/build/{{ build.uuid }}">{{ build.name }}</a>
 
 				{% if build.repo %}
-					{% if build.repo.type == "stable" %}
-						<span class="text-success pull-right">{{ _("Stable") }}</span>
-					{% elif build.repo.type == "unstable" %}
-						<span class="text-warning pull-right">{{ _("Unstable") }}</span>
-					{% elif build.repo.type == "testing" %}
-						<span class="text-error pull-right">{{ _("Testing") }}</span>
-					{% end %}
+					<small class="pull-right">
+						<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
+							{{ build.repo.distro.name }} &dash;
+							{% if build.repo.type == "stable" %}
+								<span class="text-success">{{ build.repo.name }}</span>
+							{% elif build.repo.type == "unstable" %}
+								<span class="text-warning">{{ build.repo.name }}</span>
+							{% elif build.repo.type == "testing" %}
+								<span class="text-error">{{ build.repo.name }}</span>
+							{% end %}
+						</a>
+					</small>
 				{% end %}
-			</small>
-		</h4>
+			</h4>
 
-		{% if build.commit %}
-			{% module Text(build.commit.message_full, remove_linebreaks=False) %}
+			<hr>
 
-			<p class="muted pull-right">
-				{{ _("Author") }} {% module Maintainer(build.commit.author) %}
-				&dash;
-				{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
-			</p>
-		{% else %}
-			<p class="muted">
-				{{ _("No commit message.") }}
-			</p>
-		{% end %}
+			{% if build.commit %}
+				{% module CommitMessage(build.commit) %}
+
+				<hr>
+
+				<p class="muted">
+					{{ _("Author") }} {% module Maintainer(build.commit.author) %}
+					&dash;
+					{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
+
+					<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
+				</p>
+			{% else %}
+				<p class="muted">
+					{{ _("No commit message.") }}
+					<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
+				</p>
+			{% end %}
+		</div>
 	</div>
 </li>

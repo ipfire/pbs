@@ -1,17 +1,15 @@
-<table class="table table-striped table-hover">
+<dl>
 	{% for bug in bugs %}
-		<tr>
-			<td>
-				{{ bug.summary }}
-				<br>
-				<a href="{{ bug.url }}" target="_blank">#{{ bug.id }}</a>
-				<span class="muted">
-					&dash; {{ bug.status }}
-					{% if bug.resolution %}
-						{{ bug.resolution }}
-					{% end %}
-				</span>
-			</td>
-		</tr>
+		<br>
+		<dt>
+			<a href="{{ bug.url }}" target="_blank">#{{ bug.id }}</a> &dash;
+			{{ bug.summary }}
+		</dt>
+		<dd class="muted">
+			{{ bug.status }} {% if bug.resolution %}{{ bug.resolution }}{% end %}
+			{% if bug.assignee %}
+				&dash; {% raw format_email(bug.assignee) %}
+			{% end %}
+		</dd>
 	{% end %}
-</table>
+</dl>

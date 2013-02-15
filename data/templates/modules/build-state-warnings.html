@@ -1,19 +1,11 @@
 {% if build.state == "broken" %}
-	<div class="alert alert-block alert-danger">
-		<h4 class="alert-heading">{{ _("This build is broken!") }}</h4>
-		<p>
-			{{ _("This means that the package may cause severe damage on your system and/or does not work at all.") }}
-		</p>
-		<p>
-			{{ _("It is discouraged to use this package anymore.") }}
-		</p>
+	<div class="alert alert-danger">
+		<strong>{{ _("This build is broken!") }}</strong>
+		{{ _("This means that the package may cause severe damage on your system and/or does not work at all.") }}
 	</div>
 {% elif build.state == "obsolete" %}
-	<div class="alert alert-block alert-warning">
-		<h4 class="alert-heading">{{ _("This build is obsolete!") }}</h4>
-		<p>
-			{{ _("This means that this package is not up to date anymore.") }}
-			{{ _("Possibly there is an update that fixes bugs in this release.") }}
-		</p>
+	<div class="alert alert-warning">
+		<strong>{{ _("This build is obsolete!") }}</strong>
+		{{ _("This means that this package has been replaced with a new one.") }}
 	</div>
 {% end %}

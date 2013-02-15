@@ -1,31 +1,27 @@
 <div class="lead lead-small ac">
 	{% module Text(pkg.description) %}
-	<br>
 </div>
 
-<div class="muted">
-	<p class="pull-right">
-		{% if pkg.url %}
-			<i class="icon-home"></i>
-			<a href="{{ pkg.url }}" target="_blank">{{ _("Home") }}</a>
+<hr>
 
-			{% if pkg.license or pkg.groups %}&dash;{% end %}
-		{% end %}
+<dl class="dl-horizontal">
+	{% if pkg.url %}
+		<dt>{{ _("Home") }}</dt>
+		<dd>{% raw linkify(pkg.url, shorten=True) %}</dd>
+	{% end %}
 
-		{% if pkg.license %}
-			{{ _("License") }}: {{ pkg.license }}
+	{% if pkg.license %}
+		<dt>{{ _("License") }}</dt>
+		<dd>{{ pkg.license }}</dd>
+	{% end %}
 
-			{% if pkg.groups %}&dash;{% end %}
-		{% end %}
-
-		{% if pkg.groups %}
-			{{ _("Group", "Groups", len(pkg.groups)) }}: {{ locale.list(pkg.groups) }}
-		{% end %}
-	</p>
+	{% if pkg.groups %}
+		<dt>{{ _("Group", "Groups", len(pkg.groups)) }}</dt>
+		<dd>{{ locale.list(pkg.groups) }}</dd>
+	{% end %}
 
 	{% if pkg.maintainer %}
-		<p>
-			{{ _("This package is maintained by") }} {% module Maintainer(pkg.maintainer) %}.
-		</p>
+		<dt>{{ _("Maintainer") }}</dt>
+		<dd>{% module Maintainer(pkg.maintainer) %}</dd>
 	{% end %}
-</div>
+</dl>
