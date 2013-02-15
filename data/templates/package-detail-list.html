@@ -18,6 +18,20 @@
 	</ul>
 
 	<div class="page-header">
+		<div class="pull-right">
+			<ul class="nav nav-pills">
+				<li>
+					<a href="/packages/{{ pkg.name }}/builds/scratch">
+						{{ _("Scratch builds") }}
+					</a>
+				<li>
+					<a href="/packages/{{ pkg.name }}/builds/test">
+						{{ _("Test builds") }}
+					</a>
+				</li>
+			</ul>
+		</div>
+
 		<h2>
 			{{ pkg.name }}<br>
 			<small>{{ pkg.summary }}</small>
