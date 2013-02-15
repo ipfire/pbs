@@ -50,20 +50,18 @@ class PackageListHandler(BaseHandler):
 
 class PackageNameHandler(BaseHandler):
 	def get(self, name):
-		latest_build = self.pakfire.builds.get_latest_by_name(name, public=self.public)
-
-		if not latest_build:
+		builds = self.pakfire.builds.get_active_builds(name, public=self.public)
+		if not builds:
 			raise tornado.web.HTTPError(404, "Package '%s' was not found" % name)
 
-		# Get the average build times of this package.
-		build_times = self.pakfire.packages.get_avg_build_times(name)
+		# Get the latest build to show the package meta information.
+		latest_build = builds[0]
 
 		# Get the latest bugs from bugzilla.
 		bugs = self.pakfire.bugzilla.get_bugs_from_component(name)
 
-		self.render("package-detail-list.html", name=name,
-			latest_build=latest_build, pkg=latest_build.pkg,
-			build_times=build_times, bugs=bugs)
+		self.render("package-detail-list.html", name=name, builds=builds,
+			latest_build=latest_build, pkg=latest_build.pkg, bugs=bugs)
 
 
 class PackageChangelogHandler(BaseHandler):

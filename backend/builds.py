@@ -166,6 +166,34 @@ class Builds(base.Object):
 
 			return builds[0]
 
+	def get_active_builds(self, name, public=None):
+		query = "\
+			SELECT builds.* FROM builds \
+				LEFT JOIN packages ON builds.pkg_id = packages.id \
+			WHERE packages.name = %s"
+		args = [name,]
+
+		if public is True:
+			query += " AND builds.public = %s"
+			args.append("Y")
+		elif public is False:
+			query += " AND builds.public = %s"
+			args.append("N")
+
+		query += " AND builds.id IN ( \
+			SELECT build_id FROM repositories_builds \
+		)"
+
+		builds = []
+		for row in self.db.query(query, *args):
+			b = Build(self.pakfire, row.id, row)
+			builds.append(b)
+
+		# Sort the result. Lastest build first.
+		builds.sort(reverse=True)
+
+		return builds
+
 	def count(self):
 		count = self.cache.get("builds_count")
 		if count is None:
