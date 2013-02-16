@@ -13,7 +13,7 @@ pot: $(POTFILE)
 
 $(POTFILE): $(ALL_FILES)
 	xgettext --language=Python --from-code=UTF-8 --keyword=_:1,2 --keyword=N_ -d pakfire -o $(POTFILE) \
-		$(ALL_FILES)
+		$(sort $(ALL_FILES))
 
 .PHONY: po
 po: $(POTFILE) $(patsubst %.po, %.mo, $(POFILES))
