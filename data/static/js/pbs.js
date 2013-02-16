@@ -5,6 +5,16 @@ $(document).ready(function() {
 	// Activate tooltips.
 	$("a[rel=tooltip]").tooltip();
 	$("span[rel=tooltip]").tooltip();
+
+	$(".typeahead-packages-autocomplete").typeahead({
+		source: function(query, process) {
+			$.get("/api/packages/autocomplete", { q: query }, function(data) {
+				if (data.query == query) {
+					process(data.packages);
+				}
+			});
+		},
+	});
 });
 
 function getCookie(name) {

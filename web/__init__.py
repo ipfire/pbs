@@ -10,6 +10,8 @@ import tornado.web
 from handlers import *
 from ui_modules import *
 
+import handlers_api
+
 BASEDIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 # Enable logging
@@ -237,6 +239,9 @@ class Application(tornado.web.Application):
 
 			# Sessions
 			(r"/sessions", SessionsHandler),
+
+			# API handlers
+			(r"/api/packages/autocomplete", handlers_api.ApiPackagesAutocomplete),
 
 		] + static_handlers + [
 

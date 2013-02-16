@@ -95,6 +95,13 @@ class Packages(base.Object):
 
 		return files
 
+	def autocomplete(self, query, limit=8):
+		res = self.db.query("SELECT DISTINCT name FROM packages \
+			WHERE packages.name LIKE %s AND packages.type = %s \
+			ORDER BY packages.name LIMIT %s", "%%%s%%" % query, "source", limit)
+
+		return [row.name for row in res]
+
 	def get_avg_build_times(self, name):
 		query = "SELECT jobs.arch_id AS arch_id, \
 				AVG(UNIX_TIMESTAMP(jobs.time_finished) - UNIX_TIMESTAMP(jobs.time_started)) AS build_time \
