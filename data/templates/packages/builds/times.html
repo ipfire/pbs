@@ -1,0 +1,68 @@
+{% extends "../../base.html" %}
+
+{% block title %}{{ _("Package build times") }}: {{ pkg.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/package/{{ pkg.name }}/builds/times">{{ _("Build times") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h2>
+			{{ pkg.name }}<br>
+			<small>{{ pkg.summary }}</small>
+		</h2>
+	</div>
+
+	<h4>{{ _("Summary") }}</h4>
+
+	<p class="muted">
+		{{ _("This table shows you how long this package normally takes to be built.") }}
+	</p>
+
+	<table class="table table-striped table-hover table-condensed">
+		<thead>
+			<tr>
+				<th></th>
+				<th class="ac" colspan="4">{{ _("Build times") }}</th>
+			</tr>
+			<tr>
+				<th>{{ _("Architecture") }}</th>
+				<th class="ar">{{ _("Average") }}</th>
+				<th class="ar">{{ _("Maximum") }}</th>
+				<th class="ar">{{ _("Minimum") }}</th>
+				<th class="ar">{{ _("Total") }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in build_times_summary %}
+				<tr>
+					<td>{{ row.arch }}</td>
+					<td class="ar">
+						{{ format_time(row.average) }}
+						<span class="muted">
+							 &plusmn; {{ format_time(row.stddev) }}
+						</span>
+					</td>
+					<td class="ar">{{ format_time(row.maximum) }}</td>
+					<td class="ar">{{ format_time(row.minimum) }}</td>
+					<td class="ar">{{ format_time(row.sum) }}</td>
+				</tr>
+			{% end %}
+		</tbody>
+	</table>
+{% end block %}
