@@ -43,11 +43,11 @@ body {
 	padding: 20px;
 }
 
-.ac {
+.ac, th.ac {
 	text-align: center;
 }
 
-.ar {
+.ar, th.ar, td.ar {
 	text-align: right;
 }
 

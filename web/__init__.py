@@ -83,6 +83,9 @@ class Application(tornado.web.Application):
 				"SelectLocale"       : SelectLocaleModule,
 				"SelectTimezone"     : SelectTimezoneModule,
 			},
+			ui_methods = {
+				"format_time"        : self.format_time,
+			},
 			xsrf_cookies = True,
 		)
 
@@ -126,6 +129,7 @@ class Application(tornado.web.Application):
 			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/download(.*)", PackageFileDownloadHandler),
 			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/view(.*)", PackageFileViewHandler),
 			(r"/package/([\w\-\+]+)", PackageNameHandler),
+			(r"/package/([\w\-\+]+)/builds/times", PackageBuildsTimesHandler),
 			(r"/package/([\w\-\+]+)/changelog", PackageChangelogHandler),
 			(r"/package/([\w\-\+]+)/properties", PackagePropertiesHandler),
 
@@ -282,3 +286,16 @@ class Application(tornado.web.Application):
 
 	def reload(self):
 		logging.debug("Caught reload signal")
+
+	## UI methods
+
+	def format_time(self, handler, s):
+		_ = handler.locale.translate
+
+		hrs, s = divmod(s, 3600)
+		min, s = divmod(s, 60)
+
+		if s >= 30:
+			min += 1
+
+		return _("%(hrs)d:%(min)02d hrs") % {"hrs" : hrs, "min" : min}

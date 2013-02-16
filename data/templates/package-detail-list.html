@@ -21,11 +21,17 @@
 		<div class="pull-right">
 			<ul class="nav nav-pills">
 				<li>
-					<a href="/packages/{{ pkg.name }}/builds/scratch">
+					<a href="/package/{{ pkg.name }}/builds/times">
+						{{ _("Build times") }}
+					</a>
+				</li>
+				<li>
+					<a href="/package/{{ pkg.name }}/builds/scratch">
 						{{ _("Scratch builds") }}
 					</a>
+				</li>
 				<li>
-					<a href="/packages/{{ pkg.name }}/builds/test">
+					<a href="/package/{{ pkg.name }}/builds/test">
 						{{ _("Test builds") }}
 					</a>
 				</li>

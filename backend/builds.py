@@ -332,6 +332,41 @@ class Builds(base.Object):
 
 		return comments
 
+	def get_build_times_summary(self, name=None, job_type=None):
+		query = "\
+			SELECT \
+				builds_times.arch AS arch, \
+				MAX(duration) AS maximum, \
+				MIN(duration) AS minimum, \
+				AVG(duration) AS average, \
+				SUM(duration) AS sum, \
+				STDDEV_POP(duration) AS stddev \
+			FROM builds_times \
+				LEFT JOIN builds ON builds_times.build_id = builds.id \
+				LEFT JOIN packages ON builds.pkg_id = packages.id"
+
+		args = []
+		conditions = []
+
+		# Filter for name.
+		if name:
+			conditions.append("packages.name = %s")
+			args.append(name)
+
+		# Filter by job types.
+		if type:
+			conditions.append("builds_times.job_type = %s")
+			args.append(job_type)
+
+		# Add conditions.
+		if conditions:
+			query += " WHERE %s" % " AND ".join(conditions)
+
+		# Grouping and sorting.
+		query += " GROUP BY arch ORDER BY arch DESC"
+
+		return self.db.query(query, *args)
+
 
 class Build(base.Object):
 	def __init__(self, pakfire, id, data=None):
