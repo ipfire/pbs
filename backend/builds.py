@@ -141,30 +141,35 @@ class Builds(base.Object):
 		return sorted([Build(self.pakfire, b.id) for b in self.db.query(query, *args)])
 
 	def get_latest_by_name(self, name, type=None, public=None):
-		if type is None:
-			types = ("release", "scratch")
-		else:
-			types = (type,)
-
-		query = "SELECT builds.id AS id FROM builds \
-			JOIN packages ON builds.pkg_id = packages.id \
-			WHERE builds.type = %s AND packages.name = %s"
+		query = "\
+			SELECT * FROM builds \
+				LEFT JOIN builds_latest ON builds.id = builds_latest.build_id \
+			WHERE builds_latest.package_name = %s"
 		args = [name,]
 
+		if type:
+			query += " AND builds_latest.build_type = %s"
+			args.append(type)
+
 		if public is True:
-			query += " AND builds.public = 'Y'"
+			query += " AND builds.public = %s"
+			args.append("Y")
 		elif public is False:
-			query += " AND builds.public = 'N'"
+			query += " AND builds.public = %s"
+			args.append("N")
 
-		for type in types:
-			res = self.db.query(query, type, *args)
-			if not res:
-				continue
+		# Get the last one only.
+		# Prefer release builds over scratch builds.
+		query += "\
+			ORDER BY \
+				CASE builds.type WHEN 'release' THEN 0 ELSE 1 END, \
+				builds.time_created DESC \
+			LIMIT 1"
 
-			builds = [Build(self.pakfire, b.id) for b in res]
-			builds.sort(reverse=True)
+		res = self.db.get(query, *args)
 
-			return builds[0]
+		if res:
+			return Build(self.pakfire, res.id, res)
 
 	def get_active_builds(self, name, public=None):
 		query = "\
