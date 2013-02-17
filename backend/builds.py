@@ -175,8 +175,8 @@ class Builds(base.Object):
 		query = "\
 			SELECT * FROM builds \
 				LEFT JOIN builds_latest ON builds.id = builds_latest.build_id \
-			WHERE builds_latest.package_name = %s"
-		args = [name,]
+			WHERE builds_latest.package_name = %s AND builds.type = %s"
+		args = [name, "release"]
 
 		if public is True:
 			query += " AND builds.public = %s"
