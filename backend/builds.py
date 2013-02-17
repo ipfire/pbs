@@ -168,9 +168,9 @@ class Builds(base.Object):
 
 	def get_active_builds(self, name, public=None):
 		query = "\
-			SELECT builds.* FROM builds \
-				LEFT JOIN packages ON builds.pkg_id = packages.id \
-			WHERE packages.name = %s"
+			SELECT * FROM builds \
+				LEFT JOIN builds_latest ON builds.id = builds_latest.build_id \
+			WHERE builds_latest.package_name = %s"
 		args = [name,]
 
 		if public is True:
@@ -179,10 +179,6 @@ class Builds(base.Object):
 		elif public is False:
 			query += " AND builds.public = %s"
 			args.append("N")
-
-		query += " AND builds.id IN ( \
-			SELECT build_id FROM repositories_builds \
-		)"
 
 		builds = []
 		for row in self.db.query(query, *args):
