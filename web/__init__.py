@@ -308,7 +308,7 @@ class Application(tornado.web.Application):
 		if s < 0:
 			s = 0
 
-		return "%s ± %s" % (
+		return u"%s ± %s" % (
 			self.format_time(handler, s),
 			self.format_time_short(handler, stddev),
 		)
