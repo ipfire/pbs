@@ -55,7 +55,7 @@
 					<td class="ar">
 						{{ format_time(row.average) }}
 						<span class="muted">
-							 &plusmn; {{ format_time(row.stddev) }}
+							 &plusmn; {{ format_time(row.stddev / 2) }}
 						</span>
 					</td>
 					<td class="ar">{{ format_time(row.maximum) }}</td>

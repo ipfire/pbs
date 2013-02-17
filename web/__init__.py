@@ -310,7 +310,7 @@ class Application(tornado.web.Application):
 
 		return u"%s ± %s" % (
 			self.format_time(handler, s),
-			self.format_time_short(handler, stddev),
+			self.format_time_short(handler, stddev / 2),
 		)
 
 	def format_time(self, handler, s, shorter=False):
