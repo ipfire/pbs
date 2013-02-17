@@ -184,10 +184,11 @@ class Users(base.Object):
 		return count
 
 	def search(self, pattern, limit=None):
+		pattern = "%%%s%%" % pattern
+
 		query = "SELECT id FROM users \
-			WHERE (name LIKE %s OR MATCH(name, realname) AGAINST(%s)) \
-				AND activated = 'Y' AND deleted = 'N'"
-		args  = [pattern, pattern,]
+			WHERE (name LIKE %s OR realname LIKE %s) AND activated = %s AND deleted = %s"
+		args  = [pattern, pattern, "Y", "N"]
 
 		if limit:
 			query += " LIMIT %s"
