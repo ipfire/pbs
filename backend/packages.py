@@ -64,13 +64,22 @@ class Packages(base.Object):
 
 			This function does not work for UUIDs or filenames.
 		"""
-		query = "SELECT id FROM packages WHERE type = 'source' AND \
-			(name LIKE %s OR MATCH(name, summary, description) AGAINST(%s)) \
+		query = "SELECT * FROM packages \
+			WHERE type = %s AND ( \
+				name LIKE %s OR \
+				summary LIKE %s OR \
+				description LIKE %s \
+			) \
 			GROUP BY name"
 
+		pattern = "%%%s%%" % pattern
+		args = ("source", pattern, pattern, pattern)
+
+		res = self.db.query(query, *args)
+
 		pkgs = []
-		for pkg in self.db.query(query, pattern, pattern):
-			pkg = Package(self.pakfire, pkg.id)
+		for row in res:
+			pkg = Package(self.pakfire, row.id, row)
 			pkgs.append(pkg)
 
 			if limit and len(pkgs) >= limit:
