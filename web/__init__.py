@@ -313,7 +313,7 @@ class Application(tornado.web.Application):
 			self.format_time_short(handler, stddev),
 		)
 
-	def format_time(self, handler, s):
+	def format_time(self, handler, s, shorter=False):
 		_ = handler.locale.translate
 
 		hrs, s = divmod(s, 3600)
@@ -321,6 +321,9 @@ class Application(tornado.web.Application):
 
 		if s >= 30:
 			min += 1
+
+		if shorter and not hrs:
+			return _("%(min)d min") % { "min" : min }
 
 		return _("%(hrs)d:%(min)02d hrs") % {"hrs" : hrs, "min" : min}
 
