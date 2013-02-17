@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import logging
+import multiprocessing
 import os.path
 import tornado.httpserver
 import tornado.locale
@@ -271,18 +272,20 @@ class Application(tornado.web.Application):
 		logging.debug("Caught shutdown signal")
 		self.ioloop.stop()
 
-	def run(self, port=80):
+	def run(self, port=7001):
 		logging.debug("Going to background")
 
 		http_server = tornado.httpserver.HTTPServer(self, xheaders=True)
 
 		# If we are not running in debug mode, we can actually run multiple
 		# frontends to get best performance out of our service.
-		if not self.settings["debug"]:
-			http_server.bind(port)
-			http_server.start(num_processes=4)
-		else:
+		if self.settings.get("debug", False):
 			http_server.listen(port)
+		else:
+			cpu_count = multiprocessing.cpu_count()
+
+			http_server.bind(port)
+			http_server.start(num_processes=cpu_count)
 
 		# All requests should be done after 60 seconds or they will be killed.
 		self.ioloop.set_blocking_log_threshold(60)
