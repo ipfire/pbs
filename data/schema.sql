@@ -3,8 +3,8 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 12, 2012 at 05:25 PM
--- Server version: 5.1.61-log
+-- Generation Time: Feb 17, 2013 at 03:01 PM
+-- Server version: 5.1.67-log
 -- PHP Version: 5.3.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `arches` (
   `prio` int(11) NOT NULL DEFAULT '0',
   `binary` enum('Y','N') NOT NULL DEFAULT 'Y',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `builders` (
   `time_updated` datetime DEFAULT NULL,
   `time_keepalive` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `builders_arches` (
   `arch_id` int(11) unsigned NOT NULL,
   `enabled` enum('Y','N') NOT NULL DEFAULT 'Y',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=81 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `builders_history` (
   `user_id` int(10) unsigned DEFAULT NULL,
   `time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=91 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `builds` (
   `auto_move` enum('N','Y') NOT NULL DEFAULT 'N',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1170 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `builds_bugs` (
   `bug_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `build_id` (`build_id`,`bug_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=111 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS `builds_bugs_updates` (
   `error` enum('N','Y') NOT NULL DEFAULT 'N',
   `error_msg` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `builds_comments` (
   `time_created` datetime NOT NULL,
   `time_updated` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=82 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -186,8 +186,31 @@ CREATE TABLE IF NOT EXISTS `builds_history` (
   `time` datetime NOT NULL,
   `bug_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1282 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `builds_latest`
+--
+CREATE TABLE IF NOT EXISTS `builds_latest` (
+`build_id` int(10) unsigned
+,`build_type` enum('release','scratch')
+,`build_state` enum('building','testing','stable','obsolete','broken')
+,`package_name` varchar(128)
+,`public` enum('Y','N')
+);
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `builds_times`
+--
+CREATE TABLE IF NOT EXISTS `builds_times` (
+`build_id` int(10) unsigned
+,`arch` varchar(32)
+,`job_type` enum('build','test')
+,`duration` bigint(11)
+);
 -- --------------------------------------------------------
 
 --
@@ -199,7 +222,7 @@ CREATE TABLE IF NOT EXISTS `builds_watchers` (
   `build_id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -217,7 +240,7 @@ CREATE TABLE IF NOT EXISTS `distributions` (
   `contact` varchar(128) DEFAULT NULL,
   `tag` varchar(4) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -230,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `distro_arches` (
   `distro_id` int(10) unsigned NOT NULL,
   `arch_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=32 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -251,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `filelists` (
   `mtime` datetime NOT NULL,
   `capabilities` varchar(64) DEFAULT NULL,
   KEY `pkg_id` (`pkg_id`),
-  KEY `name` (`name`(16))
+  KEY `name` (`name`(8))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -277,7 +300,7 @@ CREATE TABLE IF NOT EXISTS `jobs` (
   `message` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11998 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -321,7 +344,7 @@ CREATE TABLE IF NOT EXISTS `jobs_packages` (
   `job_id` int(10) unsigned NOT NULL,
   `pkg_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13035 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -348,7 +371,7 @@ CREATE TABLE IF NOT EXISTS `keys` (
   `data` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `fingerprint` (`fingerprint`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -364,7 +387,7 @@ CREATE TABLE IF NOT EXISTS `keys_subkeys` (
   `time_expires` datetime DEFAULT NULL,
   `algo` varchar(16) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=39 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -379,7 +402,7 @@ CREATE TABLE IF NOT EXISTS `logfiles` (
   `filesize` int(10) unsigned NOT NULL,
   `hash_sha512` varchar(140) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12739 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -397,7 +420,7 @@ CREATE TABLE IF NOT EXISTS `mirrors` (
   `check_status` enum('UNKNOWN','UP','DOWN') NOT NULL DEFAULT 'UNKNOWN',
   `last_check` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -412,7 +435,7 @@ CREATE TABLE IF NOT EXISTS `mirrors_history` (
   `user_id` int(10) unsigned DEFAULT NULL,
   `time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -447,7 +470,7 @@ CREATE TABLE IF NOT EXISTS `packages` (
   PRIMARY KEY (`id`),
   KEY `uuid` (`uuid`),
   FULLTEXT KEY `search` (`name`,`summary`,`description`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14241 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -475,7 +498,7 @@ CREATE TABLE IF NOT EXISTS `packages_properties` (
   `priority` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -487,7 +510,7 @@ CREATE TABLE IF NOT EXISTS `queue_delete` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `path` varchar(1024) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -512,7 +535,7 @@ CREATE TABLE IF NOT EXISTS `repositories` (
   `update_started` datetime DEFAULT NULL,
   `update_ended` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -528,7 +551,7 @@ CREATE TABLE IF NOT EXISTS `repositories_aux` (
   `distro_id` int(10) unsigned NOT NULL,
   `status` enum('enabled','disabled') NOT NULL DEFAULT 'disabled',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -543,7 +566,7 @@ CREATE TABLE IF NOT EXISTS `repositories_builds` (
   `time_added` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `build_id` (`build_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=805 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -599,7 +622,7 @@ CREATE TABLE IF NOT EXISTS `slogans` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `message` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -619,7 +642,7 @@ CREATE TABLE IF NOT EXISTS `sources` (
   `distro_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `identifier` (`identifier`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -639,7 +662,7 @@ CREATE TABLE IF NOT EXISTS `sources_commits` (
   `state` enum('pending','running','finished','failed') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`),
   KEY `revision` (`revision`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=487 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -661,7 +684,7 @@ CREATE TABLE IF NOT EXISTS `uploads` (
   `time_finished` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=36 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -684,7 +707,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   FULLTEXT KEY `search` (`name`,`realname`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=35 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -700,7 +723,7 @@ CREATE TABLE IF NOT EXISTS `users_emails` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -717,7 +740,7 @@ CREATE TABLE IF NOT EXISTS `users_permissions` (
   `manage_mirrors` enum('N','Y') NOT NULL DEFAULT 'N',
   `vote` enum('N','Y') NOT NULL DEFAULT 'N',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -733,7 +756,25 @@ CREATE TABLE IF NOT EXISTS `user_messages` (
   `text` text NOT NULL,
   `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `builds_latest`
+--
+DROP TABLE IF EXISTS `builds_latest`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `builds_latest` AS select `builds`.`id` AS `build_id`,`builds`.`type` AS `build_type`,`builds`.`state` AS `build_state`,`packages`.`name` AS `package_name`,`builds`.`public` AS `public` from (`builds` left join `packages` on((`builds`.`pkg_id` = `packages`.`id`))) where (`builds`.`id` in (select `repositories_builds`.`build_id` from `repositories_builds`) or ((`builds`.`time_created` >= (select `builds`.`time_created` from ((`builds` left join `repositories_builds` on((`builds`.`id` = `repositories_builds`.`build_id`))) left join `packages` `p` on((`builds`.`pkg_id` = `p`.`id`))) where (`p`.`name` = `packages`.`name`) order by `builds`.`time_created` limit 1)) and (`builds`.`state` not in ('obsolete','broken'))));
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `builds_times`
+--
+DROP TABLE IF EXISTS `builds_times`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `builds_times` AS select `builds`.`id` AS `build_id`,`arches`.`name` AS `arch`,`jobs`.`type` AS `job_type`,(unix_timestamp(`jobs`.`time_finished`) - unix_timestamp(`jobs`.`time_started`)) AS `duration` from (((`jobs` left join `builds` on((`jobs`.`build_id` = `builds`.`id`))) left join `packages` on((`builds`.`pkg_id` = `packages`.`id`))) left join `arches` on((`jobs`.`arch_id` = `arches`.`id`))) where (`jobs`.`state` = 'finished');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
