@@ -47,31 +47,14 @@ class BaseHandler(tornado.web.RequestHandler):
 			return self.current_user.session
 
 	def get_user_locale(self):
-		DEFAULT_LOCALE = tornado.locale.get("en_US")
-		ALLOWED_LOCALES = \
-			[tornado.locale.get(l) for l in tornado.locale.get_supported_locales()]
-
-		# One can append "?locale=de" to mostly and URI on the site and
-		# another output that guessed.
-		locale = self.get_argument("locale", None)
-		if locale:
-			locale = tornado.locale.get(locale)
-			for locale in ALLOWED_LOCALES:
-				return locale
-
 		# Get the locale from the user settings.
 		if self.current_user and self.current_user.locale:
 			locale = tornado.locale.get(self.current_user.locale)
-			if locale in ALLOWED_LOCALES:
+			if locale:
 				return locale
 
-		# If no locale was provided we guess what the browser sends us
-		locale = self.get_browser_locale()
-		if locale in ALLOWED_LOCALES:
-			return locale
-
-		# If no one of the cases above worked we use our default locale
-		return DEFAULT_LOCALE
+		# If no locale was provided, we take what ever the browser requested.
+		return self.get_browser_locale()
 
 	@property
 	def remote_address(self):
