@@ -111,29 +111,6 @@ class Packages(base.Object):
 
 		return [row.name for row in res]
 
-	def get_avg_build_times(self, name):
-		query = "SELECT jobs.arch_id AS arch_id, \
-				AVG(UNIX_TIMESTAMP(jobs.time_finished) - UNIX_TIMESTAMP(jobs.time_started)) AS build_time \
-			FROM jobs \
-				JOIN builds ON jobs.build_id = builds.id \
-				JOIN packages ON builds.pkg_id = packages.id \
-			WHERE packages.name = %s \
-				AND jobs.state = 'finished' \
-				AND jobs.type = 'build' \
-				AND NOT jobs.time_started IS NULL \
-				AND NOT jobs.time_finished IS NULL \
-			GROUP BY jobs.arch_id"
-
-		ret = []
-		for row in self.db.query(query, name):
-			arch = arches.Arch(self.pakfire, row.arch_id)
-			ret.append((arch, row.build_time))
-
-		# Sorts the list by the priority of the arches.
-		ret.sort()
-
-		return ret
-
 
 class Package(base.Object):
 	def __init__(self, pakfire, id, data=None):
