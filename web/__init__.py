@@ -16,6 +16,7 @@ import handlers_api
 BASEDIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 # Enable logging
+tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
 tornado.options.parse_command_line()
 
 class Application(tornado.web.Application):
@@ -23,7 +24,7 @@ class Application(tornado.web.Application):
 		self.__pakfire = None
 
 		settings = dict(
-			debug = True,
+			debug = tornado.options.options.debug,
 			gzip  = True,
 			login_url = "/login",
 			template_path = os.path.join(BASEDIR, "templates"),
