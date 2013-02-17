@@ -129,6 +129,12 @@
 									{{ format_date(job.time_finished, full_format=True) }}
 								</p>
 							{% end %}
+							{% if job.is_running() %}
+								<p>
+									<strong>{{ _("ETA") }}</strong><br>
+									{{ format_eta(job.eta) }}
+								</p>
+							{% end %}
 					</div>
 				</div>
 			</div>

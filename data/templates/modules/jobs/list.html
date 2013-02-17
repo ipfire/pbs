@@ -47,6 +47,10 @@
 
 				<td>
 					{{ friendly_time(job.duration) }}
+
+					{% if job.is_running() %}
+						<br> <span class="muted">{{ _("ETA") }}: {{ format_eta(job.eta) }}</span>
+					{% end %}
 				</td>
 			</tr>
 		{% end %}

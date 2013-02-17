@@ -15,6 +15,12 @@
 						{{ _("Builder") }}: <a href="/builder/{{ j.builder.name }}">{{ j.builder.name }}</a>
 					</li>
 				{% end %}
+
+				{% if j.is_running() %}
+					<li>
+						{{ _("ETA") }}: {{ format_eta(j.eta) }}
+					</li>
+				{% end %}
 			</ul>
 		</div>
 	{% end %}

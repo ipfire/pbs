@@ -333,7 +333,7 @@ class Builds(base.Object):
 
 		return comments
 
-	def get_build_times_summary(self, name=None, job_type=None):
+	def get_build_times_summary(self, name=None, job_type=None, arch=None):
 		query = "\
 			SELECT \
 				builds_times.arch AS arch, \
@@ -355,9 +355,14 @@ class Builds(base.Object):
 			args.append(name)
 
 		# Filter by job types.
-		if type:
+		if job_type:
 			conditions.append("builds_times.job_type = %s")
 			args.append(job_type)
+
+		# Filter by arch.
+		if arch:
+			conditions.append("builds_times.arch = %s")
+			args.append(arch)
 
 		# Add conditions.
 		if conditions:
@@ -367,6 +372,15 @@ class Builds(base.Object):
 		query += " GROUP BY arch ORDER BY arch DESC"
 
 		return self.db.query(query, *args)
+
+	def get_build_times_by_arch(self, arch, **kwargs):
+		kwargs.update({
+			"arch" : arch,
+		})
+
+		build_times = self.get_build_times_summary(**kwargs)
+		if build_times:
+			return build_times[0]
 
 
 class Build(base.Object):
@@ -1762,6 +1776,12 @@ class Job(base.Object):
 	def size(self):
 		return sum((p.size for p in self.packages))
 
+	def is_running(self):
+		"""
+			Returns True if job is in a running state.
+		"""
+		return self.state in ("pending", "dispatching", "running", "uploading")
+
 	def get_state(self):
 		return self.data.state
 
@@ -1886,6 +1906,28 @@ class Job(base.Object):
 	@property
 	def time_finished(self):
 		return self.data.time_finished
+
+	@property
+	def expected_runtime(self):
+		"""
+			Returns the estimated time and stddev, this job takes to finish.
+		"""
+		# Get the average build time.
+		build_times = self.pakfire.builds.get_build_times_by_arch(self.arch.name,
+			name=self.pkg.name)
+
+		# If there is no statistical data, we cannot estimate anything.
+		if not build_times:
+			return None, None
+
+		return build_times.average, build_times.stddev
+
+	@property
+	def eta(self):
+		expected_runtime, stddev = self.expected_runtime
+
+		if expected_runtime:
+			return expected_runtime - int(self.duration), stddev
 
 	@property
 	def tries(self):

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# encoding: utf-8
 
 import logging
 import multiprocessing
@@ -88,6 +89,7 @@ class Application(tornado.web.Application):
 				"SelectTimezone"     : SelectTimezoneModule,
 			},
 			ui_methods = {
+				"format_eta"         : self.format_eta,
 				"format_time"        : self.format_time,
 			},
 			xsrf_cookies = True,
@@ -298,6 +300,19 @@ class Application(tornado.web.Application):
 
 	## UI methods
 
+	def format_eta(self, handler, (s, stddev)):
+		if s is None:
+			_ = handler.locale.translate
+			return _("Unknown")
+
+		if s < 0:
+			s = 0
+
+		return "%s ± %s" % (
+			self.format_time(handler, s),
+			self.format_time_short(handler, stddev),
+		)
+
 	def format_time(self, handler, s):
 		_ = handler.locale.translate
 
@@ -308,3 +323,16 @@ class Application(tornado.web.Application):
 			min += 1
 
 		return _("%(hrs)d:%(min)02d hrs") % {"hrs" : hrs, "min" : min}
+
+	def format_time_short(self, handler, s):
+		_ = handler.locale.translate
+
+		hrs = s / 3600
+		if hrs >= 1:
+			return _("%dh") % hrs
+
+		min = s / 60
+		if min >= 1:
+			return _("%dm") % min
+
+		return _("%ds") % s
