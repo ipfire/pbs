@@ -126,7 +126,6 @@ class Builder(base.Object):
 		# Cache.
 		self._data = data
 		self._active_jobs = None
-		self._arches = None
 		self._disabled_arches = None
 
 	def __cmp__(self, other):
@@ -225,40 +224,26 @@ class Builder(base.Object):
 		"""
 		return self.data.time_keepalive
 
-	def update_keepalive(self, loadavg, free_space):
+	def update_keepalive(self, loadavg1=None, loadavg5=None, loadavg15=None,
+			mem_total=None, mem_free=None, swap_total=None, swap_free=None,
+			space_free=None):
 		"""
 			Update the keepalive timestamp of this machine.
 		"""
-		if free_space is None:
-			free_space = 0
+		self.db.execute("UPDATE builders SET time_keepalive = NOW(), \
+			loadavg1 = %s, loadavg5 = %s, loadavg15 = %s, space_free = %s, \
+			mem_total = %s, mem_free = %s, swap_total = %s, swap_free = %s \
+			WHERE id = %s", loadavg1, loadavg5, loadavg15, space_free,
+			mem_total, mem_free, swap_total, swap_free, self.id)
 
-		self.db.execute("UPDATE builders SET time_keepalive = NOW(), loadavg = %s, \
-			free_space = %s WHERE id = %s", loadavg, free_space, self.id)
-
-		logging.debug("Builder %s updated it keepalive status: %s" \
-			% (self.name, loadavg))
-
-	def needs_update(self):
-		query = self.db.get("SELECT time_updated, NOW() - time_updated \
-			AS seconds FROM builders WHERE id = %s", self.id)
-
-		# If there has been no update at all, we will need a new one.
-		if query.time_updated is None:
-			return True
-
-		# Require an update after the data is older than 24 hours.
-		return query.seconds >= 24*3600
-
-	def update_info(self, arches, cpu_model, cpu_count, memory, pakfire_version=None, host_key_id=None):
-		# Update architecture information.
-		self.update_arches(arches)
-
+	def update_info(self, cpu_model=None, cpu_count=None, cpu_arch=None, cpu_bogomips=None,
+			pakfire_version=None, host_key=None, os_name=None):
 		# Update all the rest.
 		self.db.execute("UPDATE builders SET time_updated = NOW(), \
-			pakfire_version = %s, cpu_model = %s, cpu_count = %s, memory = %s, \
-			host_key_id = %s \
-			WHERE id = %s", pakfire_version or "", cpu_model, cpu_count, memory,
-			host_key_id, self.id)
+			pakfire_version = %s, cpu_model = %s, cpu_count = %s, cpu_arch = %s, \
+			cpu_bogomips = %s, host_key_id = %s, os_name = %s WHERE id = %s",
+			pakfire_version, cpu_model, cpu_count, cpu_arch, cpu_bogomips,
+			host_key, os_name, self.id)
 
 	def update_arches(self, arches):
 		# Get all arches this builder does currently support.
@@ -292,19 +277,6 @@ class Builder(base.Object):
 
 			self.db.execute("DELETE FROM builders_arches WHERE builder_id = %s \
 				AND arch_id = %s", self.id, arch.id)
-
-	def update_overload(self, overload):
-		if overload:
-			overload = "Y"
-		else:
-			overload = "N"
-
-		self.db.execute("UPDATE builders SET overload = %s WHERE id = %s",
-			overload, self.id)
-		self._data["overload"] = overload
-
-		logging.debug("Builder %s updated it overload status to %s" % \
-			(self.name, self.overload))
 
 	def get_enabled(self):
 		return self.status == "enabled"
@@ -340,60 +312,20 @@ class Builder(base.Object):
 		if log:
 			self.log(status, user=user)
 
-	def get_arches(self, enabled=None):
-		"""
-			A list of architectures that are supported by this builder.
-		"""
-		if enabled is True:
-			enabled = "Y"
-		elif enabled is False:
-			enabled = "N"
-		else:
-			enabled = None
-
-		query = "SELECT arch_id AS id FROM builders_arches WHERE builder_id = %s"
-		args  = [self.id,]
-
-		if enabled:
-			query += " AND enabled = %s"
-			args.append(enabled)
-
-		# Get all other arches from the database.
-		arches = []
-		for arch in self.db.query(query, *args):
-			arch = self.pakfire.arches.get_by_id(arch.id)
-			arches.append(arch)
-
-		# Save a sorted list of supported architectures.
-		arches.sort()
-
-		return arches
-
 	@property
 	def arches(self):
-		if self._arches is None:
-			self._arches = self.get_arches(enabled=True)
+		if not hasattr(self, "_arches"):
+			self._arches = ["noarch",]
+
+			if self.cpu_arch:
+				res = self.db.query("SELECT build_arch FROM arches_compat \
+					WHERE host_arch = %s", self.cpu_arch)
+
+				self._arches += [r.build_arch for r in res]
+				if not self.cpu_arch in self._arches:
+					self._arches.append(self.cpu_arch)
 
 		return self._arches
-
-	@property
-	def disabled_arches(self):
-		if self._disabled_arches is None:
-			self._disabled_arches = self.get_arches(enabled=False)
-
-		return self._disabled_arches
-
-	def set_arch_status(self, arch, enabled):
-		if enabled:
-			enabled = "Y"
-		else:
-			enabled = "N"
-
-		self.db.execute("UPDATE builders_arches SET enabled = %s \
-			WHERE builder_id = %s AND arch_id = %s", enabled, self.id, arch.id)
-
-		# Reset the arch cache.
-		self._arches = None
 
 	def get_build_release(self):
 		return self.data.build_release == "Y"
@@ -484,23 +416,31 @@ class Builder(base.Object):
 	def passphrase(self):
 		return self.data.passphrase
 
+	# Load average
+
 	@property
 	def loadavg(self):
-		if self.state == "online":
-			return self.data.loadavg
+		return ", ".join(["%.2f" % l for l in (self.loadavg1, self.loadavg5, self.loadavg15)])
 
 	@property
-	def load1(self):
-		try:
-			load1, load5, load15 = self.loadavg.split(", ")
-		except:
-			return None
+	def loadavg1(self):
+		return self.data.loadavg1 or 0.0
 
-		return load1
+	@property
+	def loadavg5(self):
+		return self.data.loadavg5 or 0.0
+
+	@property
+	def loadavg15(self):
+		return self.data.loadavg15 or 0.0
 
 	@property
 	def pakfire_version(self):
 		return self.data.pakfire_version or ""
+
+	@property
+	def os_name(self):
+		return self.data.os_name or ""
 
 	@property
 	def cpu_model(self):
@@ -511,16 +451,63 @@ class Builder(base.Object):
 		return self.data.cpu_count
 
 	@property
-	def memory(self):
-		return self.data.memory
+	def cpu_arch(self):
+		return self.data.cpu_arch
 
 	@property
-	def free_space(self):
-		return self.data.free_space or 0
+	def cpu_bogomips(self):
+		return self.data.cpu_bogomips or 0.0
+
+	@property
+	def mem_percentage(self):
+		if not self.mem_total:
+			return None
+
+		return self.mem_used * 100 / self.mem_total
+
+	@property
+	def mem_total(self):
+		return self.data.mem_total
+
+	@property
+	def mem_used(self):
+		if self.mem_total and self.mem_free:
+			return self.mem_total - self.mem_free
+
+	@property
+	def mem_free(self):
+		return self.data.mem_free
+
+	@property
+	def swap_percentage(self):
+		if not self.swap_total:
+			return None
+
+		return self.swap_used * 100 / self.swap_total
+
+	@property
+	def swap_total(self):
+		return self.data.swap_total
+
+	@property
+	def swap_used(self):
+		if self.swap_total and self.swap_free:
+			return self.swap_total - self.swap_free
+
+	@property
+	def swap_free(self):
+		return self.data.swap_free
+
+	@property
+	def space_free(self):
+		return self.data.space_free
 
 	@property
 	def overload(self):
-		return self.data.overload == "Y"
+		if not self.cpu_count or not self.loadavg1:
+			return None
+
+		return self.loadavg1 >= self.cpu_count
 
 	@property
 	def host_key_id(self):
@@ -555,17 +542,18 @@ class Builder(base.Object):
 		"""
 		return self.count_active_jobs() >= self.max_jobs
 
-	def get_next_jobs(self, arches=None, limit=None):
-		if arches is None:
-			arches = self.get_arches()
+	def get_next_jobs(self, limit=None):
+		"""
+			Returns a list of jobs that can be built on this host.
+		"""
+		return self.pakfire.jobs.get_next(arches=self.arches, limit=limit)
 
-		return self.pakfire.jobs.get_next(arches=arches, builder=self,
-			state="pending", limit=limit)
-
-	def get_next_job(self, *args, **kwargs):
-		kwargs["limit"] = 1
-
-		jobs = self.get_next_jobs(*args, **kwargs)
+	def get_next_job(self):
+		"""
+			Returns the next job in line for this builder.
+		"""
+		# Get the first item of all jobs in the list.
+		jobs = self.pakfire.jobs.get_next(builder=self, state="pending", limit=1)
 
 		if jobs:
 			return jobs[0]

@@ -93,17 +93,6 @@ class BuilderEditHandler(BaseHandler):
 			max_jobs = 1
 		builder.max_jobs = max_jobs
 
-
-		for arch in builder.get_arches():
-			builder.set_arch_status(arch, False)
-
-		for arch in self.get_arguments("arches", []):
-			arch = self.pakfire.arches.get_by_name(arch)
-			if not arch:
-				continue
-
-			builder.set_arch_status(arch, True)
-
 		self.redirect("/builder/%s" % builder.hostname)
 
 

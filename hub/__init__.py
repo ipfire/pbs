@@ -12,7 +12,8 @@ import handlers
 
 BASEDIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
-# Enable logging
+# Read command line
+tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
 tornado.options.parse_command_line()
 
 class Application(tornado.web.Application):
@@ -20,7 +21,7 @@ class Application(tornado.web.Application):
 		self.__pakfire = None
 
 		settings = dict(
-			debug = False,
+			debug = tornado.options.options.debug,
 			gzip  = True,
 		)
 
@@ -32,11 +33,39 @@ class Application(tornado.web.Application):
 
 		self.add_handlers(r"pakfirehub.ipfire.org", [
 			# Redirect strayed users.
-			(r"/", handlers.RedirectHandler),
+			#(r"/", handlers.RedirectHandler),
 
-			# API
-			(r"/builder", handlers.BuilderHandler),
-			(r"/user",    handlers.UserHandler),
+			# Test handlers
+			(r"/noop", handlers.NoopHandler),
+			(r"/error/test", handlers.ErrorTestHandler),
+			(r"/error/test/(\d+)", handlers.ErrorTestHandler),
+
+			# Statistics
+			(r"/statistics/jobs/queue", handlers.StatsJobsQueueHandler),
+
+			# Builds
+			(r"/builds/create", handlers.BuildsCreateHandler),
+			(r"/builds/(.*)", handlers.BuildsGetHandler),
+
+			# Builders
+			(r"/builders/info", handlers.BuildersInfoHandler),
+			(r"/builders/jobs/queue", handlers.BuildersJobsQueueHandler),
+			(r"/builders/jobs/(.*)/addfile/(.*)", handlers.BuildersJobsAddFileHandler),
+			(r"/builders/jobs/(.*)/buildroot", handlers.BuildersJobsBuildrootHandler),
+			(r"/builders/jobs/(.*)/state/(.*)", handlers.BuildersJobsStateHandler),
+			(r"/builders/keepalive", handlers.BuildersKeepaliveHandler),
+
+			# Jobs
+			(r"/jobs/(.*)", handlers.JobsGetHandler),
+
+			# Packages
+			(r"/packages/(.*)", handlers.PackagesGetHandler),
+
+			# Uploads
+			(r"/uploads/create", handlers.UploadsCreateHandler),
+			(r"/uploads/(.*)/sendchunk", handlers.UploadsSendChunkHandler),
+			(r"/uploads/(.*)/finished", handlers.UploadsFinishedHandler),
+			(r"/uploads/(.*)/destroy", handlers.UploadsDestroyHandler),
 		])
 
 		logging.info("Successfully initialied application")

@@ -28,7 +28,7 @@
 					<tr>
 						<th>&nbsp;</th>
 						<th>{{ _("Hostname") }}</th>
-						<th>{{ _("Architectures") }}</th>
+						<th>{{ _("Architecture") }}</th>
 						<th>{{ _("Jobs") }}</th>
 					</tr>
 				</thead>
@@ -50,14 +50,13 @@
 										<span class="label label-important pull-right">{{ _("Overload") }}</span>
 								{% end %}
 								<br>
-								{{ builder.cpu_model or _("Unknown CPU") }} - {{ format_size(builder.memory) }}
+								{{ builder.cpu_model or _("Unknown CPU") }}
+								{% if builder.mem_total %}
+									- {{ format_size(builder.mem_total) }}
+								{% end %}
 							</td>
 							<td>
-								{% if builder.arches %}
-									{{ locale.list([a.name for a in builder.arches]) }}
-								{% else %}
-									{{ _("N/A") }}
-								{% end %}
+								{{ builder.cpu_arch or _("Unknown") }}
 							</td>
 							<td>
 								<p class="{% if builder.count_active_jobs() == 0 %}text-success{% elif builder.count_active_jobs() >= builder.max_jobs %}text-error{% else %}text-warning{% end %}">

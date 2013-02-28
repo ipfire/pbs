@@ -1410,46 +1410,24 @@ class Jobs(base.Object):
 	def get_next(self, arches=None, builder=None, limit=None, offset=None, type=None,
 			state=None, states=None, max_tries=None):
 
-		if state is None and states is None:
-			states = ["pending", "new"]
+		if state and states is None:
+			states = [state,]
 
-		if builder and arches is None:
-			arches = builder.get_arches()
-
-		query = "SELECT jobs.* FROM jobs \
-					JOIN builds ON jobs.build_id = builds.id \
-				WHERE \
-					(start_not_before IS NULL OR start_not_before <= NOW())"
+		query = "SELECT * FROM jobs \
+			INNER JOIN jobs_queue ON jobs.id = jobs_queue.id"
 		args = []
 
 		if arches:
-			query += " AND jobs.arch_id IN (%s)" % ", ".join(["%s"] * len(arches))
-			args.extend([a.id for a in arches])
+			query += " AND jobs_queue.arch IN (%s)" % ", ".join(["%s"] * len(arches))
+			args.extend(arches)
 
 		if builder:
-			#query += " AND (jobs.builder_id = %s OR jobs.builder_id IS NULL)"
-			#args.append(builder.id)
-
-			# Check out which types of builds this builder builds.
-			build_types = []
-			for build_type in builder.build_types:
-				if build_type == "release":
-					build_types.append("(builds.type = 'release' AND jobs.type = 'build')")
-				elif build_type == "scratch":
-					build_types.append("(builds.type = 'scratch' AND jobs.type = 'build')")
-				elif build_type == "test":
-					build_types.append("jobs.type = 'test'")
-
-			if build_types:
-				query += " AND (%s)" % " OR ".join(build_types)
+			query += " AND jobs_queue.designated_builder_id = %s"
+			args.append(builder.id)
 
 		if max_tries:
 			query += " AND jobs.max_tries <= %s"
 			args.append(max_tries)
-
-		if state:
-			query += " AND jobs.state = %s"
-			args.append(state)
 
 		if states:
 			query += " AND jobs.state IN (%s)" % ", ".join(["%s"] * len(states))
@@ -1459,21 +1437,6 @@ class Jobs(base.Object):
 			query += " AND jobs.type = %s"
 			args.append(type)
 
-		# Order builds.
-		#  Release builds and scratch builds are more important than test builds.
-		#  Builds are sorted by priority and older builds are preferred.
-
-		query += " ORDER BY \
-			CASE \
-				WHEN jobs.state = 'pending' THEN 0 \
-				WHEN jobs.state = 'new'     THEN 1 \
-			END, \
-			CASE \
-				WHEN jobs.type = 'build' THEN 0 \
-				WHEN jobs.type = 'test'  THEN 1 \
-			END, \
-			builds.priority DESC, jobs.time_created ASC"
-
 		if limit:
 			query += " LIMIT %s"
 			args.append(limit)
@@ -1482,6 +1445,9 @@ class Jobs(base.Object):
 		for row in self.db.query(query, *args):
 			job = self.pakfire.jobs.get_by_id(row.id, row)
 			jobs.append(job)
+
+		# Reverse the order of the builds.
+		jobs.reverse()
 
 		return jobs
 
@@ -1562,6 +1528,12 @@ class Jobs(base.Object):
 			self.cache.set(cache_key, count, 60)
 
 		return count
+
+	def get_queue_length(self):
+		res = self.db.get("SELECT COUNT(*) AS count FROM jobs_queue")
+
+		if res:
+			return res.count
 
 
 class Job(base.Object):

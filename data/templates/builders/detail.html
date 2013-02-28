@@ -138,6 +138,12 @@
 			<table class="table table-striped table-hover">
 				<tbody>
 					<tr>
+						<td>{{ _("OS") }}</td>
+						<td>
+							{{ builder.os_name or _("N/A") }}
+						</td>
+					</tr>
+					<tr>
 						<td>{{ _("Pakfire version") }}</td>
 						<td>
 							{{ builder.pakfire_version or _("N/A") }}
@@ -146,11 +152,7 @@
 					<tr>
 						<td>{{ _("Supported architectures") }}</td>
 						<td>
-							{{ locale.list([a.name for a in builder.get_arches() ]) }}
-
-							{% if builder.disabled_arches %}
-								({{ _("disabled: %s") % locale.list([a.name for a in builder.disabled_arches]) }})
-							{% end %}
+							{{ locale.list(builder.arches) }}
 						</td>
 					</tr>
 					<tr>
@@ -164,8 +166,43 @@
 						<td>{{ builder.cpu_count }}</td>
 					</tr>
 					<tr>
-						<td>{{ _("Memory") }}</td>
-						<td>{{ format_size(builder.memory) }}</td>
+						<td>{{ _("Bogomips") }}</td>
+						<td>{{ builder.cpu_bogomips or _("N/A") }}</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{% if builder.mem_total %}
+								<h6>
+									<span class="pull-right">
+										{{ format_size(builder.mem_used) }}/{{ format_size(builder.mem_total) }}
+									</span>
+
+									{{ _("Memory") }}
+								</h6>
+
+								<div class="progress">
+									<div class="bar" style="width: {{ "%.2f%%" % builder.mem_percentage }}"></div>
+								</div>
+							{% end %}
+
+							{% if builder.swap_total %}
+								<h6>
+									<span class="pull-right">
+										{{ format_size(builder.swap_used) }}/{{ format_size(builder.swap_total) }}
+									</span>
+
+									{{ _("SWAP space") }}
+								</h6>
+
+								<div class="progress">
+									<div class="bar bar-danger" style="width: {{ "%.2f%%" % builder.swap_percentage }}"></div>
+								</div>
+							{% end %}
+
+							{% if not builder.mem_total and not builder.swap_total %}
+								<span class="muted">{{ _("No memory information available.") }}</span>
+							{% end %}
+						</td>
 					</tr>
 					<tr>
 						<td>{{ _("Load average") }}</td>
@@ -178,7 +215,7 @@
 					</tr>
 					<tr>
 						<td>{{ _("Free disk space") }}</td>
-						<td>{{ format_size(builder.free_space * 1024**2) }}</td>
+						<td>{{ format_size(builder.space_free or 0) }}</td>
 					</tr>
 
 					<tr>

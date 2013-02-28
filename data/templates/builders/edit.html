@@ -94,21 +94,6 @@
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="arches">{{ _("Enable host for these architectures") }}</label>
-				<div class="controls">
-					<select multiple="multiple" id="arches" name="arches">
-						{% for arch in builder.get_arches() %}
-							<option value="{{ arch.name }}"	{% if arch in builder.arches %}selected="selected"{% end %}>{{ arch.name }}</option>
-						{% end %}
-					</select>
-
-					<p class="help-block">
-						{{ _("Select or deselect the architectures, this builder should build or not.") }}
-					</p>
-				</div>
-			</div>
-
 			<div class="form-actions">
 				<button type="submit" class="btn btn-primary">{{ _("Save changes") }}</button>
 			</div>
