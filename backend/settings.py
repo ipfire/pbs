@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import time
+
 import base
 import cache
 
@@ -7,50 +9,53 @@ class Settings(base.Object):
 	def __init__(self, pakfire):
 		base.Object.__init__(self, pakfire)
 
-	def query(self, key):
-		return self.db.get("SELECT * FROM settings WHERE k = %s", key)
+		self.next_update = 0
+
+	@property
+	def data(self):
+		now = time.time()
+
+		# Update the cache if no data is available or the data
+		# has timed out.
+		if not hasattr(self, "_data") or now >= self.next_update:
+			self._data = self.fetch_everything()
+			self.next_update = now + 300
+
+		return self._data
+
+	def fetch_everything(self):
+		res = self.db.query("SELECT k, v FROM settings")
+
+		ret = {}
+		for row in res:
+			ret[row.k] = row.v
+
+		return ret
 
 	def get(self, key, default=None):
-		result = self.query(key)
-		if not result:
+		try:
+			return self.data[key]
+		except KeyError:
 			return default
-
-		return result.v
-
-	def get_id(self, key):
-		res = self.query(key)
-
-		if res:
-			return res.id
 
 	def get_int(self, key, default=None):
 		value = self.get(key, default)
 
-		if value is None:
+		try:
+			return int(value)
+		except ValueError:
 			return None
-
-		return int(value)
 
 	def get_float(self, key, default=None):
 		value = self.get(key, default)
 
-		if value is None:
+		try:
+			return float(value)
+		except ValueError:
 			return None
 
-		return float(value)
-
 	def set(self, key, value):
-		id = self.get(key)
+		self.db.execute("REPLACE INTO settings(k, v) VALUES(%s, %s)", key, value)
 
-		if not id:
-			self.db.execute("INSERT INTO settings(k, v) VALUES(%s, %s)", key, value)
-		else:
-			self.db.execute("UPDATE settings SET v = %s WHERE id = %s", value, id)
-
-	def get_all(self):
-		attrs = {}
-
-		for s in self.db.query("SELECT * FROM settings"):
-			attrs[s.k] = s.v
-
-		return attrs
+		if hasattr(self, "_data"):
+			self._data[key] = value
