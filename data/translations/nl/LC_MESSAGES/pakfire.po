@@ -4,12 +4,13 @@
 #
 # Translators:
 #   <dutchtux@gmail.com>, 2013.
+# Hans <dutchtux@gmail.com>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: IPFire Project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-16 21:40+0100\n"
-"PO-Revision-Date: 2013-01-11 15:28+0000\n"
+"POT-Creation-Date: 2013-03-02 13:03+0100\n"
+"PO-Revision-Date: 2013-02-17 14:23+0000\n"
 "Last-Translator: dutchtux <dutchtux@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/ipfire/language/"
 "nl/)\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: backend/builds.py:1097
+#: backend/builds.py:1086
 #, python-format
 msgid "%(user_name)s commented on %(build_name)s"
 msgstr "%(user_name)s heeft commentaar gegeven op %(build_name)s"
@@ -104,18 +105,20 @@ msgid "Unknown action."
 msgstr "Onbekende actie."
 
 #: backend/logs.py:118 backend/logs.py:187 backend/logs.py:248
-#: backend/logs.py:322 data/templates/builders/detail.html:159
-#: data/templates/jobs-detail.html:82 data/templates/mirrors-list.html:72
+#: backend/logs.py:322 data/templates/builders/detail.html:161
+#: data/templates/builders/list.html:59 data/templates/jobs-detail.html:82
+#: data/templates/mirrors-list.html:72 web/__init__.py:306
 msgid "Unknown"
 msgstr "Onbekend"
 
 #: backend/logs.py:125 backend/logs.py:131
 #: data/templates/builders/detail.html:143
-#: data/templates/builders/detail.html:173
-#: data/templates/builders/detail.html:187
-#: data/templates/builders/list.html:59 data/templates/jobs-buildroot.html:87
-#: data/templates/mirrors-detail.html:67 data/templates/mirrors-list.html:56
-#: data/templates/mirrors-list.html:81
+#: data/templates/builders/detail.html:149
+#: data/templates/builders/detail.html:170
+#: data/templates/builders/detail.html:210
+#: data/templates/builders/detail.html:224
+#: data/templates/jobs-buildroot.html:87 data/templates/mirrors-detail.html:67
+#: data/templates/mirrors-list.html:56 data/templates/mirrors-list.html:81
 #: data/templates/modules/jobs-table.html:42
 #: data/templates/modules/jobs/list.html:44
 #: data/templates/modules/repository-table.html:14
@@ -352,11 +355,11 @@ msgstr "U heeft mirror '%(mirror)s' aangemaakt."
 msgid "%(user)s created mirror '%(mirror)s'."
 msgstr "%(user)s heeft mirror '%(mirror)s' aangemaakt."
 
-#: backend/users.py:462
+#: backend/users.py:459
 msgid "Account Activation"
 msgstr "Account activatie"
 
-#: backend/users.py:464
+#: backend/users.py:461
 msgid ""
 "You, or somebody using you email address, has registered an account on the "
 "Pakfire Build Service."
@@ -364,7 +367,7 @@ msgstr ""
 "U, of iemand die uw e-mailadres gebruikt, heeft een account geregistreerd "
 "bij de Pakfire Build Service."
 
-#: backend/users.py:466
+#: backend/users.py:463
 msgid "To activate your account, please click on the link below."
 msgstr "Om uw account te activeren dient u op de link hieronder te klikken."
 
@@ -515,7 +518,7 @@ msgstr "Aanmelden"
 
 #: data/templates/base.html:184
 msgid "Forgot your password?"
-msgstr "Password vergeten?"
+msgstr "Wachtwoord vergeten?"
 
 #: data/templates/build-bugs.html:3
 msgid "Bug list"
@@ -731,7 +734,7 @@ msgid "Comment"
 msgstr "Commentaar"
 
 #: data/templates/build-detail.html:121
-#: data/templates/builders/detail.html:205 data/templates/jobs-detail.html:169
+#: data/templates/builders/detail.html:242 data/templates/jobs-detail.html:175
 #: data/templates/log.html:4 data/templates/mirrors-detail.html:119
 #: data/templates/mirrors-list.html:95
 msgid "Log"
@@ -1199,7 +1202,7 @@ msgstr "%s verwijderen"
 
 #: data/templates/builders/detail.html:27
 msgid "Show jobs by this builder"
-msgstr "Toon taken van deze builder."
+msgstr "Toon taken van deze builder"
 
 #: data/templates/builders/detail.html:36
 msgid "Disable builder"
@@ -1269,8 +1272,8 @@ msgstr "Parallelle builds"
 #, python-format
 msgid "One job only."
 msgid_plural "Up to %(num)s jobs."
-msgstr[0] "Een enkele taak."
-msgstr[1] "Tot %(num)s taken."
+msgstr[0] "Een enkele taak"
+msgstr[1] "Tot %(num)s taken"
 
 #: data/templates/builders/detail.html:109
 msgid "This host builds"
@@ -1295,49 +1298,60 @@ msgid "Remarks"
 msgstr "Opmerkingen"
 
 #: data/templates/builders/detail.html:141
+msgid "OS"
+msgstr ""
+
+#: data/templates/builders/detail.html:147
 msgid "Pakfire version"
 msgstr "Pakfire versie"
 
-#: data/templates/builders/detail.html:147
+#: data/templates/builders/detail.html:153
 #: data/templates/distro-detail.html:35
 msgid "Supported architectures"
 msgstr "Ondersteunde architecturen"
 
-#: data/templates/builders/detail.html:152
-#, python-format
-msgid "disabled: %s"
-msgstr "Uitgeschakeld: %s"
-
-#: data/templates/builders/detail.html:157
+#: data/templates/builders/detail.html:159
 msgid "CPU model"
 msgstr "CPU model"
 
-#: data/templates/builders/detail.html:163
+#: data/templates/builders/detail.html:165
 msgid "CPU count"
 msgstr "CPU aantal"
 
-#: data/templates/builders/detail.html:167
+#: data/templates/builders/detail.html:169
+msgid "Bogomips"
+msgstr ""
+
+#: data/templates/builders/detail.html:180
 msgid "Memory"
 msgstr "Geheugen"
 
-#: data/templates/builders/detail.html:171
+#: data/templates/builders/detail.html:194
+msgid "SWAP space"
+msgstr ""
+
+#: data/templates/builders/detail.html:203
+msgid "No memory information available."
+msgstr ""
+
+#: data/templates/builders/detail.html:208
 msgid "Load average"
 msgstr "Load gemiddelde"
 
-#: data/templates/builders/detail.html:175
+#: data/templates/builders/detail.html:212
 #: data/templates/builders/list.html:50
 msgid "Overload"
 msgstr "Overload"
 
-#: data/templates/builders/detail.html:180
+#: data/templates/builders/detail.html:217
 msgid "Free disk space"
 msgstr "Vrije schijfruimte"
 
-#: data/templates/builders/detail.html:185
+#: data/templates/builders/detail.html:222
 msgid "Host key"
 msgstr "Hostsleutel"
 
-#: data/templates/builders/detail.html:198
+#: data/templates/builders/detail.html:235
 msgid "Active and pending jobs"
 msgstr "Actieve en wachtende taken"
 
@@ -1395,30 +1409,21 @@ msgstr "Geautoriseerd om scratch-builds te maken."
 msgid "Authorized to build test builds."
 msgstr "Geautoriseerd om test-builds te maken."
 
-#: data/templates/builders/edit.html:98
-msgid "Enable host for these architectures"
-msgstr "Sta host toe voor deze architecturen"
-
-#: data/templates/builders/edit.html:107
-msgid "Select or deselect the architectures, this builder should build or not."
-msgstr ""
-"Selecteer of deselecteer de architecturen die deze builder zou moeten maken "
-"of niet."
-
-#: data/templates/builders/edit.html:113 data/templates/mirrors-edit.html:81
+#: data/templates/builders/edit.html:98 data/templates/mirrors-edit.html:81
 #: data/templates/package-properties.html:93
 msgid "Save changes"
 msgstr "Wijzigingen opslaan"
 
-#: data/templates/builders/list.html:31 data/templates/distro-edit.html:66
-msgid "Architectures"
-msgstr "Architecturen"
+#: data/templates/builders/list.html:31 data/templates/jobs-filter.html:44
+#: data/templates/packages/builds/times.html:44
+msgid "Architecture"
+msgstr "Architectuur"
 
 #: data/templates/builders/list.html:53
 msgid "Unknown CPU"
 msgstr "Onbekende CPU"
 
-#: data/templates/builders/list.html:74 data/templates/builders/new.html:3
+#: data/templates/builders/list.html:73 data/templates/builders/new.html:3
 #: data/templates/builders/new.html:16 data/templates/builders/new.html:41
 msgid "Create new builder"
 msgstr "Nieuwe builder aanmaken"
@@ -1705,6 +1710,10 @@ msgstr "Motto"
 #: data/templates/distro-edit.html:62
 msgid "A short sentence that characterizes the distribution."
 msgstr "Een korte zin die de distributie kenmerkt."
+
+#: data/templates/distro-edit.html:66
+msgid "Architectures"
+msgstr "Architecturen"
 
 #: data/templates/distro-edit.html:75
 msgid "For which architectures should the distribution be built?"
@@ -2430,7 +2439,7 @@ msgid "Job buildroot"
 msgstr "Taak buildroot"
 
 #: data/templates/jobs-buildroot.html:28 data/templates/jobs-buildroot.html:34
-#: data/templates/jobs-detail.html:148
+#: data/templates/jobs-detail.html:154
 msgid "Buildroot"
 msgstr "Buildroot"
 
@@ -2508,22 +2517,26 @@ msgstr "Aangemaakt"
 msgid "Started"
 msgstr "Gestart"
 
-#: data/templates/jobs-detail.html:138
+#: data/templates/jobs-detail.html:134
+msgid "ETA"
+msgstr ""
+
+#: data/templates/jobs-detail.html:144
 msgid "Build logs"
 msgstr "Build-logs"
 
-#: data/templates/jobs-detail.html:142
+#: data/templates/jobs-detail.html:148
 msgid "No logs available, yet."
 msgstr "Geen logs aanwezig."
 
-#: data/templates/jobs-detail.html:149
+#: data/templates/jobs-detail.html:155
 #, python-format
 msgid "%s package"
 msgid_plural "%s packages"
 msgstr[0] "%s pakket"
 msgstr[1] "%s pakketten"
 
-#: data/templates/jobs-detail.html:159
+#: data/templates/jobs-detail.html:165
 msgid "Package files"
 msgstr "Pakketbestanden"
 
@@ -2543,11 +2556,6 @@ msgstr "[Kies er een]"
 #: data/templates/jobs-filter.html:36
 msgid "Only show jobs, that have been built by this builder."
 msgstr "Laat alleen taken zien die door deze builder zijn gemaakt."
-
-#: data/templates/jobs-filter.html:44
-#: data/templates/packages/builds/times.html:44
-msgid "Architecture"
-msgstr "Architectuur"
 
 #: data/templates/jobs-filter.html:53
 msgid "Only show jobs, with this architecture."
@@ -2654,7 +2662,7 @@ msgstr "Inloggen mislukt!"
 
 #: data/templates/login.html:13
 msgid "Username and/or password was wrong. Login failed."
-msgstr "Gebruikersnaam en/of password is onjuist. Inloggen mislukt."
+msgstr "Gebruikersnaam en/of wachtwoord is onjuist. Inloggen mislukt."
 
 #: data/templates/login.html:22 data/templates/register.html:30
 #: data/templates/user-profile-edit.html:37
@@ -2665,7 +2673,7 @@ msgstr "Gebruikersnaam"
 #: data/templates/login.html:28 data/templates/register.html:67
 #: data/templates/user-profile-edit.html:101
 msgid "Password"
-msgstr "Password"
+msgstr "Wachtwoord"
 
 #: data/templates/login.html:41
 msgid "You also might want to..."
@@ -2673,7 +2681,7 @@ msgstr "Wellicht wilt u ook..."
 
 #: data/templates/login.html:44
 msgid "Register a new account."
-msgstr "Registreer een nieuw account."
+msgstr "Een nieuw account registreren."
 
 #: data/templates/login.html:47
 msgid "Recover your password."
@@ -2886,9 +2894,8 @@ msgid "This build is obsolete!"
 msgstr "Deze build is verouderd!"
 
 #: data/templates/modules/build-state-warnings.html:9
-#, fuzzy
 msgid "This means that this package has been replaced with a new one."
-msgstr "Dit betekent dat dit pakket niet meer up-to-date is."
+msgstr ""
 
 #: data/templates/modules/build-table.html:17
 #: data/templates/repository-detail.html:4
@@ -3256,9 +3263,8 @@ msgstr "Sluiten"
 #: data/templates/package-detail-list.html:25
 #: data/templates/packages/builds/times.html:20
 #: data/templates/packages/builds/times.html:41
-#, fuzzy
 msgid "Build times"
-msgstr "Build-tijd"
+msgstr ""
 
 #: data/templates/package-detail-list.html:58
 msgid "File new bug"
@@ -3402,28 +3408,24 @@ msgid "Show all packages"
 msgstr "Toon alle pakketten"
 
 #: data/templates/packages/builds/times.html:3
-#, fuzzy
 msgid "Package build times"
-msgstr "Gemiddelde build-tijd"
+msgstr ""
 
 #: data/templates/packages/builds/times.html:34
 msgid "This table shows you how long this package normally takes to be built."
 msgstr ""
 
 #: data/templates/packages/builds/times.html:45
-#, fuzzy
 msgid "Average"
-msgstr "Load gemiddelde"
+msgstr ""
 
 #: data/templates/packages/builds/times.html:46
-#, fuzzy
 msgid "Maximum"
-msgstr "Maximale tijd"
+msgstr ""
 
 #: data/templates/packages/builds/times.html:47
-#, fuzzy
 msgid "Minimum"
-msgstr "Minimale tijd"
+msgstr ""
 
 #: data/templates/packages/builds/times.html:48
 msgid "Total"
@@ -3564,7 +3566,7 @@ msgstr "E-mailadres"
 #: data/templates/register.html:46
 msgid "Type in your email address, which is used to verify the account."
 msgstr ""
-"Type uw e-mailadres in, welke wordt gebruikt om uw account te verifiëren."
+"Voer uw e-mailadres in, dit wordt gebruikt om uw account te verifiëren."
 
 #: data/templates/register.html:52
 msgid "Real name (optional)"
@@ -3576,13 +3578,13 @@ msgstr "Geef uw voor- en achternaam."
 
 #: data/templates/register.html:64
 msgid "Account security"
-msgstr "Account beveiliging"
+msgstr "Accountbeveiliging"
 
 #: data/templates/register.html:72 data/templates/user-profile-edit.html:106
 msgid ""
 "The password is used to secure the login and must be at least 8 characters."
 msgstr ""
-"Een password wordt gebruikt om het account mee te beveiligen en moet uit "
+"Een wachtwoord wordt gebruikt om het account mee te beveiligen en moet uit "
 "minstens 8 tekens bestaan."
 
 #: data/templates/register.html:78
@@ -4218,9 +4220,29 @@ msgstr "Deze gebruiker heeft beheerdersrechten."
 msgid "User is allowed to create scratch builds?"
 msgstr "Is gebruiker gemachtigd om scratch-builds aan te maken?"
 
-#: web/__init__.py:306
+#: web/__init__.py:326
+#, python-format
+msgid "%(min)d min"
+msgstr ""
+
+#: web/__init__.py:328
 #, python-format
 msgid "%(hrs)d:%(min)02d hrs"
+msgstr ""
+
+#: web/__init__.py:335
+#, python-format
+msgid "%dh"
+msgstr ""
+
+#: web/__init__.py:339
+#, python-format
+msgid "%dm"
+msgstr ""
+
+#: web/__init__.py:341
+#, python-format
+msgid "%ds"
 msgstr ""
 
 #: web/handlers_auth.py:66
@@ -4452,21 +4474,14 @@ msgstr "%(weekday)s, %(month_name)s %(day)s"
 msgid "%(commas)s and %(last)s"
 msgstr "%(commas)s en %(last)s"
 
-#~ msgid "Changes"
-#~ msgstr "Wijzigingen"
+#~ msgid "disabled: %s"
+#~ msgstr "Uitgeschakeld: %s"
 
-#~ msgid "Bugs"
-#~ msgstr "Bugs"
+#~ msgid "Enable host for these architectures"
+#~ msgstr "Sta host toe voor deze architecturen"
 
-#~ msgid "This package is maintained by"
-#~ msgstr "Dit pakket wordt onderhouden door"
-
-#~ msgid "Unstable"
-#~ msgstr "Onstabiel"
-
-#~ msgid "It is discouraged to use this package anymore."
-#~ msgstr "Het wordt afgeraden om dit pakket te gebruiken."
-
-#~ msgid "Possibly there is an update that fixes bugs in this release."
+#~ msgid ""
+#~ "Select or deselect the architectures, this builder should build or not."
 #~ msgstr ""
-#~ "Misschien is er een update beschikbaar dat bugs in deze release fixt."
+#~ "Selecteer of deselecteer de architecturen die deze builder zou moeten "
+#~ "maken of niet."
