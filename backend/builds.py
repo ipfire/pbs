@@ -1798,7 +1798,10 @@ class Job(base.Object):
 
 	@property
 	def arch(self):
-		return self.pakfire.arches.get_by_id(self.arch_id)
+		if not hasattr(self, "_arch"):
+			self._arch = self.pakfire.arches.get_by_id(self.arch_id)
+
+		return self._arch
 
 	@property
 	def duration(self):
