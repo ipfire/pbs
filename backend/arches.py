@@ -78,18 +78,7 @@ class Arch(base.Object):
 	@property
 	def data(self):
 		if self._data is None:
-			cache_key = "arch_%s" % self.id
-
-			# Search for the data in the cache.
-			# If nothing was found, we get everything from the database.
-			data = self.cache.get(cache_key)
-			if not data:
-				data = self.db.get("SELECT * FROM arches WHERE id = %s", self.id)
-
-				# Store the data in the cache.
-				self.cache.set(cache_key, data)
-
-			self._data = data
+			self._data = self.db.get("SELECT * FROM arches WHERE id = %s", self.id)
 			assert self._data
 
 		return self._data

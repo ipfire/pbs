@@ -43,20 +43,3 @@ class Cache(base.Object):
 		key = "".join((self.key_prefix, key))
 
 		return self._memcache.delete(key, time=time)
-
-
-class PermanentCache(base.Object):
-	__items = {}
-
-	def has_key(self, key):
-		return self.__items.has_key(key)
-
-	def get(self, key, default=None):
-		return self.__items.get(key, default)
-
-	def set(self, key, val):
-		self.__items[key] = val
-
-	def delete(self, key):
-		if self.__items.has_key(key):
-			del self.__items[key]

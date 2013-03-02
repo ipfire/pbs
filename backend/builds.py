@@ -196,14 +196,9 @@ class Builds(base.Object):
 		return builds
 
 	def count(self):
-		count = self.cache.get("builds_count")
-		if count is None:
-			builds = self.db.get("SELECT COUNT(*) AS count FROM builds")
-
-			count = builds.count
-			self.cache.set("builds_count", count, 3600 / 4)
-
-		return count
+		builds = self.db.get("SELECT COUNT(*) AS count FROM builds")
+		if builds:
+			return builds.count
 
 	def needs_test(self, threshold, arch, limit=None, randomize=False):
 		query = "SELECT id FROM builds \
@@ -411,16 +406,6 @@ class Build(base.Object):
 
 		return cmp(self.pkg, other.pkg)
 
-	@property
-	def cache_key(self):
-		return "build_%s" % self.id
-
-	def clear_cache(self):
-		"""
-			Clear the stored data from the cache.
-		"""
-		self.cache.delete(self.cache_key)
-
 	@classmethod
 	def create(cls, pakfire, pkg, type="release", owner=None, distro=None, public=True):
 		assert type in ("release", "scratch", "test")
@@ -502,7 +487,6 @@ class Build(base.Object):
 
 		# Delete the build itself.
 		self.db.execute("DELETE FROM builds WHERE id = %s", self.id)
-		self.clear_cache()
 
 	def __delete_bugs(self):
 		"""
@@ -551,13 +535,7 @@ class Build(base.Object):
 			Lazy fetching of data for this object.
 		"""
 		if self._data is None:
-			data = self.cache.get(self.cache_key)
-			if not data:
-				# Fetch the whole row in one call.
-				data = self.db.get("SELECT * FROM builds WHERE id = %s", self.id)
-				self.cache.set(self.cache_key, data)
-
-			self._data = data
+			self._data = self.db.get("SELECT * FROM builds WHERE id = %s", self.id)
 			assert self._data
 
 		return self._data
@@ -652,7 +630,6 @@ class Build(base.Object):
 	def set_depends_on(self, build):
 		self.db.execute("UPDATE builds SET depends_on = %s WHERE id = %s",
 			build.id, self.id)
-		self.clear_cache()
 
 		# Update cache.
 		self._depends_on = build
@@ -791,7 +768,6 @@ class Build(base.Object):
 
 		if self._data:
 			self._data["severity"] = severity
-		self.clear_cache()
 
 	def get_severity(self):
 		return self.data.severity
@@ -808,7 +784,6 @@ class Build(base.Object):
 
 		if self._data:
 			self._data["message"] = msg
-		self.clear_cache()
 
 	def has_perm(self, user):
 		"""
@@ -869,7 +844,6 @@ class Build(base.Object):
 
 		self.db.execute("UPDATE builds SET priority = %s WHERE id = %s", priority,
 			self.id)
-		self.clear_cache()
 
 		if self._data:
 			self._data["priority"] = priority
@@ -1495,39 +1469,24 @@ class Jobs(base.Object):
 			Returns the average build time of all finished builds from the
 			last 3 months.
 		"""
-		cache_key = "jobs_avg_build_time"
+		result = self.db.get("SELECT AVG(time_finished - time_started) as average \
+			FROM jobs WHERE type = 'build' AND state = 'finished' AND \
+			time_finished >= DATE_SUB(NOW(), INTERVAL 3 MONTH)")
 
-		build_time = self.cache.get(cache_key)
-		if not build_time:
-			result = self.db.get("SELECT AVG(time_finished - time_started) as average \
-				FROM jobs WHERE type = 'build' AND state = 'finished' AND \
-				time_finished >= DATE_SUB(NOW(), INTERVAL 3 MONTH)")
-
-			build_time = result.average or 0
-			self.cache.set(cache_key, build_time, 3600)
-
-		return build_time
+		if result:
+			return result.average
 
 	def count(self, *states):
-		states = sorted(states)
+		query = "SELECT COUNT(*) AS count FROM jobs"
+		args  = []
 
-		cache_key = "jobs_count_%s" % ("-".join(states) or "all")
+		if states:
+			query += " WHERE state IN %s"
+			args.append(states)
 
-		count = self.cache.get(cache_key)
-		if count is None:
-			query = "SELECT COUNT(*) AS count FROM jobs"
-			args  = []
-
-			if states:
-				query += " WHERE %s" % " OR ".join("state = %s" for s in states)
-				args += states
-
-			jobs = self.db.get(query, *args)
-
-			count = jobs.count
-			self.cache.set(cache_key, count, 60)
-
-		return count
+		jobs = self.db.get(query, *args)
+		if jobs:
+			return jobs.count
 
 	def get_queue_length(self):
 		res = self.db.get("SELECT COUNT(*) AS count FROM jobs_queue")
@@ -1574,16 +1533,6 @@ class Job(base.Object):
 		assert self.build.distro
 		return self.build.distro
 
-	@property
-	def cache_key(self):
-		return "job_%s" % self.id
-
-	def clear_cache(self):
-		"""
-			Clear the stored data from the cache.
-		"""
-		self.cache.delete(self.cache_key)
-
 	@classmethod
 	def create(cls, pakfire, build, arch, type="build"):
 		id = pakfire.db.execute("INSERT INTO jobs(uuid, type, build_id, arch_id, time_created) \
@@ -1611,7 +1560,6 @@ class Job(base.Object):
 
 		# Delete the job itself.
 		self.db.execute("DELETE FROM jobs WHERE id = %s", self.id)
-		self.clear_cache()
 
 	def __delete_buildroots(self):
 		"""
@@ -1761,7 +1709,6 @@ class Job(base.Object):
 		# Nothing to do if the state remains.
 		if not self.state == state:
 			self.db.execute("UPDATE jobs SET state = %s WHERE id = %s", state, self.id)
-			self.clear_cache()
 
 			# Log the event.
 			if log and not state == "new":
@@ -1811,7 +1758,6 @@ class Job(base.Object):
 	def update_message(self, msg):
 		self.db.execute("UPDATE jobs SET message = %s WHERE id = %s",
 			msg, self.id)
-		self.clear_cache()
 
 		if self._data:
 			self._data["message"] = msg
@@ -1837,7 +1783,6 @@ class Job(base.Object):
 		# Update cache.
 		if self._data:
 			self._data["builder_id"] = builder.id
-		self.clear_cache()
 
 		self._builder = builder
 
@@ -2027,7 +1972,6 @@ class Job(base.Object):
 	def set_aborted_state(self, state):
 		self.db.execute("UPDATE jobs SET aborted_state = %s WHERE id = %s",
 			state, self.id)
-		self.clear_cache()
 
 		if self._data:
 			self._data["aborted_state"] = state

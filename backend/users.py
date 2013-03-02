@@ -173,15 +173,11 @@ class Users(base.Object):
 			return User(self.pakfire, user.id)
 
 	def count(self):
-		count = self.cache.get("users_count")
-		if count is None:
-			users = self.db.get("SELECT COUNT(*) AS count FROM users \
-				WHERE activated = 'Y' AND deleted = 'N'")
+		users = self.db.get("SELECT COUNT(*) AS count FROM users \
+			WHERE activated = 'Y' AND deleted = 'N'")
 
-			count = users.count
-			self.cache.set("users_count", count, 3600)
-
-		return count
+		if users:
+			return users.count
 
 	def search(self, pattern, limit=None):
 		pattern = "%%%s%%" % pattern

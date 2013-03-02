@@ -26,21 +26,11 @@ class BugzillaBug(base.Object):
 		return self.bug_id
 
 	@property
-	def cache_id(self):
-		return "bug_%s" % self.id
-
-	def clear_cache(self):
-		self.cache.delete(self.cache_id)
-
-	@property
 	def data(self):
 		if self._data is None:
-			data = self.cache.get(self.cache_id)
-			if not data:
-				data = self.call("get", ids=[self.id,])["bugs"][0]
-				self.cache.set(self.cache_id, data, 120)
+			self._data = self.call("get", ids=[self.id,])["bugs"][0]
+			assert self._data
 
-			self._data = data
 		return self._data
 
 	@property
@@ -75,7 +65,6 @@ class BugzillaBug(base.Object):
 			kwargs["comment"] = { "body" : comment }
 
 		self.call("update", ids=[self.id,], **kwargs)
-		self.clear_cache()
 
 	
 
@@ -153,14 +142,9 @@ class Bugzilla(base.Object):
 		return bug
 
 	def find_users(self, pattern):
-		users = self.cache.get("users_%s" % pattern)
-		if users is None:
-			users = self.call("User", "get", match=[pattern,])
-			users = users["users"]
-
-			self.cache.set("users_%s" % pattern, users)
-
-		return users
+		users = self.call("User", "get", match=[pattern,])
+		if users:
+			return users["users"]
 
 	def find_user(self, pattern):
 		users = self.find_users(pattern)

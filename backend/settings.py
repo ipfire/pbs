@@ -7,41 +7,32 @@ class Settings(base.Object):
 	def __init__(self, pakfire):
 		base.Object.__init__(self, pakfire)
 
-		# Private cache.
-		self._cache = cache.PermanentCache(self.pakfire)
-
 	def query(self, key):
 		return self.db.get("SELECT * FROM settings WHERE k = %s", key)
 
-	def get(self, key, default=None, cacheable=True):
-		if cacheable and self.cache.has_key(key):
-			return self.cache.get(key)
-
+	def get(self, key, default=None):
 		result = self.query(key)
 		if not result:
 			return default
 
-		result = result.v
-
-		# Put the item into the cache to access it later.
-		if cacheable:
-			self.cache.set(key, result)
-
-		return result
+		return result.v
 
 	def get_id(self, key):
-		return self.query(key)["id"]
+		res = self.query(key)
 
-	def get_int(self, key, default=None, cacheable=True):
-		value = self.get(key, default, cacheable=cacheable)
+		if res:
+			return res.id
+
+	def get_int(self, key, default=None):
+		value = self.get(key, default)
 
 		if value is None:
 			return None
 
 		return int(value)
 
-	def get_float(self, key, default=None, cacheable=True):
-		value = self.get(key, default, cacheable=cacheable)
+	def get_float(self, key, default=None):
+		value = self.get(key, default)
 
 		if value is None:
 			return None
