@@ -16,11 +16,7 @@ $(POTFILE): $(ALL_FILES)
 		$(sort $(ALL_FILES))
 
 .PHONY: po
-po: $(POTFILE) $(patsubst %.po, %.mo, $(POFILES))
-
-# Merge the POTFILE.
-%.po: $(POTFILE)
-	msgmerge $@ $(POTFILE) -o $@
+po: $(patsubst %.po, %.mo, $(POFILES))
 
 # Compile the translations.
 %.mo: %.po
