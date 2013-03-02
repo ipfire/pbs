@@ -533,6 +533,7 @@ class SelectLocaleModule(UIModule):
 		("nl_NL", u"Dutch", u"Nederlands"),
 		("pt_BR", u"Portuguese (Brazil)", u"Portugu\xeas (Brasil)"),
 		("pt_PT", u"Portuguese (Portugal)", u"Portugu\xeas (Portugal)"),
+		("ro_RO", u"Romanian", u"Rom\xe2n\u0103"),
 		("ru_RU", u"Russian", u"\u0440\u0443\u0441\u0441\u043a\u0438\u0439"),
 		("uk_UA", u"Ukrainian", u"\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430"),
 	]
