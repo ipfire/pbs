@@ -175,7 +175,7 @@ class PackageFileDownloadHandler(BaseHandler):
 		# Open the package in the filesystem.
 		pkg_file = pkg.get_file()
 		if not pkg_file:
-			raise torando.web.HTTPError(404, "Could not open package %s" % pkg.path)
+			raise tornado.web.HTTPError(404, "Could not open package %s" % pkg.path)
 
 		# Open the file to transfer it to the client.
 		f = pkg_file.open_file(filename)
