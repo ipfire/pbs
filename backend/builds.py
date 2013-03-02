@@ -107,7 +107,7 @@ class Builds(base.Object):
 
 		return builds
 
-	def get_by_name(self, name, type=None, public=None, user=None):
+	def get_by_name(self, name, type=None, public=None, user=None, limit=None, offset=None):
 		args = [name,]
 		conditions = [
 			"packages.name = %s",
@@ -127,7 +127,7 @@ class Builds(base.Object):
 			or_conditions.append("builds.owner_id = %s")
 			args.append(user.id)
 
-		query = "SELECT builds.id AS id FROM builds \
+		query = "SELECT builds.* AS id FROM builds \
 			JOIN packages ON builds.pkg_id = packages.id"
 
 		if or_conditions:
@@ -136,9 +136,20 @@ class Builds(base.Object):
 		if conditions:
 			query += " WHERE %s" % " AND ".join(conditions)
 
-		query += " ORDER BY packages.name,packages.epoch,packages.version,packages.release,id ASC"
+		if type == "release":
+			query += " ORDER BY packages.name,packages.epoch,packages.version,packages.release,id ASC"
+		elif type == "scratch":
+			query += " ORDER BY time_created DESC"
 
-		return sorted([Build(self.pakfire, b.id) for b in self.db.query(query, *args)])
+		if limit:
+			if offset:
+				query += " LIMIT %s,%s"
+				args.extend([offset, limit])
+			else:
+				query += " LIMIT %s"
+				args.append(limit)
+
+		return [Build(self.pakfire, b.id, b) for b in self.db.query(query, *args)]
 
 	def get_latest_by_name(self, name, type=None, public=None):
 		query = "\

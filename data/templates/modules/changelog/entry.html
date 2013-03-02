@@ -1,10 +1,10 @@
 <li class="media">
 	<div class="media-body">
-		<div class="well">
+		<div class="well {% if build.type == "release" %}well-build-state-{{ build.repo.type }}{% elif build.type == "scratch" %}well-build-type-scratch{% end %}">
 			<h4>
 				<a class="{% if build.is_broken() %}line-through{% end %}" href="/build/{{ build.uuid }}">{{ build.name }}</a>
 
-				{% if build.repo %}
+				{% if build.type == "release" and build.repo %}
 					<small class="pull-right">
 						<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
 							{{ build.repo.distro.name }} &dash;
@@ -17,26 +17,36 @@
 							{% end %}
 						</a>
 					</small>
+				{% elif build.type == "scratch" %}
+					<span class="label label-important pull-right">
+						{{ _("Scratch build") }}
+					</span>
 				{% end %}
 			</h4>
 
 			<hr>
 
-			{% if build.commit %}
-				{% module CommitMessage(build.commit) %}
+			{% if build.type == "release" %}
+				{% if build.commit %}
+					{% module CommitMessage(build.commit) %}
 
-				<hr>
+					<hr>
 
+					<p class="muted">
+						{{ _("Author") }} {% module Maintainer(build.commit.author) %}
+						<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
+					</p>
+				{% else %}
+					<p class="muted">
+						{{ _("No commit message.") }}
+						<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
+					</p>
+				{% end %}
+
+			{% elif build.type == "scratch" %}
 				<p class="muted">
-					{{ _("Author") }} {% module Maintainer(build.commit.author) %}
-					&dash;
-					{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
+					{{ _("Owner") }} {% module Maintainer(build.owner) %}
 
-					<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
-				</p>
-			{% else %}
-				<p class="muted">
-					{{ _("No commit message.") }}
 					<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
 				</p>
 			{% end %}

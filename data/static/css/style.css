@@ -110,6 +110,18 @@ body {
 	background-color: white;
 }
 
+.well-build-state-stable {
+	border-color: #468847;
+}
+
+.well-build-state-unstable {
+	border-color: #f89406;
+}
+
+.well-build-type-scratch, .well-build-state-testing {
+	border-color: #b94a48;
+}
+
 p.huge {
 	font-size: 4em;
 	font-weight: bold;

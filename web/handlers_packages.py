@@ -64,6 +64,27 @@ class PackageNameHandler(BaseHandler):
 			latest_build=latest_build, pkg=latest_build.pkg, bugs=bugs)
 
 
+class PackageScratchBuildsHandler(BaseHandler):
+	def get(self, name):
+		offset = self.get_argument("offset", 0)
+		limit  = self.get_argument("limit", 10)
+
+		scratch_builds = self.pakfire.builds.get_by_name(name, type="scratch",
+			public=self.public, limit=limit, offset=offset)
+
+		if scratch_builds:
+			latest_build = scratch_builds[0]
+		else:
+			release_builds = self.pakfire.builds.get_by_name(name, type="release", public=self.public, limit=1)
+			if not release_builds:
+				raise tornado.web.HTTPError(404, "Could not find any build with this name: %s" % name)
+
+			latest_build = release_builds[0]
+
+		self.render("packages/builds/scratch.html", builds=scratch_builds,
+			pkg=latest_build.pkg)
+
+
 class PackageChangelogHandler(BaseHandler):
 	def get(self, name):
 		limit = self.get_argument("limit", 10)

@@ -1,0 +1,38 @@
+{% extends "../../base.html" %}
+
+{% block title %}{{ _("Scratch builds") }}: {{ pkg.name }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/packages">{{ _("Packages") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li class="active">
+			<a href="/package/{{ pkg.name }}/builds/scratch">{{ _("Scratch builds") }}</a>
+		</li>
+	</ul>
+
+	<div class="page-header">
+		<h2>
+			{{ pkg.name }}<br>
+			<small>{{ pkg.summary }}</small>
+		</h2>
+	</div>
+
+	{% if builds %}
+		{% module Changelog(builds=builds) %}
+	{% else %}
+		<p class="muted ac">
+			{{ _("There are no scratch builds for this package.") }}
+		</p>
+	{% end %}
+{% end block %}

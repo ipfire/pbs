@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-02 13:03+0100\n"
+"POT-Creation-Date: 2013-03-02 14:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: backend/builds.py:1086
+#: backend/builds.py:1098
 #, python-format
 msgid "%(user_name)s commented on %(build_name)s"
 msgstr ""
@@ -79,7 +79,7 @@ msgstr ""
 #: backend/logs.py:118 backend/logs.py:187 backend/logs.py:248
 #: backend/logs.py:322 data/templates/builders/detail.html:161
 #: data/templates/builders/list.html:59 data/templates/jobs-detail.html:82
-#: data/templates/mirrors-list.html:72 web/__init__.py:306
+#: data/templates/mirrors-list.html:72 web/__init__.py:307
 msgid "Unknown"
 msgstr ""
 
@@ -357,6 +357,7 @@ msgstr ""
 #: data/templates/package-detail.html:12
 #: data/templates/package-properties.html:12
 #: data/templates/packages-list.html:12
+#: data/templates/packages/builds/scratch.html:12
 #: data/templates/packages/builds/times.html:12
 #: data/templates/packages/changelog.html:12
 #: data/templates/packages/view-file.html:12
@@ -516,6 +517,7 @@ msgstr ""
 #: data/templates/package-detail.html:8
 #: data/templates/package-properties.html:8
 #: data/templates/packages-list.html:8
+#: data/templates/packages/builds/scratch.html:8
 #: data/templates/packages/builds/times.html:8
 #: data/templates/packages/changelog.html:8
 #: data/templates/packages/view-file.html:8
@@ -673,21 +675,20 @@ msgstr ""
 
 #: data/templates/build-detail.html:98
 #: data/templates/distro-source-commit-detail.html:55
-#: data/templates/modules/changelog/entry.html:31
+#: data/templates/modules/changelog/entry.html:36
 #: data/templates/modules/commits-table.html:5
 msgid "Author"
 msgstr ""
 
 #: data/templates/build-detail.html:100
 #: data/templates/distro-source-commit-detail.html:3
-#: data/templates/modules/changelog/entry.html:33
 #: data/templates/modules/commits-table.html:4
 #: data/templates/package-detail.html:137
 msgid "Commit"
 msgstr ""
 
 #: data/templates/build-detail.html:103
-#: data/templates/modules/changelog/entry.html:39
+#: data/templates/modules/changelog/entry.html:41
 msgid "No commit message."
 msgstr ""
 
@@ -1215,6 +1216,8 @@ msgstr ""
 
 #: data/templates/builders/detail.html:117
 #: data/templates/package-detail-list.html:30
+#: data/templates/packages/builds/scratch.html:3
+#: data/templates/packages/builds/scratch.html:20
 msgid "Scratch builds"
 msgstr ""
 
@@ -2629,6 +2632,7 @@ msgid "Contact information"
 msgstr ""
 
 #: data/templates/mirrors-edit.html:57 data/templates/mirrors-list.html:43
+#: data/templates/modules/changelog/entry.html:48
 #: data/templates/uploads-list.html:25
 msgid "Owner"
 msgstr ""
@@ -2704,6 +2708,7 @@ msgid "Release build"
 msgstr ""
 
 #: data/templates/modules/build-headline.html:11
+#: data/templates/modules/changelog/entry.html:22
 msgid "Scratch build"
 msgstr ""
 
@@ -3235,6 +3240,10 @@ msgstr ""
 
 #: data/templates/packages-list.html:39
 msgid "Show all packages"
+msgstr ""
+
+#: data/templates/packages/builds/scratch.html:35
+msgid "There are no scratch builds for this package."
 msgstr ""
 
 #: data/templates/packages/builds/times.html:3
@@ -4007,27 +4016,27 @@ msgstr ""
 msgid "User is allowed to create scratch builds?"
 msgstr ""
 
-#: web/__init__.py:326
+#: web/__init__.py:327
 #, python-format
 msgid "%(min)d min"
 msgstr ""
 
-#: web/__init__.py:328
+#: web/__init__.py:329
 #, python-format
 msgid "%(hrs)d:%(min)02d hrs"
 msgstr ""
 
-#: web/__init__.py:335
+#: web/__init__.py:336
 #, python-format
 msgid "%dh"
 msgstr ""
 
-#: web/__init__.py:339
+#: web/__init__.py:340
 #, python-format
 msgid "%dm"
 msgstr ""
 
-#: web/__init__.py:341
+#: web/__init__.py:342
 #, python-format
 msgid "%ds"
 msgstr ""
