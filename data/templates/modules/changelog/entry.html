@@ -1,6 +1,6 @@
 <li class="media">
 	<div class="media-body">
-		<div class="well {% if build.type == "release" %}well-build-state-{{ build.repo.type }}{% elif build.type == "scratch" %}well-build-type-scratch{% end %}">
+		<div class="well {% if build.type == "release" and build.repo %}well-build-state-{{ build.repo.type }}{% elif build.type == "scratch" %}well-build-type-scratch{% end %}">
 			<h4>
 				<a class="{% if build.is_broken() %}line-through{% end %}" href="/build/{{ build.uuid }}">{{ build.name }}</a>
 
