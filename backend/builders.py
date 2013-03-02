@@ -315,7 +315,7 @@ class Builder(base.Object):
 	@property
 	def arches(self):
 		if not hasattr(self, "_arches"):
-			self._arches = ["noarch",]
+			self._arches = []
 
 			if self.cpu_arch:
 				res = self.db.query("SELECT build_arch FROM arches_compat \
