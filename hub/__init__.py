@@ -56,6 +56,9 @@ class Application(tornado.web.Application):
 			(r"/builders/keepalive", handlers.BuildersKeepaliveHandler),
 
 			# Jobs
+			(r"/jobs/active", handlers.JobsGetActiveHandler),
+			(r"/jobs/latest", handlers.JobsGetLatestHandler),
+			(r"/jobs/queue", handlers.JobsGetQueueHandler),
 			(r"/jobs/(.*)", handlers.JobsGetHandler),
 
 			# Packages

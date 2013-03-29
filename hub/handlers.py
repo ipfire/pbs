@@ -337,7 +337,73 @@ class BuildsGetHandler(BaseHandler):
 
 # Jobs
 
-class JobsGetHandler(BaseHandler):
+class JobsBaseHandler(BaseHandler):
+	def job2json(self, job):
+		ret = {
+			"arch"         : job.arch.name,
+			"build"        : job.build.uuid,
+			"duration"     : job.duration,
+			"name"         : job.name,
+			"packages"     : [p.uuid for p in job.packages],
+			"state"        : job.state,
+			"time_created" : job.time_created.isoformat(),
+			"type"         : job.type,
+			"uuid"         : job.uuid,
+		}
+
+		if job.builder:
+			ret["builder"] = job.builder.hostname
+
+		if job.time_started:
+			ret["time_started"] = job.time_started.isoformat()
+
+		if job.time_finished:
+			ret["time_finished"] = job.time_finished.isoformat()
+
+		return ret
+
+
+class JobsGetActiveHandler(JobsBaseHandler):
+	def get(self):
+		# Get list of all active jobs.
+		jobs = self.backend.jobs.get_active()
+
+		args = {
+			"jobs" : [self.job2json(j) for j in jobs],
+		}
+
+		self.finish(args)
+
+
+class JobsGetLatestHandler(JobsBaseHandler):
+	def get(self):
+		limit = self.get_argument_int("limit", 5)
+
+		# Get the latest jobs.
+		jobs = self.backend.jobs.get_latest(age="24 HOUR", limit=limit)
+
+		args = {
+			"jobs" : [self.job2json(j) for j in jobs],
+		}
+
+		self.finish(args)
+
+
+class JobsGetQueueHandler(JobsBaseHandler):
+	def get(self):
+		limit = self.get_argument_int("limit", 5)
+
+		# Get the job queue.
+		jobs = self.backend.jobs.get_next(limit=limit)
+
+		args = {
+			"jobs" : [self.job2json(j) for j in jobs],
+		}
+
+		self.finish(args)
+
+
+class JobsGetHandler(JobsBaseHandler):
 	def get(self, job_uuid):
 		job = self.backend.jobs.get_by_uuid(job_uuid)
 		if not job:
@@ -352,25 +418,7 @@ class JobsGetHandler(BaseHandler):
 			if not job.build.has_perm(self.user):
 				raise tornado.web.HTTPError(403)
 
-		ret = {
-			"arch"         : job.arch.name,
-			"build"        : job.build.uuid,
-			"builder"      : job.builder.hostname,
-			"duration"     : job.duration,
-			"name"         : job.name,
-			"packages"     : [p.uuid for p in job.packages],
-			"state"        : job.state,
-			"time_created" : job.time_created.isoformat(),
-			"type"         : job.type,
-			"uuid"         : job.uuid,
-		}
-
-		if job.time_started:
-			ret["time_started"] = job.time_started.isoformat()
-
-		if job.time_finished:
-			ret["time_finished"] = job.time_finished.isoformat()
-
+		ret = self.job2json(job)
 		self.finish(ret)
 
 
