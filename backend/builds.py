@@ -388,6 +388,18 @@ class Builds(base.Object):
 		if build_times:
 			return build_times[0]
 
+	def get_types_stats(self):
+		res = self.db.query("SELECT type, COUNT(*) AS count FROM builds GROUP BY type")
+
+		if not res:
+			return {}
+
+		ret = {}
+                for row in res:
+                        ret[row.type] = row.count
+
+		return ret
+
 
 class Build(base.Object):
 	def __init__(self, pakfire, id, data=None):
@@ -1499,11 +1511,74 @@ class Jobs(base.Object):
 		if jobs:
 			return jobs.count
 
-	def get_queue_length(self):
-		res = self.db.get("SELECT COUNT(*) AS count FROM jobs_queue")
+	def get_queue_length(self, state=None):
+		if state:
+			res = self.db.get("SELECT COUNT(*) AS count FROM jobs_queue \
+				LEFT JOIN jobs ON jobs_queue.id = jobs.id WHERE state = %s", state)
+		else:
+			res = self.db.get("SELECT COUNT(*) AS count FROM jobs_queue")
 
 		if res:
 			return res.count
+
+		return 0
+
+	def get_avg_wait_time(self):
+		res = self.db.get("SELECT AVG(time_waiting) AS time_waiting FROM jobs_waiting")
+
+		if res and res.time_waiting:
+			try:
+				return int(res.time_waiting)
+			except ValueError:
+				return 0
+
+		return 0
+
+	def get_state_stats(self):
+		res = self.db.query("SELECT state, COUNT(*) AS count FROM jobs GROUP BY state")
+
+		if not res:
+			return {}
+
+		ret = {
+			"new"              : 0,
+			"pending"          : 0,
+			"running"          : 0,
+			"finished"         : 0,
+			"dispatching"      : 0,
+			"uploading"        : 0,
+			"failed"           : 0,
+			"aborted"          : 0,
+			"temporary_failed" : 0,
+			"dependency_error" : 0,
+			"download_error"   : 0,
+			"deleted"          : 0,
+		}
+		for row in res:
+			ret[row.state] = int(row.count)
+
+		return ret
+
+	def get_build_durations(self):
+		res = self.db.query("SELECT platform, MIN(duration) AS minimum, \
+			MAX(duration) AS maximum, AVG(duration) AS average, \
+			STDDEV_POP(duration) AS stddev \
+			FROM builds_times GROUP BY platform \
+			UNION SELECT 'all', MIN(duration) AS minimum, \
+			MAX(duration) AS maximum, AVG(duration) AS average, \
+			STDDEV_POP(duration) AS stddev \
+			FROM builds_times")
+
+		ret = {}
+		for row in res:
+			ret[row.platform] = {
+				"minimum" : int(row.minimum),
+				"maximum" : int(row.maximum),
+				"average" : int(row.average),
+				"stddev"  : int(row.stddev),
+			}
+
+		return ret
 
 
 class Job(base.Object):
