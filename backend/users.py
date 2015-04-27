@@ -458,7 +458,7 @@ class User(base.Object):
 
 		subject = _("Account Activation")
 
-		message  = _("You, or somebody using you email address, has registered an account on the Pakfire Build Service.")
+		message  = _("You, or somebody using your email address, has registered an account on the Pakfire Build Service.")
 		message += "\n"*2
 		message += _("To activate your account, please click on the link below.")
 		message += "\n"*2
