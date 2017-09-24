@@ -625,10 +625,10 @@ SET default_with_oids = false;
 
 CREATE TABLE arches (
     id integer NOT NULL,
-    name character varying(32) NOT NULL,
-    prio bigint DEFAULT 0::bigint NOT NULL,
+    name text NOT NULL,
+    prio integer DEFAULT 0 NOT NULL,
     "binary" arches_binary DEFAULT 'Y'::arches_binary NOT NULL,
-    platform character varying(8)
+    platform text
 );
 
 
@@ -639,8 +639,8 @@ ALTER TABLE arches OWNER TO pakfire;
 --
 
 CREATE TABLE arches_compat (
-    host_arch character varying(8) NOT NULL,
-    build_arch character varying(8) NOT NULL
+    host_arch text NOT NULL,
+    build_arch text NOT NULL
 );
 
 
@@ -651,40 +651,40 @@ ALTER TABLE arches_compat OWNER TO pakfire;
 --
 
 CREATE TABLE builders (
-    id bigint NOT NULL,
-    name character varying(255) NOT NULL,
-    passphrase character varying(255),
+    id integer NOT NULL,
+    name text NOT NULL,
+    passphrase text,
     description text,
     status builders_status DEFAULT 'disabled'::builders_status NOT NULL,
     disabled builders_disabled DEFAULT 'Y'::builders_disabled NOT NULL,
-    loadavg character varying(32) DEFAULT '0'::character varying NOT NULL,
-    arches character varying(128),
+    loadavg text DEFAULT '0'::character varying NOT NULL,
+    arches text,
     build_release builders_build_release DEFAULT 'N'::builders_build_release NOT NULL,
     build_scratch builders_build_scratch DEFAULT 'N'::builders_build_scratch NOT NULL,
     build_test builders_build_test DEFAULT 'N'::builders_build_test NOT NULL,
     max_jobs bigint DEFAULT 1::bigint NOT NULL,
-    pakfire_version character varying(32),
-    os_name character varying(64),
-    cpu_model character varying(255),
-    cpu_count smallint DEFAULT 1::smallint NOT NULL,
-    cpu_arch character varying(8),
+    pakfire_version text,
+    os_name text,
+    cpu_model text,
+    cpu_count integer DEFAULT 1 NOT NULL,
+    cpu_arch text,
     cpu_bogomips double precision,
-    memory numeric DEFAULT 0::numeric NOT NULL,
+    memory bigint DEFAULT 0 NOT NULL,
     overload builders_overload DEFAULT 'N'::builders_overload NOT NULL,
-    free_space numeric DEFAULT 0::numeric NOT NULL,
-    host_key_id character varying(64),
+    free_space bigint DEFAULT 0 NOT NULL,
+    host_key_id text,
     deleted builders_deleted DEFAULT 'N'::builders_deleted NOT NULL,
-    time_created timestamp with time zone NOT NULL,
-    time_updated timestamp with time zone,
-    time_keepalive timestamp with time zone,
+    time_created timestamp without time zone NOT NULL,
+    time_updated timestamp without time zone,
+    time_keepalive timestamp without time zone,
     loadavg1 double precision,
     loadavg5 double precision,
     loadavg15 double precision,
-    mem_total numeric,
-    mem_free numeric,
-    swap_total numeric,
-    swap_free numeric,
-    space_free numeric
+    mem_total bigint,
+    mem_free bigint,
+    swap_total bigint,
+    swap_free bigint,
+    space_free bigint
 );
 
 
@@ -698,7 +698,7 @@ CREATE VIEW arches_builders AS
  SELECT arches_compat.build_arch AS arch,
     builders.id AS builder_id
    FROM (arches_compat
-     LEFT JOIN builders ON (((arches_compat.host_arch)::text = (builders.cpu_arch)::text)));
+     LEFT JOIN builders ON ((arches_compat.host_arch = builders.cpu_arch)));
 
 
 ALTER TABLE arches_builders OWNER TO pakfire;
@@ -729,9 +729,9 @@ ALTER SEQUENCE arches_id_seq OWNED BY arches.id;
 --
 
 CREATE TABLE builders_arches (
-    id bigint NOT NULL,
-    builder_id bigint NOT NULL,
-    arch_id bigint NOT NULL,
+    id integer NOT NULL,
+    builder_id integer NOT NULL,
+    arch_id integer NOT NULL,
     enabled builders_arches_enabled DEFAULT 'Y'::builders_arches_enabled NOT NULL
 );
 
@@ -764,11 +764,11 @@ ALTER SEQUENCE builders_arches_id_seq OWNED BY builders_arches.id;
 --
 
 CREATE TABLE builders_history (
-    id bigint NOT NULL,
-    builder_id bigint NOT NULL,
+    id integer NOT NULL,
+    builder_id integer NOT NULL,
     action builders_history_action NOT NULL,
-    user_id bigint,
-    "time" timestamp with time zone NOT NULL
+    user_id integer,
+    "time" timestamp without time zone NOT NULL
 );
 
 
@@ -821,19 +821,19 @@ ALTER SEQUENCE builders_id_seq OWNED BY builders.id;
 --
 
 CREATE TABLE jobs (
-    id bigint NOT NULL,
-    uuid character varying(40) NOT NULL,
+    id integer NOT NULL,
+    uuid text NOT NULL,
     type jobs_type DEFAULT 'build'::jobs_type NOT NULL,
-    build_id bigint NOT NULL,
+    build_id integer NOT NULL,
     state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
-    arch_id bigint NOT NULL,
-    time_created timestamp with time zone NOT NULL,
-    time_started timestamp with time zone,
-    time_finished timestamp with time zone,
-    start_not_before timestamp with time zone,
-    builder_id bigint,
-    tries bigint DEFAULT 0::bigint NOT NULL,
-    aborted_state smallint DEFAULT 0::smallint NOT NULL,
+    arch_id integer NOT NULL,
+    time_created timestamp without time zone NOT NULL,
+    time_started timestamp without time zone,
+    time_finished timestamp without time zone,
+    start_not_before timestamp without time zone,
+    builder_id integer,
+    tries integer DEFAULT 0 NOT NULL,
+    aborted_state integer DEFAULT 0 NOT NULL,
     message text
 );
 
@@ -877,10 +877,10 @@ CREATE VIEW builders_ready AS
     builders.build_scratch,
     builders.build_test
    FROM builders
-  WHERE (((builders.status = 'enabled'::builders_status) AND (builders.time_keepalive >= (now() - '00:05:00'::interval))) AND (builders.max_jobs > ( SELECT count(0) AS count
+  WHERE (((builders.status = 'enabled'::builders_status) AND (builders.time_keepalive >= (now() - '00:05:00'::interval))) AND (builders.max_jobs > ( SELECT count(*) AS count
            FROM jobs_active
           WHERE (jobs_active.builder_id = builders.id))))
-  ORDER BY ( SELECT count(0) AS count
+  ORDER BY ( SELECT count(*) AS count
            FROM jobs_active
           WHERE (jobs_active.builder_id = builders.id)), builders.cpu_bogomips DESC;
 
@@ -892,21 +892,21 @@ ALTER TABLE builders_ready OWNER TO pakfire;
 --
 
 CREATE TABLE builds (
-    id bigint NOT NULL,
-    uuid character varying(40) NOT NULL,
-    pkg_id bigint NOT NULL,
+    id integer NOT NULL,
+    uuid text NOT NULL,
+    pkg_id integer NOT NULL,
     type builds_type DEFAULT 'release'::builds_type NOT NULL,
     state builds_state DEFAULT 'building'::builds_state NOT NULL,
     severity builds_severity,
     message text,
     time_created timestamp with time zone NOT NULL,
-    update_year bigint,
-    update_num bigint,
-    depends_on bigint,
-    distro_id bigint NOT NULL,
-    owner_id bigint,
+    update_year integer,
+    update_num integer,
+    depends_on integer,
+    distro_id integer NOT NULL,
+    owner_id integer,
     public builds_public DEFAULT 'Y'::builds_public NOT NULL,
-    priority bigint DEFAULT 0::bigint NOT NULL,
+    priority integer DEFAULT 0 NOT NULL,
     auto_move builds_auto_move DEFAULT 'N'::builds_auto_move NOT NULL
 );
 
@@ -918,9 +918,9 @@ ALTER TABLE builds OWNER TO pakfire;
 --
 
 CREATE TABLE builds_bugs (
-    id bigint NOT NULL,
-    build_id bigint NOT NULL,
-    bug_id bigint NOT NULL
+    id integer NOT NULL,
+    build_id integer NOT NULL,
+    bug_id integer NOT NULL
 );
 
 
@@ -952,12 +952,12 @@ ALTER SEQUENCE builds_bugs_id_seq OWNED BY builds_bugs.id;
 --
 
 CREATE TABLE builds_bugs_updates (
-    id bigint NOT NULL,
-    bug_id bigint NOT NULL,
-    status character varying(32),
-    resolution character varying(32),
+    id integer NOT NULL,
+    bug_id integer NOT NULL,
+    status text,
+    resolution text,
     comment text,
-    "time" timestamp with time zone NOT NULL,
+    "time" timestamp without time zone NOT NULL,
     error builds_bugs_updates_error DEFAULT 'N'::builds_bugs_updates_error NOT NULL,
     error_msg text
 );
@@ -991,13 +991,13 @@ ALTER SEQUENCE builds_bugs_updates_id_seq OWNED BY builds_bugs_updates.id;
 --
 
 CREATE TABLE builds_comments (
-    id bigint NOT NULL,
-    build_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    id integer NOT NULL,
+    build_id integer NOT NULL,
+    user_id integer NOT NULL,
     text text NOT NULL,
-    credit smallint NOT NULL,
-    time_created timestamp with time zone NOT NULL,
-    time_updated timestamp with time zone
+    credit integer NOT NULL,
+    time_created timestamp without time zone NOT NULL,
+    time_updated timestamp without time zone
 );
 
 
@@ -1029,12 +1029,12 @@ ALTER SEQUENCE builds_comments_id_seq OWNED BY builds_comments.id;
 --
 
 CREATE TABLE builds_history (
-    id bigint NOT NULL,
-    build_id bigint NOT NULL,
+    id integer NOT NULL,
+    build_id integer NOT NULL,
     action builds_history_action NOT NULL,
-    user_id bigint,
-    "time" timestamp with time zone NOT NULL,
-    bug_id bigint
+    user_id integer,
+    "time" timestamp without time zone NOT NULL,
+    bug_id integer
 );
 
 
@@ -1087,29 +1087,29 @@ ALTER SEQUENCE builds_id_seq OWNED BY builds.id;
 --
 
 CREATE TABLE packages (
-    id bigint NOT NULL,
-    name character varying(128) NOT NULL,
-    epoch bigint NOT NULL,
-    version character varying(128) NOT NULL,
-    release character varying(32) NOT NULL,
+    id integer NOT NULL,
+    name text NOT NULL,
+    epoch integer NOT NULL,
+    version text NOT NULL,
+    release text NOT NULL,
     type packages_type NOT NULL,
-    arch smallint NOT NULL,
-    groups character varying(1024) NOT NULL,
-    maintainer character varying(128) NOT NULL,
-    license character varying(128) NOT NULL,
-    url character varying(1024) NOT NULL,
+    arch integer NOT NULL,
+    groups text NOT NULL,
+    maintainer text NOT NULL,
+    license text NOT NULL,
+    url text NOT NULL,
     summary text NOT NULL,
     description text NOT NULL,
     size bigint NOT NULL,
-    supported_arches character varying(64),
-    uuid character varying(40) NOT NULL,
-    commit_id bigint,
-    build_id character varying(40) NOT NULL,
-    build_host character varying(128) NOT NULL,
-    build_time timestamp with time zone NOT NULL,
-    path character varying(255) NOT NULL,
+    supported_arches text,
+    uuid text NOT NULL,
+    commit_id integer,
+    build_id text NOT NULL,
+    build_host text NOT NULL,
+    build_time timestamp without time zone NOT NULL,
+    path text NOT NULL,
     filesize bigint NOT NULL,
-    hash_sha512 character varying(140) NOT NULL
+    hash_sha512 text NOT NULL
 );
 
 
@@ -1120,10 +1120,10 @@ ALTER TABLE packages OWNER TO pakfire;
 --
 
 CREATE TABLE repositories_builds (
-    id bigint NOT NULL,
-    repo_id bigint NOT NULL,
+    id integer NOT NULL,
+    repo_id integer NOT NULL,
     build_id bigint NOT NULL,
-    time_added timestamp with time zone NOT NULL
+    time_added timestamp without time zone NOT NULL
 );
 
 
@@ -1146,7 +1146,7 @@ CREATE VIEW builds_latest AS
            FROM ((builds builds_1
              LEFT JOIN repositories_builds ON ((builds_1.id = repositories_builds.build_id)))
              LEFT JOIN packages p ON ((builds_1.pkg_id = p.id)))
-          WHERE ((p.name)::text = (packages.name)::text)
+          WHERE (p.name = packages.name)
           ORDER BY builds_1.time_created
          LIMIT 1)) AND (builds.state <> ALL (ARRAY['obsolete'::builds_state, 'broken'::builds_state]))));
 
@@ -1177,9 +1177,9 @@ ALTER TABLE builds_times OWNER TO pakfire;
 --
 
 CREATE TABLE builds_watchers (
-    id bigint NOT NULL,
-    build_id bigint NOT NULL,
-    user_id bigint NOT NULL
+    id integer NOT NULL,
+    build_id integer NOT NULL,
+    user_id integer NOT NULL
 );
 
 
@@ -1211,14 +1211,14 @@ ALTER SEQUENCE builds_watchers_id_seq OWNED BY builds_watchers.id;
 --
 
 CREATE TABLE distributions (
-    id bigint NOT NULL,
-    name character varying(64) NOT NULL,
-    sname character varying(64) NOT NULL,
-    slogan character varying(255) NOT NULL,
+    id integer NOT NULL,
+    name text NOT NULL,
+    sname text NOT NULL,
+    slogan text NOT NULL,
     description text,
-    vendor character varying(64) NOT NULL,
-    contact character varying(128),
-    tag character varying(4) NOT NULL
+    vendor text NOT NULL,
+    contact text,
+    tag text NOT NULL
 );
 
 
@@ -1250,9 +1250,9 @@ ALTER SEQUENCE distributions_id_seq OWNED BY distributions.id;
 --
 
 CREATE TABLE distro_arches (
-    id bigint NOT NULL,
-    distro_id bigint NOT NULL,
-    arch_id bigint NOT NULL
+    id integer NOT NULL,
+    distro_id integer NOT NULL,
+    arch_id integer NOT NULL
 );
 
 
@@ -1284,17 +1284,17 @@ ALTER SEQUENCE distro_arches_id_seq OWNED BY distro_arches.id;
 --
 
 CREATE TABLE filelists (
-    pkg_id bigint NOT NULL,
-    name character varying(256) NOT NULL,
+    pkg_id integer NOT NULL,
+    name text NOT NULL,
     size bigint NOT NULL,
-    hash_sha512 character varying(130),
-    type smallint NOT NULL,
+    hash_sha512 text,
+    type integer NOT NULL,
     config filelists_config NOT NULL,
-    mode bigint NOT NULL,
-    "user" character varying(16) NOT NULL,
-    "group" character varying(16) NOT NULL,
+    mode integer NOT NULL,
+    "user" text NOT NULL,
+    "group" text NOT NULL,
     mtime timestamp with time zone NOT NULL,
-    capabilities character varying(64)
+    capabilities text
 );
 
 
@@ -1305,8 +1305,8 @@ ALTER TABLE filelists OWNER TO pakfire;
 --
 
 CREATE TABLE images_types (
-    id bigint NOT NULL,
-    type character varying(12) NOT NULL
+    id integer NOT NULL,
+    type text NOT NULL
 );
 
 
@@ -1338,10 +1338,10 @@ ALTER SEQUENCE images_types_id_seq OWNED BY images_types.id;
 --
 
 CREATE TABLE jobs_buildroots (
-    job_id bigint NOT NULL,
-    tries smallint NOT NULL,
-    pkg_uuid character varying(40) NOT NULL,
-    pkg_name character varying(1024) NOT NULL
+    job_id integer NOT NULL,
+    tries integer NOT NULL,
+    pkg_uuid text NOT NULL,
+    pkg_name text NOT NULL
 );
 
 
@@ -1352,13 +1352,13 @@ ALTER TABLE jobs_buildroots OWNER TO pakfire;
 --
 
 CREATE TABLE jobs_history (
-    job_id bigint NOT NULL,
+    job_id integer NOT NULL,
     action jobs_history_action NOT NULL,
     state jobs_history_state,
-    user_id bigint,
-    "time" timestamp with time zone NOT NULL,
-    builder_id bigint,
-    test_job_id bigint
+    user_id integer,
+    "time" timestamp without time zone NOT NULL,
+    builder_id integer,
+    test_job_id integer
 );
 
 
@@ -1390,9 +1390,9 @@ ALTER SEQUENCE jobs_id_seq OWNED BY jobs.id;
 --
 
 CREATE TABLE jobs_packages (
-    id bigint NOT NULL,
-    job_id bigint NOT NULL,
-    pkg_id bigint NOT NULL
+    id integer NOT NULL,
+    job_id integer NOT NULL,
+    pkg_id integer NOT NULL
 );
 
 
@@ -1430,7 +1430,7 @@ CREATE VIEW jobs_queue AS
            FROM builders_ready
           WHERE (builders_ready.builder_id IN ( SELECT arches_builders.builder_id
                    FROM arches_builders
-                  WHERE (((arches_builders.arch)::text = (arches.name)::text) AND
+                  WHERE ((arches_builders.arch = arches.name) AND
                         CASE
                             WHEN ((builds.type = 'release'::builds_type) AND (jobs.type = 'build'::jobs_type)) THEN (builders_ready.build_release = 'Y'::builders_build_release)
                             WHEN ((builds.type = 'scratch'::builds_type) AND (jobs.type = 'build'::jobs_type)) THEN (builders_ready.build_scratch = 'Y'::builders_build_scratch)
@@ -1457,8 +1457,8 @@ ALTER TABLE jobs_queue OWNER TO pakfire;
 --
 
 CREATE TABLE jobs_repos (
-    job_id bigint NOT NULL,
-    repo_id bigint NOT NULL
+    job_id integer NOT NULL,
+    repo_id integer NOT NULL
 );
 
 
@@ -1470,13 +1470,13 @@ ALTER TABLE jobs_repos OWNER TO pakfire;
 
 CREATE VIEW jobs_waiting AS
  SELECT jobs_queue.id,
-    (now() - jobs.time_created) AS time_waiting
+    (now() - (jobs.time_created)::timestamp with time zone) AS time_waiting
    FROM (jobs_queue
      LEFT JOIN jobs ON ((jobs_queue.id = jobs.id)))
   WHERE (jobs.start_not_before IS NULL)
 UNION
  SELECT jobs_queue.id,
-    (now() - jobs.start_not_before) AS time_waiting
+    (now() - (jobs.start_not_before)::timestamp with time zone) AS time_waiting
    FROM (jobs_queue
      LEFT JOIN jobs ON ((jobs_queue.id = jobs.id)))
   WHERE (jobs.start_not_before IS NOT NULL);
@@ -1489,9 +1489,9 @@ ALTER TABLE jobs_waiting OWNER TO pakfire;
 --
 
 CREATE TABLE keys (
-    id bigint NOT NULL,
-    fingerprint character varying(64) NOT NULL,
-    uids character varying(255) NOT NULL,
+    id integer NOT NULL,
+    fingerprint text NOT NULL,
+    uids text NOT NULL,
     data text NOT NULL
 );
 
@@ -1524,12 +1524,12 @@ ALTER SEQUENCE keys_id_seq OWNED BY keys.id;
 --
 
 CREATE TABLE keys_subkeys (
-    id bigint NOT NULL,
-    key_id bigint NOT NULL,
-    fingerprint character varying(64) NOT NULL,
-    time_created timestamp with time zone NOT NULL,
-    time_expires timestamp with time zone,
-    algo character varying(16)
+    id integer NOT NULL,
+    key_id integer NOT NULL,
+    fingerprint text NOT NULL,
+    time_created timestamp without time zone NOT NULL,
+    time_expires timestamp without time zone,
+    algo text
 );
 
 
@@ -1561,11 +1561,11 @@ ALTER SEQUENCE keys_subkeys_id_seq OWNED BY keys_subkeys.id;
 --
 
 CREATE TABLE logfiles (
-    id bigint NOT NULL,
-    job_id bigint NOT NULL,
-    path character varying(255) NOT NULL,
+    id integer NOT NULL,
+    job_id integer NOT NULL,
+    path text NOT NULL,
     filesize bigint NOT NULL,
-    hash_sha512 character varying(140) NOT NULL
+    hash_sha512 text NOT NULL
 );
 
 
@@ -1597,14 +1597,14 @@ ALTER SEQUENCE logfiles_id_seq OWNED BY logfiles.id;
 --
 
 CREATE TABLE mirrors (
-    id bigint NOT NULL,
-    hostname character varying(128) NOT NULL,
-    path character varying(128) NOT NULL,
-    owner character varying(128),
-    contact character varying(128),
+    id integer NOT NULL,
+    hostname text NOT NULL,
+    path text NOT NULL,
+    owner text,
+    contact text,
     status mirrors_status DEFAULT 'disabled'::mirrors_status NOT NULL,
     check_status mirrors_check_status DEFAULT 'UNKNOWN'::mirrors_check_status NOT NULL,
-    last_check timestamp with time zone
+    last_check timestamp without time zone
 );
 
 
@@ -1615,11 +1615,11 @@ ALTER TABLE mirrors OWNER TO pakfire;
 --
 
 CREATE TABLE mirrors_history (
-    id bigint NOT NULL,
-    mirror_id bigint NOT NULL,
+    id integer NOT NULL,
+    mirror_id integer NOT NULL,
     action mirrors_history_action NOT NULL,
-    user_id bigint,
-    "time" timestamp with time zone NOT NULL
+    user_id integer,
+    "time" timestamp without time zone NOT NULL
 );
 
 
@@ -1672,9 +1672,9 @@ ALTER SEQUENCE mirrors_id_seq OWNED BY mirrors.id;
 --
 
 CREATE TABLE packages_deps (
-    pkg_id bigint NOT NULL,
+    pkg_id integer NOT NULL,
     type packages_deps_type NOT NULL,
-    what character varying(1024) NOT NULL
+    what text NOT NULL
 );
 
 
@@ -1706,10 +1706,10 @@ ALTER SEQUENCE packages_id_seq OWNED BY packages.id;
 --
 
 CREATE TABLE packages_properties (
-    id bigint NOT NULL,
-    name character varying(128) NOT NULL,
+    id integer NOT NULL,
+    name text NOT NULL,
     critical_path packages_properties_critical_path DEFAULT 'N'::packages_properties_critical_path NOT NULL,
-    priority smallint DEFAULT 0::smallint NOT NULL
+    priority integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1741,8 +1741,8 @@ ALTER SEQUENCE packages_properties_id_seq OWNED BY packages_properties.id;
 --
 
 CREATE TABLE queue_delete (
-    id bigint NOT NULL,
-    path character varying(1024) NOT NULL
+    id integer NOT NULL,
+    path text NOT NULL
 );
 
 
@@ -1774,21 +1774,21 @@ ALTER SEQUENCE queue_delete_id_seq OWNED BY queue_delete.id;
 --
 
 CREATE TABLE repositories (
-    id bigint NOT NULL,
-    name character varying(64) NOT NULL,
+    id integer NOT NULL,
+    name text NOT NULL,
     type repositories_type DEFAULT 'testing'::repositories_type NOT NULL,
     description text NOT NULL,
-    distro_id bigint NOT NULL,
-    parent_id bigint,
-    key_id bigint,
+    distro_id integer NOT NULL,
+    parent_id integer,
+    key_id integer,
     mirrored repositories_mirrored DEFAULT 'N'::repositories_mirrored NOT NULL,
     enabled_for_builds repositories_enabled_for_builds DEFAULT 'N'::repositories_enabled_for_builds NOT NULL,
-    score_needed bigint DEFAULT 0::bigint NOT NULL,
-    last_update timestamp with time zone,
-    time_min bigint DEFAULT 0::bigint NOT NULL,
-    time_max bigint DEFAULT 0::bigint NOT NULL,
-    update_started timestamp with time zone,
-    update_ended timestamp with time zone
+    score_needed integer DEFAULT 0 NOT NULL,
+    last_update timestamp without time zone,
+    time_min integer DEFAULT 0 NOT NULL,
+    time_max integer DEFAULT 0 NOT NULL,
+    update_started timestamp without time zone,
+    update_ended timestamp without time zone
 );
 
 
@@ -1799,11 +1799,11 @@ ALTER TABLE repositories OWNER TO pakfire;
 --
 
 CREATE TABLE repositories_aux (
-    id bigint NOT NULL,
-    name character varying(32) NOT NULL,
+    id integer NOT NULL,
+    name text NOT NULL,
     description text,
-    url character varying(128) NOT NULL,
-    distro_id bigint NOT NULL,
+    url text NOT NULL,
+    distro_id integer NOT NULL,
     status repositories_aux_status DEFAULT 'disabled'::repositories_aux_status NOT NULL
 );
 
@@ -1859,10 +1859,10 @@ ALTER SEQUENCE repositories_builds_id_seq OWNED BY repositories_builds.id;
 CREATE TABLE repositories_history (
     build_id bigint NOT NULL,
     action repositories_history_action NOT NULL,
-    from_repo_id bigint,
-    to_repo_id bigint,
-    user_id bigint,
-    "time" timestamp with time zone NOT NULL
+    from_repo_id integer,
+    to_repo_id integer,
+    user_id integer,
+    "time" timestamp without time zone NOT NULL
 );
 
 
@@ -1894,12 +1894,12 @@ ALTER SEQUENCE repositories_id_seq OWNED BY repositories.id;
 --
 
 CREATE TABLE sessions (
-    session_id character varying(64) NOT NULL,
-    user_id bigint NOT NULL,
-    impersonated_user_id bigint,
-    creation_time timestamp with time zone,
-    valid_until timestamp with time zone,
-    from_address character varying(255)
+    session_id text NOT NULL,
+    user_id integer NOT NULL,
+    impersonated_user_id integer,
+    creation_time timestamp without time zone,
+    valid_until timestamp without time zone,
+    from_address inet
 );
 
 
@@ -1910,8 +1910,8 @@ ALTER TABLE sessions OWNER TO pakfire;
 --
 
 CREATE TABLE settings (
-    k character varying(255) NOT NULL,
-    v character varying(1024) NOT NULL
+    k text NOT NULL,
+    v text NOT NULL
 );
 
 
@@ -1922,8 +1922,8 @@ ALTER TABLE settings OWNER TO pakfire;
 --
 
 CREATE TABLE slogans (
-    id bigint NOT NULL,
-    message character varying(64) NOT NULL
+    id integer NOT NULL,
+    message text NOT NULL
 );
 
 
@@ -1955,15 +1955,15 @@ ALTER SEQUENCE slogans_id_seq OWNED BY slogans.id;
 --
 
 CREATE TABLE sources (
-    id bigint NOT NULL,
-    name character varying(128) NOT NULL,
-    identifier character varying(128) NOT NULL,
-    url character varying(1024) NOT NULL,
-    gitweb character varying(255),
-    revision character varying(40) NOT NULL,
-    branch character varying(32) NOT NULL,
-    updated timestamp with time zone,
-    distro_id bigint NOT NULL
+    id integer NOT NULL,
+    name text NOT NULL,
+    identifier text NOT NULL,
+    url text NOT NULL,
+    gitweb text,
+    revision text NOT NULL,
+    branch text NOT NULL,
+    updated timestamp without time zone,
+    distro_id integer NOT NULL
 );
 
 
@@ -1974,14 +1974,14 @@ ALTER TABLE sources OWNER TO pakfire;
 --
 
 CREATE TABLE sources_commits (
-    id bigint NOT NULL,
-    source_id bigint NOT NULL,
-    revision character varying(40) NOT NULL,
-    author character varying(1024) NOT NULL,
-    committer character varying(1024) NOT NULL,
-    subject character varying(1024) NOT NULL,
+    id integer NOT NULL,
+    source_id integer NOT NULL,
+    revision text NOT NULL,
+    author text NOT NULL,
+    committer text NOT NULL,
+    subject text NOT NULL,
     body text NOT NULL,
-    date timestamp with time zone NOT NULL,
+    date timestamp without time zone NOT NULL,
     state sources_commits_state DEFAULT 'pending'::sources_commits_state NOT NULL
 );
 
@@ -2035,17 +2035,17 @@ ALTER SEQUENCE sources_id_seq OWNED BY sources.id;
 --
 
 CREATE TABLE uploads (
-    id bigint NOT NULL,
-    uuid character varying(40) NOT NULL,
-    user_id bigint,
-    builder_id bigint,
-    filename character varying(1024) NOT NULL,
-    hash character varying(40) NOT NULL,
+    id integer NOT NULL,
+    uuid text NOT NULL,
+    user_id integer,
+    builder_id integer,
+    filename text NOT NULL,
+    hash text NOT NULL,
     size bigint NOT NULL,
-    progress bigint DEFAULT 0::bigint NOT NULL,
+    progress bigint DEFAULT 0 NOT NULL,
     finished uploads_finished DEFAULT 'N'::uploads_finished NOT NULL,
-    time_started timestamp with time zone DEFAULT now() NOT NULL,
-    time_finished timestamp with time zone
+    time_started timestamp without time zone DEFAULT now() NOT NULL,
+    time_finished timestamp without time zone
 );
 
 
@@ -2077,12 +2077,12 @@ ALTER SEQUENCE uploads_id_seq OWNED BY uploads.id;
 --
 
 CREATE TABLE user_messages (
-    id bigint NOT NULL,
-    frm character varying(255) NOT NULL,
-    "to" character varying(2048) NOT NULL,
-    subject character varying(1024) NOT NULL,
+    id integer NOT NULL,
+    frm text NOT NULL,
+    "to" text NOT NULL,
+    subject text NOT NULL,
     text text NOT NULL,
-    time_added timestamp with time zone DEFAULT now() NOT NULL
+    time_added timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -2114,17 +2114,17 @@ ALTER SEQUENCE user_messages_id_seq OWNED BY user_messages.id;
 --
 
 CREATE TABLE users (
-    id bigint NOT NULL,
-    name character varying(32) NOT NULL,
-    realname character varying(255),
-    passphrase character varying(153) NOT NULL,
+    id integer NOT NULL,
+    name text NOT NULL,
+    realname text,
+    passphrase text NOT NULL,
     state users_state NOT NULL,
-    locale character varying(8),
-    timezone character varying(64),
+    locale text,
+    timezone text,
     activated users_activated DEFAULT 'N'::users_activated NOT NULL,
-    activation_code character varying(20),
+    activation_code text,
     deleted users_deleted DEFAULT 'N'::users_deleted NOT NULL,
-    registered timestamp with time zone DEFAULT now() NOT NULL
+    registered timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -2135,9 +2135,9 @@ ALTER TABLE users OWNER TO pakfire;
 --
 
 CREATE TABLE users_emails (
-    id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    email character varying(128) NOT NULL,
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    email text NOT NULL,
     "primary" users_emails_primary DEFAULT 'N'::users_emails_primary NOT NULL
 );
 
@@ -2191,8 +2191,8 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 --
 
 CREATE TABLE users_permissions (
-    id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    id integer NOT NULL,
+    user_id integer NOT NULL,
     create_scratch_builds users_permissions_create_scratch_builds DEFAULT 'N'::users_permissions_create_scratch_builds NOT NULL,
     maintain_builders users_permissions_maintain_builders DEFAULT 'N'::users_permissions_maintain_builders NOT NULL,
     manage_critical_path users_permissions_manage_critical_path DEFAULT 'N'::users_permissions_manage_critical_path NOT NULL,
@@ -2741,16 +2741,12 @@ ALTER TABLE ONLY user_messages
 ALTER TABLE ONLY jobs_packages
     ADD CONSTRAINT jobs_packages_unique UNIQUE (job_id, pkg_id);
 
-ALTER TABLE jobs_packages CLUSTER ON jobs_packages_unique;
-
 
 --
 -- Name: builders_arches_builder_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
 CREATE INDEX builders_arches_builder_id ON builders_arches USING btree (builder_id);
-
-ALTER TABLE builders_arches CLUSTER ON builders_arches_builder_id;
 
 
 --
@@ -2815,8 +2811,6 @@ CREATE UNIQUE INDEX idx_2197988_uuid ON builds USING btree (uuid);
 
 CREATE UNIQUE INDEX idx_2198002_build_id ON builds_bugs USING btree (build_id, bug_id);
 
-ALTER TABLE builds_bugs CLUSTER ON idx_2198002_build_id;
-
 
 --
 -- Name: idx_2198018_build_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
@@ -2838,8 +2832,6 @@ CREATE INDEX idx_2198018_user_id ON builds_comments USING btree (user_id);
 
 CREATE INDEX idx_2198052_pkg_id ON filelists USING btree (pkg_id);
 
-ALTER TABLE filelists CLUSTER ON idx_2198052_pkg_id;
-
 
 --
 -- Name: idx_2198063_arch_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
@@ -2853,8 +2845,6 @@ CREATE INDEX idx_2198063_arch_id ON jobs USING btree (arch_id);
 --
 
 CREATE INDEX idx_2198063_build_id ON jobs USING btree (build_id);
-
-ALTER TABLE jobs CLUSTER ON idx_2198063_build_id;
 
 
 --
@@ -2897,8 +2887,6 @@ CREATE INDEX idx_2198074_job_id ON jobs_buildroots USING btree (job_id);
 --
 
 CREATE INDEX idx_2198080_job_id ON jobs_history USING btree (job_id);
-
-ALTER TABLE jobs_history CLUSTER ON idx_2198080_job_id;
 
 
 --
@@ -2962,8 +2950,6 @@ CREATE INDEX idx_2198132_version ON packages USING btree (version);
 --
 
 CREATE INDEX idx_2198139_pkg_id ON packages_deps USING btree (pkg_id);
-
-ALTER TABLE packages_deps CLUSTER ON idx_2198139_pkg_id;
 
 
 --
@@ -3327,6 +3313,22 @@ ALTER TABLE ONLY mirrors_history
 
 ALTER TABLE ONLY mirrors_history
     ADD CONSTRAINT mirrors_history_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: packages_arch; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY packages
+    ADD CONSTRAINT packages_arch FOREIGN KEY (arch) REFERENCES arches(id);
+
+
+--
+-- Name: packages_commit_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY packages
+    ADD CONSTRAINT packages_commit_id FOREIGN KEY (commit_id) REFERENCES sources_commits(id);
 
 
 --
