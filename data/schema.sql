@@ -2735,6 +2735,39 @@ ALTER TABLE ONLY user_messages
 
 
 --
+-- Name: jobs_packages_unique; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY jobs_packages
+    ADD CONSTRAINT jobs_packages_unique UNIQUE (job_id, pkg_id);
+
+ALTER TABLE jobs_packages CLUSTER ON jobs_packages_unique;
+
+
+--
+-- Name: builders_arches_builder_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX builders_arches_builder_id ON builders_arches USING btree (builder_id);
+
+ALTER TABLE builders_arches CLUSTER ON builders_arches_builder_id;
+
+
+--
+-- Name: builds_watchers_build_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX builds_watchers_build_id ON builds_watchers USING btree (build_id);
+
+
+--
+-- Name: filelists_name; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX filelists_name ON filelists USING btree (name);
+
+
+--
 -- Name: idx_2197949_host_arch; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2782,6 +2815,8 @@ CREATE UNIQUE INDEX idx_2197988_uuid ON builds USING btree (uuid);
 
 CREATE UNIQUE INDEX idx_2198002_build_id ON builds_bugs USING btree (build_id, bug_id);
 
+ALTER TABLE builds_bugs CLUSTER ON idx_2198002_build_id;
+
 
 --
 -- Name: idx_2198018_build_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
@@ -2803,6 +2838,8 @@ CREATE INDEX idx_2198018_user_id ON builds_comments USING btree (user_id);
 
 CREATE INDEX idx_2198052_pkg_id ON filelists USING btree (pkg_id);
 
+ALTER TABLE filelists CLUSTER ON idx_2198052_pkg_id;
+
 
 --
 -- Name: idx_2198063_arch_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
@@ -2816,6 +2853,8 @@ CREATE INDEX idx_2198063_arch_id ON jobs USING btree (arch_id);
 --
 
 CREATE INDEX idx_2198063_build_id ON jobs USING btree (build_id);
+
+ALTER TABLE jobs CLUSTER ON idx_2198063_build_id;
 
 
 --
@@ -2858,6 +2897,8 @@ CREATE INDEX idx_2198074_job_id ON jobs_buildroots USING btree (job_id);
 --
 
 CREATE INDEX idx_2198080_job_id ON jobs_history USING btree (job_id);
+
+ALTER TABLE jobs_history CLUSTER ON idx_2198080_job_id;
 
 
 --
@@ -2922,12 +2963,7 @@ CREATE INDEX idx_2198132_version ON packages USING btree (version);
 
 CREATE INDEX idx_2198139_pkg_id ON packages_deps USING btree (pkg_id);
 
-
---
--- Name: idx_2198139_type; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198139_type ON packages_deps USING btree (type);
+ALTER TABLE packages_deps CLUSTER ON idx_2198139_pkg_id;
 
 
 --
@@ -3008,10 +3044,441 @@ CREATE INDEX idx_2198256_user_id ON users_emails USING btree (user_id);
 
 
 --
+-- Name: jobs_buildroots_pkg_uuid; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
+
+
+--
 -- Name: on_update_current_timestamp; Type: TRIGGER; Schema: public; Owner: pakfire
 --
 
 CREATE TRIGGER on_update_current_timestamp BEFORE UPDATE ON sources FOR EACH ROW EXECUTE PROCEDURE on_update_current_timestamp_sources();
+
+
+--
+-- Name: builders_arches_arch_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builders_arches
+    ADD CONSTRAINT builders_arches_arch_id FOREIGN KEY (arch_id) REFERENCES arches(id);
+
+
+--
+-- Name: builders_arches_builder_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builders_arches
+    ADD CONSTRAINT builders_arches_builder_id FOREIGN KEY (builder_id) REFERENCES builders(id);
+
+
+--
+-- Name: builders_history_builder_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builders_history
+    ADD CONSTRAINT builders_history_builder_id FOREIGN KEY (builder_id) REFERENCES builders(id);
+
+
+--
+-- Name: builders_history_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builders_history
+    ADD CONSTRAINT builders_history_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: builds_bug_build_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds_bugs
+    ADD CONSTRAINT builds_bug_build_id FOREIGN KEY (build_id) REFERENCES builds(id);
+
+
+--
+-- Name: builds_comments_build_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds_comments
+    ADD CONSTRAINT builds_comments_build_id FOREIGN KEY (build_id) REFERENCES builds(id);
+
+
+--
+-- Name: builds_comments_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds_comments
+    ADD CONSTRAINT builds_comments_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: builds_depends_on; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds
+    ADD CONSTRAINT builds_depends_on FOREIGN KEY (depends_on) REFERENCES builds(id);
+
+
+--
+-- Name: builds_distro_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds
+    ADD CONSTRAINT builds_distro_id FOREIGN KEY (distro_id) REFERENCES distributions(id);
+
+
+--
+-- Name: builds_history_build_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds_history
+    ADD CONSTRAINT builds_history_build_id FOREIGN KEY (build_id) REFERENCES builds(id);
+
+
+--
+-- Name: builds_history_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds_history
+    ADD CONSTRAINT builds_history_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: builds_owner_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds
+    ADD CONSTRAINT builds_owner_id FOREIGN KEY (owner_id) REFERENCES users(id);
+
+
+--
+-- Name: builds_pkg_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds
+    ADD CONSTRAINT builds_pkg_id FOREIGN KEY (pkg_id) REFERENCES packages(id);
+
+
+--
+-- Name: builds_watchers_build_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds_watchers
+    ADD CONSTRAINT builds_watchers_build_id FOREIGN KEY (build_id) REFERENCES builds(id);
+
+
+--
+-- Name: builds_watchers_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY builds_watchers
+    ADD CONSTRAINT builds_watchers_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: distro_arches_arch_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY distro_arches
+    ADD CONSTRAINT distro_arches_arch_id FOREIGN KEY (arch_id) REFERENCES arches(id);
+
+
+--
+-- Name: distro_arches_distro_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY distro_arches
+    ADD CONSTRAINT distro_arches_distro_id FOREIGN KEY (distro_id) REFERENCES distributions(id);
+
+
+--
+-- Name: filelists_pkg_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY filelists
+    ADD CONSTRAINT filelists_pkg_id FOREIGN KEY (pkg_id) REFERENCES packages(id);
+
+
+--
+-- Name: jobs_arch_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT jobs_arch_id FOREIGN KEY (arch_id) REFERENCES arches(id);
+
+
+--
+-- Name: jobs_build_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT jobs_build_id FOREIGN KEY (build_id) REFERENCES builds(id);
+
+
+--
+-- Name: jobs_builder_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT jobs_builder_id FOREIGN KEY (builder_id) REFERENCES builders(id);
+
+
+--
+-- Name: jobs_buildroots_job_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_buildroots
+    ADD CONSTRAINT jobs_buildroots_job_id FOREIGN KEY (job_id) REFERENCES jobs(id);
+
+
+--
+-- Name: jobs_history_builder_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_history
+    ADD CONSTRAINT jobs_history_builder_id FOREIGN KEY (builder_id) REFERENCES builders(id);
+
+
+--
+-- Name: jobs_history_job_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_history
+    ADD CONSTRAINT jobs_history_job_id FOREIGN KEY (job_id) REFERENCES jobs(id);
+
+
+--
+-- Name: jobs_history_test_job_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_history
+    ADD CONSTRAINT jobs_history_test_job_id FOREIGN KEY (test_job_id) REFERENCES jobs(id);
+
+
+--
+-- Name: jobs_history_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_history
+    ADD CONSTRAINT jobs_history_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: jobs_packaged_job_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_packages
+    ADD CONSTRAINT jobs_packaged_job_id FOREIGN KEY (job_id) REFERENCES jobs(id);
+
+
+--
+-- Name: jobs_packages_pkg_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_packages
+    ADD CONSTRAINT jobs_packages_pkg_id FOREIGN KEY (pkg_id) REFERENCES packages(id);
+
+
+--
+-- Name: jobs_repos_job_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_repos
+    ADD CONSTRAINT jobs_repos_job_id FOREIGN KEY (job_id) REFERENCES jobs(id);
+
+
+--
+-- Name: jobs_repos_repo_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs_repos
+    ADD CONSTRAINT jobs_repos_repo_id FOREIGN KEY (repo_id) REFERENCES repositories(id);
+
+
+--
+-- Name: keys_subkeys_key_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY keys_subkeys
+    ADD CONSTRAINT keys_subkeys_key_id FOREIGN KEY (key_id) REFERENCES keys(id);
+
+
+--
+-- Name: logfiles_job_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY logfiles
+    ADD CONSTRAINT logfiles_job_id FOREIGN KEY (job_id) REFERENCES jobs(id);
+
+
+--
+-- Name: mirrors_history_mirror_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY mirrors_history
+    ADD CONSTRAINT mirrors_history_mirror_id FOREIGN KEY (mirror_id) REFERENCES mirrors(id);
+
+
+--
+-- Name: mirrors_history_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY mirrors_history
+    ADD CONSTRAINT mirrors_history_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: packages_deps_pkg_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY packages_deps
+    ADD CONSTRAINT packages_deps_pkg_id FOREIGN KEY (pkg_id) REFERENCES packages(id);
+
+
+--
+-- Name: repositories_aux_distro_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories_aux
+    ADD CONSTRAINT repositories_aux_distro_id FOREIGN KEY (distro_id) REFERENCES distributions(id);
+
+
+--
+-- Name: repositories_builds_build_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories_builds
+    ADD CONSTRAINT repositories_builds_build_id FOREIGN KEY (build_id) REFERENCES builds(id);
+
+
+--
+-- Name: repositories_builds_repo_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories_builds
+    ADD CONSTRAINT repositories_builds_repo_id FOREIGN KEY (repo_id) REFERENCES repositories(id);
+
+
+--
+-- Name: repositories_distro_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories
+    ADD CONSTRAINT repositories_distro_id FOREIGN KEY (distro_id) REFERENCES distributions(id);
+
+
+--
+-- Name: repositories_history_build_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories_history
+    ADD CONSTRAINT repositories_history_build_id FOREIGN KEY (build_id) REFERENCES builds(id);
+
+
+--
+-- Name: repositories_history_from_repo_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories_history
+    ADD CONSTRAINT repositories_history_from_repo_id FOREIGN KEY (from_repo_id) REFERENCES repositories(id);
+
+
+--
+-- Name: repositories_history_to_repo_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories_history
+    ADD CONSTRAINT repositories_history_to_repo_id FOREIGN KEY (to_repo_id) REFERENCES repositories(id);
+
+
+--
+-- Name: repositories_history_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories_history
+    ADD CONSTRAINT repositories_history_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: repositories_key_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories
+    ADD CONSTRAINT repositories_key_id FOREIGN KEY (key_id) REFERENCES keys(id);
+
+
+--
+-- Name: repositories_parent_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories
+    ADD CONSTRAINT repositories_parent_id FOREIGN KEY (parent_id) REFERENCES repositories(id);
+
+
+--
+-- Name: sessions_impersonated_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY sessions
+    ADD CONSTRAINT sessions_impersonated_user_id FOREIGN KEY (impersonated_user_id) REFERENCES users(id);
+
+
+--
+-- Name: sessions_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY sessions
+    ADD CONSTRAINT sessions_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: sources_commits_source_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY sources_commits
+    ADD CONSTRAINT sources_commits_source_id FOREIGN KEY (source_id) REFERENCES sources(id);
+
+
+--
+-- Name: sources_distro_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY sources
+    ADD CONSTRAINT sources_distro_id FOREIGN KEY (distro_id) REFERENCES distributions(id);
+
+
+--
+-- Name: uploads_builder_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY uploads
+    ADD CONSTRAINT uploads_builder_id FOREIGN KEY (builder_id) REFERENCES builders(id);
+
+
+--
+-- Name: uploads_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY uploads
+    ADD CONSTRAINT uploads_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: users_emails_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY users_emails
+    ADD CONSTRAINT users_emails_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: users_permissions_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY users_permissions
+    ADD CONSTRAINT users_permissions_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 
 
 --
