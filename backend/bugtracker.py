@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import tornado.database
 import xmlrpclib
 
 import base

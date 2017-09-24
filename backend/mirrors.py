@@ -3,7 +3,6 @@
 import logging
 import math
 import socket
-import tornado.database
 
 import base
 import logs

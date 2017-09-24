@@ -4,10 +4,10 @@ import datetime
 import logging
 import os
 import subprocess
-import tornado.database
 
 import base
 import builds
+import database
 import packages
 
 class Sources(base.Object):
@@ -70,7 +70,7 @@ class Commit(base.Object):
 			id = pakfire.db.execute("INSERT INTO sources_commits(source_id, revision, \
 				author, committer, subject, body, date) VALUES(%s, %s, %s, %s, %s, %s, %s)",
 				source.id, revision, author, committer, subject, body, date)
-		except tornado.database.IntegrityError:
+		except database.IntegrityError:
 			# If the commit (apperently) already existed, we return nothing.
 			return
 
