@@ -1,2 +1,5 @@
 # Send queued emails once a minute
 * * * * *	nobody	pakfire-build-service process-message-queue &>/dev/null
+
+# Cleanup timed-out uploads
+0 */6 * * *	nobody	pakfire-build-service cleanup-uploads &>/dev/null

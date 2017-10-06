@@ -8,7 +8,6 @@ from .builds       import CreateTestBuildsEvent, DistEvent
 from .repositories import RepositoriesUpdateEvent
 from .sessions     import SessionsCleanupEvent
 from .sources      import SourcesPullEvent
-from .uploads      import UploadsCleanupEvent
 
 
 # Events that do not fit anywhere else.
