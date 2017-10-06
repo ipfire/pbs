@@ -166,9 +166,7 @@ src/manager/bugs.py
 src/manager/builds.py
 src/manager/__init__.py
 src/manager/repositories.py
-src/manager/sessions.py
 src/manager/sources.py
-src/manager/uploads.py
 src/web/handlers_api.py
 src/web/handlers_auth.py
 src/web/handlers_base.py
