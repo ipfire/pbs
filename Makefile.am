@@ -79,6 +79,7 @@ buildservice_PYTHON = \
 	src/buildservice/cache.py \
 	src/buildservice/constants.py \
 	src/buildservice/database.py \
+	src/buildservice/decorators.py \
 	src/buildservice/distribution.py \
 	src/buildservice/git.py \
 	src/buildservice/__init__.py \
