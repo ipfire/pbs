@@ -19,9 +19,6 @@ class Object(object):
 		if hasattr(self.pakfire, "settings"):
 			self.settings = self.pakfire.settings
 
-		# Private cache.
-		self._cache = None
-
 		# Call custom constructor
 		self.init(*args, **kwargs)
 
@@ -30,16 +27,6 @@ class Object(object):
 			Custom constructor to be overwritten by inheriting class
 		"""
 		pass
-
-	@property
-	def cache(self):
-		"""
-			Shortcut to the cache.
-		"""
-		if self._cache:
-			return self._cache
-
-		return self.pakfire.cache
 
 	@property
 	def geoip(self):
