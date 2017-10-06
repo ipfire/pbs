@@ -114,9 +114,7 @@ manager_PYTHON = \
 	src/manager/bugs.py \
 	src/manager/builds.py \
 	src/manager/repositories.py \
-	src/manager/sessions.py \
-	src/manager/sources.py \
-	src/manager/uploads.py
+	src/manager/sources.py
 
 managerdir = $(buildservicedir)/manager
 
