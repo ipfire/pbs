@@ -36,6 +36,16 @@ class Messages(base.Object):
 	def delete(self, id):
 		self.db.execute("DELETE FROM user_messages WHERE id = %s", id)
 
+	def process_queue(self):
+		# Get 10 messages at a time and send them one after the other
+		while True:
+			messages = self.get_all(limit=10)
+
+			for message in messages:
+				self.send_msg(message)
+			else:
+				break
+
 	def send_to_all(self, recipients, subject, body, format=None):
 		"""
 			Sends an email to all recipients and does the translation.
@@ -104,3 +114,6 @@ class Messages(base.Object):
 
 		if p.returncode:
 			raise Exception, "Could not send mail: %s" % stderr
+
+		# If everything was okay, we can delete the message in the database.
+		self.delete(msg.id)

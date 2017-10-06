@@ -1,1 +1,2 @@
-# Placeholder for any cron jobs
+# Send queued emails once a minute
+* * * * *	nobody	pakfire-build-service process-message-queue &>/dev/null

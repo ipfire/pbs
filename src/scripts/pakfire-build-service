@@ -13,7 +13,10 @@ class Cli(object):
 		# Initialise backend
 		self.backend = pakfire.buildservice.Backend(*args, **kwargs)
 
-		self._commands = {}
+		self._commands = {
+			# Sends all queued messages
+			"process-message-queue" : self.backend.messages.process_queue,
+		}
 
 	def __call__(self, *args):
 		if not len(args) >= 2:
