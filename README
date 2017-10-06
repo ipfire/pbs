@@ -3,6 +3,11 @@ REQUIREMENTS
 	Python modules:
 		* geoip2
 
+TRANSLATE
+	Help translating the build service!
+
+	http://pootle.ipfire.org/projects/pakfire-build-service/
+
 
 This product includes GeoLite2 data created by MaxMind, available from
   https://dev.maxmind.com/geoip/geoip2/geolite2/
