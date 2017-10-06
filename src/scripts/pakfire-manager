@@ -23,7 +23,6 @@ events = (
 	pakfire.buildservice.manager.CreateTestBuildsEvent,
 	pakfire.buildservice.manager.DistEvent,
 	pakfire.buildservice.manager.RepositoriesUpdateEvent,
-	pakfire.buildservice.manager.SessionsCleanupEvent,
 	pakfire.buildservice.manager.SourcesPullEvent,
 )
 

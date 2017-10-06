@@ -6,7 +6,6 @@ from .bugs         import BugsUpdateEvent
 from .builds       import BuildsFailedRestartEvent, CheckBuildDependenciesEvent
 from .builds       import CreateTestBuildsEvent, DistEvent
 from .repositories import RepositoriesUpdateEvent
-from .sessions     import SessionsCleanupEvent
 from .sources      import SourcesPullEvent
 
 

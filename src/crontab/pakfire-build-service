@@ -3,3 +3,6 @@
 
 # Cleanup timed-out uploads
 0 */6 * * *	nobody	pakfire-build-service cleanup-uploads &>/dev/null
+
+# Cleanup expired sessions
+0 0 * * *	nobody	pakfire-build-service cleanup-sessions &>/dev/null
