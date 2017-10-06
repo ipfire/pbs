@@ -12,9 +12,6 @@ class Object(object):
 	def __init__(self, backend, *args, **kwargs):
 		self.backend = backend
 
-		# Shortcut to the database.
-		self.db = self.backend.db
-
 		# Shortcut to settings.
 		if hasattr(self.pakfire, "settings"):
 			self.settings = self.backend.settings
@@ -27,6 +24,13 @@ class Object(object):
 			Custom constructor to be overwritten by inheriting class
 		"""
 		pass
+
+	@lazy_property
+	def db(self):
+		"""
+			Shortcut to database
+		"""
+		return self.backend.db
 
 	@lazy_property
 	def pakfire(self):

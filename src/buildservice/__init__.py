@@ -27,6 +27,7 @@ from . import updates
 from . import uploads
 from . import users
 
+from .decorators import *
 from .constants import *
 
 class Backend(object):
@@ -35,7 +36,6 @@ class Backend(object):
 		self.config = self.read_config(config_file)
 
 		# Connect to databases.
-		self.db = self.connect_database()
 		self.geoip_db = self.connect_database("geoip-database")
 
 		# Global pakfire settings (from database).
@@ -65,16 +65,15 @@ class Backend(object):
 		# A pool to store strings (for comparison).
 		self.pool        = pakfire.satsolver.Pool("dummy")
 
-	def __del__(self):
-		if self.db:
-			self.db.close()
-			del self.db
-
 	def read_config(self, path):
 		c = ConfigParser.SafeConfigParser()
 		c.read(path)
 
 		return c
+
+	@lazy_property
+	def db(self):
+		return self.connect_database()
 
 	def connect_database(self, section="database"):
 		db = self.config.get(section, "db")
