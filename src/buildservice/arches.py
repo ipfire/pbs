@@ -62,26 +62,11 @@ class Arches(base.Object):
 		return sorted([self.get_by_id(a.id) for a in self.db.query(query, *args)])
 
 
-class Arch(base.Object):
-	def __init__(self, pakfire, id, data=None):
-		base.Object.__init__(self, pakfire)
-
-		# The ID of this architecture.
-		self.id = id
-
-		# Cache data.
-		self._data = data
+class Arch(base.DataObject):
+	table = "arches"
 
 	def __cmp__(self, other):
 		return cmp(self.prio, other.prio)
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM arches WHERE id = %s", self.id)
-			assert self._data
-
-		return self._data
 
 	@property
 	def name(self):
