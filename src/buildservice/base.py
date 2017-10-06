@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-
 class Object(object):
 	"""
 		Main object where all other objects inherit from.
@@ -8,7 +7,7 @@ class Object(object):
 		This is used to access the global instance of Pakfire
 		and hold the database connection.
 	"""
-	def __init__(self, pakfire):
+	def __init__(self, pakfire, *args, **kwargs):
 		self.pakfire = pakfire
 
 		# Shortcut to the database.
@@ -20,6 +19,15 @@ class Object(object):
 
 		# Private cache.
 		self._cache = None
+
+		# Call custom constructor
+		self.init(*args, **kwargs)
+
+	def init(self, *args, **kwargs):
+		"""
+			Custom constructor to be overwritten by inheriting class
+		"""
+		pass
 
 	@property
 	def cache(self):
