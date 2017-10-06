@@ -40,10 +40,6 @@ class Object(object):
 		"""
 		return self.backend
 
-	@property
-	def geoip(self):
-		return self.backend.geoip
-
 
 class DataObject(Object):
 	# Table name

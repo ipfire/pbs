@@ -58,7 +58,8 @@ AM_V_XSLT_0 = @echo "  XSLT    " $@;
 # ------------------------------------------------------------------------------
 
 dist_doc_DATA = \
-	COPYING
+	COPYING \
+	README
 
 # ------------------------------------------------------------------------------
 
@@ -84,6 +85,7 @@ buildservice_PYTHON = \
 	src/buildservice/database.py \
 	src/buildservice/decorators.py \
 	src/buildservice/distribution.py \
+	src/buildservice/geoip.py \
 	src/buildservice/git.py \
 	src/buildservice/keys.py \
 	src/buildservice/logs.py \
@@ -417,6 +419,14 @@ dist_cron_DATA = \
 	src/crontab/pakfire-build-service
 
 crondir = $(sysconfdir)/cron.d
+
+dist_geoip_DATA = \
+	src/geoip/GeoLite2-Country.mmdb
+
+geoipdir = $(datadir)/geoip
+
+EXTRA_DIST += \
+	src/tools/update-geoip-database.sh
 
 # ------------------------------------------------------------------------------
 

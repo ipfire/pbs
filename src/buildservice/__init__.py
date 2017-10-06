@@ -14,6 +14,7 @@ from . import builds
 from . import cache
 from . import database
 from . import distribution
+from . import geoip
 from . import keys
 from . import logs
 from . import messages
@@ -38,16 +39,13 @@ class Backend(object):
 		# Read configuration file.
 		self.config = self.read_config(config_file)
 
-		# Connect to databases.
-		self.geoip_db = self.connect_database("geoip-database")
-
 		# Global pakfire settings (from database).
 		self.settings = settings.Settings(self)
 
 		self.arches      = arches.Arches(self)
 		self.builds      = builds.Builds(self)
 		self.cache       = cache.Cache(self)
-		self.geoip       = mirrors.GeoIP(self)
+		self.geoip       = geoip.GeoIP(self)
 		self.jobs        = builds.Jobs(self)
 		self.builders    = builders.Builders(self)
 		self.distros     = distribution.Distributions(self)

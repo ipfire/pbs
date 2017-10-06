@@ -95,23 +95,9 @@
 		</div>
 
 		<div class="span6">
-			{% if mirror.longitude and mirror.latitude %}
-				<iframe width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
-					src="http://www.openstreetmap.org/export/embed.html?bbox={{ mirror.longitude - 4 }},{{ mirror.latitude - 4 }},{{ mirror.longitude + 4 }},{{ mirror.latitude + 4 }}&amp;layer=mapquest&amp;marker={{ mirror.latitude }},{{ mirror.longitude }}" style="border: 1px solid black">
-				</iframe>
-				<p>
-					<a href="http://www.openstreetmap.org/?lat={{ mirror.latitude }}&amp;lon={{ mirror.longitude }}&amp;zoom=8&amp;layers=M&amp;mlat={{ mirror.latitude }}&amp;mlon={{ mirror.longitude }}" target="_blank">{{ _("View larger map") }}</a>
-					-
-					&copy; <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors, CC-BY-SA
-				</p>
-				<p class="muted">
-					{{ _("The location of the mirror server is estimated by the IP address.") }}
-				</p>
-			{% else %}
-				<p class="muted">
-					{{ _("The location of the mirror server could not be estimated.") }}
-				</p>
-			{% end %}
+			<p class="muted">
+				{{ _("The location of the mirror server could not be estimated.") }}
+			</p>
 		</div>
 	</div>
 

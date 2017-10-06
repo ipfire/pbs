@@ -5,11 +5,3 @@ host  = mysql-master.ipfire.org
 user  = pakfire
 pass  = pakfire
 db    = pakfire
-
-[geoip-database]
-; Credentials to the geoip database.
-
-host  = mysql-master.ipfire.org
-user  = pakfire
-pass  = pakfire
-db    = geoip

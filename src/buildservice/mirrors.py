@@ -7,47 +7,7 @@ import socket
 from . import base
 from . import logs
 
-class GeoIP(object):
-	def __init__(self, pakfire):
-		self.pakfire = pakfire
-
-		self.db = self.pakfire.geoip_db
-
-	def __encode_ip(self, addr):
-		# We get a tuple if there were proxy headers.
-		addr = addr.split(", ")
-		if addr:
-			addr = addr[-1]
-
-		# ip is calculated as described in http://dev.maxmind.com/geoip/csv
-		try:
-			a1, a2, a3, a4 = addr.split(".")
-
-			a1 = int(a1)
-			a2 = int(a2)
-			a3 = int(a3)
-			a4 = int(a4)
-		except:
-			return 0
-
-		return (16777216 * a1) + (65536 * a2) + (256 * a3) + a4
-
-	def get_all(self, addr):
-		addr = self.__encode_ip(addr)
-
-		ret = self.db.get("\
-			SELECT * FROM locations \
-				JOIN addresses ON addresses.location = locations.id \
-			WHERE \
-				%s BETWEEN addresses.start_ip_num AND addresses.end_ip_num \
-			LIMIT 1", addr)
-
-		# If location was not determinable
-		if ret and ret.latitude == 0 and ret.longitude == 0:
-			return None
-
-		return ret
-
+from .decorators import lazy_property
 
 class Mirrors(base.Object):
 	def get_all(self):
@@ -104,28 +64,23 @@ class Mirrors(base.Object):
 		return Mirror(self.pakfire, mirror.id)
 
 	def get_for_location(self, addr):
-		distance = 10
+		country_code = self.backend.geoip.guess_from_address(addr)
 
-		# Get all mirrors in here.
-		_mirrors = self.get_all()
+		# Cannot return any good mirrors if location is unknown
+		if not country_code:
+			return []
 
 		mirrors = []
-		while len(mirrors) <= 2 and distance <= 270:
-			for mirror in _mirrors:
-				if not mirror.enabled:
-					continue
 
-				if mirror in mirrors:
-					continue
+		# Walk through all mirrors
+		for mirror in self.get_all():
+			if not mirror.enabled:
+				continue
 
-				# Cannot calc the distance for mirrors when their location is unknown.
-				if mirror.location is None:
-					continue
+			if mirror.country_code == country_code:
+				mirrors.append(mirror)
 
-				if mirror.distance_to(addr) <= distance:
-					mirrors.append(mirror)
-
-			distance *= 1.2
+			# XXX needs to search for nearby countries
 
 		return mirrors
 
@@ -307,52 +262,9 @@ class Mirror(base.Object):
 	def address(self):
 		return socket.gethostbyname(self.hostname)
 
-	@property
-	def location(self):
-		if self._location is None:
-			self._location = self.geoip.get_all(self.address)
-
-		return self._location
-
-	@property
+	@lazy_property
 	def country_code(self):
-		if self.location:
-			return self.location.country_code
-			
-		return "UNKNOWN"
-
-	@property
-	def latitude(self):
-		if self.location:
-			return self.location.latitude
-
-		return 0
-
-	@property
-	def longitude(self):
-		if self.location:
-			return self.location.longitude
-
-		return 0
-
-	def distance_to(self, addr):
-		location = self.geoip.get_all(addr)
-		if not location:
-			return 0
-
-		#if location.country_code.lower() in self.prefer_for_countries:
-		#	return 0
-
-		distance_vector = (
-			self.latitude - location.latitude,
-			self.longitude - location.longitude
-		)
-
-		distance = 0
-		for i in distance_vector:
-			distance += i**2
-
-		return math.sqrt(distance)
+		return self.backend.geoip.guess_from_address(self.address) or "UNKNOWN"
 
 	def get_history(self, *args, **kwargs):
 		kwargs["mirror"] = self
