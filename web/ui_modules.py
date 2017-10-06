@@ -8,7 +8,6 @@ import math
 import pytz
 import re
 import string
-import textile
 import tornado.escape
 import tornado.web
 
@@ -90,7 +89,7 @@ class TextModule(UIModule):
 		if pre:
 			return "<pre>%s</pre>" % text
 
-		return textile.textile(text)
+		return text
 
 
 class CommitMessageModule(TextModule):
