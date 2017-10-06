@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import base
+from . import base
 
 class SessionsCleanupEvent(base.Event):
 	"""

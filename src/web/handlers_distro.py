@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
-from handlers_base import *
-
+from .handlers_base import *
 
 class DistributionListHandler(BaseHandler):
 	def get(self):

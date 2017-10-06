@@ -7,7 +7,7 @@ import os
 import shutil
 import tempfile
 
-import base
+from . import base
 
 def read_key(data):
 	data = str(data)

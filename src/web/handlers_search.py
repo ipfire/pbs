@@ -2,7 +2,7 @@
 
 import re
 
-from handlers_base import *
+from .handlers_base import *
 
 class SearchHandler(BaseHandler):
 	def get(self):

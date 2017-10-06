@@ -5,8 +5,8 @@ import logging
 import os
 import subprocess
 
-import base
-import sources
+from . import base
+from . import sources
 
 class Repo(base.Object):
 	def __init__(self, pakfire, id, mode="normal"):

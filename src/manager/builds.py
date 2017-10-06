@@ -7,12 +7,12 @@ import pakfire.config
 import shutil
 import tempfile
 
-import backend.builds
-import backend.git
+from .. import builds
+from .. import git
 
-import base
+from . import base
 
-from pakfire.constants import *
+from ..constants import *
 
 class BuildsFailedRestartEvent(base.Event):
 	# Run when idle.
@@ -160,7 +160,7 @@ class DistEvent(base.Event):
 			logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
 
 			# Get the repository of this commit.
-			repo = backend.git.Repo(self.pakfire, commit.source_id)
+			repo = git.Repo(self.pakfire, commit.source_id)
 
 			# Make sure, it is checked out.
 			if not repo.cloned:
@@ -196,7 +196,7 @@ class DistEvent(base.Event):
 				continue
 
 			# Initialize the repository or and clone it if necessary.
-			repo = backend.git.Repo(self.pakfire, source.id)
+			repo = git.Repo(self.pakfire, source.id)
 			if not repo.cloned:
 				repo.clone()
 
@@ -250,7 +250,7 @@ class DistFileEvent(base.Event):
 				# Import all packages in one swoop.
 				for pkg in pkgs:
 					# Import the package file and create a build out of it.
-					backend.builds.import_from_package(_pakfire, pkg,
+					builds.import_from_package(_pakfire, pkg,
 						distro=source.distro, commit=commit, type="release")
 
 			except:

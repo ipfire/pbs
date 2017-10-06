@@ -2,8 +2,7 @@
 
 import tornado.web
 
-from handlers_base import BaseHandler
-
+from .handlers_base import BaseHandler
 
 class JobsIndexHandler(BaseHandler):
 	def get(self):

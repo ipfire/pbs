@@ -2,18 +2,18 @@
 
 import tornado.web
 
-from handlers_auth import *
-from handlers_base import *
-from handlers_builds import *
-from handlers_builders import *
-from handlers_distro import *
-from handlers_jobs import *
-from handlers_keys import *
-from handlers_mirrors import *
-from handlers_packages import *
-from handlers_search import *
-from handlers_updates import *
-from handlers_users import *
+from .handlers_auth import *
+from .handlers_base import *
+from .handlers_builds import *
+from .handlers_builders import *
+from .handlers_distro import *
+from .handlers_jobs import *
+from .handlers_keys import *
+from .handlers_mirrors import *
+from .handlers_packages import *
+from .handlers_search import *
+from .handlers_updates import *
+from .handlers_users import *
 
 class IndexHandler(BaseHandler):
 	def get(self):

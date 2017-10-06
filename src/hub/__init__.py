@@ -7,8 +7,9 @@ import tornado.locale
 import tornado.options
 import tornado.web
 
-import backend
-import handlers
+from .. import Pakfire
+
+from . import handlers
 
 BASEDIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
@@ -81,7 +82,7 @@ class Application(tornado.web.Application):
 		if self.__pakfire is None:
 			config_file = os.path.join(BASEDIR, "..", "pbs.conf")
 
-			self.__pakfire = backend.Pakfire(config_file=config_file)
+			self.__pakfire = Pakfire(config_file=config_file)
 
 		return self.__pakfire
 

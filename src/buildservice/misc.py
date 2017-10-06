@@ -9,7 +9,7 @@ import tarfile
 
 from tornado.escape import xhtml_escape
 
-from constants import *
+from .constants import *
 
 def format_size(s):
 	units = ("B", "k", "M", "G", "T")

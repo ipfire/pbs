@@ -7,7 +7,7 @@ import tornado.locale
 
 from email.mime.text import MIMEText
 
-import base
+from . import base
 
 class Messages(base.Object):
 	def add(self, to, subject, text, frm=None):

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import base
+from . import base
 
 class Arches(base.Object):
 	def get_all(self, really=False):

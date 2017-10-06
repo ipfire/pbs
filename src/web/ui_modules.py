@@ -11,8 +11,8 @@ import string
 import tornado.escape
 import tornado.web
 
-import backend.users
-from backend.constants import *
+from .. import users
+from ..constants import *
 
 class UIModule(tornado.web.UIModule):
 	@property
@@ -438,7 +438,7 @@ class LogEntryCommentModule(LogEntryModule):
 
 class MaintainerModule(UIModule):
 	def render(self, maintainer):
-		if isinstance(maintainer, backend.users.User):
+		if isinstance(maintainer, users.User):
 			type = "user"
 		else:
 			type = "string"

@@ -2,8 +2,8 @@
 
 import time
 
-import base
-import cache
+from . import base
+from . import cache
 
 class Settings(base.Object):
 	def __init__(self, pakfire):

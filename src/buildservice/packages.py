@@ -8,14 +8,13 @@ import shutil
 import pakfire
 import pakfire.packages as packages
 
-import arches
-import base
-import builds
-import database
-import misc
-import sources
+from . import arches
+from . import base
+from . import database
+from . import misc
+from . import sources
 
-from constants import *
+from .constants import *
 
 class Packages(base.Object):
 	def get_all_names(self, public=None, user=None, states=None):
@@ -471,7 +470,7 @@ class Package(base.Object):
 			WHERE type = 'release' AND pkg_id = %s", self.id)
 
 		if build:
-			return builds.Build(self.pakfire, build.id)
+			return self.pakfire.builds.get_by_id(build.id)
 
 	@property
 	def job(self):
@@ -480,7 +479,7 @@ class Package(base.Object):
 				WHERE pkg_id = %s", self.id)
 
 			if job:
-				self._job = builds.Job(self.pakfire, job.id)
+				self._job = self.pakfire.jobs.get_by_id(job.id)
 
 		return self._job
 

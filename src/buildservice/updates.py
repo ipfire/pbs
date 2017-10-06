@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-import base
-import builds
-import distribution
+from . import base
 
 class Updates(base.Object):
 	def __init__(self, pakfire):

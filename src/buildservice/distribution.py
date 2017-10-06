@@ -2,14 +2,14 @@
 
 import logging
 
-import arches
-import base
-import builds
-import packages
-import sources
-import updates
+from . import arches
+from . import base
+from . import builds
+from . import packages
+from . import sources
+from . import updates
 
-from repository import Repository, RepositoryAux
+from .repository import Repository, RepositoryAux
 
 class Distributions(base.Object):
 	def get_all(self):

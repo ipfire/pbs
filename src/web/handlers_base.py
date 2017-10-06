@@ -10,8 +10,7 @@ import tornado.locale
 import tornado.web
 import traceback
 
-import backend
-import backend.misc
+from .. import misc
 
 class BaseHandler(tornado.web.RequestHandler):
 	@property
@@ -90,10 +89,10 @@ class BaseHandler(tornado.web.RequestHandler):
 			"bugtracker"      : self.pakfire.bugzilla,
 			"hostname"        : self.request.host,
 			"format_date"     : self.format_date,
-			"format_size"     : backend.misc.format_size,
-			"friendly_time"   : backend.misc.friendly_time,
-			"format_email"    : backend.misc.format_email,
-			"format_filemode" : backend.misc.format_filemode,
+			"format_size"     : misc.format_size,
+			"friendly_time"   : misc.friendly_time,
+			"format_email"    : misc.format_email,
+			"format_filemode" : misc.format_filemode,
 			"lang"            : self.locale.code[:2],
 			"pakfire_version" : pakfire.__version__,
 			"session"         : session,

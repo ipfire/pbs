@@ -2,10 +2,8 @@
 
 import os.path
 
-import base
-import builds
-import logs
-import packages
+from . import base
+from . import logs
 
 class Repositories(base.Object):
 	def get_all(self):
@@ -326,7 +324,7 @@ class Repository(base.Object):
 
 		_builds = []
 		for build in self.db.query(query, *args):
-			build = builds.Build(self.pakfire, build.id)
+			build = self.pakfire.builds.get_by_id(build.id)
 			build._repo = self
 
 			_builds.append(build)
@@ -357,7 +355,7 @@ class Repository(base.Object):
 		return pkgs
 
 	def get_packages(self, arch):
-		pkgs =  [packages.Package(self.pakfire, p.id) for p in self._get_packages(arch)]
+		pkgs =  [self.pakfire.packages.get_by_id(p.id) for p in self._get_packages(arch)]
 		pkgs.sort()
 
 		return pkgs
@@ -380,7 +378,7 @@ class Repository(base.Object):
 
 		ret = []
 		for row in query:
-			b = builds.Build(self.pakfire, row.build_id)
+			b = self.pakfire.builds.get_by_id(row.build_id)
 			ret.append(b)
 
 		return ret

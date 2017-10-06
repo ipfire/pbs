@@ -2,8 +2,8 @@
 
 import uuid
 
-import base
-import users
+from . import base
+from . import users
 
 class Sessions(base.Object):
 	def get(self, session_id):

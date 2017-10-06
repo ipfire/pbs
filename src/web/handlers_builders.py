@@ -2,9 +2,9 @@
 
 import tornado.web
 
-import backend
+from .. import builders
 
-from handlers_base import *
+from .handlers_base import *
 
 class BuilderListHandler(BaseHandler):
 	def get(self):
@@ -52,7 +52,7 @@ class BuilderNewHandler(BaseHandler):
 
 		# Create a new builder.
 		builder, passphrase = \
-			backend.builders.Builder.create(self.pakfire, name, user=self.current_user)
+			builders.Builder.create(self.pakfire, name, user=self.current_user)
 
 		self.render("builders/pass.html", action="new", builder=builder,
 			passphrase=passphrase)

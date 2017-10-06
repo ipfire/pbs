@@ -4,9 +4,9 @@ import logging
 import os
 import pakfire
 
-import base
+from . import base
 
-from backend.constants import *
+from ..constants import *
 
 class RepositoriesUpdateEvent(base.Event):
 	priority = 6

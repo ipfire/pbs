@@ -5,7 +5,7 @@ import datetime
 import tornado.locale
 import tornado.web
 
-from handlers_base import *
+from .handlers_base import *
 
 class UserHandler(BaseHandler):
 	@tornado.web.authenticated

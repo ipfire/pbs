@@ -10,7 +10,7 @@ import urllib
 
 import tornado.locale
 
-import base
+from . import base
 
 # A list of possible random characters.
 random_chars = string.ascii_letters + string.digits

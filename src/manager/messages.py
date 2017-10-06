@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import base
+from . import base
 
 class MessagesSendEvent(base.Event):
 	# Emails should be sent out as quickly as possible.

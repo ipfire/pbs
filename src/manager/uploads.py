@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import base
+from . import base
 
 class UploadsCleanupEvent(base.Event):
 	interval = 3600

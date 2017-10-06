@@ -4,8 +4,8 @@ import logging
 import math
 import socket
 
-import base
-import logs
+from . import base
+from . import logs
 
 class GeoIP(object):
 	def __init__(self, pakfire):

@@ -2,8 +2,7 @@
 
 import os
 
-import base
-import builds
+from . import base
 
 _ = lambda x: x
 

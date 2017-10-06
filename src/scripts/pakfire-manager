@@ -1,9 +1,7 @@
 #!/usr/bin/python
 
-import backend.main
-import backend.scheduler
-
-import manager
+import pakfire.buildservice
+import pakfire.buildservice.manager
 
 # Use tornado's logging options.
 import tornado.options
@@ -12,23 +10,23 @@ tornado.options.parse_command_line()
 # main
 
 # Create Scheduler instance.
-s = backend.scheduler.Scheduler()
+s = pakfire.buildservice.scheduler.Scheduler()
 
 # Create Pakfire instance.
-p = backend.main.Pakfire()
+p = pakfire.buildservice.Pakfire()
 
 events = (
-	manager.BugsUpdateEvent,
-	manager.BuildsFailedRestartEvent,
-	manager.CheckBuildDependenciesEvent,
-	manager.CleanupFilesEvent,
-	manager.CreateTestBuildsEvent,
-	manager.DistEvent,
-	manager.MessagesSendEvent,
-	manager.RepositoriesUpdateEvent,
-	manager.SessionsCleanupEvent,
-	manager.SourcesPullEvent,
-	manager.UploadsCleanupEvent,
+	pakfire.buildservice.manager.BugsUpdateEvent,
+	pakfire.buildservice.manager.BuildsFailedRestartEvent,
+	pakfire.buildservice.manager.CheckBuildDependenciesEvent,
+	pakfire.buildservice.manager.CleanupFilesEvent,
+	pakfire.buildservice.manager.CreateTestBuildsEvent,
+	pakfire.buildservice.manager.DistEvent,
+	pakfire.buildservice.manager.MessagesSendEvent,
+	pakfire.buildservice.manager.RepositoriesUpdateEvent,
+	pakfire.buildservice.manager.SessionsCleanupEvent,
+	pakfire.buildservice.manager.SourcesPullEvent,
+	pakfire.buildservice.manager.UploadsCleanupEvent,
 )
 
 # Add all events to the scheduler.

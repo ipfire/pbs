@@ -12,15 +12,15 @@ import pakfire
 import pakfire.config
 import pakfire.packages
 
-import base
-import builders
-import logs
-import packages
-import repository
-import updates
-import users
+from . import base
+from . import builders
+from . import logs
+from . import packages
+from . import repository
+from . import updates
+from . import users
 
-from constants import *
+from .constants import *
 
 def import_from_package(_pakfire, filename, distro=None, commit=None, type="release",
 		arches=None, check_for_duplicates=True, owner=None):

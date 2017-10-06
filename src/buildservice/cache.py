@@ -3,7 +3,7 @@
 import logging
 import memcache
 
-import base
+from . import base
 
 class Client(memcache.Client):
 	def debuglog(self, str):

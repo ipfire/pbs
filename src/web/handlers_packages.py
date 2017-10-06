@@ -4,9 +4,9 @@ import mimetypes
 import os.path
 import tornado.web
 
-from handlers_base import BaseHandler
+from .handlers_base import BaseHandler
 
-from backend.constants import BUFFER_SIZE
+from ..constants import BUFFER_SIZE
 
 class PackageIDDetailHandler(BaseHandler):
 	def get(self, id):

@@ -2,7 +2,7 @@
 
 import logging
 
-import base
+from . import base
 
 class BugsUpdateEvent(base.Event):
 	# User feedback gets a high priority.

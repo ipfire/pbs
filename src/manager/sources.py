@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-import backend.git
+from .. import git
 
-import base
+from . import base
 
 class SourcesPullEvent(base.Event):
 	# This should run whenever possible, so the user can see his commits
@@ -15,7 +15,7 @@ class SourcesPullEvent(base.Event):
 
 	def run(self):
 		for source in self.pakfire.sources.get_all():
-			repo = backend.git.Repo(self.pakfire, source.id, mode="mirror")
+			repo = git.Repo(self.pakfire, source.id, mode="mirror")
 
 			# If the repository is not yet cloned, we need to make a local
 			# clone to work with.

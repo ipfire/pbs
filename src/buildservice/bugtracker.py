@@ -2,7 +2,7 @@
 
 import xmlrpclib
 
-import base
+from . import base
 
 class BugzillaBug(base.Object):
 	def __init__(self, bugzilla, bug_id):

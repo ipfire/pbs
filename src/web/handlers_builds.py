@@ -2,7 +2,7 @@
 
 import tornado.web
 
-from handlers_base import BaseHandler
+from .handlers_base import BaseHandler
 
 class BuildsHandler(BaseHandler):
 	def get(self):

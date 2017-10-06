@@ -2,10 +2,9 @@
 
 import tornado.web
 
-import backend.sessions
-import backend.users
+from .. import sessions
 
-from handlers_base import *
+from .handlers_base import *
 
 class LoginHandler(BaseHandler):
 	def get(self):
@@ -25,7 +24,7 @@ class LoginHandler(BaseHandler):
 
 		if user:
 			# Create a new session for the user.
-			session = backend.sessions.Session.create(self.pakfire, user)
+			session = sessions.Session.create(self.pakfire, user)
 
 			# Set a cookie and update the current user.
 			self.set_cookie("session_id", session.id, expires=session.valid_until)
@@ -114,7 +113,7 @@ class ActivationHandler(BaseHandler):
 
 			else:
 				# Automatically login the user.
-				session = backend.sessions.Session.create(self.pakfire, user)
+				session = sessions.Session.create(self.pakfire, user)
 
 				# Set a cookie and update the current user.
 				self.set_cookie("session_id", session.id, expires=session.valid_until)

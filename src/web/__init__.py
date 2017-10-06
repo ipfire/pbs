@@ -9,10 +9,10 @@ import tornado.locale
 import tornado.options
 import tornado.web
 
-from handlers import *
-from ui_modules import *
+from . import handlers_api
 
-import handlers_api
+from .handlers import *
+from .ui_modules import *
 
 BASEDIR = os.path.join(os.path.dirname(__file__), "..", "data")
 

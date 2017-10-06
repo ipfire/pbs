@@ -5,10 +5,8 @@ import logging
 import os
 import subprocess
 
-import base
-import builds
-import database
-import packages
+from . import base
+from . import database
 
 class Sources(base.Object):
 	def get_all(self):
@@ -153,7 +151,7 @@ class Commit(base.Object):
 			self._packages = []
 
 			for pkg in self.db.query("SELECT id FROM packages WHERE commit_id = %s", self.id):
-				pkg = packages.Package(self.pakfire, pkg.id)
+				pkg = self.pakfire.packages.get_by_id(pkg.id)
 				self._packages.append(pkg)
 
 			self._packages.sort()

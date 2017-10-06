@@ -11,11 +11,11 @@ import uuid
 
 import pakfire.packages
 
-import base
-import misc
-import packages
+from . import base
+from . import misc
+from . import packages
 
-from constants import *
+from .constants import *
 
 class Uploads(base.Object):
 	def get_by_uuid(self, _uuid):

@@ -2,9 +2,9 @@
 
 import tornado.web
 
-import backend
+from .. import mirrors
 
-from handlers_base import BaseHandler
+from .handlers_base import BaseHandler
 
 class MirrorListHandler(BaseHandler):
 	def get(self):
@@ -77,7 +77,7 @@ class MirrorNewHandler(MirrorActionHandler):
 			})
 			return self.get(**errors)
 
-		mirror = backend.mirrors.Mirror.create(self.pakfire, hostname, path,
+		mirror = mirrors.Mirror.create(self.pakfire, hostname, path,
 			user=self.current_user)
 		assert mirror
 

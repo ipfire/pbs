@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-import backend.scheduler
+from .. import scheduler
 
-class Event(backend.scheduler.Event):
+class Event(scheduler.Event):
 	def __init__(self, pakfire, *args, **kwargs):
-		backend.scheduler.Event.__init__(self, *args, **kwargs)
+		scheduler.Event.__init__(self, *args, **kwargs)
 
 		self.pakfire = pakfire
 

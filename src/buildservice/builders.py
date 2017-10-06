@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from __future__ import division
+from __future__ import absolute_import, division
 
 import datetime
 import hashlib
@@ -9,10 +9,10 @@ import random
 import string
 import time
 
-import base
-import logs
+from . import base
+from . import logs
 
-from users import generate_password_hash, check_password_hash, generate_random_string
+from .users import generate_password_hash, check_password_hash, generate_random_string
 
 class Builders(base.Object):
 	def auth(self, name, passphrase):

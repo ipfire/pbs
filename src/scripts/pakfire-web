@@ -7,8 +7,7 @@ import sys
 
 import tornado.options
 
-from web import Application
-
+from pakfire.buildservice.web import Application
 
 #tornado.options.parse_command_line()
 

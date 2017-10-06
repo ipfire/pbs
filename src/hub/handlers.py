@@ -1,13 +1,16 @@
 #!/usr/bin/python
 
-import backend
-
 import base64
 import hashlib
 import json
 import logging
 import time
 import tornado.web
+
+from .. import builds
+from .. import builders
+from .. import uploads
+from .. import users
 
 class LongPollMixin(object):
 	def initialize(self):
@@ -76,12 +79,12 @@ class BaseHandler(LongPollMixin, tornado.web.RequestHandler):
 
 	@property
 	def builder(self):
-		if isinstance(self.current_user, backend.builders.Builder):
+		if isinstance(self.current_user, builders.Builder):
 			return self.current_user
 
 	@property
 	def user(self):
-		if isinstance(self.current_user, backend.users.User):
+		if isinstance(self.current_user, users.User):
 			return self.current_user
 
 	def get_argument_int(self, *args, **kwargs):
@@ -207,7 +210,7 @@ class UploadsCreateHandler(BaseHandler):
 		filesize = self.get_argument_int("filesize")
 		filehash = self.get_argument("hash")
 
-		upload = backend.uploads.Upload.create(self.backend, filename, filesize,
+		upload = uploads.Upload.create(self.backend, filename, filesize,
 			filehash, user=self.user, builder=self.builder)
 
 		self.finish(upload.uuid)
@@ -341,7 +344,7 @@ class BuildsCreateHandler(BaseHandler):
 			args["owner"] = self.user
 
 		try:
-			pkg, build = backend.builds.import_from_package(self.backend, upload.path, **args)
+			pkg, build = builds.import_from_package(self.backend, upload.path, **args)
 
 		except:
 			# Raise any exception.
@@ -512,7 +515,7 @@ class PackagesGetHandler(BaseHandler):
 		if pkg.type == "source":
 			ret["supported_arches"] = pkg.supported_arches
 
-		if isinstance(pkg.maintainer, backend.users.User):
+		if isinstance(pkg.maintainer, users.User):
 			ret["maintainer"] = "%s <%s>" % (pkg.maintainer.realname, pkg.maintainer.email)
 		elif pkg.maintainer:
 			ret["maintainer"] = pkg.maintainer
