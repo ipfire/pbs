@@ -5,41 +5,45 @@ import memcache
 
 from . import base
 
+from .decorators import *
+
+log = logging.getLogger("cache")
+log.propagate = 1
+
 class Client(memcache.Client):
 	def debuglog(self, str):
-		logging.debug("MemCached: %s" % str)
+		log.debug(str)
 
 
 class Cache(base.Object):
 	key_prefix = "pbs_"
 
-	def __init__(self, pakfire):
-		base.Object.__init__(self, pakfire)
-
-		logging.info("Initializing memcache...")
-
-		# Fetching servers from the database configuration.
+	@property
+	def servers(self):
 		servers = self.settings.get("memcache_servers", "")
-		self.servers = servers.split()
 
-		logging.info("  Using servers: %s" % ", ".join(self.servers))
+		return servers.split()
 
-		self._memcache = Client(self.servers, debug=1)
+	@lazy_property
+	def _cache(self):
+		logging.debug("Connecting to memcache...")
+
+		return Client(self.servers, debug=1)
 
 	def get(self, key):
-		logging.debug("Querying memcache for: %s" % key)
+		log.debug("Querying for: %s" % key)
 
 		key = "".join((self.key_prefix, key))
 
-		return self._memcache.get(key)
+		return self._cache.get(key)
 
 	def set(self, key, val, time=60, min_compress_len=0):
 		key = "".join((self.key_prefix, key))
 
-		return self._memcache.set(key, val, time=time,
+		return self._cache.set(key, val, time=time,
 			min_compress_len=min_compress_len)
 
 	def delete(self, key, time=0):
 		key = "".join((self.key_prefix, key))
 
-		return self._memcache.delete(key, time=time)
+		return self._cache.delete(key, time=time)
