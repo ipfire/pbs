@@ -72,6 +72,8 @@ dist_configs_DATA = \
 	pbs.conf.sample
 
 buildservice_PYTHON = \
+	src/buildservice/__init__.py \
+	src/buildservice/__version__.py \
 	src/buildservice/arches.py \
 	src/buildservice/base.py \
 	src/buildservice/bugtracker.py \
@@ -83,7 +85,6 @@ buildservice_PYTHON = \
 	src/buildservice/decorators.py \
 	src/buildservice/distribution.py \
 	src/buildservice/git.py \
-	src/buildservice/__init__.py \
 	src/buildservice/keys.py \
 	src/buildservice/logs.py \
 	src/buildservice/messages.py \

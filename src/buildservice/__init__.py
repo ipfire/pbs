@@ -27,6 +27,9 @@ from . import updates
 from . import uploads
 from . import users
 
+# Import version
+from .__version__ import VERSION as __version__
+
 from .decorators import *
 from .constants import *
 
