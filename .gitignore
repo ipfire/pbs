@@ -4,6 +4,7 @@
 /missing
 /src/buildservice/__version__.py
 /tmp
+/.vscode
 *.py[co]
 /*.tar.bz2
 /*.tar.gz
