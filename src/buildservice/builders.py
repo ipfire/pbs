@@ -12,6 +12,8 @@ import time
 from . import base
 from . import logs
 
+from .decorators import *
+
 from .users import generate_password_hash, check_password_hash, generate_random_string
 
 class Builders(base.Object):
@@ -117,30 +119,12 @@ class Builders(base.Object):
 		return entries
 
 
-class Builder(base.Object):
-	def __init__(self, pakfire, id, data=None):
-		base.Object.__init__(self, pakfire)
-
-		self.id = id
-
-		# Cache.
-		self._data = data
-		self._active_jobs = None
-		self._disabled_arches = None
-
+class Builder(base.DataObject):
 	def __cmp__(self, other):
 		if other is None:
 			return -1
 
 		return cmp(self.id, other.id)
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM builders WHERE id = %s", self.id)
-			assert self._data
-
-		return self._data
 
 	@classmethod
 	def create(cls, pakfire, name, user=None, log=True):
@@ -171,11 +155,6 @@ class Builder(base.Object):
 		self.db.execute("INSERT INTO builders_history(builder_id, action, user_id, time) \
 			VALUES(%s, %s, %s, NOW())", self.id, action, user_id)
 
-	def set(self, key, value):
-		self.db.execute("UPDATE builders SET %s = %%s WHERE id = %%s LIMIT 1" % key,
-			value, self.id)
-		self.data[key] = value
-
 	def regenerate_passphrase(self):
 		"""
 			Generates a new random passphrase and stores it as a salted hash
@@ -190,8 +169,7 @@ class Builder(base.Object):
 		passphrase_hash = generate_password_hash(passphrase)
 
 		# Store the hash in the database.
-		self.db.execute("UPDATE builders SET passphrase = %s WHERE id = %s",
-			passphrase_hash, self.id)
+		self._set_attribute("passphrase", passphrase_hash)
 
 		# Return the clear-text passphrase.
 		return passphrase
@@ -202,20 +180,16 @@ class Builder(base.Object):
 		"""
 		return check_password_hash(passphrase, self.data.passphrase)
 
-	@property
-	def description(self):
-		return self.data.description or ""
+	# Description
+
+	def set_description(self, description):
+		self._set_attribute("description", description)
+
+	description = property(lambda s: s.data.description or "", set_description)
 
 	@property
 	def status(self):
 		return self.data.status
-
-	def update_description(self, description):
-		self.db.execute("UPDATE builders SET description = %s, time_updated = NOW() \
-			WHERE id = %s", description, self.id)
-
-		if self._data:
-			self._data["description"] = description
 
 	@property
 	def keepalive(self):
@@ -303,29 +277,24 @@ class Builder(base.Object):
 		if self.status == status:
 			return
 
-		self.db.execute("UPDATE builders SET status = %s WHERE id = %s",
-			status, self.id)
-
-		if self._data:
-			self._data["status"] = status
+		self._set_attribute("status", status)
 
 		if log:
 			self.log(status, user=user)
 
-	@property
+	@lazy_property
 	def arches(self):
-		if not hasattr(self, "_arches"):
-			self._arches = []
+		if self.cpu_arch:
+			res = self.db.query("SELECT build_arch FROM arches_compat \
+				WHERE host_arch = %s", self.cpu_arch)
 
-			if self.cpu_arch:
-				res = self.db.query("SELECT build_arch FROM arches_compat \
-					WHERE host_arch = %s", self.cpu_arch)
+			arches += [r.build_arch for r in res]
+			if not self.cpu_arch in arches:
+				arches.append(self.cpu_arch)
 
-				self._arches += [r.build_arch for r in res]
-				if not self.cpu_arch in self._arches:
-					self._arches.append(self.cpu_arch)
+			return arches
 
-		return self._arches
+		return []
 
 	def get_build_release(self):
 		return self.data.build_release == "Y"
@@ -396,13 +365,10 @@ class Builder(base.Object):
 
 		return ret
 
-	def get_max_jobs(self):
-		return self.data.max_jobs
-
 	def set_max_jobs(self, value):
-		self.set("max_jobs", value)
+		self._set_attribute("max_jobs", value)
 
-	max_jobs = property(get_max_jobs, set_max_jobs)
+	max_jobs = property(lambda s: s.data.max_jobs, set_max_jobs)
 
 	@property
 	def name(self):
@@ -526,21 +492,16 @@ class Builder(base.Object):
 
 		return "online"
 
-	def get_active_jobs(self, *args, **kwargs):
-		if self._active_jobs is None:
-			self._active_jobs = self.pakfire.jobs.get_active(builder=self, *args, **kwargs)
-
-		return self._active_jobs
-
-	def count_active_jobs(self):
-		return len(self.get_active_jobs())
+	@lazy_property
+	def active_jobs(self, *args, **kwargs):
+		return self.pakfire.jobs.get_active(builder=self, *args, **kwargs)
 
 	@property
 	def too_many_jobs(self):
 		"""
 			Tell if this host is already running enough or too many jobs.
 		"""
-		return self.count_active_jobs() >= self.max_jobs
+		return len(self.active_jobs) >= self.max_jobs
 
 	def get_next_jobs(self, limit=None):
 		"""

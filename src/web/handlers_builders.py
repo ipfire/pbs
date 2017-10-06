@@ -33,8 +33,8 @@ class BuilderDetailHandler(BaseHandler):
 
 		builder = self.pakfire.builders.get_by_name(hostname)
 
-		description = self.get_argument("description", "")
-		builder.update_description(description)
+		with self.db.transaction():
+			builder.description = self.get_argument("description", None)
 
 		self.redirect("/builder/%s" % builder.hostname)
 
