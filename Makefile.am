@@ -63,6 +63,7 @@ dist_doc_DATA = \
 # ------------------------------------------------------------------------------
 
 dist_bin_SCRIPTS = \
+	src/scripts/pakfire-build-service \
 	src/scripts/pakfire-hub \
 	src/scripts/pakfire-manager \
 	src/scripts/pakfire-web

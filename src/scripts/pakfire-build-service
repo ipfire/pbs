@@ -1,0 +1,43 @@
+#!/usr/bin/python
+
+import sys
+
+# Use tornado's logging options
+import tornado.options
+tornado.options.parse_command_line()
+
+import pakfire.buildservice
+
+class Cli(object):
+	def __init__(self, *args, **kwargs):
+		# Initialise backend
+		self.backend = pakfire.buildservice.Backend(*args, **kwargs)
+
+		self._commands = {}
+
+	def __call__(self, *args):
+		if not len(args) >= 2:
+			print >>sys.stderr, "Insufficient number of arguments"
+			return 2
+
+		args = list(args)
+		basename = args.pop(0)
+		command  = args.pop(0)
+
+		# Get called command
+		try:
+			command = self._commands[command]
+		except KeyError:
+			print >>sys.stderr, "Command not found: %s" % command
+			return 2
+
+		# Execute command
+		r = command(*args)
+
+		# Exit with error code
+		sys.exit(r or 0)
+
+# main
+
+cli = Cli()
+cli(*sys.argv)
