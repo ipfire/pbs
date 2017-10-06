@@ -9,15 +9,15 @@ class Object(object):
 		This is used to access the global instance of Pakfire
 		and hold the database connection.
 	"""
-	def __init__(self, pakfire, *args, **kwargs):
-		self.pakfire = pakfire
+	def __init__(self, backend, *args, **kwargs):
+		self.backend = backend
 
 		# Shortcut to the database.
-		self.db = self.pakfire.db
+		self.db = self.backend.db
 
 		# Shortcut to settings.
 		if hasattr(self.pakfire, "settings"):
-			self.settings = self.pakfire.settings
+			self.settings = self.backend.settings
 
 		# Call custom constructor
 		self.init(*args, **kwargs)
@@ -28,9 +28,17 @@ class Object(object):
 		"""
 		pass
 
+	@lazy_property
+	def pakfire(self):
+		"""
+			DEPRECATED: This attribute is only kept until
+			all other code has been updated to use self.backend.
+		"""
+		return self.backend
+
 	@property
 	def geoip(self):
-		return self.pakfire.geoip
+		return self.backend.geoip
 
 
 class DataObject(Object):
