@@ -1,7 +1,0 @@
-[main]
-host = https://www.transifex.net
-
-[ipfire.pbs]
-file_filter = data/translations/<lang>/LC_MESSAGES/pakfire.po
-source_file = data/translations/pakfire.pot
-source_lang = en
