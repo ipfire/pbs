@@ -84,7 +84,6 @@ buildservice_PYTHON = \
 	src/buildservice/__init__.py \
 	src/buildservice/keys.py \
 	src/buildservice/logs.py \
-	src/buildservice/main.py \
 	src/buildservice/messages.py \
 	src/buildservice/mirrors.py \
 	src/buildservice/misc.py \
