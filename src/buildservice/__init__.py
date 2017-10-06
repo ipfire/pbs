@@ -29,7 +29,7 @@ from . import users
 
 from .constants import *
 
-class Pakfire(object):
+class Backend(object):
 	def __init__(self, config_file="pbs.conf"):
 		# Read configuration file.
 		self.config = self.read_config(config_file)

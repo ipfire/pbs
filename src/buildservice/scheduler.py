@@ -5,7 +5,7 @@ import multiprocessing
 import time
 import traceback
 
-from . import Pakfire
+from . import Backend
 
 class Event(object):
 	interval = None
@@ -50,9 +50,9 @@ class Event(object):
 	@staticmethod
 	def fork(method, *args, **kwargs):
 		# Create new pakfire instance.
-		_pakfire = Pakfire()
+		backend = Backend()
 
-		return method(_pakfire, *args, **kwargs)
+		return method(backend, *args, **kwargs)
 
 
 class Scheduler(object):
