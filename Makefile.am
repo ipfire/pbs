@@ -112,7 +112,6 @@ manager_PYTHON = \
 	src/manager/base.py \
 	src/manager/bugs.py \
 	src/manager/builds.py \
-	src/manager/messages.py \
 	src/manager/repositories.py \
 	src/manager/sessions.py \
 	src/manager/sources.py \
