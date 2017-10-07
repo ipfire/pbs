@@ -1135,7 +1135,7 @@ class Build(base.Object):
 	## Watchers stuff
 
 	def get_watchers(self):
-		query = self.db.query("SELECT DISTINCT user_id AS id FROM builds_watchers \
+		query = self.db.query("SELECT DISTINCT users.id AS id FROM builds_watchers \
 			JOIN users ON builds_watchers.user_id = users.id \
 			WHERE builds_watchers.build_id = %s AND NOT users.deleted = 'Y' \
 			AND users.activated = 'Y' ORDER BY users.id", self.id)
