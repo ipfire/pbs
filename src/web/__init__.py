@@ -260,9 +260,7 @@ class Application(tornado.web.Application):
 	@property
 	def pakfire(self):
 		if self.__pakfire is None:
-			config_file = os.path.join(BASEDIR, "..", "pbs.conf")
-
-			self.__pakfire = Backend(config_file=config_file)
+			self.__pakfire = Backend()
 
 		return self.__pakfire
 

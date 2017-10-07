@@ -28,6 +28,9 @@ from . import updates
 from . import uploads
 from . import users
 
+log = logging.getLogger("backend")
+log.propagate = 1
+
 # Import version
 from .__version__ import VERSION as __version__
 
@@ -35,7 +38,7 @@ from .decorators import *
 from .constants import *
 
 class Backend(object):
-	def __init__(self, config_file="pbs.conf"):
+	def __init__(self, config_file=None):
 		# Read configuration file.
 		self.config = self.read_config(config_file)
 
@@ -68,7 +71,19 @@ class Backend(object):
 
 	def read_config(self, path):
 		c = ConfigParser.SafeConfigParser()
-		c.read(path)
+
+		# Load default configuration file first
+		paths = [
+			os.path.join(CONFIGSDIR, "pbs.conf"),
+		]
+
+		if path:
+			paths.append(path)
+
+		# Load all configuration files
+		for path in paths:
+			log.debug("Loading configuration from %s" % path)
+			c.read(path)
 
 		return c
 
