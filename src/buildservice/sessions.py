@@ -29,7 +29,7 @@ class Sessions(base.Object):
 		"""
 		session_id = users.generate_random_string(48)
 
-		res = self.db.get("INSERT INTO session(session_id, user_id, address, user_agent) \
+		res = self.db.get("INSERT INTO sessions(session_id, user_id, address, user_agent) \
 			VALUES(%s, %s, %s, %s) RETURNING *", session_id, user.id, address, user_agent)
 
 		return Session(self.backend, res.id, data=res)
@@ -62,6 +62,10 @@ class Session(base.DataObject):
 
 	def destroy(self):
 		self.db.execute("DELETE FROM sessions WHERE id = %s", self.id)
+
+	@property
+	def session_id(self):
+		return self.data.session_id
 
 	@lazy_property
 	def user(self):
