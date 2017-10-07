@@ -22,7 +22,7 @@ tornado.options.define("debug", default=False, help="Run in debug mode", type=bo
 tornado.options.parse_command_line()
 
 class Application(tornado.web.Application):
-	def __init__(self):
+	def __init__(self, **_settings):
 		settings = dict(
 			debug = tornado.options.options.debug,
 			gzip  = True,
@@ -94,13 +94,12 @@ class Application(tornado.web.Application):
 			},
 			xsrf_cookies = True,
 		)
+		settings.update(_settings)
 
 		# Load translations.
 		tornado.locale.load_gettext_translations(LOCALEDIR, PACKAGE_NAME)
 
-		tornado.web.Application.__init__(self, **settings)
-
-		self.add_handlers(r".*", [
+		tornado.web.Application.__init__(self, [
 			# Entry site that lead the user to index
 			(r"/", IndexHandler),
 
@@ -239,7 +238,7 @@ class Application(tornado.web.Application):
 
 			# API handlers
 			(r"/api/packages/autocomplete", handlers_api.ApiPackagesAutocomplete),
-		])
+		], **settings)
 
 		logging.info("Successfully initialied application")
 
