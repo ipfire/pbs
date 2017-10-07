@@ -120,6 +120,8 @@ class Builders(base.Object):
 
 
 class Builder(base.DataObject):
+	table = "builders"
+
 	def __cmp__(self, other):
 		if other is None:
 			return -1

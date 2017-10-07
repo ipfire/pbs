@@ -50,6 +50,8 @@ class Sessions(base.Object):
 
 
 class Session(base.DataObject):
+	table = "sessions"
+
 	def __eq__(self, other):
 		if isinstance(other, self.__class__):
 			return self.id == other.id
