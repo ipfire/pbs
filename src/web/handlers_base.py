@@ -14,10 +14,6 @@ from .. import misc
 from ..decorators import *
 
 class BaseHandler(tornado.web.RequestHandler):
-	@property
-	def cache(self):
-		return self.pakfire.cache
-
 	@lazy_property
 	def session(self):
 		# Get the session from the cookie
