@@ -1770,6 +1770,21 @@ ALTER SEQUENCE queue_delete_id_seq OWNED BY queue_delete.id;
 
 
 --
+-- Name: relation_sizes; Type: VIEW; Schema: public; Owner: pakfire
+--
+
+CREATE VIEW relation_sizes AS
+ SELECT c.relname AS relation,
+    pg_size_pretty(pg_relation_size((c.oid)::regclass)) AS size
+   FROM (pg_class c
+     LEFT JOIN pg_namespace n ON ((n.oid = c.relnamespace)))
+  WHERE (n.nspname <> ALL (ARRAY['pg_catalog'::name, 'information_schema'::name]))
+  ORDER BY pg_relation_size((c.oid)::regclass) DESC;
+
+
+ALTER TABLE relation_sizes OWNER TO pakfire;
+
+--
 -- Name: repositories; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
