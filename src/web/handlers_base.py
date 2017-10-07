@@ -57,6 +57,13 @@ class BaseHandler(tornado.web.RequestHandler):
 		return self.request.headers.get("X-Real-IP") or self.request.remote_ip
 
 	@property
+	def user_agent(self):
+		"""
+			Returns the HTTP user agent
+		"""
+		return self.request.headers.get("User-Agent", None)
+
+	@property
 	def timezone(self):
 		if self.current_user:
 			return self.current_user.timezone
