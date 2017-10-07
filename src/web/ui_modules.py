@@ -60,7 +60,7 @@ class TextModule(UIModule):
 		return self.LINK % (self.cve_url % r"\3", r"\1\2\3")
 
 	def split_paragraphs(self, s):
-		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=unicode.isspace):
+		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=str.isspace):
 			if group_seperator:
 				continue
 
