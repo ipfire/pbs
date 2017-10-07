@@ -240,7 +240,7 @@ class RepositoryMirrorlistHandler(BaseHandler):
 				MAX_MIRRORS = num_mirrors
 
 
-			for mirror in self.mirrors.get_for_location(self.remote_address):
+			for mirror in self.mirrors.get_for_location(self.current_address):
 				mirrors.append({
 					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch.name)),
 					"location"  : mirror.country_code,

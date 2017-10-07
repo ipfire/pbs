@@ -9,7 +9,7 @@ from .handlers_base import BaseHandler
 class MirrorListHandler(BaseHandler):
 	def get(self):
 		mirrors = self.pakfire.mirrors.get_all()
-		mirrors_nearby = self.pakfire.mirrors.get_for_location(self.remote_address)
+		mirrors_nearby = self.pakfire.mirrors.get_for_location(self.current_address)
 
 		mirrors_worldwide = []
 		for mirror in mirrors:

@@ -50,7 +50,7 @@ class BaseHandler(tornado.web.RequestHandler):
 		return self.get_browser_locale()
 
 	@property
-	def remote_address(self):
+	def current_address(self):
 		"""
 			Returns the IP address the request came from.
 		"""
