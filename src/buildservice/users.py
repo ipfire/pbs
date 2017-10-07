@@ -246,7 +246,7 @@ class User(base.Object):
 			VALUES(%s, %s, %s)", name, generate_password_hash(passphrase), realname)
 
 		# Add email address.
-		pakfire.db.execute("INSERT INTO users_emails(user_id, email, `primary`) \
+		pakfire.db.execute("INSERT INTO users_emails(user_id, email, primary) \
 			VALUES(%s, %s, 'Y')", id, email)
 
 		# Create row in permissions table.

@@ -38,7 +38,7 @@ class Keys(base.Object):
 		return Key.create(self.pakfire, *args, **kwargs)
 
 	def get_all(self):
-		query = self.db.query("SELECT id FROM `keys` ORDER BY uids")
+		query = self.db.query("SELECT id FROM keys ORDER BY uids")
 
 		keys = []
 		for key in query:
@@ -48,7 +48,7 @@ class Keys(base.Object):
 		return keys
 
 	def get_by_id(self, id):
-		key = self.db.get("SELECT id FROM `keys` WHERE id = %s", id)
+		key = self.db.get("SELECT id FROM keys WHERE id = %s", id)
 		if not key:
 			return
 
@@ -57,7 +57,7 @@ class Keys(base.Object):
 	def get_by_fpr(self, fpr):
 		fpr = "%%%s" % fpr
 
-		key = self.db.get("SELECT id FROM `keys` WHERE fingerprint LIKE %s", fpr)
+		key = self.db.get("SELECT id FROM keys WHERE fingerprint LIKE %s", fpr)
 		if not key:
 			return
 
@@ -89,7 +89,7 @@ class Key(base.Object):
 			return k
 
 		# Insert new into the database.
-		key_id = pakfire.db.execute("INSERT INTO `keys`(fingerprint, uids, data) \
+		key_id = pakfire.db.execute("INSERT INTO keys(fingerprint, uids, data) \
 			VALUES(%s, %s, %s)", fingerprint, ", ".join([u.uid for u in key.uids]), data)
 
 		key = cls(pakfire, key_id)
@@ -100,7 +100,7 @@ class Key(base.Object):
 	@property
 	def data(self):
 		if self._data is None:
-			self._data = self.db.get("SELECT * FROM `keys` WHERE id = %s", self.id)
+			self._data = self.db.get("SELECT * FROM keys WHERE id = %s", self.id)
 			assert self._data
 
 		return self._data
@@ -126,7 +126,7 @@ class Key(base.Object):
 				time_created, time_expires, algo) VALUES(%s, %s, %s, %s, %s)",
 				self.id, subkey.keyid, time_created, time_expires, algo)
 
-		self.db.execute("UPDATE `keys` SET fingerprint = %s, uids = %s, data = %s WHERE id = %s",
+		self.db.execute("UPDATE keys SET fingerprint = %s, uids = %s, data = %s WHERE id = %s",
 			fingerprint, ", ".join([u.uid for u in key.uids]), data, self.id)
 
 	def can_be_deleted(self):
@@ -140,8 +140,8 @@ class Key(base.Object):
 	def delete(self):
 		assert self.can_be_deleted()
 
-		self.db.execute("DELETE FROM `keys_subkeys` WHERE key_id = %s", self.id)
-		self.db.execute("DELETE FROM `keys` WHERE id = %s", self.id)
+		self.db.execute("DELETE FROM keys_subkeys WHERE key_id = %s", self.id)
+		self.db.execute("DELETE FROM keys WHERE id = %s", self.id)
 
 	@property
 	def fingerprint(self):

@@ -7,7 +7,7 @@ class Arches(base.Object):
 		query = "SELECT * FROM arches"
 
 		if not really:
-			query += " WHERE `binary` = 'Y'"
+			query += " WHERE binary = 'Y'"
 		else:
 			query += " WHERE NOT name = 'src'"
 

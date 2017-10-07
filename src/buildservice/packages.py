@@ -184,7 +184,7 @@ class Package(base.Object):
 		keys = []
 		vals = []
 		for key, val in query:
-			keys.append("`%s`" % key)
+			keys.append(key)
 			vals.append(val)
 
 		_query = "INSERT INTO packages(%s)" % ", ".join(keys)
@@ -233,7 +233,7 @@ class Package(base.Object):
 				f.capabilities))
 
 		_pakfire.db.executemany("INSERT INTO filelists(pkg_id, name, size, hash_sha512, \
-			type, config, mode, user, `group`, mtime, capabilities) \
+			type, config, mode, user, group, mtime, capabilities) \
 			VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", filelist)
 
 		# Return the newly created object.
