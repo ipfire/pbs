@@ -101,13 +101,6 @@ class Application(tornado.web.Application):
 
 		tornado.web.Application.__init__(self, **settings)
 
-		self.settings["static_path"] = static_path = STATICDIR
-		static_handlers = [
-			(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path = static_path)),
-			(r"/(favicon\.ico)", tornado.web.StaticFileHandler, dict(path = static_path)),
-			(r"/(robots\.txt)", tornado.web.StaticFileHandler, dict(path = static_path)),
-		]
-
 		self.add_handlers(r".*", [
 			# Entry site that lead the user to index
 			(r"/", IndexHandler),
@@ -247,11 +240,6 @@ class Application(tornado.web.Application):
 
 			# API handlers
 			(r"/api/packages/autocomplete", handlers_api.ApiPackagesAutocomplete),
-
-		] + static_handlers + [
-
-			# Everything else is catched by the 404 handler.
-			(r"/.*", Error404Handler),
 		])
 
 		logging.info("Successfully initialied application")
