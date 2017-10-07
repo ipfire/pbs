@@ -92,7 +92,7 @@ class Backend(object):
 		return self.connect_database()
 
 	def connect_database(self, section="database"):
-		db = self.config.get(section, "db")
+		name = self.config.get(section, "db")
 		host = self.config.get(section, "host")
 		user = self.config.get(section, "user")
 
@@ -101,7 +101,9 @@ class Backend(object):
 		else:
 			pw = None
 
-		return database.Connection(host, db, user=user, password=pw)
+		log.debug("Connecting to database %s @ %s" % (name, host))
+
+		return database.Connection(host, name, user=user, password=pw)
 
 	def cleanup_files(self):
 		query = self.db.query("SELECT * FROM queue_delete")
