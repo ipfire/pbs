@@ -59,11 +59,15 @@
 						<td>
 							[{{ mirror.country_code }}] -
 
-							{% if mirror.check_status == "UP" %}
+							{% if mirror.status == "OK" %}
 								<span class="text-success">
 									{{ _("Up") }}
 								</span>
-							{% elif mirror.check_status == "DOWN" %}
+							{% elif mirror.status == "OUTOFSYNC" %}
+								<span class="text-warning">
+									{{ _("Out Of Sync") }}
+								</span>
+							{% elif mirror.status == "ERROR" %}
 								<span class="text-error">
 									{{ _("Down") }}
 								</span>
@@ -76,7 +80,7 @@
 
 						<td>
 							{% if mirror.last_check %}
-								{{ format_date(mirror.last_check, relative=True) }}
+								{{ format_date(mirror.last_check.timestamp, relative=True) }}
 							{% else %}
 								{{ _("N/A") }}
 							{% end %}

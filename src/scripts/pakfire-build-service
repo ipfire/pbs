@@ -14,6 +14,9 @@ class Cli(object):
 		self.backend = pakfire.buildservice.Backend(*args, **kwargs)
 
 		self._commands = {
+			# Run mirror check
+			"check-mirrors"    : self.backend.mirrors.check,
+
 			# Cleanup sessions
 			"cleanup-sessions" : self.backend.sessions.cleanup,
 

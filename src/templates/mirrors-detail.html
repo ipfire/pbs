@@ -75,21 +75,48 @@
 			<h3>{{ _("Status information") }}</h3>
 			<table class="table table-striped table-hover">
 				<tbody>
-					<tr>
-						<td>{{ _("Status") }}</td>
-						<td>{{ mirror.status }}</td>
-					</tr>
+					{% if not mirror.status == "OK" %}
+						<tr>
+							<td>{{ _("Status") }}</td>
+							<td>{{ mirror.status }}</td>
+						</tr>
 
-					<tr>
-						<td>{{ _("Last check") }}</td>
-						<td>
-							{% if mirror.last_check %}
-								{{ format_date(mirror.last_check) }}
-							{% else %}
-								{{ _("Never") }}
-							{% end %}
-						</td>
-					</tr>
+						{% if mirror.status == "ERROR" %}
+							<tr>
+								<td>{{ _("HTTP Response Code") }}</td>
+								<td>{{ mirror.last_check.http_status }}</td>
+							</tr>
+						{% end %}
+
+						{% if mirror.last_check.last_sync_at %}
+							<tr>
+								<td>{{ _("Last sync") }}</td>
+								<td>
+									{{ locale.format_date(mirror.last_check.last_sync_at) }}
+								</td>
+							</tr>
+						{% end %}
+
+						<tr>
+							<td>{{ _("Last check") }}</td>
+							<td>
+								{% if mirror.last_check %}
+									{{ format_date(mirror.last_check.timestamp) }}
+								{% else %}
+									{{ _("Never") }}
+								{% end %}
+							</td>
+						</tr>
+					{% end %}
+
+					{% if mirror.average_response_time %}
+						<tr>
+							<td>{{ _("Average Response Time") }}</td>
+							<td>
+								{{ "%.2fms" % (mirror.average_response_time * 1000) }}
+							</td>
+						</tr>
+					{% end %}
 				</tbody>
 			</table>
 		</div>

@@ -1,36 +1,47 @@
 #!/usr/bin/python
 
+import datetime
 import logging
 import math
 import socket
+import time
+import tornado.httpclient
+import urlparse
 
 from . import base
 from . import logs
 
+log = logging.getLogger("mirrors")
+log.propagate = 1
+
 from .decorators import lazy_property
 
 class Mirrors(base.Object):
-	def get_all(self):
-		mirrors = []
+	def __iter__(self):
+		res = self.db.query("SELECT * FROM mirrors \
+			WHERE deleted IS FALSE ORDER BY hostname")
 
-		for mirror in self.db.query("SELECT id FROM mirrors \
-				WHERE NOT status = 'deleted' ORDER BY hostname"):
-			mirror = Mirror(self.pakfire, mirror.id)
+		mirrors = []
+		for row in res:
+			mirror = Mirror(self.backend, row.id, data=row)
 			mirrors.append(mirror)
 
-		return mirrors
+		return iter(mirrors)
 
-	def count(self, status=None):
-		query = "SELECT COUNT(*) AS count FROM mirrors"
-		args  = []
+	def _get_mirror(self, query, *args):
+		res = self.db.get(query, *args)
 
-		if status:
-			query += " WHERE status = %s"
-			args.append(status)
+		if res:
+			return Mirror(self.backend, res.id, data=res)
 
-		query = self.db.get(query, *args)
+	def create(self, hostname, path="", owner=None, contact=None, user=None):
+		mirror = self._get_mirror("INSERT INTO mirrors(hostname, path, owner, contact) \
+			VALUES(%s, %s, %s, %s) RETURNING *", hostname, path, owner, contact)
 
-		return query.count
+		# Log creation
+		mirror.log("created", user=user)
+
+		return mirror
 
 	def get_random(self, limit=None):
 		query = "SELECT id FROM mirrors WHERE status = 'enabled' ORDER BY RAND()"
@@ -48,23 +59,14 @@ class Mirrors(base.Object):
 		return mirrors
 
 	def get_by_id(self, id):
-		mirror = self.db.get("SELECT id FROM mirrors WHERE id = %s", id)
-		if not mirror:
-			return
-
-		return Mirror(self.pakfire, mirror.id)
+		return self._get_mirror("SELECT * FROM mirrors WHERE id = %s", id)
 
 	def get_by_hostname(self, hostname):
-		mirror = self.db.get("SELECT id FROM mirrors WHERE NOT status = 'deleted' \
-			AND hostname = %s", hostname)
+		return self._get_mirror("SELECT * FROM mirrors \
+			WHERE hostname = %s AND deleted IS FALSE", hostname)
 
-		if not mirror:
-			return
-
-		return Mirror(self.pakfire, mirror.id)
-
-	def get_for_location(self, addr):
-		country_code = self.backend.geoip.guess_from_address(addr)
+	def get_for_location(self, address):
+		country_code = self.backend.geoip.guess_from_address(address)
 
 		# Cannot return any good mirrors if location is unknown
 		if not country_code:
@@ -118,29 +120,21 @@ class Mirrors(base.Object):
 
 		return entries
 
+	def check(self, **kwargs):
+		"""
+			Runs the mirror check for all mirrors
+		"""
+		for mirror in self:
+			with self.db.transaction():
+				mirror.check(**kwargs)
 
-class Mirror(base.Object):
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
 
-		self.id = id
+class Mirror(base.DataObject):
+	table = "mirrors"
 
-		# Cache.
-		self._data = None
-		self._location = None
-
-	def __cmp__(self, other):
-		return cmp(self.id, other.id)
-
-	@classmethod
-	def create(cls, pakfire, hostname, path="", owner=None, contact=None, user=None):
-		id = pakfire.db.execute("INSERT INTO mirrors(hostname, path, owner, contact) \
-			VALUES(%s, %s, %s, %s)", hostname, path, owner, contact)
-
-		mirror = cls(pakfire, id)
-		mirror.log("created", user=user)
-
-		return mirror
+	def __eq__(self, other):
+		if isinstance(other, self.__class__):
+			return self.id == other.id
 
 	def log(self, action, user=None):
 		user_id = None
@@ -150,38 +144,8 @@ class Mirror(base.Object):
 		self.db.execute("INSERT INTO mirrors_history(mirror_id, action, user_id, time) \
 			VALUES(%s, %s, %s, NOW())", self.id, action, user_id)
 
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = \
-				self.db.get("SELECT * FROM mirrors WHERE id = %s", self.id)
-
-		return self._data
-
-	def set_status(self, status, user=None):
-		assert status in ("enabled", "disabled", "deleted")
-
-		if self.status == status:
-			return
-
-		self.db.execute("UPDATE mirrors SET status = %s WHERE id = %s",
-			status, self.id)
-
-		if self._data:
-			self._data["status"] = status
-
-		# Log the status change.
-		self.log(status, user=user)
-
 	def set_hostname(self, hostname):
-		if self.hostname == hostname:
-			return
-
-		self.db.execute("UPDATE mirrors SET hostname = %s WHERE id = %s",
-			hostname, self.id)
-
-		if self._data:
-			self._data["hostname"] = hostname
+		self._set_attribute("hostname", hostname)
 
 	hostname = property(lambda self: self.data.hostname, set_hostname)
 
@@ -190,73 +154,102 @@ class Mirror(base.Object):
 		return self.data.path
 
 	def set_path(self, path):
-		if self.path == path:
-			return
-
-		self.db.execute("UPDATE mirrors SET path = %s WHERE id = %s",
-			path, self.id)
-
-		if self._data:
-			self._data["path"] = path
+		self._set_attribute("path", path)
 
 	path = property(lambda self: self.data.path, set_path)
 
 	@property
 	def url(self):
-		ret = "http://%s" % self.hostname
+		return self.make_url()
 
-		if self.path:
-			path = self.path
+	def make_url(self, path=""):
+		url = "http://%s%s" % (self.hostname, self.path)
 
-			if not self.path.startswith("/"):
-				path = "/%s" % path
+		if path.startswith("/"):
+			path = path[1:]
 
-			if self.path.endswith("/"):
-				path = path[:-1]
-
-			ret += path
-
-		return ret
+		return urlparse.urljoin(url, path)
 
 	def set_owner(self, owner):
-		if self.owner == owner:
-			return
-
-		self.db.execute("UPDATE mirrors SET owner = %s WHERE id = %s",
-			owner, self.id)
-
-		if self._data:
-			self._data["owner"] = owner
+		self._set_attribute("owner", owner)
 
 	owner = property(lambda self: self.data.owner or "", set_owner)
 
 	def set_contact(self, contact):
-		if self.contact == contact:
-			return
-
-		self.db.execute("UPDATE mirrors SET contact = %s WHERE id = %s",
-			contact, self.id)
-
-		if self._data:
-			self._data["contact"] = contact
+		self._set_attribute("contact", contact)
 
 	contact = property(lambda self: self.data.contact or "", set_contact)
 
+	def check(self, connect_timeout=10, request_timeout=10):
+		log.info("Running mirror check for %s" % self.hostname)
+
+		client = tornado.httpclient.HTTPClient()
+
+		# Get URL for .timestamp
+		url = self.make_url(".timestamp")
+		log.debug("  Fetching %s..." % url)
+
+		# Record start time
+		time_start = time.time()
+
+		http_status = None
+		last_sync_at = None
+		status = "OK"
+
+		# XXX needs to catch connection resets, DNS errors, etc.
+
+		try:
+			response = client.fetch(url,
+				connect_timeout=connect_timeout,
+				request_timeout=request_timeout)
+
+			# We expect the response to be an integer
+			# which holds the timestamp of the last sync
+			# in seconds since epoch UTC
+			try:
+				timestamp = int(response.body)
+			except ValueError:
+				raise
+
+			# Convert to datetime
+			last_sync_at = datetime.datetime.utcfromtimestamp(timestamp)
+
+			# Must have synced within 24 hours
+			now = datetime.datetime.utcnow()
+			if now - last_sync_at >= datetime.timedelta(hours=24):
+				status = "OUTOFSYNC"
+
+		except tornado.httpclient.HTTPError as e:
+			http_status = e.code
+			status = "ERROR"
+
+		finally:
+			response_time = time.time() - time_start
+
+		# Log check
+		self.db.execute("INSERT INTO mirrors_checks(mirror_id, response_time, \
+			http_status, last_sync_at, status) VALUES(%s, %s, %s, %s, %s)",
+			self.id, response_time, http_status, last_sync_at, status)
+
+	@lazy_property
+	def last_check(self):
+		res = self.db.get("SELECT * FROM mirrors_checks \
+			WHERE mirror_id = %s ORDER BY timestamp DESC LIMIT 1", self.id)
+
+		return res
+
 	@property
 	def status(self):
-		return self.data.status
+		if self.last_check:
+			return self.last_check.status
 
 	@property
-	def enabled(self):
-		return self.status == "enabled"
+	def average_response_time(self):
+		res = self.db.get("SELECT AVG(response_time) AS response_time \
+			FROM mirrors_checks WHERE mirror_id = %s \
+				AND timestamp >= NOW() - '24 hours'::interval", self.id)
 
-	@property
-	def check_status(self):
-		return self.data.check_status
-
-	@property
-	def last_check(self):
-		return self.data.last_check
+		return res.response_time
 
 	@property
 	def address(self):

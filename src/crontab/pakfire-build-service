@@ -6,3 +6,6 @@
 
 # Cleanup expired sessions
 0 0 * * *	nobody	pakfire-build-service cleanup-sessions &>/dev/null
+
+# Run mirror check
+*/30 * * * *	nobody	pakfire-build-service check-mirrors &>/dev/null

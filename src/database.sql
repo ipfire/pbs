@@ -1602,13 +1602,49 @@ CREATE TABLE mirrors (
     path text NOT NULL,
     owner text,
     contact text,
-    status mirrors_status DEFAULT 'disabled'::mirrors_status NOT NULL,
-    check_status mirrors_check_status DEFAULT 'UNKNOWN'::mirrors_check_status NOT NULL,
-    last_check timestamp without time zone
+    deleted boolean DEFAULT false NOT NULL
 );
 
 
 ALTER TABLE mirrors OWNER TO pakfire;
+
+--
+-- Name: mirrors_checks; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE TABLE mirrors_checks (
+    id integer NOT NULL,
+    mirror_id integer NOT NULL,
+    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
+    response_time double precision,
+    http_status integer,
+    last_sync_at timestamp without time zone,
+    status text DEFAULT 'OK'::text NOT NULL
+);
+
+
+ALTER TABLE mirrors_checks OWNER TO pakfire;
+
+--
+-- Name: mirrors_checks_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
+--
+
+CREATE SEQUENCE mirrors_checks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mirrors_checks_id_seq OWNER TO pakfire;
+
+--
+-- Name: mirrors_checks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
+--
+
+ALTER SEQUENCE mirrors_checks_id_seq OWNED BY mirrors_checks.id;
+
 
 --
 -- Name: mirrors_history; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
@@ -2400,6 +2436,13 @@ ALTER TABLE ONLY mirrors ALTER COLUMN id SET DEFAULT nextval('mirrors_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
 --
 
+ALTER TABLE ONLY mirrors_checks ALTER COLUMN id SET DEFAULT nextval('mirrors_checks_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
+--
+
 ALTER TABLE ONLY mirrors_history ALTER COLUMN id SET DEFAULT nextval('mirrors_history_id_seq'::regclass);
 
 
@@ -2789,6 +2832,14 @@ ALTER TABLE ONLY jobs_packages
 
 
 --
+-- Name: mirrors_checks_pkey; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY mirrors_checks
+    ADD CONSTRAINT mirrors_checks_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -3092,6 +3143,15 @@ CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
 
 
 --
+-- Name: mirrors_checks_sort; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX mirrors_checks_sort ON mirrors_checks USING btree (mirror_id, "timestamp");
+
+ALTER TABLE mirrors_checks CLUSTER ON mirrors_checks_sort;
+
+
+--
 -- Name: on_update_current_timestamp; Type: TRIGGER; Schema: public; Owner: pakfire
 --
 
@@ -3352,6 +3412,14 @@ ALTER TABLE ONLY keys_subkeys
 
 ALTER TABLE ONLY logfiles
     ADD CONSTRAINT logfiles_job_id FOREIGN KEY (job_id) REFERENCES jobs(id);
+
+
+--
+-- Name: mirrors_checks_mirror_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY mirrors_checks
+    ADD CONSTRAINT mirrors_checks_mirror_id FOREIGN KEY (mirror_id) REFERENCES mirrors(id);
 
 
 --

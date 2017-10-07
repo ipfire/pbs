@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import random
 import tornado.web
 
 from .handlers_auth import *
@@ -225,19 +226,7 @@ class RepositoryMirrorlistHandler(BaseHandler):
 		# on mirror servers.
 
 		if repo.mirrored:
-			# See how many mirrors we can max. find.
-			num_mirrors = self.mirrors.count(status="enabled")
-			assert num_mirrors > 0
-
-			# Create a list with all mirrors that is up to 50 mirrors long.
-			# First add all preferred mirrors and then fill the rest up
-			# with other mirrors.
-			if num_mirrors >= 10:
-				MAX_MIRRORS = 10
-			else:
-				MAX_MIRRORS = num_mirrors
-
-
+			# Select a list of preferred mirrors
 			for mirror in self.mirrors.get_for_location(self.current_address):
 				mirrors.append({
 					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch.name)),
@@ -245,17 +234,16 @@ class RepositoryMirrorlistHandler(BaseHandler):
 					"preferred" : 1,
 				})
 
-			while MAX_MIRRORS - len(mirrors) > 0:
-				mirror = self.mirrors.get_random(limit=1)[0]
+			# Add all other mirrors at the end in a random order
+			remaining_mirrors = [m for m in self.backend.mirrors if not m in mirrors]
+			random.shuffle(remaining_mirrors)
 
-				mirror = {
+			for mirror in remaining_mirrors:
+				mirrors.append({
 					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch.name)),
 					"location"  : mirror.country_code,
 					"preferred" : 0,
-				}
-
-				if not mirror in mirrors:
-					mirrors.append(mirror)
+				})
 
 		else:
 			repo_baseurl = self.pakfire.settings.get("repository_baseurl")
