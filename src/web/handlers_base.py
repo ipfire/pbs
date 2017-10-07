@@ -14,6 +14,14 @@ from .. import misc
 from ..decorators import *
 
 class BaseHandler(tornado.web.RequestHandler):
+	@property
+	def backend(self):
+		return self.application.backend
+
+	@property
+	def db(self):
+		return self.backend.db
+
 	@lazy_property
 	def session(self):
 		# Get the session from the cookie
@@ -103,7 +111,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	@property
 	def pakfire(self):
-		return self.application.backend
+		return self.backend
 
 	@property
 	def arches(self):
