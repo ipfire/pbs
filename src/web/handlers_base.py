@@ -69,9 +69,10 @@ class BaseHandler(tornado.web.RequestHandler):
 		return self.locale.format_date(date, gmt_offset=gmt_offset,
 			relative=relative, shorter=shorter, full_format=full_format)
 
-	@property
-	def render_args(self):
-		return {
+	def get_template_namespace(self):
+		ns = tornado.web.RequestHandler.get_template_namespace(self)
+
+		ns.update({
 			"bugtracker"      : self.pakfire.bugzilla,
 			"hostname"        : self.request.host,
 			"format_date"     : self.format_date,
@@ -83,15 +84,9 @@ class BaseHandler(tornado.web.RequestHandler):
 			"pakfire_version" : pakfire.__version__,
 			"session"         : self.session,
 			"year"            : time.strftime("%Y"),
-		}
+		})
 
-	def render(self, *args, **kwargs):
-		kwargs.update(self.render_args)
-		tornado.web.RequestHandler.render(self, *args, **kwargs)
-
-	def render_string(self, *args, **kwargs):
-		kwargs.update(self.render_args)
-		return tornado.web.RequestHandler.render_string(self, *args, **kwargs)
+		return ns
 
 	def get_error_html(self, status_code, exception=None, **kwargs):
 		error_document = "errors/error.html"
