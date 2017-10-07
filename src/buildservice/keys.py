@@ -9,6 +9,8 @@ import tempfile
 
 from . import base
 
+from .decorators import *
+
 def read_key(data):
 	data = str(data)
 	data = io.BytesIO(data)
@@ -34,8 +36,23 @@ def read_key(data):
 
 
 class Keys(base.Object):
-	def create(self, *args, **kwargs):
-		return Key.create(self.pakfire, *args, **kwargs)
+	def create(self, data):
+		fingerprint, key = read_key(data)
+
+		# Search for duplicates and just update them.
+		k = pakfire.keys.get_by_fpr(fingerprint)
+		if k:
+			k.update(data)
+			return k
+
+		# Insert new into the database.
+		res = self.db.get("INSERT INTO keys(fingerprint, uids, data) \
+			VALUES(%s, %s, %s) RETURNING *", fingerprint, ", ".join([u.uid for u in key.uids]), data)
+
+		key = Key(self.backend, res.id, data=res)
+		key.update(data)
+
+		return key
 
 	def get_all(self):
 		query = self.db.query("SELECT id FROM keys ORDER BY uids")
@@ -64,46 +81,8 @@ class Keys(base.Object):
 		return Key(self.pakfire, key.id)
 
 
-class Key(base.Object):
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
-
-		self.id = id
-
-		# Cache.
-		self._data = None
-		self._subkeys = None
-
-	@property
-	def keys(self):
-		return self.pakfire.keys
-
-	@classmethod
-	def create(cls, pakfire, data):
-		fingerprint, key = read_key(data)
-
-		# Search for duplicates and just update them.
-		k = pakfire.keys.get_by_fpr(fingerprint)
-		if k:
-			k.update(data)
-			return k
-
-		# Insert new into the database.
-		key_id = pakfire.db.execute("INSERT INTO keys(fingerprint, uids, data) \
-			VALUES(%s, %s, %s)", fingerprint, ", ".join([u.uid for u in key.uids]), data)
-
-		key = cls(pakfire, key_id)
-		key.update(data)
-
-		return key
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM keys WHERE id = %s", self.id)
-			assert self._data
-
-		return self._data
+class Key(base.DataObject):
+	table = "keys"
 
 	def update(self, data):
 		fingerprint, key = read_key(data)
@@ -155,37 +134,24 @@ class Key(base.Object):
 	def key(self):
 		return self.data.data
 
-	@property
+	@lazy_property
 	def subkeys(self):
-		if self._subkeys is None:
-			self._subkeys = []
+		res = self.db.query("SELECT * FROM keys_subkeys WHERE key_id = %s ORDER BY time_created", self.id)
 
-			query = self.db.query("SELECT * FROM keys_subkeys WHERE key_id = %s ORDER BY time_created", self.id)
+		subkeys = []
+		for row in res:
+			subkey = Subkey(self.backend, row.id, data=row)
+			subkeys.append(subkey)
 
-			for subkey in query:
-				subkey = Subkey(self.pakfire, subkey.id)
-				self._subkeys.append(subkey)
-
-		return self._subkeys
+		return sorted(subkeys)
 
 
-class Subkey(base.Object):
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
+class Subkey(base.DataObject):
+	table = "keys_subkeys"
 
-		self.id = id
-
-		# Cache.
-		self._data = None
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT *, time_expires - NOW() AS expired \
-				FROM keys_subkeys WHERE id = %s", self.id)
-			assert self._data
-
-		return self._data
+	def __lt__(self, other):
+		if isinstance(other, self.__class__):
+			return self.time_created < other.time_created
 
 	@property
 	def fingerprint(self):
@@ -201,7 +167,7 @@ class Subkey(base.Object):
 
 	@property
 	def expired(self):
-		return self.data.expired <= 0
+		return self.time_expires <= datetime.datetime.utcnow()
 
 	@property
 	def algo(self):
