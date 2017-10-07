@@ -19,7 +19,7 @@ class IndexHandler(BaseHandler):
 	def get(self):
 		jobs = self.pakfire.jobs.get_active()
 		jobs += self.pakfire.jobs.get_next()
-		jobs += self.pakfire.jobs.get_latest(age="24 HOUR", limit=5)
+		jobs += self.pakfire.jobs.get_latest(age="24 hours", limit=5)
 
 		# Updates
 		updates = []

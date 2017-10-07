@@ -1474,7 +1474,7 @@ class Jobs(base.Object):
 				args += (date, date, date)
 
 		if age:
-			where.append("time_finished >= DATE_SUB(NOW(), INTERVAL %s)" % age)
+			where.append("time_finished >= NOW() - '%s'::interval" % age)
 
 		if where:
 			query += " WHERE %s" % " AND ".join(where)
@@ -1494,7 +1494,7 @@ class Jobs(base.Object):
 		"""
 		result = self.db.get("SELECT AVG(time_finished - time_started) as average \
 			FROM jobs WHERE type = 'build' AND state = 'finished' AND \
-			time_finished >= DATE_SUB(NOW(), INTERVAL 3 MONTH)")
+			time_finished >= NOW() - '3 months'::interval")
 
 		if result:
 			return result.average

@@ -32,7 +32,7 @@ class BuildsFailedRestartEvent(base.Event):
 				jobs.state = 'failed' AND \
 				jobs.tries <= %s AND \
 				NOT builds.state = 'broken' AND \
-				jobs.time_finished < DATE_SUB(NOW(), INTERVAL 72 HOUR) \
+				jobs.time_finished < NOW() - '72 hours'::interval \
 			ORDER BY \
 				CASE \
 					WHEN jobs.type = 'build' THEN 0 \
@@ -60,7 +60,7 @@ class CheckBuildDependenciesEvent(base.Event):
 		query = self.db.query("SELECT id FROM jobs \
 			WHERE state = 'new' OR \
 				(state = 'dependency_error' AND \
-				time_finished < DATE_SUB(NOW(), INTERVAL 5 MINUTE)) \
+				time_finished < NOW() - '5 minutes'::interval) \
 			ORDER BY time_finished LIMIT 50")
 
 		for row in query:
