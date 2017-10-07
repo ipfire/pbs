@@ -54,9 +54,7 @@ class BaseHandler(tornado.web.RequestHandler):
 		"""
 			Returns the IP address the request came from.
 		"""
-		remote_ips = self.request.remote_ip.split(", ")
-
-		return remote_ips[-1]
+		return self.request.headers.get("X-Real-IP") or self.request.remote_ip
 
 	@property
 	def timezone(self):
