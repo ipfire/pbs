@@ -110,12 +110,10 @@ class SessionsHandler(BaseHandler):
 
 	@tornado.web.authenticated
 	def get(self):
-		sessions = self.pakfire.sessions.get_all()
-
 		# Sort the sessions by user.
 		users = {}
 
-		for s in sessions:
+		for s in self.backend.sessions:
 			try:
 				users[s.user].append(s)
 			except KeyError:
