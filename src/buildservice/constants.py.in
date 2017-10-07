@@ -5,8 +5,8 @@ import os.path
 # Import all constants from the pakfire module.
 from pakfire.constants import *
 
-# XXX must be set by configure
-DATADIR = "/usr/share/pakfire-build-service"
+CONFIGSDIR = "@configsdir@"
+DATADIR    = "@datadir@"
 
 PAKFIRE_DIR  = "/pakfire"
 PACKAGES_DIR = os.path.join(PAKFIRE_DIR, "packages")

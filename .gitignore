@@ -3,6 +3,7 @@
 /build-aux
 /pbs.conf
 /missing
+/src/buildservice/constants.py
 /src/buildservice/__version__.py
 /tmp
 /.vscode

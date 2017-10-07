@@ -104,6 +104,12 @@ buildservice_PYTHON = \
 
 buildservicedir = $(pythondir)/buildservice
 
+EXTRA_DIST += \
+	src/buildservice/constants.py.in
+
+CLEANFILES += \
+	src/buildservice/constants.py
+
 hub_PYTHON = \
 	src/hub/__init__.py \
 	src/hub/handlers.py
@@ -449,7 +455,8 @@ substitutions = \
 	'|PACKAGE_NAME=$(PACKAGE_NAME)|' \
 	'|PACKAGE_VERSION=$(PACKAGE_VERSION)|' \
 	'|configsdir=$(configsdir)|' \
-	'|bindir=$(bindir)|'
+	'|bindir=$(bindir)|' \
+	'|datadir=$(datadir)|'
 
 SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
