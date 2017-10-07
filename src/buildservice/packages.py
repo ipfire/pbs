@@ -18,7 +18,7 @@ from .constants import *
 
 class Packages(base.Object):
 	def get_all_names(self, public=None, user=None, states=None):
-		query = "SELECT DISTINCT name, summary FROM packages \
+		query = "SELECT DISTINCT packages.name AS name, summary FROM packages \
 			JOIN builds ON builds.pkg_id = packages.id \
 			WHERE packages.type = 'source'"
 
