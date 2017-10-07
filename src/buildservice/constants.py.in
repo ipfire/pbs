@@ -5,8 +5,11 @@ import os.path
 # Import all constants from the pakfire module.
 from pakfire.constants import *
 
+PACKAGE_NAME = "@PACKAGE_NAME@"
+
 CONFIGSDIR = "@configsdir@"
 DATADIR    = "@datadir@"
+LOCALEDIR  = "@localedir@"
 
 PAKFIRE_DIR  = "/pakfire"
 PACKAGES_DIR = os.path.join(PAKFIRE_DIR, "packages")

@@ -98,8 +98,7 @@ class Application(tornado.web.Application):
 		)
 
 		# Load translations.
-		tornado.locale.load_gettext_translations(
-			os.path.join(BASEDIR, "translations"), "pakfire")
+		tornado.locale.load_gettext_translations(LOCALEDIR, PACKAGE_NAME)
 
 		tornado.web.Application.__init__(self, **settings)
 

@@ -456,7 +456,8 @@ substitutions = \
 	'|PACKAGE_VERSION=$(PACKAGE_VERSION)|' \
 	'|configsdir=$(configsdir)|' \
 	'|bindir=$(bindir)|' \
-	'|datadir=$(datadir)|'
+	'|datadir=$(datadir)|' \
+	'|localedir=$(localedir)|'
 
 SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
