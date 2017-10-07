@@ -112,7 +112,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	@property
 	def pakfire(self):
-		return self.application.pakfire
+		return self.application.backend
 
 	@property
 	def arches(self):

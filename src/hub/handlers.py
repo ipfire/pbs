@@ -36,9 +36,9 @@ class BaseHandler(LongPollMixin, tornado.web.RequestHandler):
 	@property
 	def backend(self):
 		"""
-			Shortcut handler to pakfire instance.
+			Shortcut handler to pakfire instance
 		"""
-		return self.application.pakfire
+		return self.application.backend
 
 	def get_basic_auth_credentials(self):
 		"""

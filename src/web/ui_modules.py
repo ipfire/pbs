@@ -17,7 +17,7 @@ from ..constants import *
 class UIModule(tornado.web.UIModule):
 	@property
 	def pakfire(self):
-		return self.handler.application.pakfire
+		return self.handler.application.backend
 
 	@property
 	def settings(self):

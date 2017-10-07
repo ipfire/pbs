@@ -10,6 +10,7 @@ import tornado.options
 import tornado.web
 
 from .. import Backend
+from ..decorators import *
 
 from . import handlers_api
 
@@ -22,8 +23,6 @@ tornado.options.parse_command_line()
 
 class Application(tornado.web.Application):
 	def __init__(self):
-		self.__pakfire = None
-
 		settings = dict(
 			debug = tornado.options.options.debug,
 			gzip  = True,
@@ -244,12 +243,12 @@ class Application(tornado.web.Application):
 
 		logging.info("Successfully initialied application")
 
-	@property
-	def pakfire(self):
-		if self.__pakfire is None:
-			self.__pakfire = Backend()
-
-		return self.__pakfire
+	@lazy_property
+	def backend(self):
+		"""
+			Backend connection
+		"""
+		return Backend()
 
 	def __del__(self):
 		logging.info("Shutting down application")
