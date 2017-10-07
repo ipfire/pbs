@@ -1,0 +1,46 @@
+FROM ipfire/pakfire:latest
+MAINTAINER jonatanschlag
+
+LABEL \
+	org.ipfire.pakfire.name = "@PACKAGE_NAME@" \
+	org.ipfire.pakfire.url = "https://pakfire.ipfire.org" \
+	org.ipfire.pakfire.vendor = "IPFire Project" \
+	org.ipfire.pakfire.version = "@PACKAGE_VERSION@"
+
+# Install all dependencies
+RUN yum install -y \
+	autoconf \
+	intltool \
+	make \
+	python-daemon \
+	python-memcached \
+	python-psycopg2 \
+	python-tornado \
+	pytz-2016.10 \
+	&& yum clean all
+
+# Create a user
+RUN groupadd -g 2000 pbs && \
+	useradd --system --no-create-home --shell /bin/bash --uid 2000 --gid 2000 pbs
+
+# Copy the source code
+COPY . /build/pakfire-build-service
+
+WORKDIR /build/pakfire-build-service
+
+# Compile the build service
+RUN ./autogen.sh && \
+	./configure --prefix=/usr --sysconfdir=/etc \
+	make && make check && make install && rm -rf /build/pakfire-build-service
+
+# Go back to /root
+WORKDIR /root
+
+# Cleanup
+RUN yum remove -y *-devel && yum autoremove -y && yum clean all
+
+USER pbs
+
+# Define default command.
+CMD ["/bin/bash"]
+

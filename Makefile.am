@@ -396,6 +396,20 @@ static_jsdir = $(staticdir)/js
 
 # ------------------------------------------------------------------------------
 
+EXTRA_DIST += \
+	Dockerfile.in
+
+docker_DATA = \
+	Dockerfile
+
+dockerdir = $(datadir)/docker
+
+.PHONY: docker
+docker: Dockerfile
+	docker build -t "ipfire/pakfire-build-service:$(PACKAGE_VERSION)" .
+
+# ------------------------------------------------------------------------------
+
 if HAVE_SYSTEMD
 systemdsystemunit_DATA = \
 	# TODO
