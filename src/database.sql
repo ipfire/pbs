@@ -1894,16 +1894,40 @@ ALTER SEQUENCE repositories_id_seq OWNED BY repositories.id;
 --
 
 CREATE TABLE sessions (
+    id integer NOT NULL,
     session_id text NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    valid_until timestamp without time zone DEFAULT (now() + '7 days'::interval) NOT NULL,
     user_id integer NOT NULL,
     impersonated_user_id integer,
-    creation_time timestamp without time zone,
-    valid_until timestamp without time zone,
-    from_address inet
+    address inet,
+    user_agent text,
+    CONSTRAINT sessions_impersonation_check CHECK (((impersonated_user_id IS NULL) OR (user_id <> impersonated_user_id)))
 );
 
 
 ALTER TABLE sessions OWNER TO pakfire;
+
+--
+-- Name: sessions_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
+--
+
+CREATE SEQUENCE sessions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE sessions_id_seq OWNER TO pakfire;
+
+--
+-- Name: sessions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
+--
+
+ALTER SEQUENCE sessions_id_seq OWNED BY sessions.id;
+
 
 --
 -- Name: settings; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
@@ -2410,6 +2434,13 @@ ALTER TABLE ONLY repositories_builds ALTER COLUMN id SET DEFAULT nextval('reposi
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
 --
 
+ALTER TABLE ONLY sessions ALTER COLUMN id SET DEFAULT nextval('sessions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
+--
+
 ALTER TABLE ONLY slogans ALTER COLUMN id SET DEFAULT nextval('slogans_id_seq'::regclass);
 
 
@@ -2743,6 +2774,22 @@ ALTER TABLE ONLY jobs_packages
 
 
 --
+-- Name: sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY sessions
+    ADD CONSTRAINT sessions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sessions_session_id_key; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY sessions
+    ADD CONSTRAINT sessions_session_id_key UNIQUE (session_id);
+
+
+--
 -- Name: builders_arches_builder_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2971,13 +3018,6 @@ CREATE UNIQUE INDEX idx_2198189_build_id ON repositories_builds USING btree (bui
 --
 
 CREATE INDEX idx_2198193_build_id ON repositories_history USING btree (build_id);
-
-
---
--- Name: idx_2198196_session_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_2198196_session_id ON sessions USING btree (session_id);
 
 
 --

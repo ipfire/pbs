@@ -217,9 +217,6 @@ class User(base.Object):
 		base.Object.__init__(self, pakfire)
 		self.id = id
 
-		# A valid session of the user.
-		self.session = None
-
 		# Cache.
 		self._data = None
 		self._emails = None

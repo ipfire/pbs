@@ -2,8 +2,6 @@
 
 import tornado.web
 
-from .. import sessions
-
 from .handlers_base import *
 
 class LoginHandler(BaseHandler):
@@ -20,24 +18,27 @@ class LoginHandler(BaseHandler):
 		name = self.get_argument("name", None)
 		passphrase = self.get_argument("pass", None)
 
+		# Log in the user
 		user = self.pakfire.users.auth(name, passphrase)
 
-		if user:
-			# Create a new session for the user.
-			session = sessions.Session.create(self.pakfire, user)
+		# If the login was unsuccessful
+		if not user:
+			self.set_status(403, "Login failed")
+			return self.render("login.html", failed=True)
 
-			# Set a cookie and update the current user.
-			self.set_cookie("session_id", session.id, expires=session.valid_until)
-			self._current_user = user
+		# Create a new session for the user.
+		with self.db.transaction():
+			self.session = self.backend.sessions.create(user,
+				self.current_address, user_agent=self.user_agent)
 
-			# If there is "next" given, we redirect the user accordingly.
-			# Otherwise we redirect to the front page.
-			next = self.get_argument("next", "/")
-			self.redirect(next)
+		# Set a cookie and update the current user.
+		self.set_cookie("session_id", self.session.session_id,
+			expires=self.session.valid_until)
 
-		else:
-			# If the login failed we return an error message.
-			self.render("login.html", failed=True)
+		# If there is "next" given, we redirect the user accordingly.
+		# Otherwise we redirect to the front page.
+		next = self.get_argument("next", "/")
+		self.redirect(next)
 
 
 class RegisterHandler(BaseHandler):
@@ -142,11 +143,12 @@ class PasswordRecoveryHandler(BaseHandler):
 class LogoutHandler(BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
+		# Destroy the user's session.
+		with self.db.transaction():
+			self.session.destroy()
+
 		# Remove the cookie, that identifies the user.
 		self.clear_cookie("session_id")
-
-		# Destroy the user's session.
-		self.session.destroy()
 
 		# Redirect the user to the front page.
 		self.redirect("/")

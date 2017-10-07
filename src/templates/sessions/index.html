@@ -34,20 +34,25 @@
 								<tr>
 									<th>{{ _("Started") }}</th>
 									<th>{{ _("Valid until") }}</th>
-									<th>{{ _("Last seen at") }}</th>
+									<th>{{ _("Address") }}/{{ _("User Agent") }}</th>
 								</tr>
 							</thead>
 							<tbody>
 								{% for s in user_sessions %}
 									<tr>
 										<td>
-											{{ format_date(s.creation_time) }}
+											{{ format_date(s.created_at) }}
 										</td>
 										<td>
 											{{ format_date(s.valid_until) }}
 										</td>
 										<td>
-											{{ s.from_address or _("N/A") }}
+											{{ s.address or _("N/A") }}
+
+											{% if s.user_agent %}
+												<br>
+												<span class="muted">{{ s.user_agent }}</span>
+											{% end %}
 										</td>
 									</tr>
 								{% end %}

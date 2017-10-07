@@ -11,39 +11,29 @@ import tornado.web
 import traceback
 
 from .. import misc
+from ..decorators import *
 
 class BaseHandler(tornado.web.RequestHandler):
 	@property
 	def cache(self):
 		return self.pakfire.cache
 
-	def get_current_user(self):
-		session_id = self.get_cookie("session_id")
-		if not session_id:
-			return
-
-		# Get the session from the database.
-		session = self.pakfire.sessions.get(session_id)
-
-		# Return nothing, if no session was found.
-		if not session:
-			return
-
-		# Update the session lifetime.
-		session.refresh(self.request.remote_ip)
-		self.set_cookie("session_id", session.id, expires=session.valid_until)
-
-		# If the session impersonated a user, we return that one.
-		if session.impersonated_user:
-			return session.impersonated_user
-
-		# By default, we return the user of this session.
-		return session.user
-
-	@property
+	@lazy_property
 	def session(self):
-		if self.current_user:
-			return self.current_user.session
+		# Get the session from the cookie
+		session_id = self.get_cookie("session_id", None)
+
+		# Search for a valid database session
+		if session_id:
+			session = self.backend.sessions.get(session_id)
+
+			# Found a valid session
+			if session:
+				return session
+
+	def get_current_user(self):
+		if self.session:
+			return self.session.impersonated_user or self.session.user
 
 	def get_user_locale(self):
 		# Get the locale from the user settings.
@@ -81,11 +71,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	@property
 	def render_args(self):
-		session = None
-		if self.current_user:
-			session = self.current_user.session
-
-		ret = {
+		return {
 			"bugtracker"      : self.pakfire.bugzilla,
 			"hostname"        : self.request.host,
 			"format_date"     : self.format_date,
@@ -95,11 +81,9 @@ class BaseHandler(tornado.web.RequestHandler):
 			"format_filemode" : misc.format_filemode,
 			"lang"            : self.locale.code[:2],
 			"pakfire_version" : pakfire.__version__,
-			"session"         : session,
+			"session"         : self.session,
 			"year"            : time.strftime("%Y"),
 		}
-
-		return ret
 
 	def render(self, *args, **kwargs):
 		kwargs.update(self.render_args)
