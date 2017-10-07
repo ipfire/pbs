@@ -370,7 +370,7 @@ dist_static_font_DATA = \
 	src/static/font/fontawesome-webfont.ttf \
 	src/static/font/fontawesome-webfont.woff
 
-static_fontdir = $(staticdir)/font	
+static_fontdir = $(staticdir)/font
 
 dist_static_images_DATA = \
 	src/static/images/icons/build-dependency_error.png \
