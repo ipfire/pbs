@@ -426,6 +426,7 @@ dist_geoip_DATA = \
 geoipdir = $(datadir)/geoip
 
 EXTRA_DIST += \
+	src/tools/dump-database-schema.sh \
 	src/tools/update-geoip-database.sh
 
 # ------------------------------------------------------------------------------
