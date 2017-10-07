@@ -16,8 +16,6 @@ from . import handlers_api
 from .handlers import *
 from .ui_modules import *
 
-BASEDIR = os.path.join(os.path.dirname(__file__), "..", "data")
-
 # Enable logging
 tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
 tornado.options.parse_command_line()
@@ -30,7 +28,8 @@ class Application(tornado.web.Application):
 			debug = tornado.options.options.debug,
 			gzip  = True,
 			login_url = "/login",
-			template_path = os.path.join(BASEDIR, "templates"),
+			template_path = TEMPLATESDIR,
+			static_path = STATICDIR,
 			ui_modules = {
 				"Text"               : TextModule,
 				"Modal"              : ModalModule,
@@ -102,7 +101,7 @@ class Application(tornado.web.Application):
 
 		tornado.web.Application.__init__(self, **settings)
 
-		self.settings["static_path"] = static_path = os.path.join(BASEDIR, "static")
+		self.settings["static_path"] = static_path = STATICDIR
 		static_handlers = [
 			(r"/static/(.*)", tornado.web.StaticFileHandler, dict(path = static_path)),
 			(r"/(favicon\.ico)", tornado.web.StaticFileHandler, dict(path = static_path)),

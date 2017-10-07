@@ -11,8 +11,6 @@ from .. import Backend
 
 from . import handlers
 
-BASEDIR = os.path.join(os.path.dirname(__file__), "..", "data")
-
 # Read command line
 tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
 tornado.options.parse_command_line()

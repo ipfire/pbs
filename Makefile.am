@@ -457,7 +457,9 @@ substitutions = \
 	'|configsdir=$(configsdir)|' \
 	'|bindir=$(bindir)|' \
 	'|datadir=$(datadir)|' \
-	'|localedir=$(localedir)|'
+	'|localedir=$(localedir)|' \
+	'|templatesdir=$(templatesdir)|' \
+	'|staticdir=$(staticdir)|'
 
 SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
