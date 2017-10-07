@@ -899,7 +899,7 @@ CREATE TABLE builds (
     state builds_state DEFAULT 'building'::builds_state NOT NULL,
     severity builds_severity,
     message text,
-    time_created timestamp with time zone NOT NULL,
+    time_created timestamp without time zone NOT NULL,
     update_year integer,
     update_num integer,
     depends_on integer,
@@ -1293,7 +1293,7 @@ CREATE TABLE filelists (
     mode integer NOT NULL,
     "user" text NOT NULL,
     "group" text NOT NULL,
-    mtime timestamp with time zone NOT NULL,
+    mtime timestamp without time zone NOT NULL,
     capabilities text
 );
 
