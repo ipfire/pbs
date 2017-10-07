@@ -10,6 +10,7 @@ import tornado.locale
 import tornado.web
 import traceback
 
+from .. import __version__
 from .. import misc
 from ..decorators import *
 
@@ -90,8 +91,8 @@ class BaseHandler(tornado.web.RequestHandler):
 			"format_email"    : misc.format_email,
 			"format_filemode" : misc.format_filemode,
 			"lang"            : self.locale.code[:2],
-			"pakfire_version" : pakfire.__version__,
 			"session"         : self.session,
+			"version"         : __version__,
 			"year"            : time.strftime("%Y"),
 		})
 
