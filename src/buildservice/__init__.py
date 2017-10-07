@@ -89,21 +89,14 @@ class Backend(object):
 
 	@lazy_property
 	def db(self):
-		return self.connect_database()
+		name     = self.config.get("database", "name")
+		hostname = self.config.get("database", "hostname")
+		user     = self.config.get("database", "user")
+		password = self.config.get("database", "password")
 
-	def connect_database(self, section="database"):
-		name = self.config.get(section, "db")
-		host = self.config.get(section, "host")
-		user = self.config.get(section, "user")
+		log.debug("Connecting to database %s @ %s" % (name, hostname))
 
-		if self.config.has_option(section, "pass"):
-			pw = self.config.get(section, "pass")
-		else:
-			pw = None
-
-		log.debug("Connecting to database %s @ %s" % (name, host))
-
-		return database.Connection(host, name, user=user, password=pw)
+		return database.Connection(hostname, name, user=user, password=password)
 
 	def cleanup_files(self):
 		query = self.db.query("SELECT * FROM queue_delete")
