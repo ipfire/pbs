@@ -164,6 +164,8 @@ class Connection(object):
 		return self._db.cursor()
 
 	def _execute(self, cursor, query, parameters, kwparameters):
+		logging.debug("Executing SQL: %s" % (query % (kwparameters or parameters)))
+
 		try:
 			return cursor.execute(query, kwparameters or parameters)
 		except OperationalError:
