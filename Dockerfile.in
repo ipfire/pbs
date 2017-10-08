@@ -12,12 +12,16 @@ RUN yum install -y \
 	autoconf \
 	intltool \
 	make \
+	python2-pip \
 	python-daemon \
 	python-memcached \
 	python-psycopg2 \
 	python-tornado \
 	pytz-2016.10 \
 	&& yum clean all
+
+# Install more python dependencies
+RUN pip install geoip2
 
 # Create a user
 RUN groupadd -g 2000 pbs && \
