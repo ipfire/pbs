@@ -12,7 +12,7 @@
 			{% for job in jobs %}
 				<tr>
 					<td>
-						<a href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
+						<a href="/job/{{ job.uuid }}">{{ job.arch }}</a>
 					</td>
 					<td>
 						{% if job.state == "new" %}

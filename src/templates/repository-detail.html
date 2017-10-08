@@ -88,7 +88,7 @@
 				<tbody>
 					{% for arch, build_time in build_times %}
 						<tr>
-							<td class="arch">{{ arch.name }}</td>
+							<td class="arch">{{ arch }}</td>
 							<td class="time">{{ friendly_time(build_time) }}</td>
 						</tr>
 					{% end %}

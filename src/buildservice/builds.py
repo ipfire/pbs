@@ -21,6 +21,7 @@ from . import updates
 from . import users
 
 from .constants import *
+from .decorators import *
 
 def import_from_package(_pakfire, filename, distro=None, commit=None, type="release",
 		arches=None, check_for_duplicates=True, owner=None):
@@ -216,21 +217,21 @@ class Builds(base.Object):
 			WHERE NOT EXISTS \
 				(SELECT * FROM jobs WHERE \
 					jobs.build_id = builds.id AND \
-					jobs.arch_id = %s AND \
+					jobs.arch = %s AND \
 					(jobs.state != 'finished' OR \
 					jobs.time_finished >= %s) \
 				) \
 			AND EXISTS \
 				(SELECT * FROM jobs WHERE \
 					jobs.build_id = builds.id AND \
-					jobs.arch_id = %s AND \
+					jobs.arch = %s AND \
 					jobs.type = 'build' AND \
 					jobs.state = 'finished' AND \
 					jobs.time_finished < %s \
 				) \
 			AND builds.type = 'release' \
 			AND (builds.state = 'stable' OR builds.state = 'testing')"
-		args  = [arch.id, threshold, arch.id, threshold]
+		args  = [arch, threshold, arch, threshold]
 
 		if randomize:
 			query += " ORDER BY RAND()"
@@ -916,7 +917,7 @@ class Build(base.Object):
 		s_jobs = []
 		for job in self.jobs:
 			s_jobs.append("""<a class="state_%s %s" href="/job/%s">%s</a>""" % \
-				(job.state, job.type, job.uuid, job.arch.name))
+				(job.state, job.type, job.uuid, job.arch))
 
 		if s_jobs:
 			s += " [%s]" % ", ".join(s_jobs)
@@ -1455,8 +1456,8 @@ class Jobs(base.Object):
 		where = ["(state = 'finished' OR state = 'failed' OR state = 'aborted')"]
 
 		if arch:
-			where.append("arch_id = %s")
-			args.append(arch.id)
+			where.append("arch = %s")
+			args.append(arch)
 
 		if builder:
 			where.append("builder_id = %s")
@@ -1621,8 +1622,8 @@ class Job(base.Object):
 
 	@classmethod
 	def create(cls, pakfire, build, arch, type="build"):
-		id = pakfire.db.execute("INSERT INTO jobs(uuid, type, build_id, arch_id, time_created) \
-			VALUES(%s, %s, %s, %s, NOW())",	"%s" % uuid.uuid4(), type, build.id, arch.id)
+		id = pakfire.db.execute("INSERT INTO jobs(uuid, type, build_id, arch, time_created) \
+			VALUES(%s, %s, %s, %s, NOW())",	"%s" % uuid.uuid4(), type, build.id, arch)
 
 		job = Job(pakfire, id)
 		job.log("created")
@@ -1776,7 +1777,7 @@ class Job(base.Object):
 
 	@property
 	def name(self):
-		return "%s-%s.%s" % (self.pkg.name, self.pkg.friendly_version, self.arch.name)
+		return "%s-%s.%s" % (self.pkg.name, self.pkg.friendly_version, self.arch)
 
 	@property
 	def size(self):
@@ -1879,15 +1880,12 @@ class Job(base.Object):
 	builder = property(get_builder, set_builder)
 
 	@property
-	def arch_id(self):
-		return self.data.arch_id
-
-	@property
 	def arch(self):
-		if not hasattr(self, "_arch"):
-			self._arch = self.pakfire.arches.get_by_id(self.arch_id)
+		return self.data.arch
 
-		return self._arch
+	@lazy_property
+	def _arch(self):
+		return self.backend.arches.get_by_name(self.arch)
 
 	@property
 	def duration(self):
@@ -1919,7 +1917,7 @@ class Job(base.Object):
 			Returns the estimated time and stddev, this job takes to finish.
 		"""
 		# Get the average build time.
-		build_times = self.pakfire.builds.get_build_times_by_arch(self.arch.name,
+		build_times = self.pakfire.builds.get_build_times_by_arch(self.arch,
 			name=self.pkg.name)
 
 		# If there is no statistical data, we cannot estimate anything.
@@ -2011,7 +2009,7 @@ class Job(base.Object):
 			i = 1
 			while True:
 				target_filename = os.path.join(target_dirname,
-					"test.%s.%s.%s.log" % (self.arch.name, i, self.tries))
+					"test.%s.%s.%s.log" % (self.arch, i, self.tries))
 
 				if os.path.exists(target_filename):
 					i += 1
@@ -2019,7 +2017,7 @@ class Job(base.Object):
 					break
 		else:
 			target_filename = os.path.join(target_dirname,
-				"build.%s.%s.log" % (self.arch.name, self.tries))
+				"build.%s.%s.log" % (self.arch, self.tries))
 
 		# Make sure the target directory exists.
 		if not os.path.exists(target_dirname):
@@ -2049,7 +2047,7 @@ class Job(base.Object):
 		pkg = packages.Package.open(self.pakfire, filename)
 
 		# Move package to the build directory.
-		pkg.move(os.path.join(self.build.path, self.arch.name))
+		pkg.move(os.path.join(self.build.path, self.arch))
 
 		# Attach the package to this job.
 		self.db.execute("INSERT INTO jobs_packages(job_id, pkg_id) VALUES(%s, %s)",
@@ -2281,7 +2279,7 @@ class Job(base.Object):
 
 		# Create a new pakfire instance with the configuration for
 		# this build.
-		p = pakfire.PakfireServer(config=config, arch=self.arch.name)
+		p = pakfire.PakfireServer(config=config, arch=self.arch)
 
 		# Try to solve the build dependencies.
 		try:

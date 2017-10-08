@@ -26,7 +26,7 @@
 
 				<td>
 					<a href="/build/{{ job.build.uuid }}">
-						{{ job.build.name }}</a>.<a href="/job/{{ job.uuid }}">{{ job.arch.name }}</a>
+						{{ job.build.name }}</a>.<a href="/job/{{ job.uuid }}">{{ job.arch }}</a>
 
 					{% if job.build.type == "scratch" %}
 						<span class="label label-inverse pull-right" rel="tooltip" data-placement="top" title="{{ _("Scratch build") }}">S</span>

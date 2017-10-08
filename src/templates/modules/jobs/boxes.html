@@ -6,7 +6,7 @@
 					{{ format_time(j.duration, shorter=True) }} &dash;
 					{% module JobState(j) %}
 				</small>
-				<a href="/job/{{ j.uuid }}">{{ j.arch.name }}</a>
+				<a href="/job/{{ j.uuid }}">{{ j.arch }}</a>
 			</h4>
 
 			<ul class="unstyled">
