@@ -408,6 +408,9 @@ EXTRA_DIST += \
 docker_DATA = \
 	Dockerfile
 
+CLEANFILES += \
+	Dockerfile
+
 dockerdir = $(datadir)/docker
 
 .PHONY: docker
