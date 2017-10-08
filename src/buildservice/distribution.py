@@ -2,32 +2,41 @@
 
 import logging
 
-from . import arches
 from . import base
 from . import builds
 from . import packages
 from . import sources
-from . import updates
 
 from .repository import Repository, RepositoryAux
 
+from .decorators import *
+
 class Distributions(base.Object):
-	def get_all(self):
-		distros = self.db.query("SELECT * FROM distributions ORDER BY name")
+	def _get_distribution(self, query, *args):
+		res = self.db.get(query, *args)
 
-		return [Distribution(self.pakfire, d.id, d) for d in distros]
+		if res:
+			return Distribution(self.backend, res.id, data=res)
 
-	def get_by_id(self, id):
-		distro = self.db.get("SELECT * FROM distributions WHERE id = %s LIMIT 1", id)
+	def _get_distributions(self, query, *args):
+		res = self.db.query(query, *args)
 
-		if distro:
-			return Distribution(self.pakfire, distro.id, distro)
+		for row in res:
+			yield Distribution(self.backend, row.id, data=row)
 
-	def get_by_name(self, name):
-		distro = self.db.get("SELECT * FROM distributions WHERE sname = %s LIMIT 1", name)
+	def __iter__(self):
+		distros = self._get_distributions("SELECT * FROM distributions \
+			WHERE deleted IS FALSE ORDER BY name")
 
-		if distro:
-			return Distribution(self.pakfire, distro.id, distro)
+		return iter(distros)
+
+	def get_by_id(self, distro_id):
+		return self._get_distribution("SELECT * FROM distributions \
+			WHERE id = %s", distro_id)
+
+	def get_by_name(self, sname):
+		return self._get_distribution("SELECT * FROM distributions \
+			WHERE sname = %s AND deleted IS FALSE", sname)
 
 	def get_by_ident(self, ident):
 		return self.get_by_name(ident)
@@ -37,31 +46,11 @@ class Distributions(base.Object):
 		return self.get_by_ident("ipfire3")
 
 
-class Distribution(base.Object):
-	def __init__(self, pakfire, id, data=None):
-		base.Object.__init__(self, pakfire)
-		self.id = id
-
-		self._data = data
-		self._arches = None
-		self._sources = None
+class Distribution(base.DataObject):
+	table = "distributions"
 
 	def __repr__(self):
 		return "<%s %s>" % (self.__class__.__name__, self.name)
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM distributions WHERE id = %s", self.id)
-
-		return self._data
-
-	def set(self, key, value):
-		self.db.execute("UPDATE distributions SET %s = %%s WHERE id = %%s" % key,
-			value, self.id)
-
-		if self._data:
-			self._data[key] = value
 
 	@property
 	def info(self):
@@ -110,30 +99,21 @@ class Distribution(base.Object):
 		return self.data.slogan
 
 	def get_arches(self):
-		if self._arches is None:
-			_arches = self.db.query("SELECT arch_id AS id FROM distro_arches \
-				WHERE distro_id = %s", self.id)
+		res = self.db.query("SELECT arch FROM distributions_arches \
+			WHERE distro_id = %s ORDER BY arch", self.id)
 
-			self._arches = []
-			for arch in _arches:
-				arch = arches.Arch(self.pakfire, arch.id)
-				self._arches.append(arch)
+		return sorted((row.arch for row in res))
 
-			# Sort architectures by their priority.
-			self._arches.sort()
-
-		return self._arches
-
-	def set_arches(self, _arches):
+	def set_arches(self, arches):
 		self.db.execute("DELETE FROM distro_arches WHERE distro_id = %s", self.id)
 
-		for arch in _arches:
-			self.db.execute("INSERT INTO distro_arches(distro_id, arch_id) \
-				VALUES(%s, %s)", self.id, arch.id)
+		for arch in arches:
+			self.db.execute("INSERT INTO distro_arches(distro_id, arch) \
+				VALUES(%s, %s)", self.id, arch)
 
-		self._arches = _arches
+		self.arches = sorted(arches)
 
-	arches = property(get_arches, set_arches)
+	arches = lazy_property(get_arches, set_arches)
 
 	@property
 	def vendor(self):
@@ -143,11 +123,7 @@ class Distribution(base.Object):
 		return self.data.contact
 
 	def set_contact(self, contact):
-		self.db.execute("UPDATE distributions SET contact = %s WHERE id = %s",
-			contact, self.id)
-
-		if self._data:
-			self._data["contact"] = contact
+		self._set_attribute("contact", contact)
 
 	contact = property(get_contact, set_contact)
 
@@ -155,11 +131,7 @@ class Distribution(base.Object):
 		return self.data.tag
 
 	def set_tag(self, tag):
-		self.db.execute("UPDATE distributions SET tag = %s WHERE id = %s",
-			tag, self.id)
-
-		if self._data:
-			self._data["tag"] = tag
+		self._set_attribute("tag", tag)
 
 	tag = property(get_tag, set_tag)
 
@@ -167,20 +139,20 @@ class Distribution(base.Object):
 	def description(self):
 		return self.data.description or ""
 
-	@property
+	@lazy_property
 	def repositories(self):
-		_repos = self.db.query("SELECT id FROM repositories WHERE distro_id = %s", self.id)
+		_repositories = self.backend.repos._get_repositories("SELECT * FROM repositories \
+			WHERE distro_id = %s", self.id)
 
-		repos = []
-		for repo in _repos:
-			repo = Repository(self.pakfire, repo.id)
-			repo._distro = self
+		# Cache
+		repositories = []
+		for repo in _repositories:
+			repo.distro = self
+			repositories.append(repo)
 
-			repos.append(repo)
+		return sorted(repositories)
 
-		return sorted(repos)
-
-	@property
+	@lazy_property
 	def repositories_aux(self):
 		_repos = self.db.query("SELECT id FROM repositories_aux \
 			WHERE status = 'enabled' AND distro_id = %s", self.id)
@@ -195,14 +167,11 @@ class Distribution(base.Object):
 		return sorted(repos)
 
 	def get_repo(self, name):
-		repo = self.db.get("SELECT id FROM repositories WHERE distro_id = %s AND name = %s",
-			self.id, name)
+		repo = self.backend.repos._get_repository("SELECT * FROM repositories \
+			WHERE distro_id = %s AND name = %s", self.id, name)
 
-		if not repo:
-			return
-
-		repo = Repository(self.pakfire, repo.id)
-		repo._distro = self
+		# Cache
+		repo.distro = self
 
 		return repo
 
@@ -224,13 +193,6 @@ class Distribution(base.Object):
 
 		if repos:
 			return self.repositories[-1]
-
-	@property
-	def comprehensive_repositories(self):
-		return [r for r in self.repositories if r.comprehensive]
-
-	def add_repository(self, name, description):
-		return Repository.new(self.pakfire, self, name, description)
 
 	@property
 	def log(self):
@@ -265,22 +227,19 @@ class Distribution(base.Object):
 	def delete_package(self, name):
 		pass # XXX figure out what to do at this place
 
-	@property
+	@lazy_property
 	def sources(self):
-		if self._sources is None:
-			self._sources = []
+		_sources = []
 
-			for source in self.db.query("SELECT id FROM sources WHERE distro_id = %s", self.id):
-				source = sources.Source(self.pakfire, source.id)
-				self._sources.append(source)
+		for source in self.db.query("SELECT id FROM sources WHERE distro_id = %s", self.id):
+			source = sources.Source(self.pakfire, source.id)
+			_sources.append(source)
 
-			self._sources.sort()
+		return sorted(_sources)
 
-		return self._sources
-
-	def get_source(self, ident):
+	def get_source(self, identifier):
 		for source in self.sources:
-			if not source.identifier == ident:
+			if not source.identifier == identifier:
 				continue
 
 			return source

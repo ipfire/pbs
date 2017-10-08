@@ -1183,11 +1183,25 @@ CREATE TABLE distributions (
     description text,
     vendor text NOT NULL,
     contact text,
-    tag text NOT NULL
+    tag text NOT NULL,
+    deleted boolean DEFAULT false NOT NULL
 );
 
 
 ALTER TABLE distributions OWNER TO pakfire;
+
+--
+-- Name: distributions_arches; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE TABLE distributions_arches (
+    id integer NOT NULL,
+    distro_id integer NOT NULL,
+    arch text NOT NULL
+);
+
+
+ALTER TABLE distributions_arches OWNER TO pakfire;
 
 --
 -- Name: distributions_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
@@ -1211,19 +1225,6 @@ ALTER SEQUENCE distributions_id_seq OWNED BY distributions.id;
 
 
 --
--- Name: distro_arches; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE distro_arches (
-    id integer NOT NULL,
-    distro_id integer NOT NULL,
-    arch_id integer NOT NULL
-);
-
-
-ALTER TABLE distro_arches OWNER TO pakfire;
-
---
 -- Name: distro_arches_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
 --
 
@@ -1241,7 +1242,7 @@ ALTER TABLE distro_arches_id_seq OWNER TO pakfire;
 -- Name: distro_arches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
 --
 
-ALTER SEQUENCE distro_arches_id_seq OWNED BY distro_arches.id;
+ALTER SEQUENCE distro_arches_id_seq OWNED BY distributions_arches.id;
 
 
 --
@@ -1804,7 +1805,8 @@ CREATE TABLE repositories (
     time_min integer DEFAULT 0 NOT NULL,
     time_max integer DEFAULT 0 NOT NULL,
     update_started timestamp without time zone,
-    update_ended timestamp without time zone
+    update_ended timestamp without time zone,
+    deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -2338,7 +2340,7 @@ ALTER TABLE ONLY distributions ALTER COLUMN id SET DEFAULT nextval('distribution
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
 --
 
-ALTER TABLE ONLY distro_arches ALTER COLUMN id SET DEFAULT nextval('distro_arches_id_seq'::regclass);
+ALTER TABLE ONLY distributions_arches ALTER COLUMN id SET DEFAULT nextval('distro_arches_id_seq'::regclass);
 
 
 --
@@ -2609,7 +2611,7 @@ ALTER TABLE ONLY distributions
 -- Name: idx_2198048_primary; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
-ALTER TABLE ONLY distro_arches
+ALTER TABLE ONLY distributions_arches
     ADD CONSTRAINT idx_2198048_primary PRIMARY KEY (id);
 
 
@@ -2840,6 +2842,20 @@ CREATE UNIQUE INDEX builders_name ON builders USING btree (name) WHERE (deleted 
 --
 
 CREATE INDEX builds_watchers_build_id ON builds_watchers USING btree (build_id);
+
+
+--
+-- Name: distributions_arches_distro_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX distributions_arches_distro_id ON distributions_arches USING btree (distro_id);
+
+
+--
+-- Name: distributions_sname; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE UNIQUE INDEX distributions_sname ON distributions USING btree (sname) WHERE (deleted IS FALSE);
 
 
 --
@@ -3237,18 +3253,18 @@ ALTER TABLE ONLY builds_watchers
 
 
 --
--- Name: distro_arches_arch_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+-- Name: distributions_arches_arch; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
 --
 
-ALTER TABLE ONLY distro_arches
-    ADD CONSTRAINT distro_arches_arch_id FOREIGN KEY (arch_id) REFERENCES arches(id);
+ALTER TABLE ONLY distributions_arches
+    ADD CONSTRAINT distributions_arches_arch FOREIGN KEY (arch) REFERENCES arches(name);
 
 
 --
 -- Name: distro_arches_distro_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
 --
 
-ALTER TABLE ONLY distro_arches
+ALTER TABLE ONLY distributions_arches
     ADD CONSTRAINT distro_arches_distro_id FOREIGN KEY (distro_id) REFERENCES distributions(id);
 
 

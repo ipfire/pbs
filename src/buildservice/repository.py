@@ -5,17 +5,30 @@ import os.path
 from . import base
 from . import logs
 
-class Repositories(base.Object):
-	def get_all(self):
-		repos = self.db.query("SELECT * FROM repositories")
+from .decorators import *
 
-		return [Repository(self.pakfire, r.id, r) for r in repos]
+class Repositories(base.Object):
+	def _get_repository(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Repository(self.backend, res.id, data=res)
+
+	def _get_repositories(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Repository(self.backend, row.id, data=row)
+
+	def __iter__(self):
+		repositories = self._get_repositories("SELECT * FROM repositories \
+			ORDER BY distro_id, name")
+
+		return iter(repositories)
 
 	def get_by_id(self, repo_id):
-		repo = self.db.get("SELECT * FROM repositories WHERE id = %s", repo_id)
-
-		if repo:
-			return Repository(self.pakfire, repo.id, repo)
+		return self._get_repository("SELECT * FROM repositories \
+			WHERE id = %s", repo_id)
 
 	def get_needs_update(self, limit=None):
 		query = "SELECT id FROM repositories WHERE needs_update = 'Y'"
@@ -117,13 +130,9 @@ class Repository(base.Object):
 
 		return cls(pakfire, id)
 
-	@property
+	@lazy_property
 	def distro(self):
-		if self._distro is None:
-			self._distro = self.pakfire.distros.get_by_id(self.data.distro_id)
-			assert self._distro
-
-		return self._distro
+		return self.backend.distros.get_by_id(self.data.distro_id)
 
 	@property
 	def info(self):
@@ -415,19 +424,16 @@ class Repository(base.Object):
 		return self.pakfire.repos.get_history(**kwargs)
 
 	def get_build_times(self):
-		noarch = self.pakfire.arches.get_by_name("noarch")
-		assert noarch
-
 		times = []
-		for arch in self.pakfire.arches.get_all():
-			time = self.db.get("SELECT SUM(UNIX_TIMESTAMP(jobs.time_finished) - UNIX_TIMESTAMP(jobs.time_started)) AS time FROM jobs \
+		for arch in self.arches:
+			time = self.db.get("SELECT SUM(jobs.time_finished - jobs.time_started) AS time FROM jobs \
 				JOIN builds ON builds.id = jobs.build_id \
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
-				WHERE (jobs.arch_id = %s OR jobs.arch_id = %s) AND \
+				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
 				jobs.type = 'build' AND \
-				repositories_builds.repo_id = %s", arch.id, noarch.id, self.id)
+				repositories_builds.repo_id = %s", arch, "noarch", self.id)
 
-			times.append((arch, time.time))
+			times.append((arch, time.time.total_seconds()))
 
 		return times
 

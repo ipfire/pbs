@@ -4,9 +4,7 @@ from .handlers_base import *
 
 class DistributionListHandler(BaseHandler):
 	def get(self):
-		distros = self.pakfire.distros.get_all()
-
-		self.render("distro-list.html", distros=distros)
+		self.render("distro-list.html", distros=self.backend.distros)
 
 
 class DistributionDetailHandler(BaseHandler):

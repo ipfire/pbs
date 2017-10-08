@@ -33,7 +33,7 @@
 
 			<p>
 				{{ _("Supported architectures") }}:
-				{{ locale.list([a.name for a in distro.arches]) or _("None") }}
+				{{ locale.list(distro.arches) or _("None") }}
 			</p>
 
 			<hr />

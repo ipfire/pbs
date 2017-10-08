@@ -353,7 +353,7 @@ class JobStateModule(UIModule):
 			classes.append(cls)
 
 		if show_arch:
-			text = job.arch.name
+			text = job.arch
 
 		if show_icon and icon:
 			text = """<i class="%s"></i> %s""" % (icon, text)
