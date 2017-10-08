@@ -31,7 +31,7 @@ WORKDIR /build/pakfire-build-service
 # Compile the build service
 RUN ./autogen.sh && \
 	./configure --prefix=/usr --sysconfdir=/etc \
-	make && make check && make install && rm -rf /build/pakfire-build-service
+	&& make && make check && make install && rm -rf /build/pakfire-build-service
 
 # Go back to /root
 WORKDIR /root
