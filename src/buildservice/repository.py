@@ -346,7 +346,7 @@ class Repository(base.Object):
 				JOIN builds ON builds.pkg_id = packages.id \
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
 				WHERE packages.arch = %s AND repositories_builds.repo_id = %s",
-				arch.id, self.id)
+				arch.name, self.id)
 
 		else:
 			noarch = self.pakfire.arches.get_by_name("noarch")
@@ -357,9 +357,9 @@ class Repository(base.Object):
 				JOIN jobs ON jobs_packages.job_id = jobs.id \
 				JOIN builds ON builds.id = jobs.build_id \
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
-				WHERE (jobs.arch_id = %s OR jobs.arch_id = %s) AND \
+				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
 				repositories_builds.repo_id = %s",
-				arch.id, noarch.id, self.id)
+				arch.name, noarch.name, self.id)
 
 		return pkgs
 

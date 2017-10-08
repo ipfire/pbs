@@ -121,7 +121,6 @@ class Package(base.Object):
 		# Cache.
 		self._data = data
 		self._deps = None
-		self._arch = None
 		self._filelist = None
 		self._job = None
 		self._commit = None
@@ -282,11 +281,7 @@ class Package(base.Object):
 
 	@property
 	def arch(self):
-		if self._arch is None:
-			self._arch = self.pakfire.arches.get_by_id(self.data.arch)
-			assert self._arch
-
-		return self._arch
+		return self.data.arch
 
 	@property
 	def type(self):
@@ -294,7 +289,7 @@ class Package(base.Object):
 
 	@property
 	def friendly_name(self):
-		return "%s-%s.%s" % (self.name, self.friendly_version, self.arch.name)
+		return "%s-%s.%s" % (self.name, self.friendly_version, self.arch)
 
 	@property
 	def friendly_version(self):

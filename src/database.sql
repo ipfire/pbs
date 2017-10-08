@@ -860,7 +860,7 @@ CREATE TABLE packages (
     version text NOT NULL,
     release text NOT NULL,
     type packages_type NOT NULL,
-    arch integer NOT NULL,
+    arch text NOT NULL,
     groups text NOT NULL,
     maintainer text NOT NULL,
     license text NOT NULL,
@@ -3235,7 +3235,7 @@ ALTER TABLE ONLY mirrors_history
 --
 
 ALTER TABLE ONLY packages
-    ADD CONSTRAINT packages_arch FOREIGN KEY (arch) REFERENCES arches(id);
+    ADD CONSTRAINT packages_arch FOREIGN KEY (arch) REFERENCES arches(name);
 
 
 --

@@ -390,7 +390,7 @@ class BuildsGetHandler(BaseHandler):
 class JobsBaseHandler(BaseHandler):
 	def job2json(self, job):
 		ret = {
-			"arch"         : job.arch.name,
+			"arch"         : job.arch,
 			"build"        : job.build.uuid,
 			"duration"     : job.duration,
 			"name"         : job.name,
@@ -486,7 +486,7 @@ class PackagesGetHandler(BaseHandler):
 			raise tornado.web.HTTPError(404, "Could not find package: %s" % package_uuid)
 
 		ret = {
-			"arch"             : pkg.arch.name,
+			"arch"             : pkg.arch,
 			"build_id"         : pkg.build_id,
 			"build_host"       : pkg.build_host,
 			"build_time"       : pkg.build_time.isoformat(),
@@ -618,7 +618,7 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 
 			ret = {
 				"id"                 : job.uuid,
-				"arch"               : job.arch.name,
+				"arch"               : job.arch,
 				"source_url"         : job.build.source_download,
 				"source_hash_sha512" : job.build.source_hash_sha512,
 				"type"               : job.type,
