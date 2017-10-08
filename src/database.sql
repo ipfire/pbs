@@ -826,7 +826,7 @@ CREATE TABLE jobs (
     type jobs_type DEFAULT 'build'::jobs_type NOT NULL,
     build_id integer NOT NULL,
     state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
-    arch_id integer NOT NULL,
+    arch text NOT NULL,
     time_created timestamp without time zone NOT NULL,
     time_started timestamp without time zone,
     time_finished timestamp without time zone,
@@ -850,7 +850,7 @@ CREATE VIEW jobs_active AS
     jobs.type,
     jobs.build_id,
     jobs.state,
-    jobs.arch_id,
+    jobs.arch,
     jobs.time_created,
     jobs.time_started,
     jobs.time_finished,
@@ -1159,14 +1159,14 @@ ALTER TABLE builds_latest OWNER TO pakfire;
 
 CREATE VIEW builds_times AS
  SELECT builds.id AS build_id,
-    arches.name AS arch,
+    jobs.arch,
     arches.platform,
     jobs.type AS job_type,
     (jobs.time_finished - jobs.time_started) AS duration
    FROM (((jobs
      LEFT JOIN builds ON ((jobs.build_id = builds.id)))
      LEFT JOIN packages ON ((builds.pkg_id = packages.id)))
-     LEFT JOIN arches ON ((jobs.arch_id = arches.id)))
+     LEFT JOIN arches ON ((jobs.arch = arches.name)))
   WHERE (jobs.state = 'finished'::jobs_state);
 
 
@@ -1439,7 +1439,7 @@ CREATE VIEW jobs_queue AS
                         END)))
          LIMIT 1) AS designated_builder_id
    FROM ((jobs
-     LEFT JOIN arches ON ((jobs.arch_id = arches.id)))
+     LEFT JOIN arches ON ((jobs.arch = arches.name)))
      LEFT JOIN builds ON ((jobs.build_id = builds.id)))
   WHERE ((jobs.state = ANY (ARRAY['pending'::jobs_state, 'new'::jobs_state])) AND ((jobs.start_not_before IS NULL) OR (jobs.start_not_before <= now())))
   ORDER BY
@@ -2552,6 +2552,14 @@ ALTER TABLE ONLY users_permissions ALTER COLUMN id SET DEFAULT nextval('users_pe
 
 
 --
+-- Name: arches_name; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY arches
+    ADD CONSTRAINT arches_name UNIQUE (name);
+
+
+--
 -- Name: idx_2197943_primary; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2947,13 +2955,6 @@ CREATE INDEX idx_2198052_pkg_id ON filelists USING btree (pkg_id);
 
 
 --
--- Name: idx_2198063_arch_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198063_arch_id ON jobs USING btree (arch_id);
-
-
---
 -- Name: idx_2198063_build_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -3136,6 +3137,13 @@ CREATE INDEX idx_2198256_user_id ON users_emails USING btree (user_id);
 
 
 --
+-- Name: jobs_arch; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_arch ON jobs USING btree (arch);
+
+
+--
 -- Name: jobs_buildroots_pkg_uuid; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -3303,11 +3311,11 @@ ALTER TABLE ONLY filelists
 
 
 --
--- Name: jobs_arch_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+-- Name: jobs_arch; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
 --
 
 ALTER TABLE ONLY jobs
-    ADD CONSTRAINT jobs_arch_id FOREIGN KEY (arch_id) REFERENCES arches(id);
+    ADD CONSTRAINT jobs_arch FOREIGN KEY (arch) REFERENCES arches(name);
 
 
 --
