@@ -2810,24 +2810,10 @@ CREATE UNIQUE INDEX idx_2198094_fingerprint ON keys USING btree (fingerprint);
 
 
 --
--- Name: idx_2198132_epoch; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198132_epoch ON packages USING btree (epoch);
-
-
---
 -- Name: idx_2198132_name; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
 CREATE INDEX idx_2198132_name ON packages USING btree (name);
-
-
---
--- Name: idx_2198132_release; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198132_release ON packages USING btree (release);
 
 
 --
@@ -2842,13 +2828,6 @@ CREATE INDEX idx_2198132_type ON packages USING btree (type);
 --
 
 CREATE INDEX idx_2198132_uuid ON packages USING btree (uuid);
-
-
---
--- Name: idx_2198132_version; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198132_version ON packages USING btree (version);
 
 
 --
