@@ -34,6 +34,7 @@ pythondir  = $(pyexecdir)/pakfire
 
 configsdir = $(sysconfdir)/pakfire
 
+BUILT_SOURCES =
 CLEANFILES =
 DISTCLEANFILES =
 EXTRA_DIST =
@@ -103,6 +104,9 @@ buildservice_PYTHON = \
 	src/buildservice/users.py
 
 buildservicedir = $(pythondir)/buildservice
+
+BUILT_SOURCES += \
+	src/buildservice/constants.py
 
 EXTRA_DIST += \
 	src/buildservice/constants.py.in
