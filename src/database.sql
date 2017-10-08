@@ -38,66 +38,6 @@ CREATE TYPE arches_binary AS ENUM (
 ALTER TYPE arches_binary OWNER TO pakfire;
 
 --
--- Name: builders_arches_enabled; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_arches_enabled AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_arches_enabled OWNER TO pakfire;
-
---
--- Name: builders_build_release; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_build_release AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_build_release OWNER TO pakfire;
-
---
--- Name: builders_build_scratch; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_build_scratch AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_build_scratch OWNER TO pakfire;
-
---
--- Name: builders_build_test; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_build_test AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_build_test OWNER TO pakfire;
-
---
--- Name: builders_deleted; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_deleted AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_deleted OWNER TO pakfire;
-
---
 -- Name: builders_disabled; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -136,19 +76,6 @@ CREATE TYPE builders_overload AS ENUM (
 ALTER TYPE builders_overload OWNER TO pakfire;
 
 --
--- Name: builders_status; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_status AS ENUM (
-    'enabled',
-    'disabled',
-    'deleted'
-);
-
-
-ALTER TYPE builders_status OWNER TO pakfire;
-
---
 -- Name: builds_auto_move; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -159,18 +86,6 @@ CREATE TYPE builds_auto_move AS ENUM (
 
 
 ALTER TYPE builds_auto_move OWNER TO pakfire;
-
---
--- Name: builds_bugs_updates_error; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_bugs_updates_error AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE builds_bugs_updates_error OWNER TO pakfire;
 
 --
 -- Name: builds_history_action; Type: TYPE; Schema: public; Owner: pakfire
@@ -322,19 +237,6 @@ CREATE TYPE jobs_type AS ENUM (
 ALTER TYPE jobs_type OWNER TO pakfire;
 
 --
--- Name: mirrors_check_status; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE mirrors_check_status AS ENUM (
-    'UNKNOWN',
-    'UP',
-    'DOWN'
-);
-
-
-ALTER TYPE mirrors_check_status OWNER TO pakfire;
-
---
 -- Name: mirrors_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -347,19 +249,6 @@ CREATE TYPE mirrors_history_action AS ENUM (
 
 
 ALTER TYPE mirrors_history_action OWNER TO pakfire;
-
---
--- Name: mirrors_status; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE mirrors_status AS ENUM (
-    'enabled',
-    'disabled',
-    'deleted'
-);
-
-
-ALTER TYPE mirrors_status OWNER TO pakfire;
 
 --
 -- Name: packages_deps_type; Type: TYPE; Schema: public; Owner: pakfire
@@ -680,7 +569,6 @@ CREATE TABLE builders (
     enabled boolean DEFAULT false NOT NULL,
     deleted boolean DEFAULT false NOT NULL,
     loadavg text DEFAULT '0'::character varying NOT NULL,
-    arches text,
     testmode boolean DEFAULT true NOT NULL,
     max_jobs bigint DEFAULT 1::bigint NOT NULL,
     pakfire_version text,
