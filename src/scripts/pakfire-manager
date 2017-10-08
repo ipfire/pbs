@@ -16,10 +16,8 @@ s = pakfire.buildservice.scheduler.Scheduler()
 p = pakfire.buildservice.Pakfire()
 
 events = (
-	pakfire.buildservice.manager.BugsUpdateEvent,
 	pakfire.buildservice.manager.BuildsFailedRestartEvent,
 	pakfire.buildservice.manager.CheckBuildDependenciesEvent,
-	pakfire.buildservice.manager.CleanupFilesEvent,
 	pakfire.buildservice.manager.CreateTestBuildsEvent,
 	pakfire.buildservice.manager.DistEvent,
 	pakfire.buildservice.manager.RepositoriesUpdateEvent,
