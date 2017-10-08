@@ -725,41 +725,6 @@ ALTER SEQUENCE arches_id_seq OWNED BY arches.id;
 
 
 --
--- Name: builders_arches; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE builders_arches (
-    id integer NOT NULL,
-    builder_id integer NOT NULL,
-    arch_id integer NOT NULL,
-    enabled builders_arches_enabled DEFAULT 'Y'::builders_arches_enabled NOT NULL
-);
-
-
-ALTER TABLE builders_arches OWNER TO pakfire;
-
---
--- Name: builders_arches_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
---
-
-CREATE SEQUENCE builders_arches_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE builders_arches_id_seq OWNER TO pakfire;
-
---
--- Name: builders_arches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
---
-
-ALTER SEQUENCE builders_arches_id_seq OWNED BY builders_arches.id;
-
-
---
 -- Name: builders_history; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2317,13 +2282,6 @@ ALTER TABLE ONLY builders ALTER COLUMN id SET DEFAULT nextval('builders_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
 --
 
-ALTER TABLE ONLY builders_arches ALTER COLUMN id SET DEFAULT nextval('builders_arches_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
---
-
 ALTER TABLE ONLY builders_history ALTER COLUMN id SET DEFAULT nextval('builders_history_id_seq'::regclass);
 
 
@@ -2573,14 +2531,6 @@ ALTER TABLE ONLY arches
 
 ALTER TABLE ONLY builders
     ADD CONSTRAINT idx_2197954_primary PRIMARY KEY (id);
-
-
---
--- Name: idx_2197975_primary; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
---
-
-ALTER TABLE ONLY builders_arches
-    ADD CONSTRAINT idx_2197975_primary PRIMARY KEY (id);
 
 
 --
@@ -2861,13 +2811,6 @@ ALTER TABLE ONLY sessions
 
 ALTER TABLE ONLY sessions
     ADD CONSTRAINT sessions_session_id_key UNIQUE (session_id);
-
-
---
--- Name: builders_arches_builder_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX builders_arches_builder_id ON builders_arches USING btree (builder_id);
 
 
 --
@@ -3164,22 +3107,6 @@ ALTER TABLE mirrors_checks CLUSTER ON mirrors_checks_sort;
 --
 
 CREATE TRIGGER on_update_current_timestamp BEFORE UPDATE ON sources FOR EACH ROW EXECUTE PROCEDURE on_update_current_timestamp_sources();
-
-
---
--- Name: builders_arches_arch_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
---
-
-ALTER TABLE ONLY builders_arches
-    ADD CONSTRAINT builders_arches_arch_id FOREIGN KEY (arch_id) REFERENCES arches(id);
-
-
---
--- Name: builders_arches_builder_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
---
-
-ALTER TABLE ONLY builders_arches
-    ADD CONSTRAINT builders_arches_builder_id FOREIGN KEY (builder_id) REFERENCES builders(id);
 
 
 --

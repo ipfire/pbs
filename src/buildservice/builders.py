@@ -207,39 +207,6 @@ class Builder(base.DataObject):
 			pakfire_version, cpu_model, cpu_count, cpu_arch, cpu_bogomips,
 			host_key, os_name, self.id)
 
-	def update_arches(self, arches):
-		# Get all arches this builder does currently support.
-		supported_arches = [a.name for a in self.get_arches()]
-
-		# Noarch is always supported.
-		if not "noarch" in arches:
-			arches.append("noarch")
-
-		arches_add = []
-		for arch in arches:
-			if arch in supported_arches:
-				supported_arches.remove(arch)
-				continue
-
-			arches_add.append(arch)
-		arches_rem = supported_arches
-
-		for arch_name in arches_add:
-			arch = self.pakfire.arches.get_by_name(arch_name)
-			if not arch:
-				logging.info("Client sent unknown architecture: %s" % arch_name)
-				continue
-
-			self.db.execute("INSERT INTO builders_arches(builder_id, arch_id) \
-				VALUES(%s, %s)", self.id, arch.id)
-
-		for arch_name in arches_rem:
-			arch = self.pakfire.arches.get_by_name(arch_name)
-			assert arch
-
-			self.db.execute("DELETE FROM builders_arches WHERE builder_id = %s \
-				AND arch_id = %s", self.id, arch.id)
-
 	def get_enabled(self):
 		return self.status == "enabled"
 
