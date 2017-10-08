@@ -123,7 +123,6 @@ hubdir = $(buildservicedir)/hub
 manager_PYTHON = \
 	src/manager/__init__.py \
 	src/manager/base.py \
-	src/manager/bugs.py \
 	src/manager/builds.py \
 	src/manager/repositories.py \
 	src/manager/sources.py

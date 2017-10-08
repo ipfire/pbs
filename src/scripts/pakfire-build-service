@@ -25,6 +25,9 @@ class Cli(object):
 
 			# Sends all queued messages
 			"process-message-queue" : self.backend.messages.process_queue,
+
+			# Send bug updates to Bugzilla
+			"send-bug-updates" : self.backend.bugzilla.send_all,
 		}
 
 	def __call__(self, *args):

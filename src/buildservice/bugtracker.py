@@ -65,7 +65,6 @@ class BugzillaBug(base.Object):
 
 		self.call("update", ids=[self.id,], **kwargs)
 
-	
 
 class Bugzilla(base.Object):
 	def __init__(self, pakfire):
@@ -133,7 +132,6 @@ class Bugzilla(base.Object):
 	def get_bug(self, bug_id):
 		try:
 			bug = BugzillaBug(self, bug_id)
-			s = bug.status
 
 		except xmlrpclib.Fault:
 			return None
@@ -174,3 +172,29 @@ class Bugzilla(base.Object):
 			bugs.append(bug)
 
 		return bugs
+
+	def send_all(self, limit=100):
+		# Get up to ten updates.
+		query = self.db.query("SELECT * FROM builds_bugs_updates \
+			WHERE error IS FALSE ORDER BY time LIMIT %s", limit)
+
+		# XXX CHECK IF BZ IS ACTUALLY REACHABLE AND WORKING
+
+		for update in query:
+			try:
+				bug = self.backend.bugzilla.get_bug(update.bug_id)
+				if not bug:
+					logging.error("Bug #%s does not exist." % update.bug_id)
+					continue
+
+				# Set the changes.
+				bug.set_status(update.status, update.resolution, update.comment)
+
+			except Exception, e:
+				# If there was an error, we save that and go on.
+				self.db.execute("UPDATE builds_bugs_updates SET error = 'Y', error_msg = %s \
+					WHERE id = %s", "%s" % e, update.id)
+
+			else:
+				# Remove the update when it has been done successfully.
+				self.db.execute("DELETE FROM builds_bugs_updates WHERE id = %s", update.id)

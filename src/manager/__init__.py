@@ -2,7 +2,6 @@
 
 from . import base
 
-from .bugs         import BugsUpdateEvent
 from .builds       import BuildsFailedRestartEvent, CheckBuildDependenciesEvent
 from .builds       import CreateTestBuildsEvent, DistEvent
 from .repositories import RepositoriesUpdateEvent
