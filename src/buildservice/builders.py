@@ -58,20 +58,6 @@ class Builders(base.Object):
 		if builder:
 			return Builder(self.pakfire, builder.id, builder)
 
-	def get_all_arches(self):
-		arches = set()
-
-		for result in self.db.query("SELECT DISTINCT arches FROM builders"):
-			if not result.arches:
-				continue
-
-			_arches = result.arches.split()
-
-			for arch in _arches:
-				arches.add(arch)
-
-		return sorted(arches)
-
 	def get_load(self):
 		res1 = self.db.get("SELECT SUM(max_jobs) AS max_jobs FROM builders \
 			WHERE status = 'enabled'")
