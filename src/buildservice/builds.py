@@ -2058,8 +2058,8 @@ class Job(base.Object):
 			tries = self.tries
 
 		res = self.db.get("SELECT COUNT(*) AS num FROM jobs_buildroots \
-			WHERE jobs_buildroots.job_id = %s AND jobs_buildroots.tries = %s \
-			ORDER BY pkg_name", self.id, tries)
+			WHERE jobs_buildroots.job_id = %s AND jobs_buildroots.tries = %s",
+			self.id, tries)
 
 		if res:
 			return res.num
