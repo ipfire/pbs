@@ -29,6 +29,9 @@ class Cli(object):
 			# Sends all queued messages
 			"process-message-queue" : self.backend.messages.process_queue,
 
+			# Pull sources
+			"pull-sources" : self.backend.sources.pull,
+
 			# Send bug updates to Bugzilla
 			"send-bug-updates" : self.backend.bugzilla.send_all,
 		}

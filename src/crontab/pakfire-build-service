@@ -1,6 +1,9 @@
 # Send queued emails once a minute
 * * * * *	nobody	pakfire-build-service process-message-queue &>/dev/null
 
+# Pull sources
+*/5 * * * *	nobody	pakfire-build-service pull-sources &>/dev/null
+
 # Send updates to Bugzilla
 */5 * * * *	nobody	pakfire-build-service send-bug-updates &>/dev/null
 

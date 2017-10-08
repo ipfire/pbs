@@ -23,7 +23,6 @@ events = (
 	pakfire.buildservice.manager.CreateTestBuildsEvent,
 	pakfire.buildservice.manager.DistEvent,
 	pakfire.buildservice.manager.RepositoriesUpdateEvent,
-	pakfire.buildservice.manager.SourcesPullEvent,
 )
 
 # Add all events to the scheduler.
