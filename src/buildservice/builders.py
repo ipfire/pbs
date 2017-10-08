@@ -17,21 +17,49 @@ from .decorators import *
 from .users import generate_password_hash, check_password_hash, generate_random_string
 
 class Builders(base.Object):
+	def _get_builder(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Builder(self.backend, res.id, data=res)
+
+	def _get_builders(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Builder(self.backend, row.id, data=row)
+
+	def __iter__(self):
+		builders = self._get_builders("SELECT * FROM builders \
+			WHERE deleted IS FALSE ORDER BY name")
+
+		return iter(builders)
+
+	def create(self, name, user=None, log=True):
+		"""
+			Creates a new builder.
+		"""
+		builder = self._get_builder("INSERT INTO builders(name) \
+			VALUES(%s) RETURNING *", name)
+
+		# Generate a new passphrase.
+		passphrase = builder.regenerate_passphrase()
+
+		# Log what we have done.
+		if log:
+			builder.log("created", user=user)
+
+		# The Builder object and the passphrase are returned.
+		return builder, passphrase
+
 	def auth(self, name, passphrase):
 		# If either name or passphrase is None, we don't check at all.
 		if None in (name, passphrase):
 			return
 
 		# Search for the hostname in the database.
-		# The builder must not be deleted.
-		builder = self.db.get("SELECT id FROM builders WHERE name = %s AND \
-			NOT status = 'deleted'", name)
-
-		if not builder:
-			return
-
-		# Get the whole Builder object from the database.
-		builder = self.get_by_id(builder.id)
+		builder = self._get_builder("SELECT * FROM builders \
+			WHERE name = %s AND deleted IS FALSE", name)
 
 		# If the builder was not found or the passphrase does not match,
 		# you have bad luck.
@@ -41,26 +69,16 @@ class Builders(base.Object):
 		# Otherwise we return the Builder object.
 		return builder
 
-	def get_all(self):
-		builders = self.db.query("SELECT * FROM builders WHERE NOT status = 'deleted' ORDER BY name")
-
-		return [Builder(self.pakfire, b.id, b) for b in builders]
-
-	def get_by_id(self, id):
-		if not id:
-			return
-
-		return Builder(self.pakfire, id)
+	def get_by_id(self, builder_id):
+		return self._get_builder("SELECT * FROM builders WHERE id = %s", builder_id)
 
 	def get_by_name(self, name):
-		builder = self.db.get("SELECT * FROM builders WHERE name = %s LIMIT 1", name)
-
-		if builder:
-			return Builder(self.pakfire, builder.id, builder)
+		return self._get_builder("SELECT * FROM builders \
+			WHERE name = %s AND deleted IS FALSE", name)
 
 	def get_load(self):
 		res1 = self.db.get("SELECT SUM(max_jobs) AS max_jobs FROM builders \
-			WHERE status = 'enabled'")
+			WHERE enabled IS TRUE and deleted IS FALSE")
 
 		res2 = self.db.get("SELECT COUNT(*) AS count FROM jobs \
 			WHERE state = 'dispatching' OR state = 'running' OR state = 'uploading'")
@@ -108,32 +126,13 @@ class Builders(base.Object):
 class Builder(base.DataObject):
 	table = "builders"
 
-	def __cmp__(self, other):
-		if other is None:
-			return -1
+	def __eq__(self, other):
+		if isinstance(other, self.__class__):
+			return self.id == other.id
 
-		return cmp(self.id, other.id)
-
-	@classmethod
-	def create(cls, pakfire, name, user=None, log=True):
-		"""
-			Creates a new builder.
-		"""
-		builder_id = pakfire.db.execute("INSERT INTO builders(name, time_created) \
-			VALUES(%s, NOW())", name)
-
-		# Create Builder object.
-		builder = cls(pakfire, builder_id)
-
-		# Generate a new passphrase.
-		passphrase = builder.regenerate_passphrase()
-
-		# Log what we have done.
-		if log:
-			builder.log("created", user=user)
-
-		# The Builder object and the passphrase are returned.
-		return builder, passphrase
+	def __lt__(self, other):
+		if isinstance(other, self.__class__):
+			return self.name < other.name
 
 	def log(self, action, user=None):
 		user_id = None
@@ -150,8 +149,8 @@ class Builder(base.DataObject):
 
 			The new passphrase is returned to be sent to the user (once).
 		"""
-		# Generate a random string with 20 chars.
-		passphrase = generate_random_string(length=20)
+		# Generate a random string with 40 chars.
+		passphrase = generate_random_string(length=40)
 
 		# Create salted hash.
 		passphrase_hash = generate_password_hash(passphrase)
@@ -174,10 +173,6 @@ class Builder(base.DataObject):
 		self._set_attribute("description", description)
 
 	description = property(lambda s: s.data.description or "", set_description)
-
-	@property
-	def status(self):
-		return self.data.status
 
 	@property
 	def keepalive(self):
@@ -207,49 +202,40 @@ class Builder(base.DataObject):
 			pakfire_version, cpu_model, cpu_count, cpu_arch, cpu_bogomips,
 			host_key, os_name, self.id)
 
-	def get_enabled(self):
-		return self.status == "enabled"
+	def set_enabled(self, enabled):
+		self._set_attribute("enabled", enabled)
 
-	def set_enabled(self, value):
-		# XXX deprecated
-
-		if value:
-			value = "enabled"
-		else:
-			value = "disabled"
-
-		self.set_status(value)
-
-	enabled = property(get_enabled, set_enabled)
+	enabled = property(lambda s: s.data.enabled, set_enabled)
 
 	@property
 	def disabled(self):
 		return not self.enabled
 
-	def set_status(self, status, user=None, log=True):
-		assert status in ("created", "enabled", "disabled", "deleted")
-
-		if self.status == status:
-			return
-
-		self._set_attribute("status", status)
-
-		if log:
-			self.log(status, user=user)
+	@property
+	def native_arch(self):
+		"""
+			The native architecture of this builder
+		"""
+		return self.cpu_arch
 
 	@lazy_property
-	def arches(self):
-		if self.cpu_arch:
+	def supported_arches(self):
+		# Every builder supports noarch
+		arches = ["noarch"]
+
+		# We can always build our native architeture
+		if self.native_arch:
+			arches.append(self.native_arch)
+
+			# Get all compatible architectures
 			res = self.db.query("SELECT build_arch FROM arches_compat \
-				WHERE host_arch = %s", self.cpu_arch)
+				WHERE native_arch = %s", self.native_arch)
 
-			arches += [r.build_arch for r in res]
-			if not self.cpu_arch in arches:
-				arches.append(self.cpu_arch)
+			for row in res:
+				if not row.build_arch in arches:
+					arches.append(row.build_arch)
 
-			return arches
-
-		return []
+		return sorted(arches)
 
 	def get_build_release(self):
 		return self.data.build_release == "Y"
@@ -462,7 +448,7 @@ class Builder(base.DataObject):
 		"""
 			Returns a list of jobs that can be built on this host.
 		"""
-		return self.pakfire.jobs.get_next(arches=self.arches, limit=limit)
+		return self.pakfire.jobs.get_next(arches=self.buildable_arches, limit=limit)
 
 	def get_next_job(self):
 		"""

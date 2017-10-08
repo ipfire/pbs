@@ -639,8 +639,9 @@ ALTER TABLE arches OWNER TO pakfire;
 --
 
 CREATE TABLE arches_compat (
-    host_arch text NOT NULL,
-    build_arch text NOT NULL
+    native_arch text NOT NULL,
+    build_arch text NOT NULL,
+    CONSTRAINT arches_compat_unique CHECK ((native_arch <> build_arch))
 );
 
 
@@ -655,8 +656,8 @@ CREATE TABLE builders (
     name text NOT NULL,
     passphrase text,
     description text,
-    status builders_status DEFAULT 'disabled'::builders_status NOT NULL,
-    disabled builders_disabled DEFAULT 'Y'::builders_disabled NOT NULL,
+    enabled boolean DEFAULT false NOT NULL,
+    deleted boolean DEFAULT false NOT NULL,
     loadavg text DEFAULT '0'::character varying NOT NULL,
     arches text,
     build_release builders_build_release DEFAULT 'N'::builders_build_release NOT NULL,
@@ -673,8 +674,7 @@ CREATE TABLE builders (
     overload builders_overload DEFAULT 'N'::builders_overload NOT NULL,
     free_space bigint DEFAULT 0 NOT NULL,
     host_key_id text,
-    deleted builders_deleted DEFAULT 'N'::builders_deleted NOT NULL,
-    time_created timestamp without time zone NOT NULL,
+    time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_updated timestamp without time zone,
     time_keepalive timestamp without time zone,
     loadavg1 double precision,
@@ -698,7 +698,7 @@ CREATE VIEW arches_builders AS
  SELECT arches_compat.build_arch AS arch,
     builders.id AS builder_id
    FROM (arches_compat
-     LEFT JOIN builders ON ((arches_compat.host_arch = builders.cpu_arch)));
+     LEFT JOIN builders ON ((arches_compat.native_arch = builders.cpu_arch)));
 
 
 ALTER TABLE arches_builders OWNER TO pakfire;
@@ -842,7 +842,7 @@ CREATE VIEW builders_ready AS
     builders.build_scratch,
     builders.build_test
    FROM builders
-  WHERE (((builders.status = 'enabled'::builders_status) AND (builders.time_keepalive >= (now() - '00:05:00'::interval))) AND (builders.max_jobs > ( SELECT count(*) AS count
+  WHERE ((((builders.deleted IS FALSE) AND (builders.enabled IS TRUE)) AND (builders.time_keepalive >= (now() - '00:05:00'::interval))) AND (builders.max_jobs > ( SELECT count(*) AS count
            FROM jobs_active
           WHERE (jobs_active.builder_id = builders.id))))
   ORDER BY ( SELECT count(*) AS count
@@ -2510,6 +2510,14 @@ ALTER TABLE ONLY users_permissions ALTER COLUMN id SET DEFAULT nextval('users_pe
 
 
 --
+-- Name: arches_compat_unique; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY arches_compat
+    ADD CONSTRAINT arches_compat_unique UNIQUE (native_arch, build_arch);
+
+
+--
 -- Name: arches_name; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2814,6 +2822,20 @@ ALTER TABLE ONLY sessions
 
 
 --
+-- Name: arches_compat_native_arch; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX arches_compat_native_arch ON arches_compat USING btree (native_arch);
+
+
+--
+-- Name: builders_name; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE UNIQUE INDEX builders_name ON builders USING btree (name) WHERE (deleted IS FALSE);
+
+
+--
 -- Name: builds_watchers_build_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2825,13 +2847,6 @@ CREATE INDEX builds_watchers_build_id ON builds_watchers USING btree (build_id);
 --
 
 CREATE INDEX filelists_name ON filelists USING btree (name);
-
-
---
--- Name: idx_2197949_host_arch; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2197949_host_arch ON arches_compat USING btree (host_arch);
 
 
 --
@@ -3107,6 +3122,14 @@ ALTER TABLE mirrors_checks CLUSTER ON mirrors_checks_sort;
 --
 
 CREATE TRIGGER on_update_current_timestamp BEFORE UPDATE ON sources FOR EACH ROW EXECUTE PROCEDURE on_update_current_timestamp_sources();
+
+
+--
+-- Name: arches_compat_build_arch; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY arches_compat
+    ADD CONSTRAINT arches_compat_build_arch FOREIGN KEY (build_arch) REFERENCES arches(name);
 
 
 --

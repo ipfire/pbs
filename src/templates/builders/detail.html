@@ -90,14 +90,10 @@
 					<tr>
 						<td>{{ _("State") }}</td>
 						<td>
-							{% if builder.status == "enabled" %}
+							{% if builder.enabled %}
 								{{ _("Enabled") }}
-							{% elif builder.status == "disabled" %}
-								{{ _("Disabled") }}
-							{% elif builder.status == "deleted" %}
-								{{ _("Deleted") }}
 							{% else %}
-								{{ _("Unknown status: %s") % builder.status }}
+								{{ _("Disabled") }}
 							{% end %}
 						</td>
 					</tr>
@@ -152,7 +148,7 @@
 					<tr>
 						<td>{{ _("Supported architectures") }}</td>
 						<td>
-							{{ locale.list(builder.arches) }}
+							{{ locale.list(builder.supported_arches) }}
 						</td>
 					</tr>
 					<tr>

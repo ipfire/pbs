@@ -8,9 +8,7 @@ from .handlers_base import *
 
 class BuilderListHandler(BaseHandler):
 	def get(self):
-		builders = self.pakfire.builders.get_all()
-
-		self.render("builders/list.html", builders=builders)
+		self.render("builders/list.html", builders=self.backend.builders)
 
 
 class BuilderDetailHandler(BaseHandler):
@@ -52,7 +50,7 @@ class BuilderNewHandler(BaseHandler):
 
 		# Create a new builder.
 		builder, passphrase = \
-			builders.Builder.create(self.pakfire, name, user=self.current_user)
+			self.backend.builders.create(name, user=self.current_user)
 
 		self.render("builders/pass.html", action="new", builder=builder,
 			passphrase=passphrase)
@@ -120,7 +118,8 @@ class BuilderDeleteHandler(BaseHandler):
 
 		confirmed = self.get_argument("confirmed", None)	
 		if confirmed:
-			builder.set_status("deleted", user=self.current_user)
+			with self.db.transaction():
+				builder.deleted = True
 
 			self.redirect("/builders")
 			return
@@ -129,7 +128,7 @@ class BuilderDeleteHandler(BaseHandler):
 
 
 class BuilderStatusChangeHandler(BaseHandler):
-	new_status = None
+	enabled = None
 
 	@tornado.web.authenticated
 	def get(self, hostname):
@@ -139,14 +138,15 @@ class BuilderStatusChangeHandler(BaseHandler):
 
 		# Check for sufficient right to edit things.
 		if self.current_user.has_perm("maintain_builders"):
-			builder.set_status(self.status, user=self.current_user)
+			with self.db.transaction():
+				builder.enabled = self.enabled
 
 		self.redirect("/builder/%s" % builder.name)
 
 
 class BuilderEnableHander(BuilderStatusChangeHandler):
-	status = "enabled"
+	enabled = True
 
 
 class BuilderDisableHander(BuilderStatusChangeHandler):
-	status = "disabled"
+	enabled = False
