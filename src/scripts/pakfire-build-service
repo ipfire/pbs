@@ -15,7 +15,7 @@ class Cli(object):
 
 		self._commands = {
 			# Run mirror check
-			"check-mirrors"    : self.backend.mirrors.check,
+			"check-mirrors" : self.backend.mirrors.check,
 
 			# Cleanup files
 			"cleanup-files" : self.backend.cleanup_files,
