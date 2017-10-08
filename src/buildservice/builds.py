@@ -1719,6 +1719,19 @@ class Job(base.Object):
 	def size(self):
 		return sum((p.size for p in self.packages))
 
+	@lazy_property
+	def rank(self):
+		"""
+			Returns the rank in the build queue
+		"""
+		if not self.state == "pending":
+			return
+
+		res = self.db.get("SELECT rank FROM jobs_queue WHERE job_id = %s", self.id)
+
+		if res:
+			return res.rank
+
 	def is_running(self):
 		"""
 			Returns True if job is in a running state.
