@@ -17,6 +17,9 @@ class Cli(object):
 			# Run mirror check
 			"check-mirrors"    : self.backend.mirrors.check,
 
+			# Cleanup files
+			"cleanup-files" : self.backend.cleanup_files,
+
 			# Cleanup sessions
 			"cleanup-sessions" : self.backend.sessions.cleanup,
 
