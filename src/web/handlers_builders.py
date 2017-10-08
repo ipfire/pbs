@@ -17,7 +17,7 @@ class BuilderDetailHandler(BaseHandler):
 
 		# Get running and pending jobs.
 		jobs = self.pakfire.jobs.get_active(builder=builder)
-		jobs += self.pakfire.jobs.get_next(builder=builder)
+		jobs += builder.jobqueue
 
 		# Get log.
 		log = builder.get_history(limit=5)
@@ -75,21 +75,20 @@ class BuilderEditHandler(BaseHandler):
 		if not self.current_user.has_perm("maintain_builders"):
 			raise tornado.web.HTTPError(403)
 
-		builder.enabled       = self.get_argument("enabled", False)
-		builder.build_release = self.get_argument("build_release", False)
-		builder.build_scratch = self.get_argument("build_scratch", False)
-		builder.build_test    = self.get_argument("build_test", False)
+		with self.db.transaction():
+			builder.enabled  = self.get_argument("enabled", False)
+			builder.testmode = self.get_argument("testmode", True)
 
-		# Save max_jobs.
-		max_jobs = self.get_argument("max_jobs", builder.max_jobs)
-		try:
-			max_jobs = int(max_jobs)
-		except TypeError:
-			max_jobs = 1
+			# Save max_jobs.
+			max_jobs = self.get_argument("max_jobs", builder.max_jobs)
+			try:
+				max_jobs = int(max_jobs)
+			except TypeError:
+				max_jobs = 1
 
-		if not max_jobs in range(1, 100):
-			max_jobs = 1
-		builder.max_jobs = max_jobs
+			if not max_jobs in range(1, 100):
+				max_jobs = 1
+			builder.max_jobs = max_jobs
 
 		self.redirect("/builder/%s" % builder.hostname)
 

@@ -70,26 +70,8 @@
 			<div class="control-group">
 				<div class="controls">
 					<label class="checkbox">
-						<input type="checkbox" id="build_release" name="build_release" {%if builder.build_release %}checked="checked"{% end %}>
-						{{ _("Authorized to build release builds.") }}
-					</label>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<div class="controls">
-					<label class="checkbox">
-						<input type="checkbox" id="build_scratch" name="build_scratch" {%if builder.build_scratch %}checked="checked"{% end %}>
-						{{ _("Authorized to build scratch builds.") }}
-					</label>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<div class="controls">
-					<label class="checkbox">
-						<input type="checkbox" id="build_test" name="build_test" {%if builder.build_test %}checked="checked"{% end %}>
-						{{ _("Authorized to build test builds.") }}
+						<input type="checkbox" name="testmode" {%if builder.testmode %}checked{% end %}>
+						{{ _("Test Mode") }}
 					</label>
 				</div>
 			</div>

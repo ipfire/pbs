@@ -115,11 +115,8 @@ class CreateTestBuildsEvent(base.Event):
 			arches.append(noarch)
 
 		for arch in arches:
-			# Get the job queue for each architecture.
-			queue = self.pakfire.jobs.get_next(arches=[arch,])
-
 			# Skip adding new jobs if there are more too many jobs in the queue.
-			limit = max_queue_length - len(queue)
+			limit = max_queue_length - self.backend.jobqueue.get_length_for_arch(arch.name)
 			if limit <= 0:
 				logging.debug("Already too many jobs in queue of %s to create tests." % arch.name)
 				continue

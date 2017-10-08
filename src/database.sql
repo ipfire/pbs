@@ -648,6 +648,27 @@ CREATE TABLE arches_compat (
 ALTER TABLE arches_compat OWNER TO pakfire;
 
 --
+-- Name: arches_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
+--
+
+CREATE SEQUENCE arches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE arches_id_seq OWNER TO pakfire;
+
+--
+-- Name: arches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
+--
+
+ALTER SEQUENCE arches_id_seq OWNED BY arches.id;
+
+
+--
 -- Name: builders; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -660,9 +681,7 @@ CREATE TABLE builders (
     deleted boolean DEFAULT false NOT NULL,
     loadavg text DEFAULT '0'::character varying NOT NULL,
     arches text,
-    build_release builders_build_release DEFAULT 'N'::builders_build_release NOT NULL,
-    build_scratch builders_build_scratch DEFAULT 'N'::builders_build_scratch NOT NULL,
-    build_test builders_build_test DEFAULT 'N'::builders_build_test NOT NULL,
+    testmode boolean DEFAULT true NOT NULL,
     max_jobs bigint DEFAULT 1::bigint NOT NULL,
     pakfire_version text,
     os_name text,
@@ -689,40 +708,6 @@ CREATE TABLE builders (
 
 
 ALTER TABLE builders OWNER TO pakfire;
-
---
--- Name: arches_builders; Type: VIEW; Schema: public; Owner: pakfire
---
-
-CREATE VIEW arches_builders AS
- SELECT arches_compat.build_arch AS arch,
-    builders.id AS builder_id
-   FROM (arches_compat
-     LEFT JOIN builders ON ((arches_compat.native_arch = builders.cpu_arch)));
-
-
-ALTER TABLE arches_builders OWNER TO pakfire;
-
---
--- Name: arches_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
---
-
-CREATE SEQUENCE arches_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE arches_id_seq OWNER TO pakfire;
-
---
--- Name: arches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
---
-
-ALTER SEQUENCE arches_id_seq OWNED BY arches.id;
-
 
 --
 -- Name: builders_history; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
@@ -780,77 +765,6 @@ ALTER TABLE builders_id_seq OWNER TO pakfire;
 
 ALTER SEQUENCE builders_id_seq OWNED BY builders.id;
 
-
---
--- Name: jobs; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE jobs (
-    id integer NOT NULL,
-    uuid text NOT NULL,
-    type jobs_type DEFAULT 'build'::jobs_type NOT NULL,
-    build_id integer NOT NULL,
-    state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
-    arch text NOT NULL,
-    time_created timestamp without time zone NOT NULL,
-    time_started timestamp without time zone,
-    time_finished timestamp without time zone,
-    start_not_before timestamp without time zone,
-    builder_id integer,
-    tries integer DEFAULT 0 NOT NULL,
-    aborted_state integer DEFAULT 0 NOT NULL,
-    message text
-);
-
-
-ALTER TABLE jobs OWNER TO pakfire;
-
---
--- Name: jobs_active; Type: VIEW; Schema: public; Owner: pakfire
---
-
-CREATE VIEW jobs_active AS
- SELECT jobs.id,
-    jobs.uuid,
-    jobs.type,
-    jobs.build_id,
-    jobs.state,
-    jobs.arch,
-    jobs.time_created,
-    jobs.time_started,
-    jobs.time_finished,
-    jobs.start_not_before,
-    jobs.builder_id,
-    jobs.tries,
-    jobs.aborted_state,
-    jobs.message
-   FROM jobs
-  WHERE (jobs.state = ANY (ARRAY['dispatching'::jobs_state, 'running'::jobs_state, 'uploading'::jobs_state]))
-  ORDER BY jobs.time_started;
-
-
-ALTER TABLE jobs_active OWNER TO pakfire;
-
---
--- Name: builders_ready; Type: VIEW; Schema: public; Owner: pakfire
---
-
-CREATE VIEW builders_ready AS
- SELECT builders.id AS builder_id,
-    builders.cpu_arch AS builder_arch,
-    builders.build_release,
-    builders.build_scratch,
-    builders.build_test
-   FROM builders
-  WHERE ((((builders.deleted IS FALSE) AND (builders.enabled IS TRUE)) AND (builders.time_keepalive >= (now() - '00:05:00'::interval))) AND (builders.max_jobs > ( SELECT count(*) AS count
-           FROM jobs_active
-          WHERE (jobs_active.builder_id = builders.id))))
-  ORDER BY ( SELECT count(*) AS count
-           FROM jobs_active
-          WHERE (jobs_active.builder_id = builders.id)), builders.cpu_bogomips DESC;
-
-
-ALTER TABLE builders_ready OWNER TO pakfire;
 
 --
 -- Name: builds; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
@@ -923,7 +837,7 @@ CREATE TABLE builds_bugs_updates (
     resolution text,
     comment text,
     "time" timestamp without time zone NOT NULL,
-    error builds_bugs_updates_error DEFAULT 'N'::builds_bugs_updates_error NOT NULL,
+    error boolean DEFAULT false NOT NULL,
     error_msg text
 );
 
@@ -1119,6 +1033,30 @@ CREATE VIEW builds_latest AS
 ALTER TABLE builds_latest OWNER TO pakfire;
 
 --
+-- Name: jobs; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE TABLE jobs (
+    id integer NOT NULL,
+    uuid text NOT NULL,
+    type jobs_type DEFAULT 'build'::jobs_type NOT NULL,
+    build_id integer NOT NULL,
+    state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
+    arch text NOT NULL,
+    time_created timestamp without time zone NOT NULL,
+    time_started timestamp without time zone,
+    time_finished timestamp without time zone,
+    start_not_before timestamp without time zone,
+    builder_id integer,
+    tries integer DEFAULT 0 NOT NULL,
+    aborted_state integer DEFAULT 0 NOT NULL,
+    message text
+);
+
+
+ALTER TABLE jobs OWNER TO pakfire;
+
+--
 -- Name: builds_times; Type: VIEW; Schema: public; Owner: pakfire
 --
 
@@ -1300,6 +1238,32 @@ ALTER SEQUENCE images_types_id_seq OWNED BY images_types.id;
 
 
 --
+-- Name: jobs_active; Type: VIEW; Schema: public; Owner: pakfire
+--
+
+CREATE VIEW jobs_active AS
+ SELECT jobs.id,
+    jobs.uuid,
+    jobs.type,
+    jobs.build_id,
+    jobs.state,
+    jobs.arch,
+    jobs.time_created,
+    jobs.time_started,
+    jobs.time_finished,
+    jobs.start_not_before,
+    jobs.builder_id,
+    jobs.tries,
+    jobs.aborted_state,
+    jobs.message
+   FROM jobs
+  WHERE (jobs.state = ANY (ARRAY['dispatching'::jobs_state, 'running'::jobs_state, 'uploading'::jobs_state]))
+  ORDER BY jobs.time_started;
+
+
+ALTER TABLE jobs_active OWNER TO pakfire;
+
+--
 -- Name: jobs_buildroots; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -1390,30 +1354,16 @@ ALTER SEQUENCE jobs_packages_id_seq OWNED BY jobs_packages.id;
 --
 
 CREATE VIEW jobs_queue AS
- SELECT jobs.id,
-    arches.name AS arch,
-    ( SELECT builders_ready.builder_id
-           FROM builders_ready
-          WHERE (builders_ready.builder_id IN ( SELECT arches_builders.builder_id
-                   FROM arches_builders
-                  WHERE ((arches_builders.arch = arches.name) AND
-                        CASE
-                            WHEN ((builds.type = 'release'::builds_type) AND (jobs.type = 'build'::jobs_type)) THEN (builders_ready.build_release = 'Y'::builders_build_release)
-                            WHEN ((builds.type = 'scratch'::builds_type) AND (jobs.type = 'build'::jobs_type)) THEN (builders_ready.build_scratch = 'Y'::builders_build_scratch)
-                            WHEN (jobs.type = 'test'::jobs_type) THEN (builders_ready.build_test = 'Y'::builders_build_test)
-                            ELSE NULL::boolean
-                        END)))
-         LIMIT 1) AS designated_builder_id
-   FROM ((jobs
-     LEFT JOIN arches ON ((jobs.arch = arches.name)))
-     LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-  WHERE ((jobs.state = ANY (ARRAY['pending'::jobs_state, 'new'::jobs_state])) AND ((jobs.start_not_before IS NULL) OR (jobs.start_not_before <= now())))
-  ORDER BY
-        CASE
-            WHEN (jobs.type = 'build'::jobs_type) THEN 0
-            WHEN (jobs.type = 'test'::jobs_type) THEN 1
-            ELSE NULL::integer
-        END, builds.priority DESC, jobs.tries, jobs.time_created;
+ WITH queue AS (
+         SELECT jobs.id,
+            rank() OVER (ORDER BY jobs.type, builds.priority DESC, jobs.tries, jobs.time_created) AS rank
+           FROM (jobs
+             LEFT JOIN builds ON ((jobs.build_id = builds.id)))
+          WHERE (jobs.state = 'pending'::jobs_state)
+        )
+ SELECT queue.id AS job_id,
+    queue.rank
+   FROM queue;
 
 
 ALTER TABLE jobs_queue OWNER TO pakfire;
@@ -1429,26 +1379,6 @@ CREATE TABLE jobs_repos (
 
 
 ALTER TABLE jobs_repos OWNER TO pakfire;
-
---
--- Name: jobs_waiting; Type: VIEW; Schema: public; Owner: pakfire
---
-
-CREATE VIEW jobs_waiting AS
- SELECT jobs_queue.id,
-    (now() - (jobs.time_created)::timestamp with time zone) AS time_waiting
-   FROM (jobs_queue
-     LEFT JOIN jobs ON ((jobs_queue.id = jobs.id)))
-  WHERE (jobs.start_not_before IS NULL)
-UNION
- SELECT jobs_queue.id,
-    (now() - (jobs.start_not_before)::timestamp with time zone) AS time_waiting
-   FROM (jobs_queue
-     LEFT JOIN jobs ON ((jobs_queue.id = jobs.id)))
-  WHERE (jobs.start_not_before IS NOT NULL);
-
-
-ALTER TABLE jobs_waiting OWNER TO pakfire;
 
 --
 -- Name: keys; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 

@@ -184,12 +184,10 @@ class StatsJobsQueueHandler(BaseHandler):
 		ret = {}
 
 		# Queue length(s).
-		ret["job_queue_length"] = self.backend.jobs.get_queue_length()
-		for state in ("new", "pending"):
-			ret["job_queue_length_%s" % state] = self.backend.jobs.get_queue_length(state)
+		ret["job_queue_length"] = len(self.backend.jobqueue)
 
 		# Average waiting time.
-		ret["job_queue_avg_wait_time"] = self.backend.jobs.get_avg_wait_time()
+		ret["job_queue_avg_wait_time"] = self.backend.jobqueue.average_waiting_time
 
 		self.write(ret)
 
@@ -446,7 +444,12 @@ class JobsGetQueueHandler(JobsBaseHandler):
 		limit = self.get_argument_int("limit", 5)
 
 		# Get the job queue.
-		jobs = self.backend.jobs.get_next(limit=limit)
+		jobs = []
+		for job in self.backend.jobqueue:
+			jobs.append(job)
+
+			limit -= 1
+			if not limit: break
 
 		args = {
 			"jobs" : [self.job2json(j) for j in jobs],

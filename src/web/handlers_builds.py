@@ -196,9 +196,7 @@ class BuildStateHandler(BaseHandler):
 
 class BuildQueueHandler(BaseHandler):
 	def get(self):
-		jobs = self.pakfire.jobs.get_next(limit=1000, states=["pending",])
-
-		self.render("build-queue.html", jobs=jobs)
+		self.render("build-queue.html", jobs=self.backend.jobqueue)
 
 
 class BuildDetailCommentHandler(BaseHandler):

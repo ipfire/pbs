@@ -1343,6 +1343,12 @@ class Build(base.Object):
 
 
 class Jobs(base.Object):
+	def _get_jobs(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Job(self.backend, row.id, data=row)
+
 	def get_by_id(self, id, data=None):
 		return Job(self.pakfire, id, data)
 
@@ -1401,53 +1407,6 @@ class Jobs(base.Object):
 			END, time_started ASC"
 
 		return [Job(self.pakfire, j.id, j) for j in self.db.query(query, *args)]
-
-	def get_next_iter(self, *args, **kwargs):
-		return iter(self.get_next(*args, **kwargs))
-
-	def get_next(self, arches=None, builder=None, limit=None, offset=None, type=None,
-			state=None, states=None, max_tries=None):
-
-		if state and states is None:
-			states = [state,]
-
-		query = "SELECT * FROM jobs \
-			INNER JOIN jobs_queue ON jobs.id = jobs_queue.id"
-		args = []
-
-		if arches:
-			query += " AND jobs_queue.arch IN (%s)" % ", ".join(["%s"] * len(arches))
-			args.extend(arches)
-
-		if builder:
-			query += " AND jobs_queue.designated_builder_id = %s"
-			args.append(builder.id)
-
-		if max_tries:
-			query += " AND jobs.max_tries <= %s"
-			args.append(max_tries)
-
-		if states:
-			query += " AND jobs.state IN (%s)" % ", ".join(["%s"] * len(states))
-			args.extend(states)
-
-		if type:
-			query += " AND jobs.type = %s"
-			args.append(type)
-
-		if limit:
-			query += " LIMIT %s"
-			args.append(limit)
-
-		jobs = []
-		for row in self.db.query(query, *args):
-			job = self.pakfire.jobs.get_by_id(row.id, row)
-			jobs.append(job)
-
-		# Reverse the order of the builds.
-		jobs.reverse()
-
-		return jobs
 
 	def get_latest(self, arch=None, builder=None, limit=None, age=None, date=None):
 		query = "SELECT * FROM jobs"
@@ -1511,29 +1470,6 @@ class Jobs(base.Object):
 		jobs = self.db.get(query, *args)
 		if jobs:
 			return jobs.count
-
-	def get_queue_length(self, state=None):
-		if state:
-			res = self.db.get("SELECT COUNT(*) AS count FROM jobs_queue \
-				LEFT JOIN jobs ON jobs_queue.id = jobs.id WHERE state = %s", state)
-		else:
-			res = self.db.get("SELECT COUNT(*) AS count FROM jobs_queue")
-
-		if res:
-			return res.count
-
-		return 0
-
-	def get_avg_wait_time(self):
-		res = self.db.get("SELECT AVG(time_waiting) AS time_waiting FROM jobs_waiting")
-
-		if res and res.time_waiting:
-			try:
-				return int(res.time_waiting)
-			except ValueError:
-				return 0
-
-		return 0
 
 	def get_state_stats(self):
 		res = self.db.query("SELECT state, COUNT(*) AS count FROM jobs GROUP BY state")

@@ -74,6 +74,12 @@
 		<h2>{{ _("Builder") }}: {{ builder.name }}</h2>
 	</div>
 
+	{% if builder.testmode %}
+		<div class="alert alert-block alert-warning">
+			{{ _("This builder is in test mode!") }}
+		</div>
+	{% end %}
+
 	{% if builder.overload %}
 		<div class="alert alert-block alert-warning">
 			<h4 class="alert-heading">{{ _("Warning") }}!</h4>
@@ -100,24 +106,6 @@
 					<tr>
 						<td>{{ _("Parallel builds") }}</td>
 						<td>{{ _("One job only.", "Up to %(num)s jobs.", builder.max_jobs) % { "num" : builder.max_jobs } }}</td>
-					</tr>
-					<tr>
-						<td>{{ _("This host builds") }}</td>
-						<td>
-							<ul>
-								{% for type in builder.build_types %}
-									<li>
-										{% if type == "release" %}
-											{{ _("Release builds") }}
-										{% elif type == "scratch" %}
-											{{ _("Scratch builds") }}
-										{% elif type == "test" %}
-											{{ _("Test builds") }}
-										{% end %}
-									</li>
-								{% end %}
-							</ul>
-						</td>
 					</tr>
 				</tbody>
 			</table>

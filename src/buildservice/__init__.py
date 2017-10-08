@@ -15,6 +15,7 @@ from . import cache
 from . import database
 from . import distribution
 from . import geoip
+from . import jobqueue
 from . import keys
 from . import logs
 from . import messages
@@ -52,6 +53,7 @@ class Backend(object):
 		self.jobs        = builds.Jobs(self)
 		self.builders    = builders.Builders(self)
 		self.distros     = distribution.Distributions(self)
+		self.jobqueue    = jobqueue.JobQueue(self)
 		self.keys        = keys.Keys(self)
 		self.messages    = messages.Messages(self)
 		self.mirrors     = mirrors.Mirrors(self)

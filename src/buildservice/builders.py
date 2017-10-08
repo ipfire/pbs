@@ -237,74 +237,10 @@ class Builder(base.DataObject):
 
 		return sorted(arches)
 
-	def get_build_release(self):
-		return self.data.build_release == "Y"
+	def set_testmode(self, testmode):
+		self._set_attribute("testmode", testmode)
 
-	def set_build_release(self, value):
-		if value:
-			value = "Y"
-		else:
-			value = "N"
-
-		self.db.execute("UPDATE builders SET build_release = %s WHERE id = %s",
-			value, self.id)
-
-		# Update the cache.
-		if self._data:
-			self._data["build_release"] = value
-
-	build_release = property(get_build_release, set_build_release)
-
-	def get_build_scratch(self):
-		return self.data.build_scratch == "Y"
-
-	def set_build_scratch(self, value):
-		if value:
-			value = "Y"
-		else:
-			value = "N"
-
-		self.db.execute("UPDATE builders SET build_scratch = %s WHERE id = %s",
-			value, self.id)
-
-		# Update the cache.
-		if self._data:
-			self._data["build_scratch"] = value
-
-	build_scratch = property(get_build_scratch, set_build_scratch)
-
-	def get_build_test(self):
-		return self.data.build_test == "Y"
-
-	def set_build_test(self, value):
-		if value:
-			value = "Y"
-		else:
-			value = "N"
-
-		self.db.execute("UPDATE builders SET build_test = %s WHERE id = %s",
-			value, self.id)
-
-		# Update the cache.
-		if self._data:
-			self._data["build_test"] = value
-
-	build_test = property(get_build_test, set_build_test)
-
-	@property
-	def build_types(self):
-		ret = []
-
-		if self.build_release:
-			ret.append("release")
-
-		if self.build_scratch:
-			ret.append("scratch")
-
-		if self.build_test:
-			ret.append("test")
-
-		return ret
+	testmode = property(lambda s: s.data.testmode, set_testmode)
 
 	def set_max_jobs(self, value):
 		self._set_attribute("max_jobs", value)
@@ -444,21 +380,24 @@ class Builder(base.DataObject):
 		"""
 		return len(self.active_jobs) >= self.max_jobs
 
-	def get_next_jobs(self, limit=None):
-		"""
-			Returns a list of jobs that can be built on this host.
-		"""
-		return self.pakfire.jobs.get_next(arches=self.buildable_arches, limit=limit)
+	@lazy_property
+	def jobqueue(self):
+		return self.backend.jobqueue.for_arches(self.supported_arches)
 
 	def get_next_job(self):
 		"""
 			Returns the next job in line for this builder.
 		"""
-		# Get the first item of all jobs in the list.
-		jobs = self.pakfire.jobs.get_next(builder=self, state="pending", limit=1)
+		# Don't return anything if the builder has already too many jobs running
+		if self.too_many_jobs:
+			return
 
-		if jobs:
-			return jobs[0]
+		for job in self.jobqueue:
+			# Only allow building test jobs in test mode
+			if self.testmode and not job.type == "test":
+				continue
+
+			return job
 
 	def get_history(self, *args, **kwargs):
 		kwargs["builder"] = self
