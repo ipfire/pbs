@@ -7,6 +7,7 @@ import subprocess
 
 from . import base
 from . import database
+from . import git
 
 class Sources(base.Object):
 	def get_all(self):
@@ -49,6 +50,22 @@ class Sources(base.Object):
 
 		if commit:
 			return Commit(self.pakfire, commit.id)
+
+	def pull(self):
+		for source in self.get_all():
+			repo = git.Repo(self.pakfire, source.id, mode="mirror")
+
+			# If the repository is not yet cloned, we need to make a local
+			# clone to work with.
+			if not repo.cloned:
+				repo.clone()
+
+			# Otherwise we just fetch updates.
+			else:
+				repo.fetch()
+
+			# Import all new revisions.
+			repo.import_revisions()
 
 
 class Commit(base.Object):
