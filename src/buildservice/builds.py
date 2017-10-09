@@ -59,6 +59,18 @@ def import_from_package(_pakfire, filename, distro=None, commit=None, type="rele
 
 
 class Builds(base.Object):
+	def _get_build(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Build(self.backend, res.id, data=res)
+
+	def _get_builds(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Build(self.backend, row.id, data=row)
+
 	def get_by_id(self, id, data=None):
 		return Build(self.pakfire, id, data=data)
 
@@ -417,6 +429,12 @@ class Build(base.Object):
 		assert other.pkg
 
 		return cmp(self.pkg, other.pkg)
+
+	def __iter__(self):
+		jobs = self.backend.jobs._get_jobs("SELECT * FROM jobs \
+			WHERE build_id = %s", self.id)
+
+		return iter(sorted(jobs))
 
 	@classmethod
 	def create(cls, pakfire, pkg, type="release", owner=None, distro=None, public=True):
