@@ -135,48 +135,6 @@ class ErrorTestHandler(BaseHandler):
 		raise tornado.web.HTTPError(error_code)
 
 
-class StatsBuildsTypesHandler(BaseHandler):
-	def get(self):
-		ret = {}
-
-		types = self.backend.builds.get_types_stats()
-		for type, count in types.items():
-			ret["builds_type_%s" % type] = count
-
-		self.write(ret)
-
-
-class StatsJobsHandler(BaseHandler):
-	def get(self):
-		ret = {}
-
-		self.write(ret)
-
-
-class StatsJobsStatesHandler(BaseHandler):
-	def get(self):
-		ret = {}
-
-		states = self.backend.jobs.get_state_stats()
-		for state, count in states.items():
-			ret["jobs_state_%s" % state] = count
-
-		self.write(ret)
-
-
-class StatsJobsQueueHandler(BaseHandler):
-	def get(self):
-		ret = {}
-
-		# Queue length(s).
-		ret["job_queue_length"] = len(self.backend.jobqueue)
-
-		# Average waiting time.
-		ret["job_queue_avg_wait_time"] = self.backend.jobqueue.average_waiting_time
-
-		self.write(ret)
-
-
 # Uploads
 
 class UploadsCreateHandler(BaseHandler):

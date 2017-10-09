@@ -196,7 +196,8 @@ class BuildStateHandler(BaseHandler):
 
 class BuildQueueHandler(BaseHandler):
 	def get(self):
-		self.render("build-queue.html", jobs=self.backend.jobqueue)
+		self.render("build-queue.html", jobs=self.backend.jobqueue,
+			average_waiting_time=self.backend.jobqueue.average_waiting_time)
 
 
 class BuildDetailCommentHandler(BaseHandler):

@@ -389,18 +389,6 @@ class Builds(base.Object):
 		if build_times:
 			return build_times[0]
 
-	def get_types_stats(self):
-		res = self.db.query("SELECT type, COUNT(*) AS count FROM builds GROUP BY type")
-
-		if not res:
-			return {}
-
-		ret = {}
-                for row in res:
-                        ret[row.type] = row.count
-
-		return ret
-
 
 class Build(base.Object):
 	def __init__(self, pakfire, id, data=None):
@@ -1490,31 +1478,6 @@ class Jobs(base.Object):
 		jobs = self.db.get(query, *args)
 		if jobs:
 			return jobs.count
-
-	def get_state_stats(self):
-		res = self.db.query("SELECT state, COUNT(*) AS count FROM jobs GROUP BY state")
-
-		if not res:
-			return {}
-
-		ret = {
-			"new"              : 0,
-			"pending"          : 0,
-			"running"          : 0,
-			"finished"         : 0,
-			"dispatching"      : 0,
-			"uploading"        : 0,
-			"failed"           : 0,
-			"aborted"          : 0,
-			"temporary_failed" : 0,
-			"dependency_error" : 0,
-			"download_error"   : 0,
-			"deleted"          : 0,
-		}
-		for row in res:
-			ret[row.state] = int(row.count)
-
-		return ret
 
 
 class Job(base.DataObject):
