@@ -157,7 +157,7 @@ class DistEvent(base.Event):
 			logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
 
 			# Get the repository of this commit.
-			repo = git.Repo(self.pakfire, commit.source_id)
+			repo = git.Repo(self.pakfire, commit.source)
 
 			# Make sure, it is checked out.
 			if not repo.cloned:
@@ -193,7 +193,7 @@ class DistEvent(base.Event):
 				continue
 
 			# Initialize the repository or and clone it if necessary.
-			repo = git.Repo(self.pakfire, source.id)
+			repo = git.Repo(self.pakfire, source)
 			if not repo.cloned:
 				repo.clone()
 
