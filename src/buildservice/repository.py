@@ -82,7 +82,7 @@ class Repository(base.DataObject):
 	def __iter__(self):
 		builds = self.backend.builds._get_builds("SELECT builds.* FROM repositories_builds \
 			LEFT JOIN builds ON repositories_builds.build_id = builds.id \
-			WHERE repositories.repo_id = %s", self.id)
+			WHERE repositories_builds.repo_id = %s", self.id)
 
 		return iter(builds)
 
