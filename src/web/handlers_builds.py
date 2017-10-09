@@ -34,7 +34,7 @@ class BuildDetailHandler(BuildBaseHandler):
 		log = build.get_log()
 
 		if build.repo:
-			next_repo = build.repo.next()
+			next_repo = build.repo.next
 		else:
 			next_repo = None
 
@@ -239,7 +239,7 @@ class BuildManageHandler(BaseHandler):
 
 		# Get the next repo.
 		if build.repo:
-			next_repo = build.repo.next()
+			next_repo = build.repo.next
 		else:
 			next_repo = build.distro.first_repo
 
@@ -272,7 +272,7 @@ class BuildManageHandler(BaseHandler):
 				raise tornado.web.HTTPError(404, "No such repository: %s" % next_repo)
 
 			if not self.current_user.is_admin():
-				if not distro.repo.next() == next_repo:
+				if not distro.repo.next == next_repo:
 					raise tornado.web.HTTPError(403)
 
 			if current_repo:

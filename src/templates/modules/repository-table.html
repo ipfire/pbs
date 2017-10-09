@@ -14,7 +14,7 @@
 					<br />{{ repo.summary or _("N/A") }}
 				</td>
 				<td>
-					{{ repo.build_count() }}
+					{{ len(repo) }}
 				</td>
 				<td>
 					{% if repo.enabled_for_builds %}

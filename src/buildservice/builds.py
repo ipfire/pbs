@@ -1229,13 +1229,11 @@ class Build(base.Object):
 			return False
 
 		# If there is no next repository, we cannot move anything.
-		next_repo = self.repo.next()
-
-		if not next_repo:
+		if not self.repo.next:
 			return False
 
 		# If the needed amount of score is reached, we can move forward.
-		if self.score >= next_repo.score_needed:
+		if self.score >= self.repo.next.score_needed:
 			return True
 
 		# If the repository does not require a minimal time,
