@@ -951,13 +951,10 @@ ALTER TABLE jobs OWNER TO pakfire;
 CREATE VIEW builds_times AS
  SELECT builds.id AS build_id,
     jobs.arch,
-    arches.platform,
     jobs.type AS job_type,
     (jobs.time_finished - jobs.time_started) AS duration
-   FROM (((jobs
+   FROM (jobs
      LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-     LEFT JOIN packages ON ((builds.pkg_id = packages.id)))
-     LEFT JOIN arches ON ((jobs.arch = arches.name)))
   WHERE (jobs.state = 'finished'::jobs_state);
 
 

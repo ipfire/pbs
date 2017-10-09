@@ -40,7 +40,6 @@ class Application(tornado.web.Application):
 
 			# Statistics
 			(r"/statistics/builds/types", handlers.StatsBuildsTypesHandler),
-			(r"/statistics/jobs/durations", handlers.StatsJobsDurationsHandler),
 			(r"/statistics/jobs/queue", handlers.StatsJobsQueueHandler),
 			(r"/statistics/jobs/states", handlers.StatsJobsStatesHandler),
 

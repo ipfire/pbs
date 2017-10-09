@@ -153,21 +153,6 @@ class StatsJobsHandler(BaseHandler):
 		self.write(ret)
 
 
-class StatsJobsDurationsHandler(BaseHandler):
-	def get(self):
-		durations = self.backend.jobs.get_build_durations()
-
-		ret = {}
-		for platform, d in durations.items():
-			ret.update({
-				"jobs_durations_%s_minimum" % platform : d.get("minimum", None),
-				"jobs_durations_%s_maximum" % platform : d.get("maximum", None),
-				"jobs_durations_%s_average" % platform : d.get("average", None),
-				"jobs_durations_%s_stddev"  % platform : d.get("stddev", None),
-			})
-
-		self.write(ret)
-
 class StatsJobsStatesHandler(BaseHandler):
 	def get(self):
 		ret = {}

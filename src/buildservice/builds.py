@@ -1516,27 +1516,6 @@ class Jobs(base.Object):
 
 		return ret
 
-	def get_build_durations(self):
-		res = self.db.query("SELECT platform, MIN(duration) AS minimum, \
-			MAX(duration) AS maximum, AVG(duration) AS average, \
-			STDDEV_POP(duration) AS stddev \
-			FROM builds_times GROUP BY platform \
-			UNION SELECT 'all', MIN(duration) AS minimum, \
-			MAX(duration) AS maximum, AVG(duration) AS average, \
-			STDDEV_POP(duration) AS stddev \
-			FROM builds_times")
-
-		ret = {}
-		for row in res:
-			ret[row.platform] = {
-				"minimum" : int(row.minimum),
-				"maximum" : int(row.maximum),
-				"average" : int(row.average),
-				"stddev"  : int(row.stddev),
-			}
-
-		return ret
-
 
 class Job(base.DataObject):
 	table = "jobs"
