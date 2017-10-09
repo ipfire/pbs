@@ -17,6 +17,18 @@ from . import sources
 from .constants import *
 
 class Packages(base.Object):
+	def _get_package(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Package(self.backend, res.id, data=res)
+
+	def _get_packages(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Package(self.backend, row.id, data=row)
+
 	def get_all_names(self, public=None, user=None, states=None):
 		query = "SELECT DISTINCT packages.name AS name, summary FROM packages \
 			JOIN builds ON builds.pkg_id = packages.id \
