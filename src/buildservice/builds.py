@@ -12,6 +12,7 @@ import pakfire
 import pakfire.config
 import pakfire.packages
 
+from . import arches
 from . import base
 from . import builders
 from . import logs
@@ -1514,7 +1515,7 @@ class Job(base.DataObject):
 				return True
 
 			if self.build == other.build:
-				return self.arch < other.arch # XXX needs to use the arch prio
+				return arches.priority(self.arch) < arches.priority(other.arch)
 
 			return self.time_created < other.time_created
 

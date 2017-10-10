@@ -2,6 +2,25 @@
 
 from . import base
 
+_priorities = {
+	"noarch"   : 0,
+
+	# 64 bit
+	"x86_64"   : 1,
+	"aarch64"  : 2,
+
+	# 32 bit
+	"i686"     : 3,
+	"armv7hl"  : 4,
+	"armv5tel" : 5,
+}
+
+def priority(arch):
+	try:
+		return _priorities[arch]
+	except KeyError:
+		return 99
+
 class Arches(base.Object):
 	def get_all(self, really=False):
 		query = "SELECT * FROM arches"
