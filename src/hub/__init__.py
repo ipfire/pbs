@@ -38,12 +38,6 @@ class Application(tornado.web.Application):
 			(r"/error/test", handlers.ErrorTestHandler),
 			(r"/error/test/(\d+)", handlers.ErrorTestHandler),
 
-			# Statistics
-			(r"/statistics/builds/types", handlers.StatsBuildsTypesHandler),
-			(r"/statistics/jobs/durations", handlers.StatsJobsDurationsHandler),
-			(r"/statistics/jobs/queue", handlers.StatsJobsQueueHandler),
-			(r"/statistics/jobs/states", handlers.StatsJobsStatesHandler),
-
 			# Builds
 			(r"/builds/create", handlers.BuildsCreateHandler),
 			(r"/builds/(.*)", handlers.BuildsGetHandler),

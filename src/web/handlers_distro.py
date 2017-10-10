@@ -27,7 +27,7 @@ class DistributionEditHandler(BaseHandler):
 			raise tornado.web.HTTPError(404, "Distro not found")
 
 		self.render("distro-edit.html", distro=distro,
-			arches=self.arches.get_all(), sources=self.sources)
+			arches=self.backend.arches, sources=self.sources)
 
 	@tornado.web.authenticated
 	def post(self, name):
@@ -54,15 +54,10 @@ class DistributionEditHandler(BaseHandler):
 		# Update architectures.
 		arches = []
 		for arch in self.get_arguments("arches", []):
-			try:
-				arch_id = int(arch)
-			except ValueError:
+			# Check if arch exists
+			if not self.backend.arches.exists(arch):
 				continue
 
-			if not self.arches.exists(arch_id):
-				continue
-
-			arch = self.arches.get_by_id(arch_id)
 			arches.append(arch)
 
 		distro.arches = arches

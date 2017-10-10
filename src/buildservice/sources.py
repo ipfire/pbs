@@ -7,20 +7,45 @@ import subprocess
 
 from . import base
 from . import database
+from . import git
+
+from .decorators import *
 
 class Sources(base.Object):
-	def get_all(self):
-		sources = self.db.query("SELECT id FROM sources ORDER BY id")
+	def _get_source(self, query, *args):
+		res = self.db.get(query, *args)
 
-		return [Source(self.pakfire, s.id) for s in sources]
+		if res:
+			return Source(self.backend, res.id, data=res)
+
+	def _get_sources(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Source(self.backend, row.id, data=row)
+
+	def _get_commit(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Commit(self.backend, res.id, data=res)
+
+	def _get_commits(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Commit(self.backend, row.id, data=row)
+
+	def __iter__(self):
+		return self._get_sources("SELECT * FROM sources")
 
 	def get_by_id(self, id):
-		return Source(self.pakfire, id)
+		return self._get_source("SELECT * FROM sources \
+			WHERE id = %s", id)
 
 	def get_by_distro(self, distro):
-		sources = self.db.query("SELECT id FROM sources WHERE distro_id = %s", distro.id)
-
-		return [Source(self.pakfire, s.id) for s in sources]
+		return self._get_sources("SELECT * FROM sources \
+			WHERE distro_id = %s", distro.id)
 
 	def update_revision(self, source_id, revision):
 		query = "UPDATE sources SET revision = %s WHERE id = %s"
@@ -50,54 +75,33 @@ class Sources(base.Object):
 		if commit:
 			return Commit(self.pakfire, commit.id)
 
+	def pull(self):
+		for source in self:
+			repo = git.Repo(self.backend, source, mode="mirror")
 
-class Commit(base.Object):
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
+			# If the repository is not yet cloned, we need to make a local
+			# clone to work with.
+			if not repo.cloned:
+				repo.clone()
 
-		self.id = id
+			# Otherwise we just fetch updates.
+			else:
+				repo.fetch()
 
-		# Cache.
-		self._data = None
-		self._source = None
-		self._packages = None
+			# Import all new revisions.
+			repo.import_revisions()
 
-	@classmethod
-	def create(cls, pakfire, source, revision, author, committer, subject, body, date):
-		try:
-			id = pakfire.db.execute("INSERT INTO sources_commits(source_id, revision, \
-				author, committer, subject, body, date) VALUES(%s, %s, %s, %s, %s, %s, %s)",
-				source.id, revision, author, committer, subject, body, date)
-		except database.IntegrityError:
-			# If the commit (apperently) already existed, we return nothing.
-			return
 
-		return cls(pakfire, id)
-
-	@property
-	def data(self):
-		if self._data is None:
-			data = self.db.get("SELECT * FROM sources_commits WHERE id = %s", self.id)
-
-			self._data = data
-			assert self._data
-
-		return self._data
+class Commit(base.DataObject):
+	table = "sources_commits"
 
 	@property
 	def revision(self):
 		return self.data.revision
 
-	@property
-	def source_id(self):
-		return self.data.source_id
-
-	@property
+	@lazy_property
 	def source(self):
-		if self._source is None:
-			self._source = Source(self.pakfire, self.source_id)
-
-		return self._source
+		return self.backend.sources.get_by_id(self.data.source_id)
 
 	@property
 	def distro(self):
@@ -107,17 +111,10 @@ class Commit(base.Object):
 		"""
 		return self.source.distro
 
-	def get_state(self):
-		return self.data.state
-
 	def set_state(self, state):
-		self.db.execute("UPDATE sources_commits SET state = %s WHERE id = %s",
-			state, self.id)
+		self._set_attribute("state", state)
 
-		if self._data:
-			self._data["state"] = state
-
-	state = property(get_state, set_state)
+	state = property(lambda s: s.data.state, set_state)
 
 	@property
 	def author(self):
@@ -145,18 +142,10 @@ class Commit(base.Object):
 	def date(self):
 		return self.data.date
 
-	@property
+	@lazy_property
 	def packages(self):
-		if self._packages is None:
-			self._packages = []
-
-			for pkg in self.db.query("SELECT id FROM packages WHERE commit_id = %s", self.id):
-				pkg = self.pakfire.packages.get_by_id(pkg.id)
-				self._packages.append(pkg)
-
-			self._packages.sort()
-
-		return self._packages
+		return self.backend.packages._get_packages("SELECT * FROM packages \
+			WHERE commit_id = %s", self.id)
 
 	def reset(self):
 		"""
@@ -175,33 +164,33 @@ class Commit(base.Object):
 				pkg.delete()
 
 		# Clear the cache.
-		self._packages = None
+		del self.packages
 
 		# Reset the state to 'pending'.
 		self.state = "pending"
 
 
-class Source(base.Object):
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
+class Source(base.DataObject):
+	table = "sources"
 
-		self.id = id
+	def __eq__(self, other):
+		return self.id == other.id
 
-		self._data = None
-		self._head_revision = None
+	def __len__(self):
+		ret = self.db.get("SELECT COUNT(*) AS len FROM sources_commits \
+			WHERE source_id = %s", self.id)
 
-	@property
-	def data(self):
-		if self._data is None:
-			data = self.db.get("SELECT * FROM sources WHERE id = %s", self.id)
+		return ret.len
 
-			self._data = data
-			assert self._data
+	def create_commit(self, revision, author, committer, subject, body, date):
+		commit = self.backend.sources._get_commit("INSERT INTO sources_commits(source_id, \
+			revision, author, committer, subject, body, date) VALUES(%s, %s, %s, %s, %s, %s, %s)",
+			self.id, revision, author, committer, subject, body, date)
 
-		return self._data
+		# Commit
+		commit.source = self
 
-	def __cmp__(self, other):
-		return cmp(self.id, other.id)
+		return commit
 
 	@property
 	def info(self):
@@ -214,26 +203,6 @@ class Source(base.Object):
 			"revision"   : self.revision,
 			"branch"     : self.branch,
 		}
-
-	def _import_revision(self, revision):
-		logging.debug("Going to import revision: %s" % revision)
-
-		rev_author    = self._git("log -1 --format=\"%%an <%%ae>\" %s" % revision)
-		rev_committer = self._git("log -1 --format=\"%%cn <%%ce>\" %s" % revision)
-		rev_subject   = self._git("log -1 --format=\"%%s\" %s" % revision)
-		rev_body      = self._git("log -1 --format=\"%%b\" %s" % revision)
-		rev_date      = self._git("log -1 --format=\"%%at\" %s" % revision)
-		rev_date      = datetime.datetime.utcfromtimestamp(float(rev_date))
-
-		# Convert strings properly. No idea why I have to do that.
-		rev_author    = rev_author.decode("latin-1").strip()
-		rev_committer = rev_committer.decode("latin-1").strip()
-		rev_subject   = rev_subject.decode("latin-1").strip()
-		rev_body      = rev_body.decode("latin-1").rstrip()
-
-		# Create a new source build object.
-		build.SourceBuild.new(self.pakfire, self.id, revision, rev_author,
-			rev_committer, rev_subject, rev_body, rev_date)
 
 	@property
 	def name(self):
@@ -263,7 +232,7 @@ class Source(base.Object):
 	def builds(self):
 		return self.pakfire.builds.get_by_source(self.id)
 
-	@property
+	@lazy_property
 	def distro(self):
 		return self.pakfire.distros.get_by_id(self.data.distro_id)
 
@@ -271,52 +240,19 @@ class Source(base.Object):
 	def start_revision(self):
 		return self.data.revision
 
-	@property
+	@lazy_property
 	def head_revision(self):
-		if self._head_revision is None:
-			commit = self.db.get("SELECT id FROM sources_commits \
-				WHERE source_id = %s ORDER BY id DESC LIMIT 1", self.id)
-
-			if commit:
-				self._head_revision = Commit(self.pakfire, commit.id)
-
-		return self._head_revision
-
-	@property
-	def num_commits(self):
-		ret = self.db.get("SELECT COUNT(*) AS num FROM sources_commits \
-			WHERE source_id = %s", self.id)
-
-		return ret.num
+		return self.backend.sources._get_commit("SELECT * FROM sources_commits \
+			WHERE source_id = %s ORDER BY id DESC LIMIT 1", self.id)
 
 	def get_commits(self, limit=None, offset=None):
-		query = "SELECT id FROM sources_commits WHERE source_id = %s \
-			ORDER BY id DESC"
-		args = [self.id,]
-
-		if limit:
-			if offset:
-				query += " LIMIT %s,%s"
-				args += [offset, limit]
-			else:
-				query += " LIMIT %s"
-				args += [limit,]
-
-		commits = []
-		for commit in self.db.query(query, *args):
-			commit = Commit(self.pakfire, commit.id)
-			commits.append(commit)
-
-		return commits
+		return self.backend.sources._get_commits("SELECT * FROM sources_commits \
+			WHERE source_id = %s ORDER BY id DESC LIMIT %s OFFSET %s", limit, offset)
 
 	def get_commit(self, revision):
-		commit = self.db.get("SELECT id FROM sources_commits WHERE source_id = %s \
-			AND revision = %s LIMIT 1", self.id, revision)
+		commit = self.backend.sources._get_commit("SELECT * FROM sources_commits \
+			WHERE source_id = %s AND revision = %s", self.id, revision)
 
-		if not commit:
-			return
-
-		commit = Commit(self.pakfire, commit.id)
-		commit._source = self
-
-		return commit
+		if commit:
+			commit.source = self
+			return commit

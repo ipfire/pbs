@@ -26,6 +26,9 @@ class Cli(object):
 			# Cleanup uploads
 			"cleanup-uploads" : self.backend.uploads.cleanup,
 
+			# List repository
+			"list-repository" : self._list_repository,
+
 			# Sends all queued messages
 			"process-message-queue" : self.backend.messages.process_queue,
 
@@ -57,6 +60,31 @@ class Cli(object):
 
 		# Exit with error code
 		sys.exit(r or 0)
+
+	def _list_repository(self, distro_name, repo_name, arch):
+		# Get distribution
+		distro = self.backend.distros.get_by_name(distro_name)
+		if not distro:
+			print >>sys.stderr, "Could not find distribution: %s" % distro_name
+			return 2
+
+		# Get repository
+		repo = distro.get_repo(repo_name)
+		if not repo:
+			print >>sys.stderr, "Could not find repository: %s" % repo_name
+			return 2
+
+		# Iterate through all of it
+		for build in repo:
+			for job in build:
+				if not job.type == "build":
+					continue
+
+				if not job.arch in (arch, "noarch"):
+					continue
+
+				for pkg in job:
+					print pkg
 
 # main
 

@@ -14,7 +14,7 @@
 					<br />{{ _("Branch: %s") % source.branch }}
 				</td>
 				<td>
-					{{ source.num_commits }}
+					{{ len(source) }}
 				</td>
 				<td>
 					<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/{{ source.head_revision.revision }}">

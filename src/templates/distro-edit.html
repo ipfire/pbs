@@ -67,7 +67,7 @@
 				<td class="col2">
 					<select name="arches" size="4" multiple>
 						{% for arch in arches %}
-							<option value="{{ arch.id }}" {% if arch in distro.arches %}selected="selected"{% end %}>{{ arch.name }}</option>
+							<option value="{{ arch }}" {% if arch in distro.arches %}selected{% end %}>{{ arch }}</option>
 						{% end %}
 					</select>
 				</td>

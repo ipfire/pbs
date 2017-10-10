@@ -164,15 +164,15 @@
 		</div>
 	</div>
 
-	{% if job.packages %}
+	{% if len(job) > 0 %}
 		<hr>
 
 		<h3>
 			{{ _("Package files") }}
-			<small>({{ len(job.packages) }})</small>
+			<small>({{ len(job) }})</small>
 		</h3>
 
-		{% module PackagesTable(job, job.packages) %}
+		{% module PackagesTable(job, job) %}
 	{% end %}
 
 	{% if log %}

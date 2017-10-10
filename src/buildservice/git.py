@@ -6,16 +6,15 @@ import os
 import subprocess
 
 from . import base
-from . import sources
 
 class Repo(base.Object):
-	def __init__(self, pakfire, id, mode="normal"):
+	def __init__(self, pakfire, source, mode="normal"):
 		base.Object.__init__(self, pakfire)
 
 		assert mode in ("normal", "bare", "mirror")
 
 		# Get the source object.
-		self.source = sources.Source(pakfire, id)
+		self.source = source
 		self.mode = mode
 
 	@property
@@ -112,15 +111,9 @@ class Repo(base.Object):
 		rev_date      = self.git("log -1 --format=\"%%at\" %s" % revision)
 		rev_date      = datetime.datetime.utcfromtimestamp(float(rev_date))
 
-		# Convert strings properly. No idea why I have to do that.
-		#rev_author    = rev_author.decode("latin-1").strip()
-		#rev_committer = rev_committer.decode("latin-1").strip()
-		#rev_subject   = rev_subject.decode("latin-1").strip()
-		#rev_body      = rev_body.decode("latin-1").rstrip()
-
 		# Create a new commit object in the database
-		commit = sources.Commit.create(self.pakfire, self.source, revision,
-			rev_author, rev_committer, rev_subject, rev_body, rev_date)
+		return self.source.create_commit(revision, rev_author, rev_committer,
+			rev_subject, rev_body, rev_date)
 
 	def checkout(self, revision, update=False):
 		for update in (0, 1):

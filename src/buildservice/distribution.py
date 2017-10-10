@@ -2,6 +2,7 @@
 
 import logging
 
+from . import arches
 from . import base
 from . import builds
 from . import packages
@@ -102,7 +103,7 @@ class Distribution(base.DataObject):
 		res = self.db.query("SELECT arch FROM distributions_arches \
 			WHERE distro_id = %s ORDER BY arch", self.id)
 
-		return sorted((row.arch for row in res))
+		return sorted((row.arch for row in res), key=arches.priority)
 
 	def set_arches(self, arches):
 		self.db.execute("DELETE FROM distro_arches WHERE distro_id = %s", self.id)

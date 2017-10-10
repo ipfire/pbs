@@ -12,6 +12,7 @@ import pakfire
 import pakfire.config
 import pakfire.packages
 
+from . import arches
 from . import base
 from . import builders
 from . import logs
@@ -59,6 +60,18 @@ def import_from_package(_pakfire, filename, distro=None, commit=None, type="rele
 
 
 class Builds(base.Object):
+	def _get_build(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Build(self.backend, res.id, data=res)
+
+	def _get_builds(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Build(self.backend, row.id, data=row)
+
 	def get_by_id(self, id, data=None):
 		return Build(self.pakfire, id, data=data)
 
@@ -389,18 +402,6 @@ class Builds(base.Object):
 		if build_times:
 			return build_times[0]
 
-	def get_types_stats(self):
-		res = self.db.query("SELECT type, COUNT(*) AS count FROM builds GROUP BY type")
-
-		if not res:
-			return {}
-
-		ret = {}
-                for row in res:
-                        ret[row.type] = row.count
-
-		return ret
-
 
 class Build(base.Object):
 	def __init__(self, pakfire, id, data=None):
@@ -429,6 +430,12 @@ class Build(base.Object):
 		assert other.pkg
 
 		return cmp(self.pkg, other.pkg)
+
+	def __iter__(self):
+		jobs = self.backend.jobs._get_jobs("SELECT * FROM jobs \
+			WHERE build_id = %s", self.id)
+
+		return iter(sorted(jobs))
 
 	@classmethod
 	def create(cls, pakfire, pkg, type="release", owner=None, distro=None, public=True):
@@ -1229,13 +1236,11 @@ class Build(base.Object):
 			return False
 
 		# If there is no next repository, we cannot move anything.
-		next_repo = self.repo.next()
-
-		if not next_repo:
+		if not self.repo.next:
 			return False
 
 		# If the needed amount of score is reached, we can move forward.
-		if self.score >= next_repo.score_needed:
+		if self.score >= self.repo.next.score_needed:
 			return True
 
 		# If the repository does not require a minimal time,
@@ -1343,11 +1348,33 @@ class Build(base.Object):
 
 
 class Jobs(base.Object):
+	def _get_job(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Job(self.backend, res.id, data=res)
+
 	def _get_jobs(self, query, *args):
 		res = self.db.query(query, *args)
 
 		for row in res:
 			yield Job(self.backend, row.id, data=row)
+
+	def create(self,  build, arch, type="build"):
+		job = self._get_job("INSERT INTO jobs(uuid, type, build_id, arch, time_created) \
+			VALUES(%s, %s, %s, %s, NOW()) RETURNING *", "%s" % uuid.uuid4(), type, build.id, arch)
+		job.log("created")
+
+		# Set cache for Build object.
+		job.build = build
+
+		# Jobs are by default in state "new" and wait for being checked
+		# for dependencies. Packages that do have no build dependencies
+		# can directly be forwarded to "pending" state.
+		if not job.pkg.requires:
+			job.state = "pending"
+
+		return job
 
 	def get_by_id(self, id, data=None):
 		return Job(self.pakfire, id, data)
@@ -1471,109 +1498,46 @@ class Jobs(base.Object):
 		if jobs:
 			return jobs.count
 
-	def get_state_stats(self):
-		res = self.db.query("SELECT state, COUNT(*) AS count FROM jobs GROUP BY state")
 
-		if not res:
-			return {}
-
-		ret = {
-			"new"              : 0,
-			"pending"          : 0,
-			"running"          : 0,
-			"finished"         : 0,
-			"dispatching"      : 0,
-			"uploading"        : 0,
-			"failed"           : 0,
-			"aborted"          : 0,
-			"temporary_failed" : 0,
-			"dependency_error" : 0,
-			"download_error"   : 0,
-			"deleted"          : 0,
-		}
-		for row in res:
-			ret[row.state] = int(row.count)
-
-		return ret
-
-	def get_build_durations(self):
-		res = self.db.query("SELECT platform, MIN(duration) AS minimum, \
-			MAX(duration) AS maximum, AVG(duration) AS average, \
-			STDDEV_POP(duration) AS stddev \
-			FROM builds_times GROUP BY platform \
-			UNION SELECT 'all', MIN(duration) AS minimum, \
-			MAX(duration) AS maximum, AVG(duration) AS average, \
-			STDDEV_POP(duration) AS stddev \
-			FROM builds_times")
-
-		ret = {}
-		for row in res:
-			ret[row.platform] = {
-				"minimum" : int(row.minimum),
-				"maximum" : int(row.maximum),
-				"average" : int(row.average),
-				"stddev"  : int(row.stddev),
-			}
-
-		return ret
-
-
-class Job(base.Object):
-	def __init__(self, pakfire, id, data=None):
-		base.Object.__init__(self, pakfire)
-
-		# The ID of this Job object.
-		self.id = id
-
-		# Cache the data of this object.
-		self._data = data
-		self._build = None
-		self._builder = None
-		self._packages = None
-		self._logfiles = None
+class Job(base.DataObject):
+	table = "jobs"
 
 	def __str__(self):
 		return "<%s id=%s %s>" % (self.__class__.__name__, self.id, self.name)
 
-	def __cmp__(self, other):
-		if self.type == "build" and other.type == "test":
-			return  -1
-		elif self.type == "test" and other.type == "build":
-			return 1
+	def __eq__(self, other):
+		if isinstance(other, self.__class__):
+			return self.id == other.id
 
-		if self.build_id == other.build_id:
-			return cmp(self.arch, other.arch)
+	def __lt__(self, other):
+		if isinstance(other, self.__class__):
+			if (self.type, other.type) == ("build", "test"):
+				return True
 
-		ret = cmp(self.pkg, other.pkg)
+			if self.build == other.build:
+				return arches.priority(self.arch) < arches.priority(other.arch)
 
-		if not ret:
-			ret = cmp(self.time_created, other.time_created)
+			return self.time_created < other.time_created
 
-		return ret
+	def __iter__(self):
+		packages = self.backend.packages._get_packages("SELECT packages.* FROM jobs_packages \
+			LEFT JOIN packages ON jobs_packages.pkg_id = packages.id \
+			WHERE jobs_packages.job_id = %s ORDER BY packages.name", self.id)
+
+		return iter(packages)
+
+	def __nonzero__(self):
+		return True
+
+	def __len__(self):
+		res = self.db.get("SELECT COUNT(*) AS len FROM jobs_packages \
+			WHERE job_id = %s", self.id)
+
+		return res.len
 
 	@property
 	def distro(self):
-		assert self.build.distro
 		return self.build.distro
-
-	@classmethod
-	def create(cls, pakfire, build, arch, type="build"):
-		id = pakfire.db.execute("INSERT INTO jobs(uuid, type, build_id, arch, time_created) \
-			VALUES(%s, %s, %s, %s, NOW())",	"%s" % uuid.uuid4(), type, build.id, arch)
-
-		job = Job(pakfire, id)
-		job.log("created")
-
-		# Set cache for Build object.
-		job._build = build
-
-		# Jobs are by default in state "new" and wait for being checked
-		# for dependencies. Packages that do have no build dependencies
-		# can directly be forwarded to "pending" state.
-		if not job.pkg.requires:
-			job.state = "pending"
-
-		return job
 
 	def delete(self):
 		self.__delete_buildroots()
@@ -1617,14 +1581,6 @@ class Job(base.Object):
 
 		self.state = "new"
 		self.log("reset", user=user)
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM jobs WHERE id = %s", self.id)
-			assert self._data
-
-		return self._data
 
 	## Logging stuff
 
@@ -1687,13 +1643,9 @@ class Job(base.Object):
 	def build_id(self):
 		return self.data.build_id
 
-	@property
+	@lazy_property
 	def build(self):
-		if self._build is None:
-			self._build = self.pakfire.builds.get_by_id(self.build_id)
-			assert self._build
-
-		return self._build
+		return self.pakfire.builds.get_by_id(self.build_id)
 
 	@property
 	def related_jobs(self):
@@ -1798,19 +1750,9 @@ class Job(base.Object):
 		if self._data:
 			self._data["message"] = msg
 
-	@property
-	def builder_id(self):
-		return self.data.builder_id
-
 	def get_builder(self):
-		if not self.builder_id:
-			return
-
-		if self._builder is None:
-			self._builder = builders.Builder(self.pakfire, self.builder_id)
-			assert self._builder
-
-		return self._builder
+		if self.data.builder_id:
+			return self.backend.builders.get_by_id(self.data.builder_id)
 
 	def set_builder(self, builder, user=None):
 		self.db.execute("UPDATE jobs SET builder_id = %s WHERE id = %s",
@@ -1826,15 +1768,11 @@ class Job(base.Object):
 		if user:
 			self.log("builder_assigned", builder=builder, user=user)
 
-	builder = property(get_builder, set_builder)
+	builder = lazy_property(get_builder, set_builder)
 
 	@property
 	def arch(self):
 		return self.data.arch
-
-	@lazy_property
-	def _arch(self):
-		return self.backend.arches.get_by_name(self.arch)
 
 	@property
 	def duration(self):
@@ -1886,49 +1824,27 @@ class Job(base.Object):
 	def tries(self):
 		return self.data.tries
 
-	@property
-	def packages(self):
-		if self._packages is None:
-			self._packages = []
-
-			query = "SELECT pkg_id AS id FROM jobs_packages \
-				JOIN packages ON packages.id = jobs_packages.pkg_id \
-				WHERE jobs_packages.job_id = %s ORDER BY packages.name"
-
-			for pkg in self.db.query(query, self.id):
-				pkg = packages.Package(self.pakfire, pkg.id)
-				pkg._job = self
-
-				self._packages.append(pkg)
-
-		return self._packages
-
 	def get_pkg_by_uuid(self, uuid):
-		pkg = self.db.get("SELECT packages.id FROM packages \
+		pkg = self.backend.packages._get_package("SELECT packages.id FROM packages \
 			JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
 			WHERE jobs_packages.job_id = %s AND packages.uuid = %s",
 			self.id, uuid)
 
-		if not pkg:
-			return
+		if pkg:
+			pkg.job = self
+			return pkg
 
-		pkg = packages.Package(self.pakfire, pkg.id)
-		pkg._job = self
-
-		return pkg
-
-	@property
+	@lazy_property
 	def logfiles(self):
-		if self._logfiles is None:
-			self._logfiles = []
+		logfiles = []
 
-			for log in self.db.query("SELECT id FROM logfiles WHERE job_id = %s", self.id):
-				log = logs.LogFile(self.pakfire, log.id)
-				log._job = self
+		for log in self.db.query("SELECT id FROM logfiles WHERE job_id = %s", self.id):
+			log = logs.LogFile(self.pakfire, log.id)
+			log._job = self
 
-				self._logfiles.append(log)
+			logfiles.append(log)
 
-		return self._logfiles
+		return logfiles
 
 	def add_file(self, filename):
 		"""
@@ -2006,11 +1922,7 @@ class Job(base.Object):
 		return self.data.aborted_state
 
 	def set_aborted_state(self, state):
-		self.db.execute("UPDATE jobs SET aborted_state = %s WHERE id = %s",
-			state, self.id)
-
-		if self._data:
-			self._data["aborted_state"] = state
+		self._set_attribute("aborted_state", state)
 
 	aborted_state = property(get_aborted_state, set_aborted_state)
 
@@ -2199,24 +2111,6 @@ class Job(base.Object):
 		confs.append(self.get_repo_config())
 
 		return "\n\n".join(confs)
-
-	def used_by(self):
-		if not self.packages:
-			return []
-
-		conditions = []
-		args = []
-
-		for pkg in self.packages:
-			conditions.append(" pkg_uuid = %s")
-			args.append(pkg.uuid)
-
-		query = "SELECT DISTINCT job_id AS id FROM jobs_buildroots"
-		query += " WHERE %s" % " OR ".join(conditions)
-
-		job_ids = self.db.query(query, *args)
-
-		print job_ids
 
 	def resolvdep(self):
 		config = pakfire.config.Config(files=["general.conf"])

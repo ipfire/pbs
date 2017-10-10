@@ -26,6 +26,10 @@ class Repositories(base.Object):
 
 		return iter(repositories)
 
+	def create(self, distro, name, description):
+		return self._get_repository("INSERT INTO repositories(distro_id, name, description) \
+			VALUES(%s, %s, %s) RETURNING *", distro.id, name, description)
+
 	def get_by_id(self, repo_id):
 		return self._get_repository("SELECT * FROM repositories \
 			WHERE id = %s", repo_id)
@@ -64,71 +68,40 @@ class Repositories(base.Object):
 		return entries
 
 
-class Repository(base.Object):
-	def __init__(self, pakfire, id, data=None):
-		base.Object.__init__(self, pakfire)
-		self.id = id
+class Repository(base.DataObject):
+	table = "repositories"
 
-		# Cache.
-		self._data = data
-		self._next = None
-		self._prev = None
-		self._key  = None
-		self._distro = None
+	def __eq__(self, other):
+		if isinstance(other, self.__class__):
+			return self.id == other.id
 
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM repositories WHERE id = %s", self.id)
+	def __lt__(self, other):
+		if isinstance(other, self.__class__):
+			return self.parent_id == other.id
 
-		return self._data
+	def __iter__(self):
+		builds = self.backend.builds._get_builds("SELECT builds.* FROM repositories_builds \
+			LEFT JOIN builds ON repositories_builds.build_id = builds.id \
+			WHERE repositories_builds.repo_id = %s", self.id)
 
-	def __cmp__(self, other):
-		if other is None:
-			return 1
+		return iter(builds)
 
-		if self.id == other.id:
-			return 0
+	def __len__(self):
+		res = self.db.get("SELECT COUNT(*) AS len FROM repositories_builds \
+			WHERE repo_id = %s", self.id)
 
-		elif self.id == other.parent_id:
-			return 1
+		return res.len
 
-		elif self.parent_id == other.id:
-			return -1
-
-		return 1
-
+	@lazy_property
 	def next(self):
-		if self._next is None:
-			repo = self.db.get("SELECT id FROM repositories \
-				WHERE parent_id = %s LIMIT 1", self.id)
+		return self.backend.repos._get_repository("SELECT * FROM repositories \
+			WHERE parent_id = %s", self.id)
 
-			if not repo:
-				return
-
-			self._next = Repository(self.pakfire, repo.id)
-
-		return self._next
-
-	def prev(self):
-		if not self.parent_id:
-			return
-
-		if self._prev is None:
-			self._prev = Repository(self.pakfire, self.parent_id)
-
-		return self._prev
-
-	@property
+	@lazy_property
 	def parent(self):
-		return self.prev()
-
-	@classmethod
-	def create(cls, pakfire, distro, name, description):
-		id = pakfire.db.execute("INSERT INTO repositories(distro_id, name, description)"
-			" VALUES(%s, %s, %s)", distro.id, name, description)
-
-		return cls(pakfire, id)
+		if self.data.parent_id:
+			return self.backend.repos._get_repository("SELECT * FROM repositories \
+				WHERE id = %s", self.data.parent_id)
 
 	@lazy_property
 	def distro(self):
@@ -219,16 +192,12 @@ class Repository(base.Object):
 	def parent_id(self):
 		return self.data.parent_id
 
-	@property
+	@lazy_property
 	def key(self):
 		if not self.data.key_id:
 			return
 
-		if self._key is None:
-			self._key = self.pakfire.keys.get_by_id(self.data.key_id)
-			assert self._key
-
-		return self._key
+		return self.pakfire.keys.get_by_id(self.data.key_id)
 
 	@property
 	def arches(self):
@@ -236,24 +205,12 @@ class Repository(base.Object):
 
 	@property
 	def mirrored(self):
-		return self.data.mirrored == "Y"
-
-	def get_enabled_for_builds(self):
-		return self.data.enabled_for_builds == "Y"
+		return self.data.mirrored
 
 	def set_enabled_for_builds(self, state):
-		if state:
-			state = "Y"
-		else:
-			state = "N"
+		self._set_attribute("enabled_for_builds", state)
 
-		self.db.execute("UPDATE repositories SET enabled_for_builds = %s WHERE id = %s",
-			state, self.id)
-
-		if self._data:
-			self._data["enabled_for_builds"] = state
-
-	enabled_for_builds = property(get_enabled_for_builds, set_enabled_for_builds)
+	enabled_for_builds = property(lambda s: s.data.enabled_for_builds, set_enabled_for_builds)
 
 	@property
 	def score_needed(self):
@@ -311,13 +268,6 @@ class Repository(base.Object):
 			self._log_build("moved", build, from_repo=self, to_repo=to_repo,
 				user=user)
 
-	def build_count(self):
-		query = self.db.get("SELECT COUNT(*) AS count FROM repositories_builds \
-			WHERE repo_id = %s", self.id)
-
-		if query:
-			return query.count
-
 	def get_builds(self, limit=None, offset=None):
 		query = "SELECT build_id AS id FROM repositories_builds \
 			WHERE repo_id = %s ORDER BY time_added DESC"
@@ -349,9 +299,6 @@ class Repository(base.Object):
 				arch.name, self.id)
 
 		else:
-			noarch = self.pakfire.arches.get_by_name("noarch")
-			assert noarch
-
 			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
 				JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
 				JOIN jobs ON jobs_packages.job_id = jobs.id \
@@ -359,7 +306,7 @@ class Repository(base.Object):
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
 				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
 				repositories_builds.repo_id = %s",
-				arch.name, noarch.name, self.id)
+				arch.name, "noarch", self.id)
 
 		return pkgs
 
@@ -393,17 +340,6 @@ class Repository(base.Object):
 		return ret
 
 	def get_obsolete_builds(self):
-		#query = self.db.query("SELECT build_id AS id FROM repositories_builds \
-		#	JOIN builds ON repositories.build_id = builds.id \
-		#	WHERE repositories_builds.repo_id = %s AND builds.state = 'obsolete'",
-		#	self.id)
-		#
-		#ret = []
-		#for row in query:
-		#	b = builds.Build(self.pakfire, row.id)
-		#	ret.append(b)
-		#
-		#return ret
 		return self.pakfire.builds.get_obsolete(self)
 
 	def needs_update(self):
@@ -438,23 +374,8 @@ class Repository(base.Object):
 		return times
 
 
-class RepositoryAux(base.Object):
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
-
-		self.id = id
-
-		# Cache.
-		self._data = None
-		self._distro = None
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM repositories_aux WHERE id = %s", self.id)
-			assert self._data
-
-		return self._data
+class RepositoryAux(base.DataObject):
+	table = "repositories_aux"
 
 	@property
 	def name(self):
@@ -474,11 +395,7 @@ class RepositoryAux(base.Object):
 
 	@property
 	def distro(self):
-		if self._distro is None:
-			self._distro = self.pakfire.distros.get_by_id(self.data.distro_id)
-			assert self._distro
-
-		return self._distro
+		return self.pakfire.distros.get_by_id(self.data.distro_id)
 
 	def get_conf(self):
 		lines = [

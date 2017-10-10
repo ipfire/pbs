@@ -108,17 +108,11 @@ class CreateTestBuildsEvent(base.Event):
 	def run(self):
 		max_queue_length = self.pakfire.settings.get_int("test_queue_limit", 10)
 
-		# Get a list with all feasible architectures.
-		arches = self.pakfire.arches.get_all()
-		noarch = self.pakfire.arches.get_by_name("noarch")
-		if noarch:
-			arches.append(noarch)
-
-		for arch in arches:
+		for arch in self.backend.arches:
 			# Skip adding new jobs if there are more too many jobs in the queue.
-			limit = max_queue_length - self.backend.jobqueue.get_length_for_arch(arch.name)
+			limit = max_queue_length - self.backend.jobqueue.get_length_for_arch(arch)
 			if limit <= 0:
-				logging.debug("Already too many jobs in queue of %s to create tests." % arch.name)
+				logging.debug("Already too many jobs in queue of %s to create tests." % arch)
 				continue
 
 			# Get a list of builds, with potentially need a test build.
@@ -157,7 +151,7 @@ class DistEvent(base.Event):
 			logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
 
 			# Get the repository of this commit.
-			repo = git.Repo(self.pakfire, commit.source_id)
+			repo = git.Repo(self.pakfire, commit.source)
 
 			# Make sure, it is checked out.
 			if not repo.cloned:
@@ -193,7 +187,7 @@ class DistEvent(base.Event):
 				continue
 
 			# Initialize the repository or and clone it if necessary.
-			repo = git.Repo(self.pakfire, source.id)
+			repo = git.Repo(self.pakfire, source)
 			if not repo.cloned:
 				repo.clone()
 

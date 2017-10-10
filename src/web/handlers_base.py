@@ -120,10 +120,6 @@ class BaseHandler(tornado.web.RequestHandler):
 		return self.backend
 
 	@property
-	def arches(self):
-		return self.pakfire.arches
-
-	@property
 	def mirrors(self):
 		return self.pakfire.mirrors
 

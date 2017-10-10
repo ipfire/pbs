@@ -17,6 +17,18 @@ from . import sources
 from .constants import *
 
 class Packages(base.Object):
+	def _get_package(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Package(self.backend, res.id, data=res)
+
+	def _get_packages(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Package(self.backend, row.id, data=row)
+
 	def get_all_names(self, public=None, user=None, states=None):
 		query = "SELECT DISTINCT packages.name AS name, summary FROM packages \
 			JOIN builds ON builds.pkg_id = packages.id \
@@ -142,10 +154,6 @@ class Package(base.Object):
 		p = pakfire.PakfireServer()
 		file = packages.open(p, None, path)
 
-		# Get architecture from the database.
-		arch = _pakfire.arches.get_by_name(file.arch)
-		assert arch, "Unknown architecture: %s" % file.arch
-
 		hash_sha512 = misc.calc_hash(path, "sha512")
 		assert hash_sha512
 
@@ -155,7 +163,7 @@ class Package(base.Object):
 			("version",     file.version),
 			("release",     file.release),
 			("type",        file.type),
-			("arch",        arch.id),
+			("arch",        file.arch),
 
 			("groups",      " ".join(file.groups)),
 			("maintainer",  file.maintainer),

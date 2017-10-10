@@ -9,6 +9,8 @@
 		{{ _("They one at the top is next.") }}
 	</p>
 
+	{{ _("Average waiting time: %s") % format_time(average_waiting_time.total_seconds()) }}
+
 	{% if jobs %}
 		{% module JobsList(jobs) %}
 	{% else %}

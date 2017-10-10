@@ -7,11 +7,9 @@ from .handlers_base import BaseHandler
 class JobsIndexHandler(BaseHandler):
 	def get(self):
 		# Filter for a certain arch.
-		arch_name = self.get_argument("arch", None)
-		if arch_name:
-			arch = self.pakfire.arches.get_by_name(arch_name)
-		else:
-			arch = None
+		arch = self.get_argument("arch", None)
+		if not arch or not self.backend.arches.exists(arch):
+			raise tornado.web.HTTPError(400, "Architecture does not exist")
 
 		# Check if we need to filter for a certain builder.
 		builder_name = self.get_argument("builder", None)
@@ -33,10 +31,9 @@ class JobsIndexHandler(BaseHandler):
 
 class JobsFilterHandler(BaseHandler):
 	def get(self):
-		arches   = self.pakfire.arches.get_all(really=True)
 		builders = self.pakfire.builders.get_all()
 
-		self.render("jobs-filter.html", arches=arches, builders=builders)
+		self.render("jobs-filter.html", arches=self.backend.arches, builders=builders)
 
 
 class JobDetailHandler(BaseHandler):

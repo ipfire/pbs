@@ -4,6 +4,8 @@ import xmlrpclib
 
 from . import base
 
+from .decorators import *
+
 class BugzillaBug(base.Object):
 	def __init__(self, bugzilla, bug_id):
 		base.Object.__init__(self, bugzilla.pakfire)
@@ -24,13 +26,25 @@ class BugzillaBug(base.Object):
 	def id(self):
 		return self.bug_id
 
-	@property
+	@lazy_property
 	def data(self):
-		if self._data is None:
-			self._data = self.call("get", ids=[self.id,])["bugs"][0]
-			assert self._data
+		# Fetch bug information from cache
+		data = self.backend.cache.get(self._cache_key)
 
-		return self._data
+		# Hit
+		if data:
+			return data
+
+		# Fetch bug information from Bugzilla
+		for data in self.call("get", ids=[self.id,])["bugs"]:
+			# Put it into the cache
+			self.backend.cache.set(self._cache_key, data, self.backend.bugzilla.cache_lifetime)
+
+			return data
+
+	@property
+	def _cache_key(self):
+		return "bug-%s" % self.bug_id
 
 	@property
 	def url(self):
@@ -64,6 +78,9 @@ class BugzillaBug(base.Object):
 			kwargs["comment"] = { "body" : comment }
 
 		self.call("update", ids=[self.id,], **kwargs)
+
+		# Invalidate cache
+		self.backend.cache.delete(self.cache_key)
 
 
 class Bugzilla(base.Object):
@@ -128,6 +145,10 @@ class Bugzilla(base.Object):
 	@property
 	def password(self):
 		return self.settings.get("bugzilla_xmlrpc_password")
+
+	@lazy_property
+	def cache_lifetime(self):
+		return self.settings.get("bugzilla_cache_lifetime", 3600)
 
 	def get_bug(self, bug_id):
 		try:

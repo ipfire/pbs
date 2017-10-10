@@ -951,13 +951,10 @@ ALTER TABLE jobs OWNER TO pakfire;
 CREATE VIEW builds_times AS
  SELECT builds.id AS build_id,
     jobs.arch,
-    arches.platform,
     jobs.type AS job_type,
     (jobs.time_finished - jobs.time_started) AS duration
-   FROM (((jobs
+   FROM (jobs
      LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-     LEFT JOIN packages ON ((builds.pkg_id = packages.id)))
-     LEFT JOIN arches ON ((jobs.arch = arches.name)))
   WHERE (jobs.state = 'finished'::jobs_state);
 
 
@@ -1616,8 +1613,8 @@ CREATE TABLE repositories (
     distro_id integer NOT NULL,
     parent_id integer,
     key_id integer,
-    mirrored repositories_mirrored DEFAULT 'N'::repositories_mirrored NOT NULL,
-    enabled_for_builds repositories_enabled_for_builds DEFAULT 'N'::repositories_enabled_for_builds NOT NULL,
+    mirrored boolean DEFAULT false NOT NULL,
+    enabled_for_builds boolean DEFAULT false NOT NULL,
     score_needed integer DEFAULT 0 NOT NULL,
     last_update timestamp without time zone,
     time_min integer DEFAULT 0 NOT NULL,
@@ -2928,6 +2925,13 @@ CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
 CREATE INDEX mirrors_checks_sort ON mirrors_checks USING btree (mirror_id, "timestamp");
 
 ALTER TABLE mirrors_checks CLUSTER ON mirrors_checks_sort;
+
+
+--
+-- Name: repositories_builds_repo_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX repositories_builds_repo_id ON repositories_builds USING btree (repo_id);
 
 
 --

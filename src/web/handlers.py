@@ -19,7 +19,6 @@ from .handlers_users import *
 class IndexHandler(BaseHandler):
 	def get(self):
 		jobs = self.pakfire.jobs.get_active()
-		jobs += self.backend.jobqueue
 		jobs += self.pakfire.jobs.get_latest(age="24 hours", limit=5)
 
 		# Updates
@@ -209,10 +208,8 @@ class RepositoryMirrorlistHandler(BaseHandler):
 		self.set_header("Content-Type", "text/plain")
 
 		arch = self.get_argument("arch", None)
-		arch = self.pakfire.arches.get_by_name(arch)
-
-		if not arch:
-			raise tornado.web.HTTPError(400, "You must specify the architecture.")
+		if not arch or not self.backend.arches.exists(arch):
+			raise tornado.web.HTTPError(400, "You must specify a valid architecture")
 
 		ret = {
 			"type"    : "mirrorlist",
@@ -229,7 +226,7 @@ class RepositoryMirrorlistHandler(BaseHandler):
 			# Select a list of preferred mirrors
 			for mirror in self.mirrors.get_for_location(self.current_address):
 				mirrors.append({
-					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch.name)),
+					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
 					"location"  : mirror.country_code,
 					"preferred" : 1,
 				})
@@ -240,7 +237,7 @@ class RepositoryMirrorlistHandler(BaseHandler):
 
 			for mirror in remaining_mirrors:
 				mirrors.append({
-					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch.name)),
+					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
 					"location"  : mirror.country_code,
 					"preferred" : 0,
 				})
@@ -256,7 +253,7 @@ class RepositoryMirrorlistHandler(BaseHandler):
 					continue
 
 				mirror = {
-					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch.name)),
+					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
 					"location"  : mirror.country_code,
 					"preferred" : 0,
 				}
