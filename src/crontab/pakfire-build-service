@@ -1,6 +1,9 @@
 # Send queued emails once a minute
 * * * * *	nobody	pakfire-build-service process-message-queue &>/dev/null
 
+# Remaster repositories
+*/5 * * * *	nobody	pakfire-build-service remaster-repositories &>/dev/null
+
 # Pull sources
 */5 * * * *	nobody	pakfire-build-service pull-sources &>/dev/null
 
