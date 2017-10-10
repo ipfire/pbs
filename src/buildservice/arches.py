@@ -26,7 +26,20 @@ class Arches(base.Object):
 		res = self.db.query("SELECT name FROM arches \
 			WHERE NOT name = ANY(%s)", ("noarch", "src"))
 
-		return sorted((a.name for a in res), key=priority)
+		return iter(sorted((a.name for a in res), key=priority))
+
+	def exists(self, name):
+		# noarch doesn't really exist
+		if name == "noarch":
+			return False
+
+		res = self.db.get("SELECT 1 FROM arches \
+			WHERE name = %s", name)
+
+		if res:
+			return True
+
+		return False
 
 	def get_all(self, really=False):
 		query = "SELECT * FROM arches"
