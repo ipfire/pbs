@@ -71,14 +71,29 @@ class Backend(object):
 		# A pool to store strings (for comparison).
 		self.pool        = pakfire.satsolver.Pool("dummy")
 
+	@lazy_property
+	def _environment_configuration(self):
+		env = {}
+
+		# Get database configuration
+		env["database"] = {
+			"name"     : os.environ.get("PBS_DATABASE_NAME"),
+			"hostname" : os.environ.get("PBS_DATABASE_HOSTNAME"),
+			"user"     : os.environ.get("PBS_DATABASE_USER"),
+			"password" : os.environ.get("PBS_DATABASE_PASSWORD"),
+		}
+
+		return env
+
 	def read_config(self, path):
 		c = ConfigParser.SafeConfigParser()
 
-		c.add_section("database")
-		c.set("database", "name", os.environ.get("PBS_DATABASE_NAME"))
-		c.set("database", "hostname", os.environ.get("PBS_DATABASE_HOSTNAME"))
-		c.set("database", "user", os.environ.get("PBS_DATABASE_USER"))
-		c.set("database", "password", os.environ.get("PBS_DATABASE_PASSWORD"))
+		# Import configuration from environment
+		for section in self._environment_configuration:
+			c.add_section(section)
+
+			for k in self._environment_configuration[section]:
+				c.set(section, k, self._environment_configuration[section][k] or "")
 
 		# Load default configuration file first
 		paths = [
