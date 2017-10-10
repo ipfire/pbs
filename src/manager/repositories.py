@@ -49,7 +49,7 @@ class RepositoryUpdateEvent(base.Event):
 		arches = repo.arches
 
 		# Add the source repository.
-		arches.append(_pakfire.arches.get_by_name("src"))
+		arches.append("src")
 
 		for arch in arches:
 			changed = False
