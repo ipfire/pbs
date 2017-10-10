@@ -84,8 +84,11 @@ class Backend(object):
 
 		# Load all configuration files
 		for path in paths:
-			log.debug("Loading configuration from %s" % path)
-			c.read(path)
+			if os.path.exists(path):
+				log.debug("Loading configuration from %s" % path)
+				c.read(path)
+			else:
+				log.error("No such file %s" % path)
 
 		return c
 
