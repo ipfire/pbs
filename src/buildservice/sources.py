@@ -242,15 +242,15 @@ class Source(base.DataObject):
 
 	@lazy_property
 	def head_revision(self):
-		return self.backend.sources._get_commit("SELECT id FROM sources_commits \
+		return self.backend.sources._get_commit("SELECT * FROM sources_commits \
 			WHERE source_id = %s ORDER BY id DESC LIMIT 1", self.id)
 
 	def get_commits(self, limit=None, offset=None):
-		return self.backend.sources._get_commits("SELECT id FROM sources_commits \
+		return self.backend.sources._get_commits("SELECT * FROM sources_commits \
 			WHERE source_id = %s ORDER BY id DESC LIMIT %s OFFSET %s", limit, offset)
 
 	def get_commit(self, revision):
-		commit = self.backend.sources._get_commit("SELECT id FROM sources_commits \
+		commit = self.backend.sources._get_commit("SELECT * FROM sources_commits \
 			WHERE source_id = %s AND revision = %s", self.id, revision)
 
 		if commit:
