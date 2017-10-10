@@ -1526,6 +1526,9 @@ class Job(base.DataObject):
 
 		return iter(packages)
 
+	def __nonzero__(self):
+		return True
+
 	def __len__(self):
 		res = self.db.get("SELECT COUNT(*) AS len FROM jobs_packages \
 			WHERE job_id = %s", self.id)
