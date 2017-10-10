@@ -514,10 +514,7 @@ SET default_with_oids = false;
 
 CREATE TABLE arches (
     id integer NOT NULL,
-    name text NOT NULL,
-    prio integer DEFAULT 0 NOT NULL,
-    "binary" arches_binary DEFAULT 'Y'::arches_binary NOT NULL,
-    platform text
+    name text NOT NULL
 );
 
 
