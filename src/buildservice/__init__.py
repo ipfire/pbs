@@ -94,10 +94,13 @@ class Backend(object):
 
 	@lazy_property
 	def db(self):
-		name     = self.config.get("database", "name")
-		hostname = self.config.get("database", "hostname")
-		user     = self.config.get("database", "user")
-		password = self.config.get("database", "password")
+		try:
+			name     = self.config.get("database", "name")
+			hostname = self.config.get("database", "hostname")
+			user     = self.config.get("database", "user")
+			password = self.config.get("database", "password")
+		except ConfigParser.Error as e:
+			log.error("Error parsing the config: %s" % e.message)
 
 		log.debug("Connecting to database %s @ %s" % (name, hostname))
 
