@@ -299,9 +299,6 @@ class Repository(base.DataObject):
 				arch.name, self.id)
 
 		else:
-			noarch = self.pakfire.arches.get_by_name("noarch")
-			assert noarch
-
 			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
 				JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
 				JOIN jobs ON jobs_packages.job_id = jobs.id \
@@ -309,7 +306,7 @@ class Repository(base.DataObject):
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
 				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
 				repositories_builds.repo_id = %s",
-				arch.name, noarch.name, self.id)
+				arch.name, "noarch", self.id)
 
 		return pkgs
 
