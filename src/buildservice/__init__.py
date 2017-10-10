@@ -74,6 +74,12 @@ class Backend(object):
 	def read_config(self, path):
 		c = ConfigParser.SafeConfigParser()
 
+		c.add_section("database")
+		c.set("database", "name", os.environ.get("PBS_DATABASE_NAME"))
+		c.set("database", "hostname", os.environ.get("PBS_DATABASE_HOSTNAME"))
+		c.set("database", "user", os.environ.get("PBS_DATABASE_USER"))
+		c.set("database", "password", os.environ.get("PBS_DATABASE_PASSWORD"))
+
 		# Load default configuration file first
 		paths = [
 			os.path.join(CONFIGSDIR, "pbs.conf"),
