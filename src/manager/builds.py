@@ -92,48 +92,6 @@ class CheckBuildDependencyEvent(base.Event):
 		job.resolvdep()
 
 
-class CreateTestBuildsEvent(base.Event):
-	# Run this every five minutes.
-	interval = 300
-
-	# Run when the build service is idle.
-	priority = 10
-
-	@property
-	def test_threshold(self):
-		threshold_days = self.pakfire.settings.get_int("test_threshold_days", 14)
-
-		return datetime.datetime.utcnow() - datetime.timedelta(days=threshold_days)
-
-	def run(self):
-		max_queue_length = self.pakfire.settings.get_int("test_queue_limit", 10)
-
-		for arch in self.backend.arches:
-			# Skip adding new jobs if there are more too many jobs in the queue.
-			limit = max_queue_length - self.backend.jobqueue.get_length_for_arch(arch)
-			if limit <= 0:
-				logging.debug("Already too many jobs in queue of %s to create tests." % arch)
-				continue
-
-			# Get a list of builds, with potentially need a test build.
-			# Randomize the output and do not return more jobs than we are
-			# allowed to put into the build queue.
-			builds = self.pakfire.builds.needs_test(self.test_threshold,
-				arch=arch, limit=limit)
-
-			if not builds:
-				logging.debug("No builds needs a test for %s." % arch.name)
-				continue
-
-			# Search for the job with the right architecture in each
-			# build and schedule a test job.
-			for build in builds:
-				for job in build.jobs:
-					if job.arch == arch:
-						job.schedule("test")
-						break
-
-
 class DistEvent(base.Event):
 	interval = 60
 

@@ -26,6 +26,9 @@ class Cli(object):
 			# Cleanup uploads
 			"cleanup-uploads" : self.backend.uploads.cleanup,
 
+			# Create test jobs
+			"create-test-jobs" : self.backend.jobqueue.create_test_jobs,
+
 			# List repository
 			"list-repository" : self._list_repository,
 

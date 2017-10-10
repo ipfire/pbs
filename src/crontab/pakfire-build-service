@@ -10,6 +10,9 @@
 # Send updates to Bugzilla
 */5 * * * *	nobody	pakfire-build-service send-bug-updates &>/dev/null
 
+# Create test jobs
+*/15 * * * *	nobody	pakfire-build-service create-test-jobs &>/dev/null
+
 # Cleanup files
 */5 * * * *	nobody	pakfire-build-service cleanup-files &>/dev/null
 
