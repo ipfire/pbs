@@ -154,10 +154,6 @@ class Package(base.Object):
 		p = pakfire.PakfireServer()
 		file = packages.open(p, None, path)
 
-		# Get architecture from the database.
-		arch = _pakfire.arches.get_by_name(file.arch)
-		assert arch, "Unknown architecture: %s" % file.arch
-
 		hash_sha512 = misc.calc_hash(path, "sha512")
 		assert hash_sha512
 
@@ -167,7 +163,7 @@ class Package(base.Object):
 			("version",     file.version),
 			("release",     file.release),
 			("type",        file.type),
-			("arch",        arch.id),
+			("arch",        file.arch),
 
 			("groups",      " ".join(file.groups)),
 			("maintainer",  file.maintainer),
