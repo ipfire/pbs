@@ -22,7 +22,7 @@ class Repositories(base.Object):
 
 	def __iter__(self):
 		repositories = self._get_repositories("SELECT * FROM repositories \
-			ORDER BY distro_id, name")
+			WHERE deleted IS FALSE ORDER BY distro_id, name")
 
 		return iter(repositories)
 
