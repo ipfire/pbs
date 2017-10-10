@@ -36,7 +36,7 @@ class Cli(object):
 			"pull-sources" : self.backend.sources.pull,
 
 			# Remaster Repositories
-			"remaster-repositories" : self.backend.repositories.remaster,
+			"remaster-repositories" : self.backend.repos.remaster,
 
 			# Send bug updates to Bugzilla
 			"send-bug-updates" : self.backend.bugzilla.send_all,
