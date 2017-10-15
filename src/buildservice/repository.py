@@ -1,10 +1,15 @@
 #!/usr/bin/python
 
+import logging
 import os.path
+
+log = logging.getLogger("repositories")
+log.propagate = 1
 
 from . import base
 from . import logs
 
+from .constants import *
 from .decorators import *
 
 class Repositories(base.Object):
@@ -22,7 +27,7 @@ class Repositories(base.Object):
 
 	def __iter__(self):
 		repositories = self._get_repositories("SELECT * FROM repositories \
-			ORDER BY distro_id, name")
+			WHERE deleted IS FALSE ORDER BY distro_id, name")
 
 		return iter(repositories)
 
@@ -33,18 +38,6 @@ class Repositories(base.Object):
 	def get_by_id(self, repo_id):
 		return self._get_repository("SELECT * FROM repositories \
 			WHERE id = %s", repo_id)
-
-	def get_needs_update(self, limit=None):
-		query = "SELECT id FROM repositories WHERE needs_update = 'Y'"
-		query += " ORDER BY last_update ASC"
-
-		# Append limit if any
-		if limit:
-			query += " LIMIT %d" % limit
-
-		repos = self.db.query(query)
-
-		return [Repository(self.pakfire, r.id) for r in repos]
 
 	def get_history(self, limit=None, offset=None, build=None, repo=None, user=None):
 		query = "SELECT * FROM repositories_history"
@@ -66,6 +59,19 @@ class Repositories(base.Object):
 			entries.append(entry)
 
 		return entries
+
+	def remaster(self):
+		"""
+			Remasters all repositories
+		"""
+		for repo in self:
+			# Skip all repositories that don't need an update
+			if not repo.needs_update:
+				log.debug("Repository %s does not need an update" % repo)
+				continue
+
+			with self.db.transaction():
+				repo.remaster()
 
 
 class Repository(base.DataObject):
@@ -201,7 +207,7 @@ class Repository(base.DataObject):
 
 	@property
 	def arches(self):
-		return self.distro.arches
+		return self.distro.arches + ["src"]
 
 	@property
 	def mirrored(self):
@@ -326,24 +332,20 @@ class Repository(base.DataObject):
 	def packages(self):
 		return self.get_packages()
 
-	def get_unpushed_builds(self):
-		query = self.db.query("SELECT build_id FROM repositories_builds \
-			WHERE repo_id = %s AND \
-			time_added > (SELECT last_update FROM repositories WHERE id = %s)",
-			self.id, self.id)
-
-		ret = []
-		for row in query:
-			b = self.pakfire.builds.get_by_id(row.build_id)
-			ret.append(b)
-
-		return ret
+	@property
+	def unpushed_builds(self):
+		return self.backend.builds._get_builds("SELECT builds.* FROM repositories \
+			LEFT JOIN repositories_builds ON repositories.id = repositories_builds.repo_id \
+			LEFT JOIN builds ON repositories_builds.build_id = builds.id \
+			WHERE repositories.id = %s \
+				AND repositories_builds.time_added >= repositories.last_update", self.id)
 
 	def get_obsolete_builds(self):
 		return self.pakfire.builds.get_obsolete(self)
 
+	@property
 	def needs_update(self):
-		if self.get_unpushed_builds:
+		if self.unpushed_builds:
 			return True
 
 		return False
@@ -351,6 +353,88 @@ class Repository(base.DataObject):
 	def updated(self):
 		self.db.execute("UPDATE repositories SET last_update = NOW() \
 			WHERE id = %s", self.id)
+
+	def remaster(self):
+		log.info("Going to update repository %s..." % self.name)
+
+		# Update the timestamp when we started at last.
+		self.updated()
+
+		for arch in self.arches:
+			changed = False
+
+			# Get all package paths that are to be included in this repository.
+			paths = self.get_paths(arch)
+
+			repo_path = os.path.join(
+				REPOS_DIR,
+				self.distro.identifier,
+				self.identifier,
+				arch
+			)
+
+			if not os.path.exists(repo_path):
+				os.makedirs(repo_path)
+
+			source_files = []
+			remove_files = []
+
+			for filename in os.listdir(repo_path):
+				path = os.path.join(repo_path, filename)
+
+				if not os.path.isfile(path):
+					continue
+
+				remove_files.append(path)
+
+			for path in paths:
+				filename = os.path.basename(path)
+
+				source_file = os.path.join(PACKAGES_DIR, path)
+				target_file = os.path.join(repo_path, filename)
+
+				# Do not add duplicate files twice.
+				if source_file in source_files:
+					continue
+
+				source_files.append(source_file)
+
+				try:
+					remove_files.remove(target_file)
+				except ValueError:
+					changed = True
+
+			if remove_files:
+				changed = True
+
+			# If nothing in the repository data has changed, there
+			# is nothing to do.
+			if changed:
+				log.info("The repository has updates...")
+			else:
+				log.info("Nothing to update.")
+				continue
+
+			# Find the key to sign the package.
+			key_id = None
+			if repo.key:
+				key_id = self.key.fingerprint
+
+			# Create package index.
+			p = pakfire.PakfireServer(arch=arch)
+
+			p.repo_create(repo_path, source_files,
+				name="%s - %s.%s" % (self.distro.name, self.name, arch),
+				key_id=key_id)
+
+			# Remove files afterwards.
+			for file in remove_files:
+				file = os.path.join(repo_path, file)
+
+				try:
+					os.remove(file)
+				except OSError:
+					log.warning("Could not remove %s." % file)
 
 	def get_history(self, **kwargs):
 		kwargs.update({

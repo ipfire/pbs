@@ -1,11 +1,17 @@
 # Send queued emails once a minute
 * * * * *	nobody	pakfire-build-service process-message-queue &>/dev/null
 
+# Remaster repositories
+*/5 * * * *	nobody	pakfire-build-service remaster-repositories &>/dev/null
+
 # Pull sources
 */5 * * * *	nobody	pakfire-build-service pull-sources &>/dev/null
 
 # Send updates to Bugzilla
 */5 * * * *	nobody	pakfire-build-service send-bug-updates &>/dev/null
+
+# Create test jobs
+*/15 * * * *	nobody	pakfire-build-service create-test-jobs &>/dev/null
 
 # Cleanup files
 */5 * * * *	nobody	pakfire-build-service cleanup-files &>/dev/null

@@ -24,7 +24,7 @@ def priority(arch):
 class Arches(base.Object):
 	def __iter__(self):
 		res = self.db.query("SELECT name FROM arches \
-			WHERE NOT name = ANY(%s)", ("noarch", "src"))
+			WHERE NOT name = ANY(%s)", ["noarch", "src"])
 
 		return iter(sorted((a.name for a in res), key=priority))
 

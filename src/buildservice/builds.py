@@ -225,36 +225,6 @@ class Builds(base.Object):
 		if builds:
 			return builds.count
 
-	def needs_test(self, threshold, arch, limit=None, randomize=False):
-		query = "SELECT id FROM builds \
-			WHERE NOT EXISTS \
-				(SELECT * FROM jobs WHERE \
-					jobs.build_id = builds.id AND \
-					jobs.arch = %s AND \
-					(jobs.state != 'finished' OR \
-					jobs.time_finished >= %s) \
-				) \
-			AND EXISTS \
-				(SELECT * FROM jobs WHERE \
-					jobs.build_id = builds.id AND \
-					jobs.arch = %s AND \
-					jobs.type = 'build' AND \
-					jobs.state = 'finished' AND \
-					jobs.time_finished < %s \
-				) \
-			AND builds.type = 'release' \
-			AND (builds.state = 'stable' OR builds.state = 'testing')"
-		args  = [arch, threshold, arch, threshold]
-
-		if randomize:
-			query += " ORDER BY RAND()"
-
-		if limit:
-			query += " LIMIT %s"
-			args.append(limit)
-
-		return [Build(self.pakfire, b.id) for b in self.db.query(query, *args)]
-
 	def get_obsolete(self, repo=None):
 		"""
 			Get all obsoleted builds.

@@ -18,7 +18,6 @@ p = pakfire.buildservice.Pakfire()
 events = (
 	pakfire.buildservice.manager.BuildsFailedRestartEvent,
 	pakfire.buildservice.manager.CheckBuildDependenciesEvent,
-	pakfire.buildservice.manager.CreateTestBuildsEvent,
 	pakfire.buildservice.manager.DistEvent,
 	pakfire.buildservice.manager.RepositoriesUpdateEvent,
 )

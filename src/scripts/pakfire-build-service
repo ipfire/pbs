@@ -26,6 +26,9 @@ class Cli(object):
 			# Cleanup uploads
 			"cleanup-uploads" : self.backend.uploads.cleanup,
 
+			# Create test jobs
+			"create-test-jobs" : self.backend.jobqueue.create_test_jobs,
+
 			# List repository
 			"list-repository" : self._list_repository,
 
@@ -34,6 +37,9 @@ class Cli(object):
 
 			# Pull sources
 			"pull-sources" : self.backend.sources.pull,
+
+			# Remaster Repositories
+			"remaster-repositories" : self.backend.repos.remaster,
 
 			# Send bug updates to Bugzilla
 			"send-bug-updates" : self.backend.bugzilla.send_all,
