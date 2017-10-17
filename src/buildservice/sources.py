@@ -10,7 +10,6 @@ import subprocess
 import tempfile
 
 from . import base
-from . import database
 from . import git
 
 from .constants import *
