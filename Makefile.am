@@ -67,7 +67,6 @@ dist_doc_DATA = \
 dist_bin_SCRIPTS = \
 	src/scripts/pakfire-build-service \
 	src/scripts/pakfire-hub \
-	src/scripts/pakfire-manager \
 	src/scripts/pakfire-web
 
 dist_configs_DATA = \
@@ -120,13 +119,6 @@ hub_PYTHON = \
 	src/hub/handlers.py
 
 hubdir = $(buildservicedir)/hub
-
-manager_PYTHON = \
-	src/manager/__init__.py \
-	src/manager/base.py \
-	src/manager/builds.py
-
-managerdir = $(buildservicedir)/manager
 
 web_PYTHON = \
 	src/web/__init__.py \

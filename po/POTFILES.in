@@ -161,10 +161,6 @@ src/templates/user-profile-passwd.html
 src/templates/user-profile-passwd-ok.html
 src/hub/handlers.py
 src/hub/__init__.py
-src/manager/base.py
-src/manager/builds.py
-src/manager/__init__.py
-src/manager/repositories.py
 src/web/handlers_api.py
 src/web/handlers_auth.py
 src/web/handlers_base.py

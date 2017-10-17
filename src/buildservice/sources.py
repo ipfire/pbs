@@ -3,9 +3,14 @@
 import datetime
 import logging
 import os
+import pakfire
+import pakfire.config
+import shutil
 import subprocess
+import tempfile
 
 from . import base
+from . import builds
 from . import database
 from . import git
 
@@ -90,6 +95,97 @@ class Sources(base.Object):
 
 			# Import all new revisions.
 			repo.import_revisions()
+
+	def dist(self):
+		self._init_repos()
+
+		for commit in self.get_pending_commits():
+			commit.state = "running"
+
+			logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
+
+			# Get the repository of this commit.
+			repo = git.Repo(self.pakfire, commit.source)
+
+			# Make sure, it is checked out.
+			if not repo.cloned:
+				repo.clone()
+
+			# Navigate to the right revision.
+			repo.checkout(commit.revision)
+
+			# Get all changed makefiles.
+			deleted_files = []
+			updated_files = []
+
+			for file in repo.changed_files(commit.revision):
+				# Don't care about files that are not a makefile.
+				if not file.endswith(".%s" % MAKEFILE_EXTENSION):
+					continue
+
+				if os.path.exists(file):
+					updated_files.append(file)
+				else:
+					deleted_files.append(file)
+
+				if updated_files:
+					# Create a temporary directory where to put all the files
+					# that are generated here.
+					pkg_dir = tempfile.mkdtemp()
+
+					try:
+						config = pakfire.config.Config(["general.conf",])
+						config.parse(source.distro.get_config())
+
+						p = pakfire.PakfireServer(config=config)
+
+						pkgs = []
+						for file in updated_files:
+							try:
+								pkg_file = p.dist(file, pkg_dir)
+								pkgs.append(pkg_file)
+							except:
+								raise
+
+						# Import all packages in one swoop.
+						for pkg in pkgs:
+							# Import the package file and create a build out of it.
+							builds.import_from_package(_pakfire, pkg,
+								distro=source.distro, commit=commit, type="release")
+
+					except:
+						if commit:
+							commit.state = "failed"
+
+						raise
+
+					finally:
+						if os.path.exists(pkg_dir):
+							shutil.rmtree(pkg_dir)
+
+				for file in deleted_files:
+					# Determine the name of the package.
+					name = os.path.basename(file)
+					name = name[:len(MAKEFILE_EXTENSION) + 1]
+
+					source.distro.delete_package(name)
+
+				if commit:
+					commit.state = "finished"
+
+	def _init_repos(self):
+		"""
+			Initialize all repositories.
+		"""
+		for source in self.get_all():
+			# Skip those which already have a revision.
+			if source.revision:
+				continue
+
+			# Initialize the repository or and clone it if necessary.
+			repo = git.Repo(self.pakfire, source)
+			if not repo.cloned:
+				repo.clone()
 
 
 class Commit(base.DataObject):

@@ -14,6 +14,9 @@ class Cli(object):
 		self.backend = pakfire.buildservice.Backend(*args, **kwargs)
 
 		self._commands = {
+			# Check build dependencies
+			"check-build-dependencies" : self.backend.jobqueue.check_build_dependencies,
+
 			# Run mirror check
 			"check-mirrors" : self.backend.mirrors.check,
 
@@ -28,6 +31,9 @@ class Cli(object):
 
 			# Create test jobs
 			"create-test-jobs" : self.backend.jobqueue.create_test_jobs,
+
+			# Dist
+			"dist" : self.backend.sources.dist,
 
 			# List repository
 			"list-repository" : self._list_repository,
