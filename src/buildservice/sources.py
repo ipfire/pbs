@@ -10,10 +10,10 @@ import subprocess
 import tempfile
 
 from . import base
-from . import builds
 from . import database
 from . import git
 
+from .constants import *
 from .decorators import *
 
 class Sources(base.Object):
@@ -82,110 +82,83 @@ class Sources(base.Object):
 
 	def pull(self):
 		for source in self:
-			repo = git.Repo(self.backend, source, mode="mirror")
-
-			# If the repository is not yet cloned, we need to make a local
-			# clone to work with.
-			if not repo.cloned:
-				repo.clone()
-
-			# Otherwise we just fetch updates.
-			else:
+			with git.Repo(self.backend, source, mode="mirror") as repo:
+				# Fetch the latest updates
 				repo.fetch()
 
-			# Import all new revisions.
-			repo.import_revisions()
+				# Import all new revisions
+				repo.import_revisions()
 
 	def dist(self):
-		self._init_repos()
-
 		for commit in self.get_pending_commits():
 			commit.state = "running"
 
 			logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
 
-			# Get the repository of this commit.
-			repo = git.Repo(self.pakfire, commit.source)
+			# Get the repository of this commit
+			with git.Repo(self.pakfire, commit.source) as repo:
+				# Navigate to the right revision.
+				repo.checkout(commit.revision)
 
-			# Make sure, it is checked out.
-			if not repo.cloned:
-				repo.clone()
+				# Get all changed makefiles.
+				deleted_files = []
+				updated_files = []
 
-			# Navigate to the right revision.
-			repo.checkout(commit.revision)
+				for file in repo.changed_files(commit.revision):
+					# Don't care about files that are not a makefile.
+					if not file.endswith(".%s" % MAKEFILE_EXTENSION):
+						continue
 
-			# Get all changed makefiles.
-			deleted_files = []
-			updated_files = []
+					if os.path.exists(file):
+						updated_files.append(file)
+					else:
+						deleted_files.append(file)
 
-			for file in repo.changed_files(commit.revision):
-				# Don't care about files that are not a makefile.
-				if not file.endswith(".%s" % MAKEFILE_EXTENSION):
-					continue
+					if updated_files:
+						# Create a temporary directory where to put all the files
+						# that are generated here.
+						pkg_dir = tempfile.mkdtemp()
 
-				if os.path.exists(file):
-					updated_files.append(file)
-				else:
-					deleted_files.append(file)
+						try:
+							config = pakfire.config.Config(["general.conf",])
+							config.parse(commit.source.distro.get_config())
 
-				if updated_files:
-					# Create a temporary directory where to put all the files
-					# that are generated here.
-					pkg_dir = tempfile.mkdtemp()
+							p = pakfire.PakfireServer(config=config)
 
-					try:
-						config = pakfire.config.Config(["general.conf",])
-						config.parse(source.distro.get_config())
+							pkgs = []
+							for file in updated_files:
+								try:
+									pkg_file = p.dist(file, pkg_dir)
+									pkgs.append(pkg_file)
+								except:
+									raise
 
-						p = pakfire.PakfireServer(config=config)
+							# Import all packages in one swoop.
+							for pkg in pkgs:
+								# Import the package file and create a build out of it.
+								from . import builds
+								builds.import_from_package(_pakfire, pkg,
+									distro=commit.source.distro, commit=commit, type="release")
 
-						pkgs = []
-						for file in updated_files:
-							try:
-								pkg_file = p.dist(file, pkg_dir)
-								pkgs.append(pkg_file)
-							except:
-								raise
+						except:
+							if commit:
+								commit.state = "failed"
 
-						# Import all packages in one swoop.
-						for pkg in pkgs:
-							# Import the package file and create a build out of it.
-							builds.import_from_package(_pakfire, pkg,
-								distro=source.distro, commit=commit, type="release")
+							raise
 
-					except:
-						if commit:
-							commit.state = "failed"
+						finally:
+							if os.path.exists(pkg_dir):
+								shutil.rmtree(pkg_dir)
 
-						raise
+					for file in deleted_files:
+						# Determine the name of the package.
+						name = os.path.basename(file)
+						name = name[:len(MAKEFILE_EXTENSION) + 1]
 
-					finally:
-						if os.path.exists(pkg_dir):
-							shutil.rmtree(pkg_dir)
+						commit.source.distro.delete_package(name)
 
-				for file in deleted_files:
-					# Determine the name of the package.
-					name = os.path.basename(file)
-					name = name[:len(MAKEFILE_EXTENSION) + 1]
-
-					source.distro.delete_package(name)
-
-				if commit:
-					commit.state = "finished"
-
-	def _init_repos(self):
-		"""
-			Initialize all repositories.
-		"""
-		for source in self.get_all():
-			# Skip those which already have a revision.
-			if source.revision:
-				continue
-
-			# Initialize the repository or and clone it if necessary.
-			repo = git.Repo(self.pakfire, source)
-			if not repo.cloned:
-				repo.clone()
+					if commit:
+						commit.state = "finished"
 
 
 class Commit(base.DataObject):
