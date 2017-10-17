@@ -10,6 +10,9 @@
 # Pull sources
 */5 * * * *	nobody	pakfire-build-service pull-sources &>/dev/null
 
+# Dist
+*/5 * * * *	nobody	pakfire-build-service dist &>/dev/null
+
 # Send updates to Bugzilla
 */5 * * * *	nobody	pakfire-build-service send-bug-updates &>/dev/null
 
