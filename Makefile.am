@@ -95,7 +95,6 @@ buildservice_PYTHON = \
 	src/buildservice/misc.py \
 	src/buildservice/packages.py \
 	src/buildservice/repository.py \
-	src/buildservice/scheduler.py \
 	src/buildservice/sessions.py \
 	src/buildservice/settings.py \
 	src/buildservice/sources.py \
