@@ -57,23 +57,6 @@ class Sources(base.Object):
 
 		return self.db.execute(query, revision, source_id)
 
-	def get_pending_commits(self, limit=None):
-		query = "SELECT id FROM sources_commits WHERE state = 'pending' ORDER BY id ASC"
-		args = []
-
-		if limit:
-			query += " LIMIT %s"
-			args.append(limit)
-
-		rows = self.db.query(query, *args)
-
-		commits = []
-		for row in rows:
-			commit = Commit(self.pakfire, row.id)
-			commits.append(commit)
-
-		return commits
-
 	def get_commit_by_id(self, commit_id):
 		commit = self.db.get("SELECT id FROM sources_commits WHERE id = %s", commit_id)
 
@@ -90,75 +73,78 @@ class Sources(base.Object):
 				repo.import_revisions()
 
 	def dist(self):
-		for commit in self.get_pending_commits():
-			commit.state = "running"
+		# Walk through all source repositories
+		for source in self:
+			# Get access to the git repo
+			with git.Repo(self.pakfire, source) as repo:
+				# Walk through all pending commits
+				for commit in source.pending_commits:
+					commit.state = "running"
 
-			logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
+					logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
 
-			# Get the repository of this commit
-			with git.Repo(self.pakfire, commit.source) as repo:
-				# Navigate to the right revision.
-				repo.checkout(commit.revision)
+					# Navigate to the right revision.
+					repo.checkout(commit.revision)
 
-				# Get all changed makefiles.
-				deleted_files = []
-				updated_files = []
+					# Get all changed makefiles.
+					deleted_files = []
+					updated_files = []
 
-				for file in repo.changed_files(commit.revision):
-					# Don't care about files that are not a makefile.
-					if not file.endswith(".%s" % MAKEFILE_EXTENSION):
-						continue
+					for file in repo.changed_files(commit.revision):
+						# Don't care about files that are not a makefile.
+						if not file.endswith(".%s" % MAKEFILE_EXTENSION):
+							continue
 
-					if os.path.exists(file):
-						updated_files.append(file)
-					else:
-						deleted_files.append(file)
+						if os.path.exists(file):
+							updated_files.append(file)
+						else:
+							deleted_files.append(file)
 
-					if updated_files:
-						# Create a temporary directory where to put all the files
-						# that are generated here.
-						pkg_dir = tempfile.mkdtemp()
+						if updated_files:
+							# Create a temporary directory where to put all the files
+							# that are generated here.
+							pkg_dir = tempfile.mkdtemp()
 
-						try:
-							config = pakfire.config.Config(["general.conf",])
-							config.parse(commit.source.distro.get_config())
+							try:
+								config = pakfire.config.Config(["general.conf",])
+								config.parse(source.distro.get_config())
 
-							p = pakfire.PakfireServer(config=config)
+								p = pakfire.PakfireServer(config=config)
 
-							pkgs = []
-							for file in updated_files:
-								try:
-									pkg_file = p.dist(file, pkg_dir)
-									pkgs.append(pkg_file)
-								except:
-									raise
+								pkgs = []
+								for file in updated_files:
+									try:
+										pkg_file = p.dist(file, pkg_dir)
+										pkgs.append(pkg_file)
+									except:
+										raise
 
-							# Import all packages in one swoop.
-							for pkg in pkgs:
-								# Import the package file and create a build out of it.
-								from . import builds
-								builds.import_from_package(_pakfire, pkg,
-									distro=commit.source.distro, commit=commit, type="release")
+								# Import all packages in one swoop.
+								for pkg in pkgs:
+									# Import the package file and create a build out of it.
+									from . import builds
+									builds.import_from_package(_pakfire, pkg,
+										distro=source.distro, commit=commit, type="release")
 
-						except:
-							if commit:
-								commit.state = "failed"
+							except:
+								if commit:
+									commit.state = "failed"
 
-							raise
+								raise
 
-						finally:
-							if os.path.exists(pkg_dir):
-								shutil.rmtree(pkg_dir)
+							finally:
+								if os.path.exists(pkg_dir):
+									shutil.rmtree(pkg_dir)
 
-					for file in deleted_files:
-						# Determine the name of the package.
-						name = os.path.basename(file)
-						name = name[:len(MAKEFILE_EXTENSION) + 1]
+						for file in deleted_files:
+							# Determine the name of the package.
+							name = os.path.basename(file)
+							name = name[:len(MAKEFILE_EXTENSION) + 1]
 
-						commit.source.distro.delete_package(name)
+							source.distro.delete_package(name)
 
-					if commit:
-						commit.state = "finished"
+						if commit:
+							commit.state = "finished"
 
 
 class Commit(base.DataObject):
@@ -325,3 +311,8 @@ class Source(base.DataObject):
 		if commit:
 			commit.source = self
 			return commit
+
+	@property
+	def pending_commits(self):
+		return self.backend.sources._get_commits("SELECT * FROM sources_commits \
+			WHERE state = %s ORDER BY imported_at", "pending")
