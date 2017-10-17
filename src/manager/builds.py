@@ -14,40 +14,6 @@ from . import base
 
 from ..constants import *
 
-class BuildsFailedRestartEvent(base.Event):
-	# Run when idle.
-	priority = 5
-
-	@property
-	def interval(self):
-		return self.pakfire.settings.get_int("build_keepalive_interval", 900)
-
-	def run(self):
-		max_tries = self.pakfire.settings.get_int("builds_restart_max_tries", 9)
-
-		query = self.db.query("SELECT jobs.id AS id FROM jobs \
-			JOIN builds ON builds.id = jobs.build_id \
-			WHERE \
-				jobs.type = 'build' AND \
-				jobs.state = 'failed' AND \
-				jobs.tries <= %s AND \
-				NOT builds.state = 'broken' AND \
-				jobs.time_finished < NOW() - '72 hours'::interval \
-			ORDER BY \
-				CASE \
-					WHEN jobs.type = 'build' THEN 0 \
-					WHEN jobs.type = 'test'  THEN 1 \
-				END, \
-				builds.priority DESC, jobs.time_created ASC",
-			max_tries)
-
-		for row in query:
-			job = self.pakfire.jobs.get_by_id(row.id)
-
-			# Restart the job.
-			job.set_state("new", log=False)
-
-
 class CheckBuildDependenciesEvent(base.Event):
 	# Process them as quickly as possible, but there may be more important events.
 	priority = 3

@@ -41,6 +41,9 @@ class Cli(object):
 			# Remaster Repositories
 			"remaster-repositories" : self.backend.repos.remaster,
 
+			# Restart failed jobs
+			"restart-failed-jobs" : self.backend.jobs.restart_failed,
+
 			# Send bug updates to Bugzilla
 			"send-bug-updates" : self.backend.bugzilla.send_all,
 		}

@@ -1468,6 +1468,27 @@ class Jobs(base.Object):
 		if jobs:
 			return jobs.count
 
+	def restart_failed(self, max_tries=9):
+		jobs = self._get_jobs("SELECT jobs.* FROM jobs \
+			JOIN builds ON builds.id = jobs.build_id \
+			WHERE \
+				jobs.type = 'build' AND \
+				jobs.state = 'failed' AND \
+				jobs.tries <= %s AND \
+				NOT builds.state = 'broken' AND \
+				jobs.time_finished < NOW() - '72 hours'::interval \
+			ORDER BY \
+				CASE \
+					WHEN jobs.type = 'build' THEN 0 \
+					WHEN jobs.type = 'test'  THEN 1 \
+				END, \
+				builds.priority DESC, jobs.time_created ASC",
+			max_tries)
+
+		# Restart the job
+		for job in jobs:
+			job.set_state("new", log=False)
+
 
 class Job(base.DataObject):
 	table = "jobs"
