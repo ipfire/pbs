@@ -1,32 +1,32 @@
 # Send queued emails once a minute
-* * * * *	nobody	pakfire-build-service process-message-queue &>/dev/null
+* * * * *	pakfire	pakfire-build-service process-message-queue &>/dev/null
 
 # Check build dependencies
-* * * * *	nobody	pakfire-build-service check-build-dependencies &>/dev/null
+* * * * *	pakfire	pakfire-build-service check-build-dependencies &>/dev/null
 
 # Remaster repositories
-*/5 * * * *	nobody	pakfire-build-service remaster-repositories &>/dev/null
+*/5 * * * *	pakfire	pakfire-build-service remaster-repositories &>/dev/null
 
 # Pull sources
-*/5 * * * *	nobody	pakfire-build-service pull-sources &>/dev/null
+*/5 * * * *	pakfire	pakfire-build-service pull-sources &>/dev/null
 
 # Dist
-*/5 * * * *	nobody	pakfire-build-service dist &>/dev/null
+*/5 * * * *	pakfire	pakfire-build-service dist &>/dev/null
 
 # Send updates to Bugzilla
-*/5 * * * *	nobody	pakfire-build-service send-bug-updates &>/dev/null
+*/5 * * * *	pakfire	pakfire-build-service send-bug-updates &>/dev/null
 
 # Create test jobs
-*/15 * * * *	nobody	pakfire-build-service create-test-jobs &>/dev/null
+*/15 * * * *	pakfire	pakfire-build-service create-test-jobs &>/dev/null
 
 # Cleanup files
-*/5 * * * *	nobody	pakfire-build-service cleanup-files &>/dev/null
+*/5 * * * *	pakfire	pakfire-build-service cleanup-files &>/dev/null
 
 # Cleanup timed-out uploads
-0 */6 * * *	nobody	pakfire-build-service cleanup-uploads &>/dev/null
+0 */6 * * *	pakfire	pakfire-build-service cleanup-uploads &>/dev/null
 
 # Cleanup expired sessions
-0 0 * * *	nobody	pakfire-build-service cleanup-sessions &>/dev/null
+0 0 * * *	pakfire	pakfire-build-service cleanup-sessions &>/dev/null
 
 # Run mirror check
-*/30 * * * *	nobody	pakfire-build-service check-mirrors &>/dev/null
+*/30 * * * *	pakfire	pakfire-build-service check-mirrors &>/dev/null
