@@ -280,8 +280,8 @@ class Source(base.DataObject):
 
 	def create_commit(self, revision, author, committer, subject, body, date):
 		commit = self.backend.sources._get_commit("INSERT INTO sources_commits(source_id, \
-			revision, author, committer, subject, body, date) VALUES(%s, %s, %s, %s, %s, %s, %s)",
-			self.id, revision, author, committer, subject, body, date)
+			revision, author, committer, subject, body, date) VALUES(%s, %s, %s, %s, %s, %s, %s) \
+			RETURNING *", self.id, revision, author, committer, subject, body, date)
 
 		# Commit
 		commit.source = self
