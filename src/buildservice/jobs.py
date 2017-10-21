@@ -34,7 +34,7 @@ class Jobs(base.Object):
 		for row in res:
 			yield Job(self.backend, row.id, data=row)
 
-	def create(self, build, arch, test=False superseeds=None):
+	def create(self, build, arch, test=False, superseeds=None):
 		job = self._get_job("INSERT INTO jobs(uuid, build_id, arch, test) \
 			VALUES(%s, %s, %s, %s) RETURNING *", "%s" % uuid.uuid4(), build.id, arch, test)
 		job.log("created")
