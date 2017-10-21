@@ -46,12 +46,6 @@ class Jobs(base.Object):
 		if superseeds:
 			superseeds.superseeded_by = job
 
-		# Jobs are by default in state "new" and wait for being checked
-		# for dependencies. Packages that do have no build dependencies
-		# can directly be forwarded to "pending" state.
-		if not job.pkg.requires:
-			job.state = "pending"
-
 		return job
 
 	def get_by_id(self, id, data=None):
