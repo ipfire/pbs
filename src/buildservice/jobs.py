@@ -251,27 +251,33 @@ class Job(base.DataObject):
 	superseeded_by = lazy_property(get_superseeded_by, set_superseeded_by)
 
 	def delete(self):
-		self.__delete_buildroots()
-		self.__delete_history()
-		self.__delete_packages()
-		self.__delete_logfiles()
+		self._set_attribute("delete", True)
+
+	def remove(self):
+		"""
+			Removes a job from the database
+		"""
+		self.__remove_buildroots()
+		self.__remove_history()
+		self.__remove_packages()
+		self.__remove_logfiles()
 
 		# Delete the job itself.
 		self.db.execute("DELETE FROM jobs WHERE id = %s", self.id)
 
-	def __delete_buildroots(self):
+	def __remove_buildroots(self):
 		"""
 			Removes all buildroots.
 		"""
 		self.db.execute("DELETE FROM jobs_buildroots WHERE job_id = %s", self.id)
 
-	def __delete_history(self):
+	def __remove_history(self):
 		"""
 			Removes all references in the history to this build job.
 		"""
 		self.db.execute("DELETE FROM jobs_history WHERE job_id = %s", self.id)
 
-	def __delete_packages(self):
+	def __remove_packages(self):
 		"""
 			Deletes all uploaded files from the job.
 		"""
@@ -280,15 +286,15 @@ class Job(base.DataObject):
 
 		self.db.execute("DELETE FROM jobs_packages WHERE job_id = %s", self.id)
 
-	def __delete_logfiles(self):
+	def __remove_logfiles(self):
 		for logfile in self.logfiles:
 			self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", logfile.path)
 
 	def reset(self, user=None):
-		self.__delete_buildroots()
-		self.__delete_packages()
-		self.__delete_history()
-		self.__delete_logfiles()
+		self.__remove_buildroots()
+		self.__remove_packages()
+		self.__remove_history()
+		self.__remove_logfiles()
 
 		self.state = "new"
 		self.log("reset", user=user)
