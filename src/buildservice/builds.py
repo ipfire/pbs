@@ -392,51 +392,41 @@ class Build(base.DataObject):
 
 	def delete(self):
 		"""
-			Deletes this build including all jobs, packages and the source
-			package.
+			Deletes this build including all jobs,
+			packages and the source package.
 		"""
 		# If the build is in a repository, we need to remove it.
 		if self.repo:
 			self.repo.rem_build(self)
 
-		for job in self.jobs + self.test_jobs:
+		# Delete all release jobs
+		for job in self.jobs:
 			job.delete()
 
-		if self.pkg:
-			self.pkg.delete()
+		# Delete all test jobs
+		for job in self.test_jobs:
+			 job.delete()
 
-		# Delete everything related to this build.
-		self.__delete_bugs()
-		self.__delete_comments()
-		self.__delete_history()
-		self.__delete_watchers()
+		# Deleted all associated bugs
+		self.db.execute("DELETE FROM builds_bugs WHERE build_id = %s", self.id)
+
+		# Delete all comments
+		self.db.execute("DELETE FROM builds_comments WHERE build_id = %s", self.id)
+
+		# Delete the repository history
+		self.db.execute("DELETE FROM repositories_history WHERE build_id = %s", self.id)
+
+		# Delete all watchers
+		self.db.execute("DELETE FROM builds_watchers WHERE build_id = %s", self.id)
+
+		# Delete build history
+		self.db.execute("DELETE FROM builds_history WHERE build_id = %s", self.id)
 
 		# Delete the build itself.
 		self.db.execute("DELETE FROM builds WHERE id = %s", self.id)
 
-	def __delete_bugs(self):
-		"""
-			Delete all associated bugs.
-		"""
-		self.db.execute("DELETE FROM builds_bugs WHERE build_id = %s", self.id)
-
-	def __delete_comments(self):
-		"""
-			Delete all comments.
-		"""
-		self.db.execute("DELETE FROM builds_comments WHERE build_id = %s", self.id)
-
-	def __delete_history(self):
-		"""
-			Delete the repository history.
-		"""
-		self.db.execute("DELETE FROM repositories_history WHERE build_id = %s", self.id)
-
-	def __delete_watchers(self):
-		"""
-			Delete all watchers.
-		"""
-		self.db.execute("DELETE FROM builds_watchers WHERE build_id = %s", self.id)
+		# Delete source package
+		self.pkg.delete()
 
 	@property
 	def info(self):
@@ -753,12 +743,12 @@ class Build(base.DataObject):
 			Get a list of all build jobs that are in this build.
 		"""
 		return self._get_jobs("SELECT * FROM jobs \
-				WHERE build_id = %s AND test IS FALSE AND deleted_at IS NULL", self.id)
+				WHERE build_id = %s AND test IS FALSE", self.id)
 
 	@property
 	def test_jobs(self):
 		return self._get_jobs("SELECT * FROM jobs \
-			WHERE build_id = %s AND test IS TRUE AND deleted_at IS NULL", self.id)
+			WHERE build_id = %s AND test IS TRUE", self.id)
 
 	@property
 	def all_jobs_finished(self):

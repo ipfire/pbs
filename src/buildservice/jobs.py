@@ -219,44 +219,29 @@ class Job(base.DataObject):
 	superseeded_by = lazy_property(get_superseeded_by, set_superseeded_by)
 
 	def delete(self):
-		self._set_attribute("delete", True)
+		"""
+			Deletes a job from the database
+		"""
+		# Remove the buildroot
+		self.db.execute("DELETE FROM jobs_buildroots WHERE job_id = %s", self.id)
 
-	def remove(self):
-		"""
-			Removes a job from the database
-		"""
-		self.__remove_buildroots()
-		self.__remove_history()
-		self.__remove_packages()
-		self.__remove_logfiles()
+		# Remove the history
+		self.db.execute("DELETE FROM jobs_history WHERE job_id = %s", self.id)
+
+		# Delete all packages
+		for pkg in self:
+			self.db.execute("DELETE FROM jobs_packages \
+				WHERE job_id = %s AND pkg_id = %s", self.id, pkg.id)
+			pkg.delete()
+
+		# Remove all logfiles
+		for logfile in self.logfiles:
+			self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", logfile.path)
+
+		self.db.execute("DELETE FROM logfiles WHERE job_id = %s", self.id)
 
 		# Delete the job itself.
 		self.db.execute("DELETE FROM jobs WHERE id = %s", self.id)
-
-	def __remove_buildroots(self):
-		"""
-			Removes all buildroots.
-		"""
-		self.db.execute("DELETE FROM jobs_buildroots WHERE job_id = %s", self.id)
-
-	def __remove_history(self):
-		"""
-			Removes all references in the history to this build job.
-		"""
-		self.db.execute("DELETE FROM jobs_history WHERE job_id = %s", self.id)
-
-	def __remove_packages(self):
-		"""
-			Deletes all uploaded files from the job.
-		"""
-		for pkg in self.packages:
-			pkg.delete()
-
-		self.db.execute("DELETE FROM jobs_packages WHERE job_id = %s", self.id)
-
-	def __remove_logfiles(self):
-		for logfile in self.logfiles:
-			self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", logfile.path)
 
 	## Logging stuff
 

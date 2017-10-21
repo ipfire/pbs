@@ -851,8 +851,7 @@ CREATE TABLE jobs (
     aborted_state integer DEFAULT 0 NOT NULL,
     message text,
     test boolean DEFAULT true NOT NULL,
-    superseeded_by integer,
-    deleted_at timestamp without time zone
+    superseeded_by integer
 );
 
 
@@ -867,7 +866,7 @@ CREATE VIEW builds_times AS
     jobs.arch,
     (jobs.time_finished - jobs.time_started) AS duration
    FROM jobs
-  WHERE (((jobs.deleted_at IS NULL) AND (jobs.test IS FALSE)) AND (jobs.state = 'finished'::jobs_state));
+  WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::jobs_state));
 
 
 ALTER TABLE builds_times OWNER TO pakfire;
@@ -2868,13 +2867,6 @@ ALTER TABLE jobs_buildroots CLUSTER ON jobs_buildroots_job_id;
 --
 
 CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
-
-
---
--- Name: jobs_test; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX jobs_test ON jobs USING btree (test) WHERE (deleted_at IS NULL);
 
 
 --

@@ -62,7 +62,8 @@ class BuildDeleteHandler(BuildBaseHandler):
 			package_name = build.pkg.name
 
 			# Delete the build and everything that comes with it.
-			build.delete()
+			with self.db.transaction():
+				build.delete()
 
 			return self.redirect("/package/%s" % package_name)
 
