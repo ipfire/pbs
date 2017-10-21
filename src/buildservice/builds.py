@@ -41,7 +41,7 @@ class Builds(base.Object):
 			yield Build(self.backend, row.id, data=row)
 
 	def get_by_id(self, id, data=None):
-		return Build(self.pakfire, id, data=data)
+		return Build(self.backend, id, data=data)
 
 	def get_by_uuid(self, uuid):
 		build = self.db.get("SELECT id FROM builds WHERE uuid = %s LIMIT 1", uuid)
@@ -84,7 +84,7 @@ class Builds(base.Object):
 
 		builds = []
 		for build in self.db.query(query, *args):
-			build = Build(self.pakfire, build.id, build)
+			build = Build(self.backend, build.id, build)
 			builds.append(build)
 
 		return builds
@@ -131,7 +131,7 @@ class Builds(base.Object):
 				query += " LIMIT %s"
 				args.append(limit)
 
-		return [Build(self.pakfire, b.id, b) for b in self.db.query(query, *args)]
+		return [Build(self.backend, b.id, b) for b in self.db.query(query, *args)]
 
 	def get_latest_by_name(self, name, type=None, public=None):
 		query = "\
@@ -162,7 +162,7 @@ class Builds(base.Object):
 		res = self.db.get(query, *args)
 
 		if res:
-			return Build(self.pakfire, res.id, res)
+			return Build(self.backend, res.id, res)
 
 	def get_active_builds(self, name, public=None):
 		query = "\
@@ -180,7 +180,7 @@ class Builds(base.Object):
 
 		builds = []
 		for row in self.db.query(query, *args):
-			b = Build(self.pakfire, row.id, row)
+			b = Build(self.backend, row.id, row)
 			builds.append(b)
 
 		# Sort the result. Lastest build first.
@@ -218,7 +218,7 @@ class Builds(base.Object):
 
 		builds = []
 		for build in res:
-			build = Build(self.pakfire, build.id)
+			build = Build(self.backend, build.id)
 			builds.append(build)
 
 		return builds
@@ -325,7 +325,7 @@ class Builds(base.Object):
 
 		builds = []
 		for b in self.db.query(query, *args):
-			b = Build(self.pakfire, b.id, b)
+			b = Build(self.backend, b.id, b)
 			builds.append(b)
 
 		builds.sort(reverse=True)
@@ -360,7 +360,7 @@ class Builds(base.Object):
 
 		comments = []
 		for comment in self.db.query(query, *args):
-			comment = logs.CommentLogEntry(self.pakfire, comment)
+			comment = logs.CommentLogEntry(self.backend, comment)
 			comments.append(comment)
 
 		return comments
@@ -415,34 +415,19 @@ class Builds(base.Object):
 			return build_times[0]
 
 
-class Build(base.Object):
+class Build(base.DataObject):
 	table = "builds"
-
-	def __init__(self, pakfire, id, data=None):
-		base.Object.__init__(self, pakfire)
-
-		# ID of this build
-		self.id = id
-
-		# Cache data.
-		self._data = data
-		self._jobs = None
-		self._jobs_test = None
-		self._depends_on = None
-		self._pkg = None
-		self._credits = None
-		self._update = None
-		self._repo = None
-		self._distro = None
 
 	def __repr__(self):
 		return "<%s id=%s %s>" % (self.__class__.__name__, self.id, self.pkg)
 
-	def __cmp__(self, other):
-		assert self.pkg
-		assert other.pkg
+	def __eq__(self, other):
+		if isinstance(other, self.__class__):
+			return self.id == other.id
 
-		return cmp(self.pkg, other.pkg)
+	def __lt__(self, other):
+		if isinstance(other, self.__class__):
+			return self.pkg < other.pkg
 
 	def __iter__(self):
 		jobs = self.backend.jobs._get_jobs("SELECT * FROM jobs \
@@ -516,17 +501,6 @@ class Build(base.Object):
 		# XXX empty log
 
 	@property
-	def data(self):
-		"""
-			Lazy fetching of data for this object.
-		"""
-		if self._data is None:
-			self._data = self.db.get("SELECT * FROM builds WHERE id = %s", self.id)
-			assert self._data
-
-		return self._data
-
-	@property
 	def info(self):
 		"""
 			A set of information that is sent to the XMLRPC client.
@@ -548,15 +522,12 @@ class Build(base.Object):
 		"""
 		return self.data.uuid
 
-	@property
+	@lazy_property
 	def pkg(self):
 		"""
 			Get package that is to be built in the build.
 		"""
-		if self._pkg is None:
-			self._pkg = packages.Package(self.pakfire, self.data.pkg_id)
-
-		return self._pkg
+		return self.backend.packages.get_by_id(self.data.pkg_id)
 
 	@property
 	def name(self):
@@ -584,17 +555,9 @@ class Build(base.Object):
 
 	owner = lazy_property(get_owner, set_owner)
 
-	@property
-	def distro_id(self):
-		return self.data.distro_id
-
-	@property
+	@lazy_property
 	def distro(self):
-		if self._distro is None:
-			self._distro = self.pakfire.distros.get_by_id(self.distro_id)
-			assert self._distro
-
-		return self._distro
+		return self.backend.distros.get_by_id(self.data.distro_id)
 
 	@property
 	def user(self):
@@ -602,20 +565,13 @@ class Build(base.Object):
 			return self.owner
 
 	def get_depends_on(self):
-		if self.data.depends_on and self._depends_on is None:
-			self._depends_on = Build(self.pakfire, self.data.depends_on)
-
-		return self._depends_on
+		if self.data.depends_on:
+			return self.backend.builds.get_by_id(self.data.depends_on)
 
 	def set_depends_on(self, build):
-		self.db.execute("UPDATE builds SET depends_on = %s WHERE id = %s",
-			build.id, self.id)
+		self._set_attribute("depends_on", build.id)
 
-		# Update cache.
-		self._depends_on = build
-		self._data["depends_on"] = build.id
-
-	depends_on = property(get_depends_on, set_depends_on)
+	depends_on = lazy_property(get_depends_on, set_depends_on)
 
 	@property
 	def created(self):
@@ -630,9 +586,9 @@ class Build(base.Object):
 		"""
 			Is this build public?
 		"""
-		return self.data.public == "Y"
+		return self.data.public
 
-	@property
+	@lazy_property
 	def size(self):
 		"""
 			Returns the size on disk of this build.
@@ -647,29 +603,6 @@ class Build(base.Object):
 		s += sum((j.size for j in self.jobs))
 
 		return s
-
-	#@property
-	#def state(self):
-	#	# Cache all states.
-	#	states = [j.state for j in self.jobs]
-	#
-	#	target_state = "unknown"
-	#
-	#	# If at least one job has failed, the whole build has failed.
-	#	if "failed" in states:
-	#		target_state = "failed"
-	#
-	#	# It at least one of the jobs is still running, the whole
-	#	# build is in running state.
-	#	elif "running" in states:
-	#		target_state = "running"
-	#
-	#	# If all jobs are in the finished state, we turn into finished
-	#	# state as well.
-	#	elif all([s == "finished" for s in states]):
-	#		target_state = "finished"
-	#
-	#	return target_state
 
 	def auto_update_state(self):
 		"""
@@ -694,10 +627,7 @@ class Build(base.Object):
 	def update_state(self, state, user=None, remove=False):
 		assert state in ("stable", "testing", "obsolete", "broken")
 
-		self.db.execute("UPDATE builds SET state = %s WHERE id = %s", state, self.id)
-
-		if self._data:
-			self._data["state"] = state
+		self._set_attribute("state", state)
 
 		# In broken state, the removal from the repository is forced and
 		# all jobs that are not finished yet will be aborted.
@@ -731,7 +661,7 @@ class Build(base.Object):
 		if not self.type == "release":
 			return
 
-		for build in self.pakfire.builds.get_by_name(self.pkg.name, type="release"):
+		for build in self.backend.builds.get_by_name(self.pkg.name, type="release"):
 			# Don't modify ourself.
 			if self.id == build.id:
 				continue
@@ -744,26 +674,20 @@ class Build(base.Object):
 			build.update_state("obsolete")
 
 	def set_severity(self, severity):
-		self.db.execute("UPDATE builds SET severity = %s WHERE id = %s", state, self.id)
-
-		if self._data:
-			self._data["severity"] = severity
+		self._set_attribute("severity", severity)
 
 	def get_severity(self):
 		return self.data.severity
 
 	severity = property(get_severity, set_severity)
 
-	@property
+	@lazy_property
 	def commit(self):
 		if self.pkg and self.pkg.commit:
 			return self.pkg.commit
 
-	def update_message(self, msg):
-		self.db.execute("UPDATE builds SET message = %s WHERE id = %s", msg, self.id)
-
-		if self._data:
-			self._data["message"] = msg
+	def update_message(self, message):
+		self._set_attribute("message", message)
 
 	def has_perm(self, user):
 		"""
@@ -822,11 +746,7 @@ class Build(base.Object):
 	def set_priority(self, priority):
 		assert priority in (-2, -1, 0, 1, 2)
 
-		self.db.execute("UPDATE builds SET priority = %s WHERE id = %s", priority,
-			self.id)
-
-		if self._data:
-			self._data["priority"] = priority
+		self._set_attribute("priority", priority)
 
 	priority = property(get_priority, set_priority)
 
@@ -853,7 +773,7 @@ class Build(base.Object):
 
 	@property
 	def download_prefix(self):
-		return "/".join((self.pakfire.settings.get("download_baseurl"), "packages"))
+		return "/".join((self.backend.settings.get("download_baseurl"), "packages"))
 
 	@property
 	def source_download(self):
@@ -892,24 +812,18 @@ class Build(base.Object):
 		"""
 			Returns a list of jobs of this build.
 		"""
-		return self.pakfire.jobs.get_by_build(self.id, self, type=type)
+		return self.backend.jobs.get_by_build(self.id, self, type=type)
 
-	@property
+	@lazy_property
 	def jobs(self):
 		"""
 			Get a list of all build jobs that are in this build.
 		"""
-		if self._jobs is None:
-			self._jobs = self.get_jobs(type="build")
-
-		return self._jobs
+		return self.get_jobs(type="build")
 
 	@property
 	def test_jobs(self):
-		if self._jobs_test is None:
-			self._jobs_test = self.get_jobs(type="test")
-
-		return self._jobs_test
+		return self.get_jobs(type="test")
 
 	@property
 	def all_jobs_finished(self):
@@ -931,7 +845,7 @@ class Build(base.Object):
 			arches = self.supported_arches
 
 		# Create a new job for every given archirecture.
-		for arch in self.pakfire.arches.expand(arches):
+		for arch in self.backend.arches.expand(arches):
 			# Don't create jobs for src
 			if arch == "src":
 				continue
@@ -943,11 +857,10 @@ class Build(base.Object):
 		return jobs
 
 	def add_job(self, arch, type="build"):
-		job = Job.create(self.pakfire, self, arch, type=type)
+		job = self.backend.jobs.create(self.backend, self, arch, type=type)
 
 		# Add new job to cache.
-		if self._jobs:
-			self._jobs.append(job)
+		self.jobs.append(job)
 
 		return job
 
@@ -996,21 +909,20 @@ class Build(base.Object):
 
 		comments = []
 		for comment in self.db.query(query, self.id):
-			comment = logs.CommentLogEntry(self.pakfire, comment)
+			comment = logs.CommentLogEntry(self.backend, comment)
 			comments.append(comment)
 
 		return comments
 
-	def add_comment(self, user, text, credit):
+	def add_comment(self, user, text, score):
 		# Add the new comment to the database.
 		id = self.db.execute("INSERT INTO \
 			builds_comments(build_id, user_id, text, credit, time_created) \
 			VALUES(%s, %s, %s, %s, NOW())",
-			self.id, user.id, text, credit)
+			self.id, user.id, text, score)
 
-		# Update the credit cache.
-		if not self._credits is None:
-			self._credits += credit
+		# Update the credit cache
+		self.score += score
 
 		# Send the new comment to all watchers and stuff.
 		self.send_comment_message(id)
@@ -1018,19 +930,12 @@ class Build(base.Object):
 		# Return the ID of the newly created comment.
 		return id
 
-	@property
+	@lazy_property
 	def score(self):
-		# XXX UPDATE THIS
-		if self._credits is None:
-			# Get the sum of the credits from the database.
-			query = self.db.get(
-				"SELECT SUM(credit) as credits FROM builds_comments WHERE build_id = %s",
-				self.id
-			)
+		res = self.db.get("SELECT SUM(credit) AS score \
+			FROM builds_comments WHERE build_id = %s", self.id)
 
-			self._credits = query.credits or 0
-
-		return self._credits
+		return res.score or 0
 
 	@property
 	def credits(self):
@@ -1043,7 +948,7 @@ class Build(base.Object):
 			WHERE builds_comments.build_id = %s AND NOT users.deleted = 'Y' \
 			AND NOT users.activated = 'Y' ORDER BY users.id", self.id)
 
-		return [users.User(self.pakfire, u.id) for u in users]
+		return [users.User(self.backend, u.id) for u in users]
 
 	def send_comment_message(self, comment_id):
 		comment = self.db.get("SELECT * FROM builds_comments WHERE id = %s",
@@ -1053,7 +958,7 @@ class Build(base.Object):
 		assert comment.build_id == self.id
 
 		# Get user who wrote the comment.
-		user = self.pakfire.users.get_by_id(comment.user_id)
+		user = self.backend.users.get_by_id(comment.user_id)
 
 		format = {
 			"build_name" : self.name,
@@ -1062,7 +967,7 @@ class Build(base.Object):
 
 		# XXX create beautiful message
 
-		self.pakfire.messages.send_to_all(self.message_recipients,
+		self.backend.messages.send_to_all(self.message_recipients,
 			N_("%(user_name)s commented on %(build_name)s"),
 			comment.text, format)
 
@@ -1072,7 +977,7 @@ class Build(base.Object):
 		entries = []
 
 		# Created entry.
-		created_entry = logs.CreatedLogEntry(self.pakfire, self)
+		created_entry = logs.CreatedLogEntry(self.backend, self)
 		entries.append(created_entry)
 
 		if comments:
@@ -1097,7 +1002,7 @@ class Build(base.Object):
 			WHERE builds_watchers.build_id = %s AND NOT users.deleted = 'Y' \
 			AND users.activated = 'Y' ORDER BY users.id", self.id)
 
-		return [users.User(self.pakfire, u.id) for u in query]
+		return [users.User(self.backend, u.id) for u in query]
 
 	def add_watcher(self, user):
 		# Don't add a user twice.
@@ -1123,20 +1028,17 @@ class Build(base.Object):
 				WHERE build_id = %s", self.id)
 
 			if update:
-				self._update = updates.Update(self.pakfire, update.id)
+				self._update = updates.Update(self.backend, update.id)
 
 		return self._update
 
-	@property
+	@lazy_property
 	def repo(self):
-		if self._repo is None:
-			repo = self.db.get("SELECT repo_id AS id FROM repositories_builds \
-				WHERE build_id = %s", self.id)
+		res = self.db.get("SELECT repo_id FROM repositories_builds \
+			WHERE build_id = %s", self.id)
 
-			if repo:
-				self._repo = repository.Repository(self.pakfire, repo.id)
-
-		return self._repo
+		if res:
+			return self.backend.repos.get_by_id(res.repo_id)
 
 	def get_repo_moves(self, limit=None):
 		query = "SELECT * FROM repositories_history \
@@ -1144,7 +1046,7 @@ class Build(base.Object):
 
 		actions = []
 		for action in self.db.query(query, self.id):
-			action = logs.RepositoryLogEntry(self.pakfire, action)
+			action = logs.RepositoryLogEntry(self.backend, action)
 			actions.append(action)
 
 		return actions
@@ -1168,14 +1070,7 @@ class Build(base.Object):
 		return self.data.auto_move == "Y"
 
 	def set_auto_move(self, state):
-		if state:
-			state = "Y"
-		else:
-			state = "N"
-
-		self.db.execute("UPDATE builds SET auto_move = %s WHERE id = %s", self.id)
-		if self._data:
-			self._data["auto_move"] = state
+		self._set_attribute("auto_move", state)
 
 	auto_move = property(get_auto_move, set_auto_move)
 
@@ -1248,7 +1143,7 @@ class Build(base.Object):
 					continue
 
 				# Check if a bug with the given ID exists in BZ.
-				bug = self.pakfire.bugzilla.get_bug(bugid)
+				bug = self.backend.bugzilla.get_bug(bugid)
 				if not bug:
 					continue
 
@@ -1257,7 +1152,7 @@ class Build(base.Object):
 	def get_bugs(self):
 		bugs = []
 		for bug_id in self.get_bug_ids():
-			bug = self.pakfire.bugzilla.get_bug(bug_id)
+			bug = self.backend.bugzilla.get_bug(bug_id)
 			if not bug:
 				continue
 
@@ -1275,7 +1170,7 @@ class Build(base.Object):
 		except KeyError:
 			return
 
-		baseurl = self.pakfire.settings.get("baseurl", "")
+		baseurl = self.backend.settings.get("baseurl", "")
 		args = {
 			"build_url"    : "%s/build/%s" % (baseurl, self.uuid),
 			"distro_name"  : self.distro.name,
@@ -1326,7 +1221,7 @@ class Jobs(base.Object):
 		return job
 
 	def get_by_id(self, id, data=None):
-		return Job(self.pakfire, id, data)
+		return Job(self.backend, id, data)
 
 	def get_by_uuid(self, uuid):
 		job = self.db.get("SELECT id FROM jobs WHERE uuid = %s", uuid)
@@ -1348,7 +1243,7 @@ class Jobs(base.Object):
 		# Get IDs of all builds in this group.
 		jobs = []
 		for job in self.db.query(query, *args):
-			job = Job(self.pakfire, job.id, job)
+			job = Job(self.backend, job.id, job)
 
 			# If the Build object was set, we set it so it won't be retrieved
 			# from the database again.
@@ -1382,7 +1277,7 @@ class Jobs(base.Object):
 				WHEN jobs.state = 'new'         THEN 4 \
 			END, time_started ASC"
 
-		return [Job(self.pakfire, j.id, j) for j in self.db.query(query, *args)]
+		return [Job(self.backend, j.id, j) for j in self.db.query(query, *args)]
 
 	def get_latest(self, arch=None, builder=None, limit=None, age=None, date=None):
 		query = "SELECT * FROM jobs"
@@ -1421,7 +1316,7 @@ class Jobs(base.Object):
 			query += " LIMIT %s"
 			args.append(limit)
 
-		return [Job(self.pakfire, j.id, j) for j in self.db.query(query, *args)]
+		return [Job(self.backend, j.id, j) for j in self.db.query(query, *args)]
 
 	def get_average_build_time(self):
 		"""
@@ -1596,7 +1491,7 @@ class Job(base.DataObject):
 
 		entries = []
 		for entry in self.db.query(query, *args):
-			entry = logs.JobLogEntry(self.pakfire, entry)
+			entry = logs.JobLogEntry(self.backend, entry)
 			entries.append(entry)
 
 		return entries
@@ -1615,7 +1510,7 @@ class Job(base.DataObject):
 
 	@lazy_property
 	def build(self):
-		return self.pakfire.builds.get_by_id(self.build_id)
+		return self.backend.builds.get_by_id(self.build_id)
 
 	@property
 	def related_jobs(self):
@@ -1774,7 +1669,7 @@ class Job(base.DataObject):
 			Returns the estimated time and stddev, this job takes to finish.
 		"""
 		# Get the average build time.
-		build_times = self.pakfire.builds.get_build_times_by_arch(self.arch,
+		build_times = self.backend.builds.get_build_times_by_arch(self.arch,
 			name=self.pkg.name)
 
 		# If there is no statistical data, we cannot estimate anything.
@@ -1809,7 +1704,7 @@ class Job(base.DataObject):
 		logfiles = []
 
 		for log in self.db.query("SELECT id FROM logfiles WHERE job_id = %s", self.id):
-			log = logs.LogFile(self.pakfire, log.id)
+			log = logs.LogFile(self.backend, log.id)
 			log._job = self
 
 			logfiles.append(log)
@@ -1879,7 +1774,7 @@ class Job(base.DataObject):
 
 	def _add_file_package(self, filename):
 		# Open package (creates entry in the database).
-		pkg = packages.Package.open(self.pakfire, filename)
+		pkg = packages.Package.open(self.backend, filename)
 
 		# Move package to the build directory.
 		pkg.move(os.path.join(self.build.path, self.arch))
@@ -1959,7 +1854,7 @@ class Job(base.DataObject):
 		pkgs = []
 		for row in rows:
 			# Search for this package in the packages table.
-			pkg = self.pakfire.packages.get_by_uuid(row.pkg_uuid)
+			pkg = self.backend.packages.get_by_uuid(row.pkg_uuid)
 			pkgs.append((row.pkg_name, row.pkg_uuid, pkg))
 
 		return pkgs
@@ -1978,7 +1873,7 @@ class Job(base.DataObject):
 			"build_uuid" : self.uuid,
 		}
 
-		self.pakfire.messages.send_to_all(self.message_recipients,
+		self.backend.messages.send_to_all(self.message_recipients,
 			MSG_BUILD_FINISHED_SUBJECT, MSG_BUILD_FINISHED, info)
 
 	def send_failed_message(self):
@@ -1995,15 +1890,11 @@ class Job(base.DataObject):
 			"build_uuid" : self.uuid,
 		}
 
-		self.pakfire.messages.send_to_all(self.message_recipients,
+		self.backend.messages.send_to_all(self.message_recipients,
 			MSG_BUILD_FAILED_SUBJECT, MSG_BUILD_FAILED, info)
 
-	def set_start_time(self, start_time):
-		if start_time is None:
-			return
-
-		self.db.execute("UPDATE jobs SET start_not_before = NOW() + %s \
-			WHERE id = %s LIMIT 1", start_time, self.id)
+	def set_start_time(self, start_not_before):
+		self._set_attribute("start_not_before", start_not_before)
 
 	def schedule(self, type, start_time=None, user=None):
 		assert type in ("rebuild", "test")
@@ -2023,7 +1914,7 @@ class Job(base.DataObject):
 				return
 
 			# Create a new job with same build and arch.
-			job = self.create(self.pakfire, self.build, self.arch, type="test")
+			job = self.create(self.backend, self.build, self.arch, type="test")
 			job.set_start_time(start_time)
 
 			# Log the event.

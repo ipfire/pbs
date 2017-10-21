@@ -29,6 +29,10 @@ class Packages(base.Object):
 		for row in res:
 			yield Package(self.backend, row.id, data=row)
 
+	def get_by_id(self, pkg_id):
+		return self._get_package("SELECT * FROM packages \
+			WHERE id = %s", pkg_id)
+
 	def get_all_names(self, public=None, user=None, states=None):
 		query = "SELECT DISTINCT packages.name AS name, summary FROM packages \
 			JOIN builds ON builds.pkg_id = packages.id \
