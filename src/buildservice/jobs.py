@@ -381,15 +381,11 @@ class Job(base.DataObject):
 	def set_state(self, state, user=None, log=True):
 		# Nothing to do if the state remains.
 		if not self.state == state:
-			self.db.execute("UPDATE jobs SET state = %s WHERE id = %s", state, self.id)
+			self._set_attribute("state", state)
 
 			# Log the event.
 			if log and not state == "new":
 				self.log("state_change", state=state, user=user)
-
-			# Update cache.
-			if self._data:
-				self._data["state"] = state
 
 		# Always clear the message when the status is changed.
 		self.update_message(None)
@@ -397,16 +393,10 @@ class Job(base.DataObject):
 		# Update some more informations.
 		if state == "dispatching":
 			# Set start time.
-			self.db.execute("UPDATE jobs SET time_started = NOW(), time_finished = NULL \
-				WHERE id = %s", self.id)
-
-		elif state == "pending":
-			self.db.execute("UPDATE jobs SET time_started = NULL, \
-				time_finished = NULL WHERE id = %s", self.id)
+			self._set_attribute("time_started", datetime.datetime.utcnow())
 
 		elif state in ("aborted", "dependency_error", "finished", "failed"):
-			# Set finish time and reset builder..
-			self.db.execute("UPDATE jobs SET time_finished = NOW() WHERE id = %s", self.id)
+			self._set_attribute("time_finished", datetime.datetime.utcnow())
 
 			# Send messages to the user.
 			if state == "finished":
@@ -428,26 +418,15 @@ class Job(base.DataObject):
 	def message(self):
 		return self.data.message
 
-	def update_message(self, msg):
-		self.db.execute("UPDATE jobs SET message = %s WHERE id = %s",
-			msg, self.id)
-
-		if self._data:
-			self._data["message"] = msg
+	def update_message(self, message):
+		self._set_attribute("message", message)
 
 	def get_builder(self):
 		if self.data.builder_id:
 			return self.backend.builders.get_by_id(self.data.builder_id)
 
 	def set_builder(self, builder, user=None):
-		self.db.execute("UPDATE jobs SET builder_id = %s WHERE id = %s",
-			builder.id, self.id)
-
-		# Update cache.
-		if self._data:
-			self._data["builder_id"] = builder.id
-
-		self._builder = builder
+		self._set_attribute("builder_id", builder.id)
 
 		# Log the event.
 		if user:
