@@ -8,6 +8,7 @@ import tornado.options
 import tornado.web
 
 from .. import Backend
+from ..decorators import *
 
 from . import handlers
 
@@ -17,16 +18,12 @@ tornado.options.parse_command_line()
 
 class Application(tornado.web.Application):
 	def __init__(self):
-		self.__pakfire = None
-
 		settings = dict(
 			debug = tornado.options.options.debug,
 			gzip  = True,
 		)
 
-		tornado.web.Application.__init__(self, **settings)
-
-		self.add_handlers(r"pakfirehub.ipfire.org", [
+		tornado.web.Application.__init__(self, [
 			# Redirect strayed users.
 			#(r"/", handlers.RedirectHandler),
 
@@ -61,16 +58,13 @@ class Application(tornado.web.Application):
 			(r"/uploads/(.*)/sendchunk", handlers.UploadsSendChunkHandler),
 			(r"/uploads/(.*)/finished", handlers.UploadsFinishedHandler),
 			(r"/uploads/(.*)/destroy", handlers.UploadsDestroyHandler),
-		])
+		], **settings)
 
 		logging.info("Successfully initialied application")
 
-	@property
-	def pakfire(self):
-		if self.__pakfire is None:
-			self.__pakfire = Backend()
-
-		return self.__pakfire
+	@lazy_property
+	def backend(self):
+		return Backend()
 
 	def __del__(self):
 		logging.info("Shutting down application")
