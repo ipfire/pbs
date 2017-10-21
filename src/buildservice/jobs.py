@@ -52,10 +52,7 @@ class Jobs(base.Object):
 		return Job(self.backend, id, data)
 
 	def get_by_uuid(self, uuid):
-		job = self.db.get("SELECT id FROM jobs WHERE uuid = %s", uuid)
-
-		if job:
-			return self.get_by_id(job.id)
+		return self._get_job("SELECT * FROM jobs WHERE uuid = %s", uuid)
 
 	def get_active(self, host_id=None, builder=None, states=None):
 		if builder:
