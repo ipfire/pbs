@@ -30,7 +30,7 @@
 
 					{% if job.build.type == "scratch" %}
 						<span class="label label-inverse pull-right" rel="tooltip" data-placement="top" title="{{ _("Scratch build") }}">S</span>
-					{% elif job.type == "test" %}
+					{% elif job.test %}
 						<span class="label label-inverse pull-right" rel="tooltip" data-placement="top" title="{{ _("Test build") }}">T</span>
 					{% end %}
 				</td>

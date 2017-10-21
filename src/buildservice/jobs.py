@@ -210,7 +210,7 @@ class Job(base.DataObject):
 
 	def __lt__(self, other):
 		if isinstance(other, self.__class__):
-			if (self.type, other.type) == ("build", "test"):
+			if not self.test and other.test:
 				return True
 
 			if self.build == other.build:
@@ -347,8 +347,8 @@ class Job(base.DataObject):
 		return self.data.uuid
 
 	@property
-	def type(self):
-		return self.data.type
+	def test(self):
+		return self.data.test
 
 	@property
 	def build_id(self):
@@ -445,7 +445,7 @@ class Job(base.DataObject):
 				self.send_failed_message()
 
 		# Automatically update the state of the build (not on test builds).
-		if self.type == "build":
+		if not self.test:
 			self.build.auto_update_state()
 
 	state = property(get_state, set_state)
@@ -570,7 +570,7 @@ class Job(base.DataObject):
 
 		elif filename.endswith(".%s" % PACKAGE_EXTENSION):
 			# It is not allowed to upload packages on test builds.
-			if self.type == "test":
+			if self.test:
 				return
 
 			self._add_file_package(filename)
@@ -581,7 +581,7 @@ class Job(base.DataObject):
 		"""
 		target_dirname = os.path.join(self.build.path, "logs")
 
-		if self.type == "test":
+		if self.test:
 			i = 1
 			while True:
 				target_filename = os.path.join(target_dirname,
@@ -707,7 +707,7 @@ class Job(base.DataObject):
 
 	def send_finished_message(self):
 		# Send no finished mails for test jobs.
-		if self.type == "test":
+		if self.test:
 			return
 
 		logging.debug("Sending finished message for job %s to %s" % \

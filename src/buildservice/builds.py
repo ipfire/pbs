@@ -356,7 +356,7 @@ class Builds(base.Object):
 
 		return comments
 
-	def get_build_times_summary(self, name=None, job_type=None, arch=None):
+	def get_build_times_summary(self, name=None, arch=None):
 		query = "\
 			SELECT \
 				builds_times.arch AS arch, \
@@ -376,11 +376,6 @@ class Builds(base.Object):
 		if name:
 			conditions.append("packages.name = %s")
 			args.append(name)
-
-		# Filter by job types.
-		if job_type:
-			conditions.append("builds_times.job_type = %s")
-			args.append(job_type)
 
 		# Filter by arch.
 		if arch:

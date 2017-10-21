@@ -663,15 +663,15 @@ CREATE TABLE builds (
     state text DEFAULT 'building'::text NOT NULL,
     severity builds_severity,
     message text,
-    time_created timestamp without time zone NOT NULL,
+    time_created timestamp without time zone DEFAULT now() NOT NULL,
     update_year integer,
     update_num integer,
     depends_on integer,
     distro_id integer NOT NULL,
     owner_id integer,
-    public builds_public DEFAULT 'Y'::builds_public NOT NULL,
+    public boolean DEFAULT true NOT NULL,
     priority integer DEFAULT 0 NOT NULL,
-    auto_move builds_auto_move DEFAULT 'N'::builds_auto_move NOT NULL
+    auto_move boolean DEFAULT false NOT NULL
 );
 
 
@@ -864,7 +864,10 @@ CREATE TABLE jobs (
     builder_id integer,
     tries integer DEFAULT 0 NOT NULL,
     aborted_state integer DEFAULT 0 NOT NULL,
-    message text
+    message text,
+    test boolean DEFAULT true NOT NULL,
+    superseeded_by integer,
+    deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -875,13 +878,11 @@ ALTER TABLE jobs OWNER TO pakfire;
 --
 
 CREATE VIEW builds_times AS
- SELECT builds.id AS build_id,
+ SELECT jobs.build_id,
     jobs.arch,
-    jobs.type AS job_type,
     (jobs.time_finished - jobs.time_started) AS duration
-   FROM (jobs
-     LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-  WHERE (jobs.state = 'finished'::jobs_state);
+   FROM jobs
+  WHERE (((jobs.deleted IS FALSE) AND (jobs.test IS FALSE)) AND (jobs.state = 'finished'::jobs_state));
 
 
 ALTER TABLE builds_times OWNER TO pakfire;
@@ -1004,7 +1005,7 @@ CREATE TABLE filelists (
     size bigint NOT NULL,
     hash_sha512 text,
     type integer NOT NULL,
-    config filelists_config NOT NULL,
+    config boolean NOT NULL,
     mode integer NOT NULL,
     "user" text NOT NULL,
     "group" text NOT NULL,
@@ -1055,7 +1056,6 @@ ALTER SEQUENCE images_types_id_seq OWNED BY images_types.id;
 CREATE VIEW jobs_active AS
  SELECT jobs.id,
     jobs.uuid,
-    jobs.type,
     jobs.build_id,
     jobs.state,
     jobs.arch,
@@ -2739,13 +2739,6 @@ CREATE INDEX idx_2198063_time_finished ON jobs USING btree (time_finished);
 
 
 --
--- Name: idx_2198063_type; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198063_type ON jobs USING btree (type);
-
-
---
 -- Name: idx_2198063_uuid; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2890,6 +2883,13 @@ CREATE INDEX jobs_arch ON jobs USING btree (arch);
 --
 
 CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
+
+
+--
+-- Name: jobs_type; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_type ON jobs USING btree (test) WHERE (deleted IS FALSE);
 
 
 --

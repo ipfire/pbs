@@ -253,8 +253,7 @@ class PackageBuildsTimesHandler(BaseHandler):
 			raise tornado.web.HTTPError(404)
 
 		# Get the summary stats.
-		build_times_summary = self.pakfire.builds.get_build_times_summary(name,
-			job_type="build")
+		build_times_summary = self.pakfire.builds.get_build_times_summary(name)
 
 		self.render("packages/builds/times.html", pkg=latest_build.pkg,
 			build_times_summary=build_times_summary)

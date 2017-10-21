@@ -92,7 +92,8 @@ class Cli(object):
 		# Iterate through all of it
 		for build in repo:
 			for job in build:
-				if not job.type == "build":
+				# Skip all test jobs
+				if job.test:
 					continue
 
 				if not job.arch in (arch, "noarch"):

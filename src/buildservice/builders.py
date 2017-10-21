@@ -394,7 +394,7 @@ class Builder(base.DataObject):
 
 		for job in self.jobqueue:
 			# Only allow building test jobs in test mode
-			if self.testmode and not job.type == "test":
+			if self.testmode and not job.test:
 				continue
 
 			return job

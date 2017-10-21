@@ -340,7 +340,7 @@ class JobsBaseHandler(BaseHandler):
 			"packages"     : [p.uuid for p in job.packages],
 			"state"        : job.state,
 			"time_created" : job.time_created.isoformat(),
-			"type"         : job.type,
+			"type"         : "test" if job.test else "release",
 			"uuid"         : job.uuid,
 		}
 
@@ -564,7 +564,7 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 				"arch"               : job.arch,
 				"source_url"         : job.build.source_download,
 				"source_hash_sha512" : job.build.source_hash_sha512,
-				"type"               : job.type,
+				"type"               : "test" if job.test else "release",
 				"config"             : job.get_config(),
 			}
 
