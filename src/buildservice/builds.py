@@ -848,7 +848,7 @@ class Build(base.DataObject):
 		return jobs
 
 	def add_job(self, arch, type="build"):
-		job = self.backend.jobs.create(self.backend, self, arch, type=type)
+		job = self.backend.jobs.create(self, arch, type=type)
 
 		# Add new job to cache.
 		self.jobs.append(job)
