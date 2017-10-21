@@ -34,9 +34,9 @@ class Jobs(base.Object):
 		for row in res:
 			yield Job(self.backend, row.id, data=row)
 
-	def create(self, build, arch, type="build", superseeds=None):
-		job = self._get_job("INSERT INTO jobs(uuid, type, build_id, arch, time_created) \
-			VALUES(%s, %s, %s, %s, NOW()) RETURNING *", "%s" % uuid.uuid4(), type, build.id, arch)
+	def create(self, build, arch, test=False superseeds=None):
+		job = self._get_job("INSERT INTO jobs(uuid, build_id, arch, test) \
+			VALUES(%s, %s, %s, %s) RETURNING *", "%s" % uuid.uuid4(), build.id, arch, test)
 		job.log("created")
 
 		# Set cache for Build object.
@@ -193,7 +193,7 @@ class Jobs(base.Object):
 
 		# Restart the job
 		for job in jobs:
-			job.set_state("new", log=False)
+			job.restart()
 
 
 class Job(base.DataObject):
@@ -235,6 +235,11 @@ class Job(base.DataObject):
 	@property
 	def distro(self):
 		return self.build.distro
+
+	def restart(self):
+		# Copy the job and let it build again
+		return self.backend.jobs.create(self.build, self.arch,
+			test=self.test, superseeds=self)
 
 	def get_superseeded_by(self):
 		if self.data.superseeded_by:
@@ -718,8 +723,8 @@ class Job(base.DataObject):
 			if self.state == "finished":
 				return
 
-			self.set_state("new", user=user, log=False)
-			self.set_start_time(start_time)
+			job = self.restart()
+			job.set_start_time(start_time)
 
 			# Log the event.
 			self.log("schedule_rebuild", user=user)
@@ -729,7 +734,7 @@ class Job(base.DataObject):
 				return
 
 			# Create a new job with same build and arch.
-			job = self.create(self.backend, self.build, self.arch, type="test")
+			job = self.create(self.backend, self.build, self.arch, test=True)
 			job.set_start_time(start_time)
 
 			# Log the event.

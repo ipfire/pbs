@@ -857,7 +857,7 @@ CREATE TABLE jobs (
     build_id integer NOT NULL,
     state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
     arch text NOT NULL,
-    time_created timestamp without time zone NOT NULL,
+    time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_started timestamp without time zone,
     time_finished timestamp without time zone,
     start_not_before timestamp without time zone,
