@@ -1467,7 +1467,7 @@ ALTER SEQUENCE packages_id_seq OWNED BY packages.id;
 CREATE TABLE packages_properties (
     id integer NOT NULL,
     name text NOT NULL,
-    critical_path packages_properties_critical_path DEFAULT 'N'::packages_properties_critical_path NOT NULL,
+    critical_path boolean DEFAULT false NOT NULL,
     priority integer DEFAULT 0 NOT NULL
 );
 
@@ -1857,7 +1857,7 @@ CREATE TABLE uploads (
     hash text NOT NULL,
     size bigint NOT NULL,
     progress bigint DEFAULT 0 NOT NULL,
-    finished uploads_finished DEFAULT 'N'::uploads_finished NOT NULL,
+    finished boolean DEFAULT false NOT NULL,
     time_started timestamp without time zone DEFAULT now() NOT NULL,
     time_finished timestamp without time zone
 );
