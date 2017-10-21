@@ -388,6 +388,10 @@ class Builder(base.DataObject):
 		"""
 			Returns the next job in line for this builder.
 		"""
+		# Don't send any jobs to disabled builders
+		if not self.enabled:
+			return
+
 		# Don't return anything if the builder has already too many jobs running
 		if self.too_many_jobs:
 			return
