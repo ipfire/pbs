@@ -853,7 +853,6 @@ ALTER SEQUENCE builds_id_seq OWNED BY builds.id;
 CREATE TABLE jobs (
     id integer NOT NULL,
     uuid text NOT NULL,
-    type jobs_type DEFAULT 'build'::jobs_type NOT NULL,
     build_id integer NOT NULL,
     state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
     arch text NOT NULL,
@@ -1164,7 +1163,7 @@ ALTER SEQUENCE jobs_packages_id_seq OWNED BY jobs_packages.id;
 CREATE VIEW jobs_queue AS
  WITH queue AS (
          SELECT jobs.id,
-            rank() OVER (ORDER BY jobs.type, builds.priority DESC, jobs.time_created) AS rank
+            rank() OVER (ORDER BY (NOT jobs.test), builds.priority DESC, jobs.time_created) AS rank
            FROM (jobs
              LEFT JOIN builds ON ((jobs.build_id = builds.id)))
           WHERE (jobs.state = 'pending'::jobs_state)
