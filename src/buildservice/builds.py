@@ -739,17 +739,25 @@ class Build(base.DataObject):
 	def critical_path(self):
 		return self.pkg.critical_path
 
+	def _get_jobs(self, query, *args):
+		ret = []
+		for job in self.backend.jobs._get_jobs(query, *args):
+			job.build = self
+			ret.append(job)
+
+		return ret
+
 	@lazy_property
 	def jobs(self):
 		"""
 			Get a list of all build jobs that are in this build.
 		"""
-		return self.backend.jobs._get_jobs("SELECT * FROM jobs \
-			WHERE build_id = %s AND test IS FALSE AND deleted_at IS NULL", self.id)
+		return self._get_jobs("SELECT * FROM jobs \
+				WHERE build_id = %s AND test IS FALSE AND deleted_at IS NULL", self.id)
 
 	@property
 	def test_jobs(self):
-		return self.backend.jobs._get_jobs("SELECT * FROM jobs \
+		return self._get_jobs("SELECT * FROM jobs \
 			WHERE build_id = %s AND test IS TRUE AND deleted_at IS NULL", self.id)
 
 	@property
