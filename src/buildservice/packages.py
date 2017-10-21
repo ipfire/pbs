@@ -8,13 +8,12 @@ import shutil
 import pakfire
 import pakfire.packages as packages
 
-from . import arches
 from . import base
 from . import database
 from . import misc
-from . import sources
 
 from .constants import *
+from .decorators import *
 
 class Packages(base.Object):
 	def _get_package(self, query, *args):
@@ -62,7 +61,7 @@ class Packages(base.Object):
 		if not pkg:
 			return
 
-		return Package(self.pakfire, pkg.id, pkg)
+		return Package(self.backend, pkg.id, pkg)
 
 	def create(self, path):
 		# Just check if the file really exist
@@ -161,7 +160,7 @@ class Packages(base.Object):
 
 		pkgs = []
 		for row in res:
-			pkg = Package(self.pakfire, row.id, row)
+			pkg = Package(self.backend, row.id, row)
 			pkgs.append(pkg)
 
 			if limit and len(pkgs) >= limit:
@@ -181,7 +180,7 @@ class Packages(base.Object):
 
 		files = []
 		for result in self.db.query(query, *args):
-			pkg = Package(self.pakfire, result.pkg_id)
+			pkg = Package(self.backend, result.pkg_id)
 			files.append((pkg, result))
 
 		return files
@@ -194,28 +193,19 @@ class Packages(base.Object):
 		return [row.name for row in res]
 
 
-class Package(base.Object):
-	def __init__(self, pakfire, id, data=None):
-		base.Object.__init__(self, pakfire)
-
-		# The ID of the package.
-		self.id = id
-
-		# Cache.
-		self._data = data
-		self._deps = None
-		self._filelist = None
-		self._job = None
-		self._commit = None
-		self._properties = None
-		self._maintainer = None
+class Package(base.DataObject):
+	table = "packages"
 
 	def __repr__(self):
 		return "<%s %s>" % (self.__class__.__name__, self.friendly_name)
 
-	def __cmp__(self, other):
-		return pakfire.util.version_compare(self.pakfire,
-			self.friendly_name, other.friendly_name)
+	def __eq__(self, other):
+		if isinstance(other, self.__class__):
+			return self.id == other.id
+
+	def __lt__(self, other):
+		if isinstance(other, self.__class__):
+			return pakfire.util.version_compare(self.backend, self.friendly_name, other.friendly_name) < 0
 
 	def delete(self):
 		self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", self.path)
@@ -225,18 +215,6 @@ class Package(base.Object):
 
 		# Delete the package.
 		self.db.execute("DELETE FROM packages WHERE id = %s", self.id)
-
-		# Remove cached data.
-		self._data = {}
-
-	@property
-	def data(self):
-		if self._data is None:
-			self._data = \
-				self.db.get("SELECT * FROM packages WHERE id = %s", self.id)
-			assert self._data, "Cannot fetch package %s: %s" % (self.id, self._data)
-
-		return self._data
 
 	@property
 	def uuid(self):
@@ -275,7 +253,7 @@ class Package(base.Object):
 		s = "%s-%s" % (self.version, self.release)
 
 		if self.epoch:
-			s = "%d:%s" % (self.epoch, s)
+			s = "%s:%s" % (self.epoch, s)
 
 		return s
 
@@ -283,17 +261,9 @@ class Package(base.Object):
 	def groups(self):
 		return self.data.groups.split()
 
-	@property
+	@lazy_property
 	def maintainer(self):
-		if self._maintainer is None:
-			self._maintainer = self.data.maintainer
-
-			# Search if there is a user account for this person.
-			user = self.pakfire.users.find_maintainer(self._maintainer)
-			if user:
-				self._maintainer = user
-
-		return self._maintainer
+		return self.backend.users.find_maintainer(self.data.maintainer) or self.data.maintainer
 
 	@property
 	def license(self):
@@ -323,6 +293,8 @@ class Package(base.Object):
 		self.db.execute("INSERT INTO packages_deps(pkg_id, type, what) \
 			VALUES(%s, %s, %s)", self.id, type, what)
 
+		self.deps.append((type, what))
+
 	def has_deps(self):
 		"""
 			Returns True if the package has got dependencies.
@@ -331,16 +303,16 @@ class Package(base.Object):
 		"""
 		return len(self.deps) > 1
 
-	@property
+	@lazy_property
 	def deps(self):
-		if self._deps is None:
-			query = self.db.query("SELECT type, what FROM packages_deps WHERE pkg_id = %s", self.id)
+		res = self.db.query("SELECT type, what FROM packages_deps \
+			WHERE pkg_id = %s", self.id)
 
-			self._deps = []
-			for row in query:
-				self._deps.append((row.type, row.what))
+		ret = []
+		for row in res:
+			ret.append((row.type, row.what))
 
-		return self._deps
+		return ret
 
 	@property
 	def prerequires(self):
@@ -370,34 +342,21 @@ class Package(base.Object):
 	def recommends(self):
 		return [d[1] for d in self.deps if d[0] == "recommends"]
 
-	@property
-	def commit_id(self):
-		return self.data.commit_id
-
 	def get_commit(self):
-		if not self.commit_id:
-			return
-
-		if self._commit is None:
-			self._commit = sources.Commit(self.pakfire, self.commit_id)
-
-		return self._commit
+		if self.data.commit_id:
+			return self.backend.sources.get_commit_by_id(self.data.commit_id)
 
 	def set_commit(self, commit):
-		self.db.execute("UPDATE packages SET commit_id = %s WHERE id = %s",
-			commit.id, self.id)
-		self._commit = commit
+		self._set_attribute("commit_id", commit.id)
 
-	commit = property(get_commit, set_commit)
+	commit = lazy_property(get_commit, set_commit)
 
 	@property
 	def distro(self):
-		if not self.commit:
-			return
-
 		# XXX THIS CANNOT RETURN None
 
-		return self.commit.distro
+		if self.commit:
+			return self.commit.distro
 
 	@property
 	def build_id(self):
@@ -435,42 +394,33 @@ class Package(base.Object):
 		shutil.move(self.path, target)
 
 		# Update file path in the database.
-		self.db.execute("UPDATE packages SET path = %s WHERE id = %s",
-			os.path.relpath(target, PACKAGES_DIR), self.id)
-		self._data["path"] = target
+		self._set_attribute("path", os.path.relpath(target, PACKAGES_DIR))
 
-	@property
+	@lazy_property
 	def build(self):
 		if self.job:
 			return self.job.build
 
-		build = self.db.get("SELECT id FROM builds \
-			WHERE type = 'release' AND pkg_id = %s", self.id)
+		return self.backend.builds._get_build("SELECT * FROM builds \
+			WHERE pkg_id = %s" % self.id)
 
-		if build:
-			return self.pakfire.builds.get_by_id(build.id)
-
-	@property
+	@lazy_property
 	def job(self):
-		if self._job is None:
-			job = self.db.get("SELECT job_id AS id FROM jobs_packages \
-				WHERE pkg_id = %s", self.id)
+		return self.backend.jobs._get_job("SELECT jobs.* FROM jobs \
+			LEFT JOIN jobs_packages pkgs ON jobs.id = pkgs.job_id \
+			WHERE pkgs.pkg_id = %s", self.id)
 
-			if job:
-				self._job = self.pakfire.jobs.get_by_id(job.id)
-
-		return self._job
-
-	@property
+	@lazy_property
 	def filelist(self):
-		if self._filelist is None:
-			self._filelist = []
+		res = self.db.query("SELECT * FROM filelists \
+			WHERE pkg_id = %s ORDER BY name", self.id)
 
-			for f in self.db.query("SELECT * FROM filelists WHERE pkg_id = %s ORDER BY name", self.id):
-				f = File(self.pakfire, f)
-				self._filelist.append(f)
+		ret = []
+		for row in res:
+			f = File(self.backend, row)
+			ret.append(f)
 
-		return self._filelist
+		return ret
 
 	def add_file(self, name, size, hash_sha512, type, config, mode, user, group, mtime, capabilities):
 		# Convert mtime from seconds since epoch to datetime
@@ -488,43 +438,44 @@ class Package(base.Object):
 
 	## properties
 
-	_default_properties = {
-		"critical_path" : False,
-		"priority"      : 0,
-	}
-
 	def update_property(self, key, value):
-		assert self._default_properties.has_key(key), "Unknown key: %s" % key
+		if self.property:
+			self.db.execute("UPDATE packages_properties SET %s = %%s WHERE name = %%s" % key, value, self.name)
+		else:
+			self.db.execute("INSERT INTO packages_properties(name, %s) VALUES(%%s, %%s)" % key, self.name, value)
 
-		#print self.db.execute("UPDATE packages_properties SET 
+		# Update cache
+		self.property[key] = value
 
-	@property
+	@lazy_property
 	def properties(self):
-		if self._properties is None:
-			self._properties = \
-				self.db.get("SELECT * FROM packages_properties WHERE name = %s", self.name)
+		res = self.db.get("SELECT * FROM packages_properties WHERE name = %s", self.name)
 
-			if not self._properties:
-				self._properties = database.Row(self._default_properties)
+		ret = {}
 
-		return self._properties
+		if res:
+			for key in res:
+				if key in ("id", "name"):
+					continue
+
+				ret[key] = res[key]
+
+		return ret
 
 	@property
 	def critical_path(self):
-		return self.properties.get("critical_path", "N") == "Y"
+		return self.properties.get("critical_path", False)
 
 
 class File(base.Object):
-	def __init__(self, pakfire, data):
-		base.Object.__init__(self, pakfire)
-
+	def init(self, data):
 		self.data = data
 
 	def __getattr__(self, attr):
 		try:
 			return self.data[attr]
 		except KeyError:
-			raise AttributeError, attr
+			raise AttributeError(attr)
 
 	@property
 	def downloadable(self):
