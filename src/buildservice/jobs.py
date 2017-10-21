@@ -63,32 +63,6 @@ class Jobs(base.Object):
 		if job:
 			return self.get_by_id(job.id)
 
-	def get_by_build(self, build_id, build=None, type=None):
-		"""
-			Get all jobs in the specifies build.
-		"""
-		query = "SELECT * FROM jobs WHERE build_id = %s"
-		args = [build_id,]
-
-		if type:
-			query += " AND type = %s"
-			args.append(type)
-
-		# Get IDs of all builds in this group.
-		jobs = []
-		for job in self.db.query(query, *args):
-			job = Job(self.backend, job.id, job)
-
-			# If the Build object was set, we set it so it won't be retrieved
-			# from the database again.
-			if build:
-				job._build = build
-
-			jobs.append(job)
-
-		# Return sorted list of jobs.
-		return sorted(jobs)
-
 	def get_active(self, host_id=None, builder=None, states=None):
 		if builder:
 			host_id = builder.id

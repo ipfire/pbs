@@ -762,7 +762,7 @@ class Build(base.DataObject):
 		s_jobs = []
 		for job in self.jobs:
 			s_jobs.append("""<a class="state_%s %s" href="/job/%s">%s</a>""" % \
-				(job.state, job.type, job.uuid, job.arch))
+				(job.state, "test" if job.test else "build", job.uuid, job.arch))
 
 		if s_jobs:
 			s += " [%s]" % ", ".join(s_jobs)
@@ -777,22 +777,18 @@ class Build(base.DataObject):
 	def critical_path(self):
 		return self.pkg.critical_path
 
-	def get_jobs(self, type=None):
-		"""
-			Returns a list of jobs of this build.
-		"""
-		return self.backend.jobs.get_by_build(self.id, self, type=type)
-
 	@lazy_property
 	def jobs(self):
 		"""
 			Get a list of all build jobs that are in this build.
 		"""
-		return self.get_jobs(type="build")
+		return self.backend.jobs._get_jobs("SELECT * FROM jobs \
+			WHERE build_id = %s AND test IS FALSE AND deleted_at IS NULL", self.id)
 
 	@property
 	def test_jobs(self):
-		return self.get_jobs(type="test")
+		return self.backend.jobs._get_jobs("SELECT * FROM jobs \
+			WHERE build_id = %s AND test IS TRUE AND deleted_at IS NULL", self.id)
 
 	@property
 	def all_jobs_finished(self):
@@ -805,7 +801,7 @@ class Build(base.DataObject):
 
 		return ret
 
-	def create_autojobs(self, arches=None, type="build"):
+	def create_autojobs(self, arches=None, **kwargs):
 		jobs = []
 
 		# Arches may be passed to this function. If not we use all arches
@@ -819,14 +815,14 @@ class Build(base.DataObject):
 			if arch == "src":
 				continue
 
-			job = self.add_job(arch, type=type)
+			job = self.add_job(arch, **kwargs)
 			jobs.append(job)
 
 		# Return all newly created jobs.
 		return jobs
 
-	def add_job(self, arch, type="build"):
-		job = self.backend.jobs.create(self, arch, type=type)
+	def add_job(self, arch, **kwargs):
+		job = self.backend.jobs.create(self, arch, **kwargs)
 
 		# Add new job to cache.
 		self.jobs.append(job)
