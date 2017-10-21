@@ -33,22 +33,13 @@ class Packages(base.Object):
 		return self._get_package("SELECT * FROM packages \
 			WHERE id = %s", pkg_id)
 
-	def get_all_names(self, public=None, user=None, states=None):
+	def get_all_names(self, user=None, states=None):
 		query = "SELECT DISTINCT packages.name AS name, summary FROM packages \
 			JOIN builds ON builds.pkg_id = packages.id \
 			WHERE packages.type = 'source'"
 
 		conditions = []
 		args = []
-
-		if public in (True, False):
-			if public is True:
-				public = "Y"
-			elif public is False:
-				public = "N"
-
-			conditions.append("builds.public = %s")
-			args.append(public)
 
 		if user and not user.is_admin():
 			conditions.append("builds.owner_id = %s")

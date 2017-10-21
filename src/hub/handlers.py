@@ -407,15 +407,6 @@ class JobsGetHandler(JobsBaseHandler):
 		if not job:
 			raise tornado.web.HTTPError(404, "Could not find job: %s" % job_uuid)
 
-		# Check if user is allowed to view this job.
-		if job.build.public == False:
-			if not self.user:
-				raise tornado.web.HTTPError(401)
-
-			# Check if an authenticated user has permission to see this build.
-			if not job.build.has_perm(self.user):
-				raise tornado.web.HTTPError(403)
-
 		ret = self.job2json(job)
 		self.finish(ret)
 

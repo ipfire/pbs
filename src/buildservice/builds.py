@@ -48,7 +48,7 @@ class Builds(base.Object):
 
 		return [self.get_by_id(b.id, b) for b in self.db.query(query)]
 
-	def get_by_user(self, user, type=None, public=None):
+	def get_by_user(self, user, type=None):
 		args = []
 		conditions = []
 
@@ -59,11 +59,6 @@ class Builds(base.Object):
 
 		elif not type or type == "release":
 			pass # TODO
-
-		if public is True:
-			conditions.append("public = 'Y'")
-		elif public is False:
-			conditions.append("public = 'N'")
 
 		query = "SELECT builds.* AS id FROM builds \
 			JOIN packages ON builds.pkg_id = packages.id"
@@ -80,7 +75,7 @@ class Builds(base.Object):
 
 		return builds
 
-	def get_by_name(self, name, type=None, public=None, user=None, limit=None, offset=None):
+	def get_by_name(self, name, type=None, user=None, limit=None, offset=None):
 		args = [name,]
 		conditions = [
 			"packages.name = %s",
@@ -91,11 +86,6 @@ class Builds(base.Object):
 			args.append(type)
 
 		or_conditions = []
-		if public is True:
-			or_conditions.append("public = 'Y'")
-		elif public is False:
-			or_conditions.append("public = 'N'")
-
 		if user and not user.is_admin():
 			or_conditions.append("builds.owner_id = %s")
 			args.append(user.id)
@@ -124,7 +114,7 @@ class Builds(base.Object):
 
 		return [Build(self.backend, b.id, b) for b in self.db.query(query, *args)]
 
-	def get_latest_by_name(self, name, type=None, public=None):
+	def get_latest_by_name(self, name, type=None):
 		query = "\
 			SELECT * FROM builds \
 				LEFT JOIN builds_latest ON builds.id = builds_latest.build_id \
@@ -134,13 +124,6 @@ class Builds(base.Object):
 		if type:
 			query += " AND builds_latest.build_type = %s"
 			args.append(type)
-
-		if public is True:
-			query += " AND builds.public = %s"
-			args.append("Y")
-		elif public is False:
-			query += " AND builds.public = %s"
-			args.append("N")
 
 		# Get the last one only.
 		# Prefer release builds over scratch builds.
@@ -155,19 +138,12 @@ class Builds(base.Object):
 		if res:
 			return Build(self.backend, res.id, res)
 
-	def get_active_builds(self, name, public=None):
+	def get_active_builds(self, name):
 		query = "\
 			SELECT * FROM builds \
 				LEFT JOIN builds_latest ON builds.id = builds_latest.build_id \
 			WHERE builds_latest.package_name = %s AND builds.type = %s"
 		args = [name, "release"]
-
-		if public is True:
-			query += " AND builds.public = %s"
-			args.append("Y")
-		elif public is False:
-			query += " AND builds.public = %s"
-			args.append("N")
 
 		builds = []
 		for row in self.db.query(query, *args):
@@ -288,7 +264,7 @@ class Builds(base.Object):
 
 		return build
 
-	def get_changelog(self, name, public=None, limit=5, offset=0):
+	def get_changelog(self, name, limit=5, offset=0):
 		query = "SELECT builds.* FROM builds \
 			JOIN packages ON builds.pkg_id = packages.id \
 			WHERE \
@@ -296,13 +272,6 @@ class Builds(base.Object):
 			AND \
 				packages.name = %s"
 		args = ["release", name,]
-
-		if public == True:
-			query += " AND builds.public = %s"
-			args.append("Y")
-		elif public == False:
-			query += " AND builds.public = %s"
-			args.append("N")
 
 		query += " ORDER BY builds.time_created DESC"
 
@@ -549,13 +518,6 @@ class Build(base.DataObject):
 	@property
 	def date(self):
 		return self.created.date()
-
-	@property
-	def public(self):
-		"""
-			Is this build public?
-		"""
-		return self.data.public
 
 	@lazy_property
 	def size(self):

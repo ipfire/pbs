@@ -101,18 +101,6 @@ CREATE TYPE builds_history_action AS ENUM (
 ALTER TYPE builds_history_action OWNER TO pakfire;
 
 --
--- Name: builds_public; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_public AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builds_public OWNER TO pakfire;
-
---
 -- Name: builds_severity; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -669,7 +657,6 @@ CREATE TABLE builds (
     depends_on integer,
     distro_id integer NOT NULL,
     owner_id integer,
-    public boolean DEFAULT true NOT NULL,
     priority integer DEFAULT 0 NOT NULL,
     auto_move boolean DEFAULT false NOT NULL
 );
