@@ -176,13 +176,12 @@ class Jobs(base.Object):
 		if jobs:
 			return jobs.count
 
-	def restart_failed(self, max_tries=9):
+	def restart_failed(self):
 		jobs = self._get_jobs("SELECT jobs.* FROM jobs \
 			JOIN builds ON builds.id = jobs.build_id \
 			WHERE \
 				jobs.type = 'build' AND \
 				jobs.state = 'failed' AND \
-				jobs.tries <= %s AND \
 				NOT builds.state = 'broken' AND \
 				jobs.time_finished < NOW() - '72 hours'::interval \
 			ORDER BY \
@@ -190,8 +189,7 @@ class Jobs(base.Object):
 					WHEN jobs.type = 'build' THEN 0 \
 					WHEN jobs.type = 'test'  THEN 1 \
 				END, \
-				builds.priority DESC, jobs.time_created ASC",
-			max_tries)
+				builds.priority DESC, jobs.time_created ASC")
 
 		# Restart the job
 		for job in jobs:
@@ -433,7 +431,7 @@ class Job(base.DataObject):
 				WHERE id = %s", self.id)
 
 		elif state == "pending":
-			self.db.execute("UPDATE jobs SET tries = tries + 1, time_started = NULL, \
+			self.db.execute("UPDATE jobs SET time_started = NULL, \
 				time_finished = NULL WHERE id = %s", self.id)
 
 		elif state in ("aborted", "dependency_error", "finished", "failed"):
@@ -537,10 +535,6 @@ class Job(base.DataObject):
 		if expected_runtime:
 			return expected_runtime - int(self.duration), stddev
 
-	@property
-	def tries(self):
-		return self.data.tries
-
 	def get_pkg_by_uuid(self, uuid):
 		pkg = self.backend.packages._get_package("SELECT packages.id FROM packages \
 			JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
@@ -591,7 +585,7 @@ class Job(base.DataObject):
 			i = 1
 			while True:
 				target_filename = os.path.join(target_dirname,
-					"test.%s.%s.%s.log" % (self.arch, i, self.tries))
+					"test.%s.%s.%s.log" % (self.arch, i, self.uuid))
 
 				if os.path.exists(target_filename):
 					i += 1
@@ -599,7 +593,7 @@ class Job(base.DataObject):
 					break
 		else:
 			target_filename = os.path.join(target_dirname,
-				"build.%s.%s.log" % (self.arch, self.tries))
+				"build.%s.%s.log" % (self.arch, self.uuid))
 
 		# Make sure the target directory exists.
 		if not os.path.exists(target_dirname):
@@ -669,39 +663,17 @@ class Job(base.DataObject):
 		return set(l)
 
 	def save_buildroot(self, pkgs):
-		rows = []
+		# Cleanup old stuff first (for rebuilding packages)
+		self.db.execute("DELETE FROM jobs_buildroots WHERE job_id = %s", self.id)
 
 		for pkg_name, pkg_uuid in pkgs:
-			rows.append((self.id, self.tries, pkg_uuid, pkg_name))
+			self.db.execute("INSERT INTO jobs_buildroots(job_id, pkg_uuid, pkg_name) \
+				VALUES(%s, %s, %s)", self.id, pkg_name, pkg_uuid)
 
-		# Cleanup old stuff first (for rebuilding packages).
-		self.db.execute("DELETE FROM jobs_buildroots WHERE job_id = %s AND tries = %s",
-			self.id, self.tries)
-
-		self.db.executemany("INSERT INTO \
-			jobs_buildroots(job_id, tries, pkg_uuid, pkg_name) \
-			VALUES(%s, %s, %s, %s)", rows)
-
-	def has_buildroot(self, tries=None):
-		if tries is None:
-			tries = self.tries
-
-		res = self.db.get("SELECT COUNT(*) AS num FROM jobs_buildroots \
-			WHERE jobs_buildroots.job_id = %s AND jobs_buildroots.tries = %s",
-			self.id, tries)
-
-		if res:
-			return res.num
-
-		return 0
-
-	def get_buildroot(self, tries=None):
-		if tries is None:
-			tries = self.tries
-
+	@lazy_property
+	def buildroot(self):
 		rows = self.db.query("SELECT * FROM jobs_buildroots \
-			WHERE jobs_buildroots.job_id = %s AND jobs_buildroots.tries = %s \
-			ORDER BY pkg_name", self.id, tries)
+			WHERE jobs_buildroots.job_id = %s ORDER BY pkg_name", self.id)
 
 		pkgs = []
 		for row in rows:

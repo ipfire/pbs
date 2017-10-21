@@ -54,14 +54,11 @@ class JobBuildrootHandler(BaseHandler):
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
-		tries = self.get_argument("tries", None)
-		buildroot = job.get_buildroot(tries)
-
 		# Calculate the download size and buildroot size.
 		download_size = 0
 		buildroot_size = 0
 
-		for name, uuid, pkg in buildroot:
+		for name, uuid, pkg in job.buildroot:
 			if not pkg:
 				continue
 

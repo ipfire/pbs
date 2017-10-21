@@ -862,7 +862,6 @@ CREATE TABLE jobs (
     time_finished timestamp without time zone,
     start_not_before timestamp without time zone,
     builder_id integer,
-    tries integer DEFAULT 0 NOT NULL,
     aborted_state integer DEFAULT 0 NOT NULL,
     message text,
     test boolean DEFAULT true NOT NULL,
@@ -1064,7 +1063,6 @@ CREATE VIEW jobs_active AS
     jobs.time_finished,
     jobs.start_not_before,
     jobs.builder_id,
-    jobs.tries,
     jobs.aborted_state,
     jobs.message
    FROM jobs
@@ -1080,7 +1078,6 @@ ALTER TABLE jobs_active OWNER TO pakfire;
 
 CREATE TABLE jobs_buildroots (
     job_id integer NOT NULL,
-    tries integer NOT NULL,
     pkg_uuid text NOT NULL,
     pkg_name text NOT NULL
 );
@@ -1167,7 +1164,7 @@ ALTER SEQUENCE jobs_packages_id_seq OWNED BY jobs_packages.id;
 CREATE VIEW jobs_queue AS
  WITH queue AS (
          SELECT jobs.id,
-            rank() OVER (ORDER BY jobs.type, builds.priority DESC, jobs.tries, jobs.time_created) AS rank
+            rank() OVER (ORDER BY jobs.type, builds.priority DESC, jobs.time_created) AS rank
            FROM (jobs
              LEFT JOIN builds ON ((jobs.build_id = builds.id)))
           WHERE (jobs.state = 'pending'::jobs_state)
@@ -2746,13 +2743,6 @@ CREATE UNIQUE INDEX idx_2198063_uuid ON jobs USING btree (uuid);
 
 
 --
--- Name: idx_2198074_job_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198074_job_id ON jobs_buildroots USING btree (job_id);
-
-
---
 -- Name: idx_2198080_job_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2876,6 +2866,15 @@ CREATE INDEX idx_2198256_user_id ON users_emails USING btree (user_id);
 --
 
 CREATE INDEX jobs_arch ON jobs USING btree (arch);
+
+
+--
+-- Name: jobs_buildroots_job_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_buildroots_job_id ON jobs_buildroots USING btree (job_id);
+
+ALTER TABLE jobs_buildroots CLUSTER ON jobs_buildroots_job_id;
 
 
 --

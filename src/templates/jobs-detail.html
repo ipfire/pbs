@@ -154,11 +154,11 @@
 				<p class="muted">{{ _("No logs available, yet.") }}</p>
 			{% end %}
 
-			{% if job.has_buildroot() %}
+			{% if job.buildroot %}
 				<hr>
 				<p class="ac">
-					<a href="/job/{{ job.uuid }}/buildroot?tries={{ job.tries }}">{{ _("Buildroot") }}</a>
-					({{ _("%s package", "%s packages", job.has_buildroot()) % job.has_buildroot() }})
+					<a href="/job/{{ job.uuid }}/buildroot">{{ _("Buildroot") }}</a>
+					({{ _("%s package", "%s packages", len(job.buildroot)) % len(job.buildroot) }})
 				</p>
 			{% end %}
 		</div>
