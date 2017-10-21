@@ -34,12 +34,12 @@ class Uploads(base.Object):
 	def __iter__(self):
 		uploads = self._get_uploads("SELECT * FROM uploads ORDER BY time_started DESC")
 
-		return iter(sorted(uploads))
+		return iter(uploads)
 
 	def get_by_uuid(self, _uuid):
 		return self._get_upload("SELECT * FROM uploads WHERE uuid = %s", uuid)
 
-	def create(filename, size, hash, builder=None, user=None):
+	def create(self, filename, size, hash, builder=None, user=None):
 		assert builder or user
 
 		upload = self._get_upload("INSERT INTO uploads(uuid, filename, size, hash) \
@@ -101,8 +101,7 @@ class Upload(base.DataObject):
 			return self.backend.builders.get_by_id(self.data.builder_id)
 
 	def set_builder(self, builder):
-		self._set_attribute("builder", builder.id)
-		self.builder = builder
+		self._set_attribute("builder_id", builder.id)
 
 	builder = lazy_property(get_builder, set_builder)
 
@@ -113,8 +112,7 @@ class Upload(base.DataObject):
 			return self.backend.users.get_by_id(self.data.user_id)
 
 	def set_user(self, user):
-		self._set_attribute("user", user.id)
-		self.user = user
+		self._set_attribute("user_id", user.id)
 
 	user = lazy_property(get_user, set_user)
 
