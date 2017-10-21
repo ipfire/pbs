@@ -312,7 +312,7 @@ class BuildsGetHandler(BaseHandler):
 			"name"         : build.name,
 			"package"      : build.pkg.uuid,
 			"priority"     : build.priority,
-			"score"        : build.credits,
+			"score"        : build.score,
 			"severity"     : build.severity,
 			"state"        : build.state,
 			"sup_arches"   : build.supported_arches,

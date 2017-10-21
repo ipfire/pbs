@@ -29,11 +29,11 @@
 			<div class="row-fluid">
 				<div class="span3">
 					<div class="well well-large well-white ac">
-						<p class="huge {% if build.credits >= 0 %}text-success{% else %}text-error{% end %}">
-							{% if build.credits > 0 %}
-								+{{ build.credits }}
+						<p class="huge {% if build.score >= 0 %}text-success{% else %}text-error{% end %}">
+							{% if build.score > 0 %}
+								+{{ build.score }}
 							{% else %}
-								{{ build.credits }}
+								{{ build.score }}
 							{% end %}
 						</p>
 

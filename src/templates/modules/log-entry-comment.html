@@ -3,12 +3,12 @@
 {% block extra-title %}
 	{% if entry.vote == "up" %}
 		<span class="label label-success" title="{{ _("This build works for %s.") % entry.user.firstname }}">
-			+{{ entry.credit }}
+			+{{ entry.score }}
 		</span>
 		&dash;
 	{% elif entry.vote == "down" %}
 		<span class="label label-important" title="{{ _("This build does not work for %s.") % entry.user.firstname }}">
-			{{ entry.credit }}
+			{{ entry.score }}
 		</span>
 		&dash;
 	{% end %}

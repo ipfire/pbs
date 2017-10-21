@@ -844,11 +844,11 @@ class Build(base.DataObject):
 	def add_comment(self, user, text, score):
 		# Add the new comment to the database.
 		id = self.db.execute("INSERT INTO \
-			builds_comments(build_id, user_id, text, credit, time_created) \
+			builds_comments(build_id, user_id, text, score, time_created) \
 			VALUES(%s, %s, %s, %s, NOW())",
 			self.id, user.id, text, score)
 
-		# Update the credit cache
+		# Update the score cache
 		self.score += score
 
 		# Send the new comment to all watchers and stuff.
@@ -859,15 +859,10 @@ class Build(base.DataObject):
 
 	@lazy_property
 	def score(self):
-		res = self.db.get("SELECT SUM(credit) AS score \
+		res = self.db.get("SELECT SUM(score) AS score \
 			FROM builds_comments WHERE build_id = %s", self.id)
 
 		return res.score or 0
-
-	@property
-	def credits(self):
-		# XXX COMPAT
-		return self.score
 
 	def get_commenters(self):
 		users = self.db.query("SELECT DISTINCT users.id AS id FROM builds_comments \

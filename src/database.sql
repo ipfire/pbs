@@ -746,7 +746,7 @@ CREATE TABLE builds_comments (
     build_id integer NOT NULL,
     user_id integer NOT NULL,
     text text NOT NULL,
-    credit integer NOT NULL,
+    score integer NOT NULL,
     time_created timestamp without time zone NOT NULL,
     time_updated timestamp without time zone
 );
