@@ -24,9 +24,6 @@ class Application(tornado.web.Application):
 			gzip  = True,
 		)
 
-		# Load translations.
-		tornado.locale.load_gettext_translations(LOCALEDIR, PACKAGE_NAME)
-
 		tornado.web.Application.__init__(self, **settings)
 
 		self.add_handlers(r"pakfirehub.ipfire.org", [
