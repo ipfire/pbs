@@ -21,43 +21,11 @@ from . import repository
 from . import updates
 from . import users
 
+log = logging.getLogger("builds")
+log.propagate = 1
+
 from .constants import *
 from .decorators import *
-
-def import_from_package(_pakfire, filename, distro=None, commit=None, type="release",
-		arches=None, check_for_duplicates=True, owner=None):
-
-	if distro is None:
-		distro = commit.source.distro
-
-	assert distro
-
-	# Open the package file to read some basic information.
-	pkg = pakfire.packages.open(None, None, filename)
-
-	if check_for_duplicates:
-		if distro.has_package(pkg.name, pkg.epoch, pkg.version, pkg.release):
-			logging.warning("Duplicate package detected: %s. Skipping." % pkg)
-			return
-
-	# Open the package and add it to the database.
-	pkg = packages.Package.open(_pakfire, filename)
-	logging.debug("Created new package: %s" % pkg)
-
-	# Associate the package to the processed commit.
-	if commit:
-		pkg.commit = commit
-
-	# Create a new build object from the package which
-	# is always a release build.
-	build = Build.create(_pakfire, pkg, type=type, owner=owner, distro=distro)
-	logging.debug("Created new build job: %s" % build)
-
-	# Create all automatic jobs.
-	build.create_autojobs(arches=arches)
-
-	return pkg, build
-
 
 class Builds(base.Object):
 	def _get_build(self, query, *args):
@@ -255,6 +223,80 @@ class Builds(base.Object):
 
 		return builds
 
+	def create(self, pkg, type="release", owner=None, distro=None):
+		assert type in ("release", "scratch", "test")
+		assert distro, "You need to specify the distribution of this build."
+
+		# Check if scratch build has an owner.
+		if type == "scratch" and not owner:
+			raise Exception, "Scratch builds require an owner"
+
+		# Set the default priority of this build.
+		if type == "release":
+			priority = 0
+
+		elif type == "scratch":
+			priority = 1
+
+		elif type == "test":
+			priority = -1
+
+		# Create build in database
+		build = self._get_build("INSERT INTO builds(uuid, pkg_id, type, distro_id, priority) \
+			VALUES(%s, %s, %s, %s, %s) RETURNING *", "%s" % uuid.uuid4(), pkg.id, type, distro.id, priority)
+
+		# Set the owner of this build
+		if owner:
+			build.owner = owner
+
+		# Log that the build has been created.
+		build.log("created", user=owner)
+
+		# Create directory where the files live
+		if not os.path.exists(build.path):
+			os.makedirs(build.path)
+
+		# Move package file to the directory of the build.
+		build.pkg.move(os.path.join(build.path, "src"))
+
+		# Generate an update id.
+		build.generate_update_id()
+
+		# Obsolete all other builds with the same name to track updates.
+		build.obsolete_others()
+
+		# Search for possible bug IDs in the commit message.
+		build.search_for_bugs()
+
+		return build
+
+	def create_from_source_package(self, filename, distro, commit=None, type="release",
+			arches=None, check_for_duplicates=True, owner=None):
+		assert distro
+
+		# Open the package file to read some basic information.
+		pkg = pakfire.packages.open(None, None, filename)
+
+		if check_for_duplicates:
+			if distro.has_package(pkg.name, pkg.epoch, pkg.version, pkg.release):
+				log.warning("Duplicate package detected: %s. Skipping." % pkg)
+				return
+
+		# Open the package and add it to the database
+		pkg = self.backend.packages.create(filename)
+
+		# Associate the package to the processed commit
+		if commit:
+			pkg.commit = commit
+
+		# Create a new build object from the package
+		build = self.create(pkg, type=type, owner=owner, distro=distro)
+
+		# Create all automatic jobs
+		build.create_autojobs(arches=arches)
+
+		return build
+
 	def get_changelog(self, name, public=None, limit=5, offset=0):
 		query = "SELECT builds.* FROM builds \
 			JOIN packages ON builds.pkg_id = packages.id \
@@ -374,6 +416,8 @@ class Builds(base.Object):
 
 
 class Build(base.Object):
+	table = "builds"
+
 	def __init__(self, pakfire, id, data=None):
 		base.Object.__init__(self, pakfire)
 
@@ -387,7 +431,6 @@ class Build(base.Object):
 		self._depends_on = None
 		self._pkg = None
 		self._credits = None
-		self._owner = None
 		self._update = None
 		self._repo = None
 		self._distro = None
@@ -406,64 +449,6 @@ class Build(base.Object):
 			WHERE build_id = %s", self.id)
 
 		return iter(sorted(jobs))
-
-	@classmethod
-	def create(cls, pakfire, pkg, type="release", owner=None, distro=None, public=True):
-		assert type in ("release", "scratch", "test")
-		assert distro, "You need to specify the distribution of this build."
-
-		if public:
-			public = "Y"
-		else:
-			public = "N"
-
-		# Check if scratch build has an owner.
-		if type == "scratch" and not owner:
-			raise Exception, "Scratch builds require an owner"
-
-		# Set the default priority of this build.
-		if type == "release":
-			priority = 0
-
-		elif type == "scratch":
-			priority = 1
-
-		elif type == "test":
-			priority = -1
-
-		id = pakfire.db.execute("""
-			INSERT INTO builds(uuid, pkg_id, type, distro_id, time_created, public, priority)
-			VALUES(%s, %s, %s, %s, NOW(), %s, %s)""", "%s" % uuid.uuid4(), pkg.id,
-			type, distro.id, public, priority)
-
-		# Set the owner of this buildgroup.
-		if owner:
-			pakfire.db.execute("UPDATE builds SET owner_id = %s WHERE id = %s",
-				owner.id, id)
-
-		build = cls(pakfire, id)
-
-		# Log that the build has been created.
-		build.log("created", user=owner)
-
-		# Create directory where the files live.
-		if not os.path.exists(build.path):
-			os.makedirs(build.path)
-
-		# Move package file to the directory of the build.
-		source_path = os.path.join(build.path, "src")
-		build.pkg.move(source_path)
-
-		# Generate an update id.
-		build.generate_update_id()
-
-		# Obsolete all other builds with the same name to track updates.
-		build.obsolete_others()
-
-		# Search for possible bug IDs in the commit message.
-		build.search_for_bugs()
-
-		return build
 
 	def delete(self):
 		"""
@@ -584,26 +569,20 @@ class Build(base.Object):
 		"""
 		return self.data.type
 
-	@property
-	def owner_id(self):
-		"""
-			The ID of the owner of this build.
-		"""
-		return self.data.owner_id
-
-	@property
-	def owner(self):
+	def get_owner(self):
 		"""
 			The owner of this build.
 		"""
-		if not self.owner_id:
-			return
+		if self.data.owner_id:
+			return self.backend.users.get_by_id(self.data.owner_id)
 
-		if self._owner is None:
-			self._owner = self.pakfire.users.get_by_id(self.owner_id)
-			assert self._owner
+	def set_owner(self, owner):
+		if owner:
+			self._set_attribute("owner_id", owner.id)
+		else:
+			self._set_attribute("owner_id", None)
 
-		return self._owner
+	owner = lazy_property(get_owner, set_owner)
 
 	@property
 	def distro_id(self):
@@ -953,8 +932,8 @@ class Build(base.Object):
 
 		# Create a new job for every given archirecture.
 		for arch in self.pakfire.arches.expand(arches):
-			# Don't create jobs for src.
-			if arch.name == "src":
+			# Don't create jobs for src
+			if arch == "src":
 				continue
 
 			job = self.add_job(arch, type=type)
@@ -998,14 +977,14 @@ class Build(base.Object):
 			return
 
 		update = self.db.get("SELECT update_num AS num FROM builds \
-			WHERE update_year = YEAR(NOW()) ORDER BY update_num DESC LIMIT 1")
+			WHERE update_year = EXTRACT(year FROM NOW()) ORDER BY update_num DESC LIMIT 1")
 
 		if update:
 			update_num = update.num + 1
 		else:
 			update_num = 1
 
-		self.db.execute("UPDATE builds SET update_year = YEAR(NOW()), update_num = %s \
+		self.db.execute("UPDATE builds SET update_year = EXTRACT(year FROM NOW()), update_num = %s \
 			WHERE id = %s", update_num, self.id)
 
 	## Comment stuff
@@ -1426,8 +1405,8 @@ class Jobs(base.Object):
 			except ValueError:
 				pass
 			else:
-				where.append("(DATE(time_created) = %s OR \
-					DATE(time_started) = %s OR DATE(time_finished) = %s)")
+				where.append("(time_created::date = %s OR \
+					time_started::date = %s OR time_finished::date = %s)")
 				args += (date, date, date)
 
 		if age:

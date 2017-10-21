@@ -69,6 +69,82 @@ class Packages(base.Object):
 
 		return Package(self.pakfire, pkg.id, pkg)
 
+	def create(self, path):
+		# Just check if the file really exist
+		assert os.path.exists(path)
+
+		_pkg = packages.open(pakfire.PakfireServer(), None, path)
+
+		hash_sha512 = misc.calc_hash(path, "sha512")
+		assert hash_sha512
+
+		query = [
+			("name",        _pkg.name),
+			("epoch",       _pkg.epoch),
+			("version",     _pkg.version),
+			("release",     _pkg.release),
+			("type",        _pkg.type),
+			("arch",        _pkg.arch),
+
+			("groups",      " ".join(_pkg.groups)),
+			("maintainer",  _pkg.maintainer),
+			("license",     _pkg.license),
+			("url",         _pkg.url),
+			("summary",     _pkg.summary),
+			("description", _pkg.description),
+			("size",        _pkg.inst_size),
+			("uuid",        _pkg.uuid),
+
+			# Build information.
+			("build_id",    _pkg.build_id),
+			("build_host",  _pkg.build_host),
+			("build_time",  datetime.datetime.utcfromtimestamp(_pkg.build_time)),
+
+			# File "metadata".
+			("path",        path),
+			("filesize",    os.path.getsize(path)),
+			("hash_sha512", hash_sha512),
+		]
+
+		if _pkg.type == "source":
+			query.append(("supported_arches", _pkg.supported_arches))
+
+		keys = []
+		vals = []
+		for key, val in query:
+			keys.append(key)
+			vals.append(val)
+
+		_query = "INSERT INTO packages(%s)" % ", ".join(keys)
+		_query += " VALUES(%s) RETURNING *" % ", ".join("%s" for v in vals)
+
+		# Create package entry in the database.
+		pkg = self._get_package(_query, *vals)
+
+		# Dependency information.
+		for d in _pkg.prerequires:
+			pkg.add_dependency("prerequires", d)
+
+		for d in _pkg.requires:
+			pkg.add_dependency("requires", d)
+
+		for d in _pkg.provides:
+			pkg.add_dependency("provides", d)
+
+		for d in _pkg.conflicts:
+			pkg.add_dependency("conflicts", d)
+
+		for d in _pkg.obsoletes:
+			pkg.add_dependency("obsoletes", d)
+
+		# Add all files to filelists table
+		for f in _pkg.filelist:
+			pkg.add_file(f.name, f.size, f.hash1, f.type, f.config, f.mode,
+				f.user, f.group, f.mtime, f.capabilities)
+
+		# Return the newly created object
+		return pkg
+
 	def search(self, pattern, limit=None):
 		"""
 			Searches for packages that do match the query.
@@ -145,106 +221,6 @@ class Package(base.Object):
 	def __cmp__(self, other):
 		return pakfire.util.version_compare(self.pakfire,
 			self.friendly_name, other.friendly_name)
-
-	@classmethod
-	def open(cls, _pakfire, path):
-		# Just check if the file really does exist.
-		assert os.path.exists(path)
-
-		p = pakfire.PakfireServer()
-		file = packages.open(p, None, path)
-
-		hash_sha512 = misc.calc_hash(path, "sha512")
-		assert hash_sha512
-
-		query = [
-			("name",        file.name),
-			("epoch",       file.epoch),
-			("version",     file.version),
-			("release",     file.release),
-			("type",        file.type),
-			("arch",        file.arch),
-
-			("groups",      " ".join(file.groups)),
-			("maintainer",  file.maintainer),
-			("license",     file.license),
-			("url",         file.url),
-			("summary",     file.summary),
-			("description", file.description),
-			("size",        file.inst_size),
-			("uuid",        file.uuid),
-
-			# Build information.
-			("build_id",    file.build_id),
-			("build_host",  file.build_host),
-			("build_time",  datetime.datetime.utcfromtimestamp(file.build_time)),
-
-			# File "metadata".
-			("path",        path),
-			("filesize",    os.path.getsize(path)),
-			("hash_sha512", hash_sha512),
-		]
-
-		if file.type == "source":
-			query.append(("supported_arches", file.supported_arches))
-
-		keys = []
-		vals = []
-		for key, val in query:
-			keys.append(key)
-			vals.append(val)
-
-		_query = "INSERT INTO packages(%s)" % ", ".join(keys)
-		_query += " VALUES(%s)" % ", ".join("%s" for v in vals)
-
-		# Create package entry in the database.
-		id = _pakfire.db.execute(_query, *vals)
-
-		# Dependency information.
-		deps = []
-		for d in file.prerequires:
-			deps.append((id, "prerequires", d))
-
-		for d in file.requires:
-			deps.append((id, "requires", d))
-
-		for d in file.provides:
-			deps.append((id, "provides", d))
-
-		for d in file.conflicts:
-			deps.append((id, "conflicts", d))
-
-		for d in file.obsoletes:
-			deps.append((id, "obsoletes", d))
-
-		if deps:
-			_pakfire.db.executemany("INSERT INTO packages_deps(pkg_id, type, what) \
-				VALUES(%s, %s, %s)", deps)
-
-		# Add all files to filelists table.
-		filelist = []
-		for f in file.filelist:
-			if f.config:
-				config = "Y"
-			else:
-				config = "N"
-
-			# Convert mtime to integer.
-			try:
-				mtime = int(f.mtime)
-			except ValueError:
-				mtime = 0
-
-			filelist.append((id, f.name, f.size, f.hash1, f.type, config, f.mode,
-				f.user, f.group, datetime.datetime.utcfromtimestamp(mtime),
-				f.capabilities))
-
-		_pakfire.db.executemany("INSERT INTO filelists(pkg_id, name, size, hash_sha512, \
-			type, config, mode, user, group, mtime, capabilities) \
-			VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", filelist)
-
-		# Return the newly created object.
-		return cls(_pakfire, id)
 
 	def delete(self):
 		self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", self.path)
@@ -347,6 +323,10 @@ class Package(base.Object):
 	@property
 	def size(self):
 		return self.data.size
+
+	def add_dependency(self, type, what):
+		self.db.execute("INSERT INTO packages_deps(pkg_id, type, what) \
+			VALUES(%s, %s, %s)", self.id, type, what)
 
 	def has_deps(self):
 		"""
@@ -496,6 +476,14 @@ class Package(base.Object):
 				self._filelist.append(f)
 
 		return self._filelist
+
+	def add_file(self, name, size, hash_sha512, type, config, mode, user, group, mtime, capabilities):
+		# Convert mtime from seconds since epoch to datetime
+		mtime = datetime.datetime.utcfromtimestamp(float(mtime))
+
+		self.db.execute("INSERT INTO filelists(pkg_id, name, size, hash_sha512, type, config, mode, \
+			\"user\", \"group\", mtime, capabilities) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+			self.id, name, size, hash_sha512, type, config, mode, user, group, mtime, capabilities)
 
 	def get_file(self):
 		path = os.path.join(PACKAGES_DIR, self.path)

@@ -120,10 +120,9 @@ class Sources(base.Object):
 
 								# Import all packages in one swoop.
 								for pkg in pkgs:
-									# Import the package file and create a build out of it.
-									from . import builds
-									builds.import_from_package(_pakfire, pkg,
-										distro=source.distro, commit=commit, type="release")
+									with self.db.transaction():
+										self.backend.builds.create_from_source_package(pkg,
+											source.distro, commit=commit, type="release")
 
 							except:
 								if commit:
