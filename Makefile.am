@@ -88,6 +88,7 @@ buildservice_PYTHON = \
 	src/buildservice/geoip.py \
 	src/buildservice/git.py \
 	src/buildservice/jobqueue.py \
+	src/buildservice/jobs.py \
 	src/buildservice/keys.py \
 	src/buildservice/logs.py \
 	src/buildservice/messages.py \
