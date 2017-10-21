@@ -250,20 +250,6 @@ class BuildsCreateHandler(BaseHandler):
 		if arches == "":
 			arches = None
 
-		# Process build type.
-		build_type = self.get_argument("build_type")
-		if build_type == "release":
-			check_for_duplicates = True
-		elif build_type == "scratch":
-			check_for_duplicates = False
-		else:
-			raise tornado.web.HTTPError(400, "Invalid build type")
-
-		## Check if the user has permission to create a build.
-		# Users only have the permission to create scratch builds.
-		if self.user and not build_type == "scratch":
-			raise tornado.web.HTTPError(403, "Users are only allowed to upload scratch builds")
-
 		# Get previously uploaded file to create this build from.
 		upload = self.backend.uploads.get_by_uuid(upload_id)
 		if not upload:
@@ -271,10 +257,10 @@ class BuildsCreateHandler(BaseHandler):
 
 		# Check if the uploaded file belongs to this user/builder.
 		if self.user and not upload.user == self.user:
-			raise tornado.web.HTTPError(400, "Upload does not belong to this user.")
+			raise tornado.web.HTTPError(400, "Upload does not belong to this user")
 
 		elif self.builder and not upload.builder == self.builder:
-			raise tornado.web.HTTPError(400, "Upload does not belong to this builder.")
+			raise tornado.web.HTTPError(400, "Upload does not belong to this builder")
 
 		# Get distribution this package should be built for.
 		distro = self.backend.distros.get_by_ident(distro_ident)
@@ -283,17 +269,9 @@ class BuildsCreateHandler(BaseHandler):
 
 		# Open the package that was uploaded earlier and add it to
 		# the database. Create a new build object from the uploaded package.
-		args = {
-			"arches"               : arches,
-			"check_for_duplicates" : check_for_duplicates,
-			"distro"               : distro,
-			"type"                 : build_type,
-		}
-		if self.user:
-			args["owner"] = self.user
-
 		try:
-			pkg, build = builds.import_from_package(self.backend, upload.path, **args)
+			build = self.backend.builds.create_from_source_package(upload.path, distro=distro,
+				type="scratch", arches=arches, owner=self.user)
 
 		except:
 			# Raise any exception.
