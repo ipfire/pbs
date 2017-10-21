@@ -151,10 +151,11 @@ class UploadsCreateHandler(BaseHandler):
 		filesize = self.get_argument_int("filesize")
 		filehash = self.get_argument("hash")
 
-		upload = uploads.Upload.create(self.backend, filename, filesize,
-			filehash, user=self.user, builder=self.builder)
+		with self.db.transaction():
+			upload = self.backend.uploads.create(filename, filesize,
+				filehash, user=self.user, builder=self.builder)
 
-		self.finish(upload.uuid)
+			self.finish(upload.uuid)
 
 
 class UploadsSendChunkHandler(BaseHandler):
@@ -181,7 +182,8 @@ class UploadsSendChunkHandler(BaseHandler):
 			raise tornado.web.HTTPError(400, "Checksum mismatch")
 
 		# Append the data to file.
-		upload.append(data)
+		with self.db.transaction():
+			upload.append(data)
 
 
 class UploadsFinishedHandler(BaseHandler):
@@ -207,7 +209,8 @@ class UploadsFinishedHandler(BaseHandler):
 
 		# In case the download was corrupted or incomplete, we delete it
 		# and tell the client to start over.
-		upload.remove()
+		with self.db.transaction():
+			upload.remove()
 
 		self.finish("ERROR: CORRUPTED OR INCOMPLETE FILE")
 
@@ -223,7 +226,8 @@ class UploadsDestroyHandler(BaseHandler):
 			raise tornado.web.HTTPError(403, "Removing an other host's file.")
 
 		# Remove the upload from the database and trash the data.
-		upload.remove()
+		with self.db.transaction():
+			upload.remove()
 
 
 # Builds

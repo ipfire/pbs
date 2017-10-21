@@ -62,9 +62,7 @@ class UploadsHandler(BaseHandler):
 		if not self.current_user.is_admin():
 			raise tornado.web.HTTPError(403)
 
-		uploads = self.pakfire.uploads.get_all()
-
-		self.render("uploads-list.html", uploads=uploads)
+		self.render("uploads-list.html", uploads=self.backend.uploads)
 
 
 class DocsIndexHandler(BaseHandler):

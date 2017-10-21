@@ -16,46 +16,40 @@ from . import misc
 from . import packages
 
 from .constants import *
+from .decorators import *
 
 class Uploads(base.Object):
+	def _get_upload(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Upload(self.backend, res.id, data=res)
+
+	def _get_uploads(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Upload(self.backend, row.id, data=row)
+
+	def __iter__(self):
+		uploads = self._get_uploads("SELECT * FROM uploads ORDER BY time_started DESC")
+
+		return iter(sorted(uploads))
+
 	def get_by_uuid(self, _uuid):
-		upload = self.db.get("SELECT id FROM uploads WHERE uuid = %s", _uuid)
+		return self._get_upload("SELECT * FROM uploads WHERE uuid = %s", uuid)
 
-		return Upload(self.pakfire, upload.id)
-
-	def get_all(self):
-		uploads = self.db.query("SELECT id FROM uploads ORDER BY time_started DESC")
-
-		return [Upload(self.pakfire, u.id) for u in uploads]
-
-	def cleanup(self):
-		for upload in self.get_all():
-			upload.cleanup()
-
-
-class Upload(base.Object):
-	def __init__(self, pakfire, id):
-		base.Object.__init__(self, pakfire)
-
-		self.id = id
-		self.data = self.db.get("SELECT * FROM uploads WHERE id = %s", self.id)
-
-	@classmethod
-	def create(cls, pakfire, filename, size, hash, builder=None, user=None):
+	def create(filename, size, hash, builder=None, user=None):
 		assert builder or user
 
-		id = pakfire.db.execute("INSERT INTO uploads(uuid, filename, size, hash) \
-			VALUES(%s, %s, %s, %s)", "%s" % uuid.uuid4(), filename, size, hash)
+		upload = self._get_upload("INSERT INTO uploads(uuid, filename, size, hash) \
+			VALUES(%s, %s, %s, %s) RETURNING *", "%s" % uuid.uuid4(), filename, size, hash)
 
 		if builder:
-			pakfire.db.execute("UPDATE uploads SET builder_id = %s WHERE id = %s",
-				builder.id, id)
+			upload.builder = builder
 
 		elif user:
-			pakfire.db.execute("UPDATE uploads SET user_id = %s WHERE id = %s",
-				user.id, id)
-
-		upload = cls(pakfire, id)
+			upload.user = user
 
 		# Create space to where we save the data.
 		dirname = os.path.dirname(upload.path)
@@ -67,6 +61,14 @@ class Upload(base.Object):
 		f.close()
 
 		return upload
+
+	def cleanup(self):
+		for upload in self.get_all():
+			upload.cleanup()
+
+
+class Upload(base.DataObject):
+	table = "uploads"
 
 	@property
 	def uuid(self):
@@ -92,15 +94,29 @@ class Upload(base.Object):
 	def progress(self):
 		return self.data.progress / self.size
 
-	@property
-	def builder(self):
-		if self.data.builder_id:
-			return self.pakfire.builders.get_by_id(self.data.builder_id)
+	# Builder
 
-	@property
-	def user(self):
+	def get_builder(self):
+		if self.data.builder_id:
+			return self.backend.builders.get_by_id(self.data.builder_id)
+
+	def set_builder(self, builder):
+		self._set_attribute("builder", builder.id)
+		self.builder = builder
+
+	builder = lazy_property(get_builder, set_builder)
+
+	# User
+
+	def get_user(self):
 		if self.data.user_id:
-			return self.pakfire.users.get_by_id(self.data.user_id)
+			return self.backend.users.get_by_id(self.data.user_id)
+
+	def set_user(self, user):
+		self._set_attribute("user", user.id)
+		self.user = user
+
+	user = lazy_property(get_user, set_user)
 
 	def append(self, data):
 		# Check if the filesize was exceeded.
@@ -110,12 +126,10 @@ class Upload(base.Object):
 
 		logging.debug("Writing %s bytes to %s" % (len(data), self.path))
 
-		f = open(self.path, "ab")
-		f.write(data)
-		f.close()
+		with open(self.path, "ab") as f:
+			f.write(data)
 
-		self.db.execute("UPDATE uploads SET progress = %s WHERE id = %s",
-			size, self.id)
+		self._set_attribute("progress", size)
 
 	def validate(self):
 		size = os.path.getsize(self.path)
@@ -141,8 +155,8 @@ class Upload(base.Object):
 		if not self.validate():
 			return False
 
-		self.db.execute("UPDATE uploads SET finished = 'Y', time_finished = NOW() \
-			WHERE id = %s", self.id)
+		self._set_attribute("finished", True)
+		self._set_attribute("time_finished", datetime.datetime.utcnow())
 
 		return True
 
