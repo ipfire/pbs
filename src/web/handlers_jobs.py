@@ -66,7 +66,7 @@ class JobBuildrootHandler(BaseHandler):
 			buildroot_size += pkg.size
 
 		self.render("jobs-buildroot.html", job=job, build=job.build,
-			buildroot=buildroot, download_size=download_size,
+			buildroot=job.buildroot, download_size=download_size,
 			buildroot_size=buildroot_size)
 
 
