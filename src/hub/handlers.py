@@ -40,6 +40,10 @@ class BaseHandler(LongPollMixin, tornado.web.RequestHandler):
 		"""
 		return self.application.backend
 
+	@property
+	def db(self):
+		return self.backend.db
+
 	def get_basic_auth_credentials(self):
 		"""
 			This handles HTTP Basic authentication.
