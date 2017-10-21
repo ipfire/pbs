@@ -469,23 +469,6 @@ class Build(base.DataObject):
 		"""
 		self.db.execute("DELETE FROM builds_watchers WHERE build_id = %s", self.id)
 
-	def reset(self):
-		"""
-			Resets the whole build so it can start again (as it has never
-			been started).
-		"""
-		for job in self.jobs:
-			job.reset()
-
-		#self.__delete_bugs()
-		self.__delete_comments()
-		self.__delete_history()
-		self.__delete_watchers()
-
-		self.state = "building"
-
-		# XXX empty log
-
 	@property
 	def info(self):
 		"""

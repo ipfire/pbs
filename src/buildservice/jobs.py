@@ -288,15 +288,6 @@ class Job(base.DataObject):
 		for logfile in self.logfiles:
 			self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", logfile.path)
 
-	def reset(self, user=None):
-		self.__remove_buildroots()
-		self.__remove_packages()
-		self.__remove_history()
-		self.__remove_logfiles()
-
-		self.state = "new"
-		self.log("reset", user=user)
-
 	## Logging stuff
 
 	def log(self, action, user=None, state=None, builder=None, test_job=None):
