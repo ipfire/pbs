@@ -13,7 +13,7 @@ LOCALEDIR    = "@localedir@"
 TEMPLATESDIR = "@templatesdir@"
 STATICDIR    = "@staticdir@"
 
-PAKFIRE_DIR  = "/pakfire"
+PAKFIRE_DIR  = "/pub/pakfire"
 PACKAGES_DIR = os.path.join(PAKFIRE_DIR, "packages")
 BUILD_RELEASE_DIR = os.path.join(PACKAGES_DIR, "release")
 BUILD_SCRATCH_DIR = os.path.join(PACKAGES_DIR, "scratch")
