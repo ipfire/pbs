@@ -34,13 +34,17 @@ class Jobs(base.Object):
 		for row in res:
 			yield Job(self.backend, row.id, data=row)
 
-	def create(self, build, arch, type="build"):
+	def create(self, build, arch, type="build", superseeds=None):
 		job = self._get_job("INSERT INTO jobs(uuid, type, build_id, arch, time_created) \
 			VALUES(%s, %s, %s, %s, NOW()) RETURNING *", "%s" % uuid.uuid4(), type, build.id, arch)
 		job.log("created")
 
 		# Set cache for Build object.
 		job.build = build
+
+		# Mark if the new job superseeds some other job
+		if superseeds:
+			superseeds.superseeded_by = job
 
 		# Jobs are by default in state "new" and wait for being checked
 		# for dependencies. Packages that do have no build dependencies
@@ -233,6 +237,18 @@ class Job(base.DataObject):
 	@property
 	def distro(self):
 		return self.build.distro
+
+	def get_superseeded_by(self):
+		if self.data.superseeded_by:
+			return self.backend.jobs.get_by_id(self.data.superseeded_by)
+
+	def set_superseeded_by(self, superseeded_by):
+		assert isinstance(superseeded_by, self.__class__)
+
+		self._set_attribute("superseeded_by", superseeded_by.id)
+		self.superseeded_by = superseeded_by
+
+	superseeded_by = lazy_property(get_superseeded_by, set_superseeded_by)
 
 	def delete(self):
 		self.__delete_buildroots()
