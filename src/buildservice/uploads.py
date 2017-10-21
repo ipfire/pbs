@@ -7,13 +7,13 @@ import hashlib
 import logging
 import os
 import shutil
-import uuid
 
 import pakfire.packages
 
 from . import base
 from . import misc
 from . import packages
+from . import users
 
 from .constants import *
 from .decorators import *
@@ -36,14 +36,17 @@ class Uploads(base.Object):
 
 		return iter(uploads)
 
-	def get_by_uuid(self, _uuid):
+	def get_by_uuid(self, uuid):
 		return self._get_upload("SELECT * FROM uploads WHERE uuid = %s", uuid)
 
 	def create(self, filename, size, hash, builder=None, user=None):
 		assert builder or user
 
+		# Create a random ID for this upload
+		uuid = users.generate_random_string(64)
+
 		upload = self._get_upload("INSERT INTO uploads(uuid, filename, size, hash) \
-			VALUES(%s, %s, %s, %s) RETURNING *", "%s" % uuid.uuid4(), filename, size, hash)
+			VALUES(%s, %s, %s, %s) RETURNING *", uuid, filename, size, hash)
 
 		if builder:
 			upload.builder = builder
