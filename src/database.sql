@@ -2638,6 +2638,15 @@ CREATE INDEX filelists_name ON filelists USING btree (name);
 
 
 --
+-- Name: filelists_pkg_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX filelists_pkg_id ON filelists USING btree (pkg_id);
+
+ALTER TABLE filelists CLUSTER ON filelists_pkg_id;
+
+
+--
 -- Name: idx_2197982_builder_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2691,13 +2700,6 @@ CREATE INDEX idx_2198018_build_id ON builds_comments USING btree (build_id);
 --
 
 CREATE INDEX idx_2198018_user_id ON builds_comments USING btree (user_id);
-
-
---
--- Name: idx_2198052_pkg_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198052_pkg_id ON filelists USING btree (pkg_id);
 
 
 --
