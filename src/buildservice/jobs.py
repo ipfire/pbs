@@ -710,7 +710,7 @@ class Job(base.DataObject):
 		# Catch dependency errors and log the problem string.
 		except DependencyError, e:
 			self.state = "dependency_error"
-			self.update_message(e)
+			self.update_message("%s" % e)
 
 		else:
 			# If the build dependencies can be resolved, we set the build in
