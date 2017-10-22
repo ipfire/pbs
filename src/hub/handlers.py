@@ -515,22 +515,15 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 			logging.warning("Connection closed")
 			return
 
-		# Check if there is a job for us.
-		job = self.builder.get_next_job()
+		with self.db.transaction():
+			# Check if there is a job for us.
+			job = self.builder.get_next_job()
 
-		# Got no job, wait and try again.
-		if not job:
-			# Check if we have been running for too long.
-			if self.runtime >= self.max_runtime:
-				logging.debug("Exceeded max. runtime. Finishing request.")
-				return self.finish()
+			# Got no job, wait and try again.
+			if not job:
+				return self.add_timeout(10, self.callback)
 
-			# Try again in a jiffy.
-			self.add_timeout(self.heartbeat, self.callback)
-			return
-
-		try:
-			# Set job to dispatching state.
+			# We got a job!
 			job.state = "dispatching"
 
 			# Set our build host.
@@ -547,22 +540,6 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 
 			# Send build information to the builder.
 			self.finish(ret)
-		except:
-			# If anything went wrong, we reset the state.
-			job.state = "pending"
-			raise
-
-	@property
-	def heartbeat(self):
-		return 15 # 15 seconds
-
-	@property
-	def max_runtime(self):
-		timeout = self.get_argument_int("timeout", None)
-		if timeout:
-			return timeout - self.heartbeat
-
-		return 300 # 5 min
 
 
 class BuildersJobsStateHandler(BuildersBaseHandler):
