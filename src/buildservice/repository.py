@@ -98,6 +98,9 @@ class Repository(base.DataObject):
 
 		return res.len
 
+	def __nonzero__(self):
+		return True
+
 	@lazy_property
 	def next(self):
 		return self.backend.repos._get_repository("SELECT * FROM repositories \
