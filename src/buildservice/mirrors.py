@@ -75,10 +75,7 @@ class Mirrors(base.Object):
 		mirrors = []
 
 		# Walk through all mirrors
-		for mirror in self.get_all():
-			if not mirror.enabled:
-				continue
-
+		for mirror in self:
 			if mirror.country_code == country_code:
 				mirrors.append(mirror)
 
