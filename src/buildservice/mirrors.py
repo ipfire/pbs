@@ -43,21 +43,6 @@ class Mirrors(base.Object):
 
 		return mirror
 
-	def get_random(self, limit=None):
-		query = "SELECT id FROM mirrors WHERE status = 'enabled' ORDER BY RAND()"
-		args  = []
-
-		if limit:
-			query += " LIMIT %s"
-			args.append(limit)
-
-		mirrors = []
-		for mirror in self.db.query(query, *args):
-			mirror = Mirror(self.pakfire, mirror.id)
-			mirrors.append(mirror)
-
-		return mirrors
-
 	def get_by_id(self, id):
 		return self._get_mirror("SELECT * FROM mirrors WHERE id = %s", id)
 
