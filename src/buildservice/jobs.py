@@ -675,18 +675,7 @@ class Job(base.DataObject):
 
 		return repos or self.distro.get_build_repos()
 
-	def get_repo_config(self):
-		"""
-			Get repository configuration file that is sent to the builder.
-		"""
-		confs = []
-
-		for repo in self.get_build_repos():
-			confs.append(repo.get_conf())
-
-		return "\n\n".join(confs)
-
-	def get_config(self):
+	def get_config(self, local=False):
 		"""
 			Get configuration file that is sent to the builder.
 		"""
@@ -696,7 +685,9 @@ class Job(base.DataObject):
 		confs.append(self.distro.get_config())
 
 		# Then add all repositories for this build.
-		confs.append(self.get_repo_config())
+		for repo in self.get_build_repos():
+			conf = repo.get_conf(local=local)
+			confs.append(conf)
 
 		return "\n\n".join(confs)
 

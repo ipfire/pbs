@@ -137,36 +137,42 @@ class Repository(base.DataObject):
 		}
 
 	@property
-	def url(self):
-		url = os.path.join(
-			self.settings.get("repository_baseurl", "http://pakfire.ipfire.org/repositories/"),
+	def basepath(self):
+		return "/".join((
 			self.distro.identifier,
 			self.identifier,
+		))
+
+	@property
+	def path(self):
+		return os.path.join(REPOS_DIR, self.basepath, "%{arch}")
+
+	@property
+	def url(self):
+		return os.path.join(
+			self.settings.get("repository_baseurl", "http://pakfire.ipfire.org/repositories/"),
+			self.basepath,
 			"%{arch}"
 		)
 
-		return url
-
 	@property
 	def mirrorlist(self):
-		url = os.path.join(
+		return os.path.join(
 			self.settings.get("mirrorlist_baseurl", "https://pakfire.ipfire.org/"),
 			"distro", self.distro.identifier,
 			"repo", self.identifier,
 			"mirrorlist?arch=%{arch}"
 		)
 
-		return url
-
-	def get_conf(self):
+	def get_conf(self, local=False):
 		lines = [
 			"[repo:%s]" % self.identifier,
 			"description = %s - %s" % (self.distro.name, self.summary),
 			"enabled = 1",
-			"baseurl = %s" % self.url,
+			"baseurl = %s" % (self.path if local else self.url),
 		]
 
-		if self.mirrored:
+		if self.mirrored and not local:
 			lines.append("mirrors = %s" % self.mirrorlist)
 
 		if self.priority:
@@ -487,7 +493,7 @@ class RepositoryAux(base.DataObject):
 	def distro(self):
 		return self.pakfire.distros.get_by_id(self.data.distro_id)
 
-	def get_conf(self):
+	def get_conf(self, local=False):
 		lines = [
 			"[repo:%s]" % self.identifier,
 			"description = %s - %s" % (self.distro.name, self.name),
