@@ -1563,7 +1563,8 @@ CREATE TABLE repositories (
     time_max integer DEFAULT 0 NOT NULL,
     update_started timestamp without time zone,
     update_ended timestamp without time zone,
-    deleted boolean DEFAULT false NOT NULL
+    deleted boolean DEFAULT false NOT NULL,
+    priority integer
 );
 
 

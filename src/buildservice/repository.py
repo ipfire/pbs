@@ -113,6 +113,11 @@ class Repository(base.DataObject):
 	def distro(self):
 		return self.backend.distros.get_by_id(self.data.distro_id)
 
+	def set_priority(self, priority):
+		self._set_attribute("priority", priority)
+
+	priority = property(lambda s: s.data.priority, set_priority)
+
 	@property
 	def info(self):
 		return {
@@ -145,17 +150,6 @@ class Repository(base.DataObject):
 		return url
 
 	def get_conf(self):
-		prioritymap = {
-			"stable"   : 500,
-			"unstable" : 200,
-			"testing"  : 100,
-		}
-
-		try:
-			priority = prioritymap[self.type]
-		except KeyError:
-			priority = None
-
 		lines = [
 			"[repo:%s]" % self.identifier,
 			"description = %s - %s" % (self.distro.name, self.summary),
@@ -164,8 +158,8 @@ class Repository(base.DataObject):
 			"mirrors = %s" % self.mirrorlist,
 		]
 
-		if priority:
-			lines.append("priority = %s" % priority)
+		if self.priority:
+			lines.append("priority = %s" % self.priority)
 
 		return "\n".join(lines)
 
