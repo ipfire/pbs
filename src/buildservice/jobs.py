@@ -48,8 +48,8 @@ class Jobs(base.Object):
 
 		return job
 
-	def get_by_id(self, id, data=None):
-		return Job(self.backend, id, data)
+	def get_by_id(self, id):
+		return self._get_job("SELECT * FROM jobs WHERE id = %s", id)
 
 	def get_by_uuid(self, uuid):
 		return self._get_job("SELECT * FROM jobs WHERE uuid = %s", uuid)
