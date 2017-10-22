@@ -422,6 +422,13 @@ class Package(base.DataObject):
 
 		return ret
 
+	def get_file(self, filename):
+		res = self.db.get("SELECT * FROM filelists \
+			WHERE pkg_id = %s AND name = %s", self.id, filename)
+
+		if res:
+			return File(self.backend, res)
+
 	def add_file(self, name, size, hash_sha512, type, config, mode, user, group, mtime, capabilities):
 		# Convert mtime from seconds since epoch to datetime
 		mtime = datetime.datetime.utcfromtimestamp(float(mtime))
@@ -430,7 +437,7 @@ class Package(base.DataObject):
 			\"user\", \"group\", mtime, capabilities) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
 			self.id, name, size, hash_sha512, type, config, mode, user, group, mtime, capabilities)
 
-	def get_file(self):
+	def open(self):
 		path = os.path.join(PACKAGES_DIR, self.path)
 
 		if os.path.exists(path):

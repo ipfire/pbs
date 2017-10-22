@@ -190,11 +190,12 @@ class PackageFileDownloadHandler(BaseHandler):
 			raise tornado.web.HTTPError(404, "Package not found: %s" % pkg_uuid)
 
 		# Check if the package has got a file with the given name.
-		if not filename in [f.name for f in pkg.filelist]:
+		file = pkg.get_file(filename)
+		if not file:
 			raise tornado.web.HTTPError(404, "Package %s does not contain file %s" % (pkg, filename))
 
 		# Open the package in the filesystem.
-		pkg_file = pkg.get_file()
+		pkg_file = pkg.open()
 		if not pkg_file:
 			raise tornado.web.HTTPError(404, "Could not open package %s" % pkg.path)
 
