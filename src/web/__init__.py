@@ -10,13 +10,14 @@ import tornado.options
 import tornado.web
 
 from .. import Backend
+from ..constants import *
 from ..decorators import *
 
 from .handlers import *
-from .ui_modules import *
 
-from . import mirrors
 from . import handlers_api
+from . import mirrors
+from . import ui_modules
 
 # Enable logging
 tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
@@ -31,63 +32,63 @@ class Application(tornado.web.Application):
 			template_path = TEMPLATESDIR,
 			static_path = STATICDIR,
 			ui_modules = {
-				"Text"               : TextModule,
-				"Modal"              : ModalModule,
+				"Text"               : ui_modules.TextModule,
+				"Modal"              : ui_modules.ModalModule,
 
-				"Footer"             : FooterModule,
+				"Footer"             : ui_modules.FooterModule,
 
 				# Logging
-				"Log"                : LogModule,
-				"LogEntry"           : LogEntryModule,
-				"LogEntryComment"    : LogEntryCommentModule,
+				"Log"                : ui_modules.LogModule,
+				"LogEntry"           : ui_modules.LogEntryModule,
+				"LogEntryComment"    : ui_modules.LogEntryCommentModule,
 
 				# Builders
-				"BuildersLoad"       : BuildersLoadModule,
+				"BuildersLoad"       : ui_modules.BuildersLoadModule,
 
-				"BuildHeadline"      : BuildHeadlineModule,
-				"BuildStateWarnings" : BuildStateWarningsModule,
+				"BuildHeadline"      : ui_modules.BuildHeadlineModule,
+				"BuildStateWarnings" : ui_modules.BuildStateWarningsModule,
 
-				"BugsTable"          : BugsTableModule,
-				"BuildLog"           : BuildLogModule,
-				"BuildOffset"        : BuildOffsetModule,
-				"BuildTable"         : BuildTableModule,
+				"BugsTable"          : ui_modules.BugsTableModule,
+				"BuildLog"           : ui_modules.BuildLogModule,
+				"BuildOffset"        : ui_modules.BuildOffsetModule,
+				"BuildTable"         : ui_modules.BuildTableModule,
 
 				# Changelog
-				"Changelog"          : ChangelogModule,
-				"ChangelogEntry"     : ChangelogEntryModule,
+				"Changelog"          : ui_modules.ChangelogModule,
+				"ChangelogEntry"     : ui_modules.ChangelogEntryModule,
 
 				# Jobs
-				"JobsList"           : JobsListModule,
-				"JobsStatus"         : JobsStatusModule,
+				"JobsList"           : ui_modules.JobsListModule,
+				"JobsStatus"         : ui_modules.JobsStatusModule,
 
 				# Packages
-				"PackagesDependencyTable" : PackagesDependencyTableModule,
+				"PackagesDependencyTable" : ui_modules.PackagesDependencyTableModule,
 
-				"CommitMessage"      : CommitMessageModule,
-				"CommitsTable"       : CommitsTableModule,
-				"JobsBoxes"          : JobsBoxesModule,
-				"JobState"           : JobStateModule,
-				"JobsTable"          : JobsTableModule,
-				"CommentsTable"      : CommentsTableModule,
-				"FilesTable"         : FilesTableModule,
-				"LogTable"           : LogTableModule,
-				"LogFilesTable"      : LogFilesTableModule,
-				"Maintainer"         : MaintainerModule,
-				"PackagesTable"      : PackagesTableModule,
-				"PackageTable2"      : PackageTable2Module,
-				"PackageHeader"      : PackageHeaderModule,
-				"PackageFilesTable"  : PackageFilesTableModule,
-				"RepositoryTable"    : RepositoryTableModule,
-				"RepoActionsTable"   : RepoActionsTableModule,
-				"SourceTable"        : SourceTableModule,
-				"UpdatesTable"       : UpdatesTableModule,
-				"UsersTable"         : UsersTableModule,
-				"WatchersSidebarTable" : WatchersSidebarTableModule,
+				"CommitMessage"      : ui_modules.CommitMessageModule,
+				"CommitsTable"       : ui_modules.CommitsTableModule,
+				"JobsBoxes"          : ui_modules.JobsBoxesModule,
+				"JobState"           : ui_modules.JobStateModule,
+				"JobsTable"          : ui_modules.JobsTableModule,
+				"CommentsTable"      : ui_modules.CommentsTableModule,
+				"FilesTable"         : ui_modules.FilesTableModule,
+				"LogTable"           : ui_modules.LogTableModule,
+				"LogFilesTable"      : ui_modules.LogFilesTableModule,
+				"Maintainer"         : ui_modules.MaintainerModule,
+				"PackagesTable"      : ui_modules.PackagesTableModule,
+				"PackageTable2"      : ui_modules.PackageTable2Module,
+				"PackageHeader"      : ui_modules.PackageHeaderModule,
+				"PackageFilesTable"  : ui_modules.PackageFilesTableModule,
+				"RepositoryTable"    : ui_modules.RepositoryTableModule,
+				"RepoActionsTable"   : ui_modules.RepoActionsTableModule,
+				"SourceTable"        : ui_modules.SourceTableModule,
+				"UpdatesTable"       : ui_modules.UpdatesTableModule,
+				"UsersTable"         : ui_modules.UsersTableModule,
+				"WatchersSidebarTable" : ui_modules.WatchersSidebarTableModule,
 
-				"HeadingDate"        : HeadingDateModule,
+				"HeadingDate"        : ui_modules.HeadingDateModule,
 
-				"SelectLocale"       : SelectLocaleModule,
-				"SelectTimezone"     : SelectTimezoneModule,
+				"SelectLocale"       : ui_modules.SelectLocaleModule,
+				"SelectTimezone"     : ui_modules.SelectTimezoneModule,
 			},
 			ui_methods = {
 				"format_eta"         : self.format_eta,
