@@ -99,21 +99,12 @@ class MirrorEditHandler(MirrorActionHandler):
 		if not mirror:
 			raise tornado.web.HTTPError(404, "Could not find mirror: %s" % hostname)
 
-		hostname = self.get_argument("name")
-		path     = self.get_argument("path", "")
-		owner    = self.get_argument("owner", None)
-		contact  = self.get_argument("contact", None)
-		enabled  = self.get_argument("enabled", None)
-
-		if enabled:
-			mirror.set_status("enabled", user=self.current_user)
-		else:
-			mirror.set_status("disabled", user=self.current_user)
-
-		mirror.hostname = hostname
-		mirror.path     = path
-		mirror.owner    = owner
-		mirror.contact  = contact
+		with self.db.transaction():
+			mirror.hostname       = self.get_argument("name")
+			mirror.path           = self.get_argument("path", "")
+			mirror.owner          = self.get_argument("owner", None)
+			mirror.contact        = self.get_argument("contact", None)
+			mirror.supports_https = self.get_argument("supports_https", False)
 
 		self.redirect("/mirror/%s" % mirror.hostname)
 

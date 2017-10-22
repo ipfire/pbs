@@ -160,12 +160,21 @@ class Mirror(base.DataObject):
 		return self.make_url()
 
 	def make_url(self, path=""):
-		url = "http://%s%s" % (self.hostname, self.path)
+		url = "%s://%s%s" % (
+			"https" if self.supports_https else "http",
+			self.hostname,
+			self.path
+		)
 
 		if path.startswith("/"):
 			path = path[1:]
 
 		return urlparse.urljoin(url, path)
+
+	def set_supports_https(self, supports_https):
+		self._set_attribute("supports_https", supports_https)
+
+	supports_https = property(lambda s: s.data.supports_https, set_supports_https)
 
 	def set_owner(self, owner):
 		self._set_attribute("owner", owner)

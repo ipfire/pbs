@@ -1291,7 +1291,8 @@ CREATE TABLE mirrors (
     path text NOT NULL,
     owner text,
     contact text,
-    deleted boolean DEFAULT false NOT NULL
+    deleted boolean DEFAULT false NOT NULL,
+    supports_https boolean DEFAULT false NOT NULL
 );
 
 
