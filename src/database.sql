@@ -1732,39 +1732,6 @@ CREATE TABLE settings (
 ALTER TABLE settings OWNER TO pakfire;
 
 --
--- Name: slogans; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE slogans (
-    id integer NOT NULL,
-    message text NOT NULL
-);
-
-
-ALTER TABLE slogans OWNER TO pakfire;
-
---
--- Name: slogans_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
---
-
-CREATE SEQUENCE slogans_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE slogans_id_seq OWNER TO pakfire;
-
---
--- Name: slogans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
---
-
-ALTER SEQUENCE slogans_id_seq OWNED BY slogans.id;
-
-
---
 -- Name: sources; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2232,13 +2199,6 @@ ALTER TABLE ONLY sessions ALTER COLUMN id SET DEFAULT nextval('sessions_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
 --
 
-ALTER TABLE ONLY slogans ALTER COLUMN id SET DEFAULT nextval('slogans_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
---
-
 ALTER TABLE ONLY sources ALTER COLUMN id SET DEFAULT nextval('sources_id_seq'::regclass);
 
 
@@ -2498,14 +2458,6 @@ ALTER TABLE ONLY repositories_aux
 
 ALTER TABLE ONLY repositories_builds
     ADD CONSTRAINT idx_2198189_primary PRIMARY KEY (id);
-
-
---
--- Name: idx_2198207_primary; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
---
-
-ALTER TABLE ONLY slogans
-    ADD CONSTRAINT idx_2198207_primary PRIMARY KEY (id);
 
 
 --
