@@ -82,6 +82,8 @@ class Application(tornado.web.Application):
 				"UsersTable"         : ui_modules.UsersTableModule,
 				"WatchersSidebarTable" : ui_modules.WatchersSidebarTableModule,
 
+				"HeadingDate"        : ui_modules.HeadingDateModule,
+
 				"SelectLocale"       : ui_modules.SelectLocaleModule,
 				"SelectTimezone"     : ui_modules.SelectTimezoneModule,
 			},

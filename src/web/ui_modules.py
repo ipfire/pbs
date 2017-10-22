@@ -129,6 +129,26 @@ class FooterModule(UIModule):
 		return self.render_string("modules/footer.html")
 
 
+class HeadingDateModule(UIModule):
+	def render(self, date):
+		_ = self.locale.translate
+
+		# Check if this is today.
+		today = datetime.date.today()
+		if date == today:
+			return _("Today")
+
+		# Check if this was yesterday.
+		yesterday = today - datetime.timedelta(days=1)
+		if date == yesterday:
+			return _("Yesterday")
+
+		# Convert date to datetime.
+		date = datetime.datetime(date.year, date.month, date.day)
+
+		return self.locale.format_date(date, shorter=True, relative=False)
+
+
 class PackagesTableModule(UIModule):
 	def render(self, job, packages):
 		return self.render_string("modules/packages-table.html", job=job,
