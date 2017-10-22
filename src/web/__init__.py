@@ -12,10 +12,11 @@ import tornado.web
 from .. import Backend
 from ..decorators import *
 
-from . import handlers_api
-
 from .handlers import *
 from .ui_modules import *
+
+from . import mirrors
+from . import handlers_api
 
 # Enable logging
 tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
@@ -203,11 +204,11 @@ class Application(tornado.web.Application):
 			(r"/updates", UpdatesHandler),
 
 			# Mirrors
-			(r"/mirrors", MirrorListHandler),
-			(r"/mirror/new", MirrorNewHandler),
-			(r"/mirror/([A-Za-z0-9\-\.]+)/delete", MirrorDeleteHandler),
-			(r"/mirror/([A-Za-z0-9\-\.]+)/edit", MirrorEditHandler),
-			(r"/mirror/([A-Za-z0-9\-\.]+)", MirrorDetailHandler),
+			(r"/mirrors",					mirrors.MirrorListHandler),
+			(r"/mirror/new",				mirrors.MirrorNewHandler),
+			(r"/mirror/([\w\-\.]+)/delete",	mirrors.MirrorDeleteHandler),
+			(r"/mirror/([\w\-\.]+)/edit",	mirrors.MirrorEditHandler),
+			(r"/mirror/([\w\-\.]+)",		mirrors.MirrorDetailHandler),
 
 			# Key management
 			(r"/keys", KeysListHandler),

@@ -131,11 +131,11 @@ web_PYTHON = \
 	src/web/handlers_distro.py \
 	src/web/handlers_jobs.py \
 	src/web/handlers_keys.py \
-	src/web/handlers_mirrors.py \
 	src/web/handlers_packages.py \
 	src/web/handlers_search.py \
 	src/web/handlers_updates.py \
 	src/web/handlers_users.py \
+	src/web/mirrors.py \
 	src/web/ui_modules.py
 
 webdir = $(buildservicedir)/web

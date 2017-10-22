@@ -8,8 +8,8 @@ from .handlers_base import BaseHandler
 
 class MirrorListHandler(BaseHandler):
 	def get(self):
-		mirrors = self.pakfire.mirrors
-		mirrors_nearby = self.pakfire.mirrors.get_for_location(self.current_address)
+		mirrors = self.backend.mirrors
+		mirrors_nearby = self.backend.mirrors.get_for_location(self.current_address)
 
 		mirrors_worldwide = []
 		for mirror in mirrors:
@@ -25,18 +25,18 @@ class MirrorListHandler(BaseHandler):
 		}
 
 		# Get recent log messages.
-		kwargs["log"] = self.pakfire.mirrors.get_history(limit=5)
+		kwargs["log"] = self.backend.mirrors.get_history(limit=5)
 
 		self.render("mirrors/list.html", **kwargs)
 
 
 class MirrorDetailHandler(BaseHandler):
 	def get(self, hostname):
-		mirror = self.pakfire.mirrors.get_by_hostname(hostname)
+		mirror = self.backend.mirrors.get_by_hostname(hostname)
 		if not mirror:
 			raise tornado.web.HTTPError(404, "Could not find mirror: %s" % hostname)
 
-		log = self.pakfire.mirrors.get_history(mirror=mirror, limit=10)
+		log = self.backend.mirrors.get_history(mirror=mirror, limit=10)
 
 		self.render("mirrors/detail.html", mirror=mirror, log=log)
 
@@ -77,9 +77,9 @@ class MirrorNewHandler(MirrorActionHandler):
 			})
 			return self.get(**errors)
 
-		mirror = mirrors.Mirror.create(self.pakfire, hostname, path,
-			user=self.current_user)
-		assert mirror
+		# Create mirror
+		with self.db.transaction():
+			mirror = self.backend.mirrors.create(hostname, path, user=self.current_user)
 
 		self.redirect("/mirror/%s" % mirror.hostname)
 
@@ -87,7 +87,7 @@ class MirrorNewHandler(MirrorActionHandler):
 class MirrorEditHandler(MirrorActionHandler):
 	@tornado.web.authenticated
 	def get(self, hostname):
-		mirror = self.pakfire.mirrors.get_by_hostname(hostname)
+		mirror = self.backend.mirrors.get_by_hostname(hostname)
 		if not mirror:
 			raise tornado.web.HTTPError(404, "Could not find mirror: %s" % hostname)
 
@@ -95,7 +95,7 @@ class MirrorEditHandler(MirrorActionHandler):
 
 	@tornado.web.authenticated
 	def post(self, hostname):
-		mirror = self.pakfire.mirrors.get_by_hostname(hostname)
+		mirror = self.backend.mirrors.get_by_hostname(hostname)
 		if not mirror:
 			raise tornado.web.HTTPError(404, "Could not find mirror: %s" % hostname)
 
@@ -112,7 +112,7 @@ class MirrorEditHandler(MirrorActionHandler):
 class MirrorDeleteHandler(MirrorActionHandler):
 	@tornado.web.authenticated
 	def get(self, hostname):
-		mirror = self.pakfire.mirrors.get_by_hostname(hostname)
+		mirror = self.backend.mirrors.get_by_hostname(hostname)
 		if not mirror:
 			raise tornado.web.HTTPError(404, "Could not find mirror: %s" % hostname)
 

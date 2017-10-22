@@ -10,7 +10,6 @@ from .handlers_builders import *
 from .handlers_distro import *
 from .handlers_jobs import *
 from .handlers_keys import *
-from .handlers_mirrors import *
 from .handlers_packages import *
 from .handlers_search import *
 from .handlers_updates import *
