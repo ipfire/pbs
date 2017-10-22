@@ -89,7 +89,6 @@ class Application(tornado.web.Application):
 				"SelectTimezone"     : ui_modules.SelectTimezoneModule,
 			},
 			ui_methods = {
-				"format_eta"         : self.format_eta,
 				"format_time"        : self.format_time,
 			},
 			xsrf_cookies = True,
@@ -284,19 +283,6 @@ class Application(tornado.web.Application):
 		logging.debug("Caught reload signal")
 
 	## UI methods
-
-	def format_eta(self, handler, (s, stddev)):
-		if s is None:
-			_ = handler.locale.translate
-			return _("Unknown")
-
-		if s < 0:
-			s = 0
-
-		return u"%s ± %s" % (
-			self.format_time(handler, s),
-			self.format_time_short(handler, stddev / 2),
-		)
 
 	def format_time(self, handler, s, shorter=False):
 		_ = handler.locale.translate

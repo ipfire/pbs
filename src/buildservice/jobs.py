@@ -438,28 +438,6 @@ class Job(base.DataObject):
 	def time_finished(self):
 		return self.data.time_finished
 
-	@property
-	def expected_runtime(self):
-		"""
-			Returns the estimated time and stddev, this job takes to finish.
-		"""
-		# Get the average build time.
-		build_times = self.backend.builds.get_build_times_by_arch(self.arch,
-			name=self.pkg.name)
-
-		# If there is no statistical data, we cannot estimate anything.
-		if not build_times:
-			return None, None
-
-		return build_times.average, build_times.stddev
-
-	@property
-	def eta(self):
-		expected_runtime, stddev = self.expected_runtime
-
-		if expected_runtime:
-			return expected_runtime - int(self.duration), stddev
-
 	def get_pkg_by_uuid(self, uuid):
 		pkg = self.backend.packages._get_package("SELECT packages.id FROM packages \
 			JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
