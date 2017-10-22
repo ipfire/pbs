@@ -42,9 +42,6 @@ class Application(tornado.web.Application):
 				"LogEntry"           : ui_modules.LogEntryModule,
 				"LogEntryComment"    : ui_modules.LogEntryCommentModule,
 
-				# Builders
-				"BuildersLoad"       : ui_modules.BuildersLoadModule,
-
 				"BuildHeadline"      : ui_modules.BuildHeadlineModule,
 				"BuildStateWarnings" : ui_modules.BuildStateWarningsModule,
 

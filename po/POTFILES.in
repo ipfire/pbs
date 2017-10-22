@@ -84,7 +84,6 @@ src/templates/mirrors/edit.html
 src/templates/mirrors/list.html
 src/templates/mirrors/new.html
 src/templates/modules/bugs-table.html
-src/templates/modules/builders/load.html
 src/templates/modules/build-headline.html
 src/templates/modules/build-log.html
 src/templates/modules/build-offset.html

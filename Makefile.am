@@ -286,11 +286,6 @@ dist_templates_modules_DATA = \
 
 templates_modulesdir = $(templatesdir)/modules
 
-dist_templates_modules_builders_DATA = \
-	src/templates/modules/builders/load.html
-
-templates_modules_buildersdir = $(templates_modulesdir)/builders
-
 dist_templates_modules_changelog_DATA = \
 	src/templates/modules/changelog/entry.html \
 	src/templates/modules/changelog/index.html

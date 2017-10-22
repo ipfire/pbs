@@ -76,18 +76,6 @@ class Builders(base.Object):
 		return self._get_builder("SELECT * FROM builders \
 			WHERE name = %s AND deleted IS FALSE", name)
 
-	def get_load(self):
-		res1 = self.db.get("SELECT SUM(max_jobs) AS max_jobs FROM builders \
-			WHERE enabled IS TRUE and deleted IS FALSE")
-
-		res2 = self.db.get("SELECT COUNT(*) AS count FROM jobs \
-			WHERE state = 'dispatching' OR state = 'running' OR state = 'uploading'")
-
-		try:
-			return (res2.count * 100 / res1.max_jobs)
-		except:
-			return 0
-
 	def get_history(self, limit=None, offset=None, builder=None, user=None):
 		query = "SELECT * FROM builders_history"
 		args  = []
