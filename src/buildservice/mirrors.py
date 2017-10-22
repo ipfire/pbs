@@ -205,16 +205,22 @@ class Mirror(base.DataObject):
 			# in seconds since epoch UTC
 			try:
 				timestamp = int(response.body)
+
+			# If we could not parse the timestamp, we probably got
+			# an error page or something similar.
+			# So that's an error then...
 			except ValueError:
-				raise
+				status = "ERROR"
 
-			# Convert to datetime
-			last_sync_at = datetime.datetime.utcfromtimestamp(timestamp)
+			# Timestamp seems to be okay
+			else:
+				# Convert to datetime
+				last_sync_at = datetime.datetime.utcfromtimestamp(timestamp)
 
-			# Must have synced within 24 hours
-			now = datetime.datetime.utcnow()
-			if now - last_sync_at >= datetime.timedelta(hours=24):
-				status = "OUTOFSYNC"
+				# Must have synced within 24 hours
+				now = datetime.datetime.utcnow()
+				if now - last_sync_at >= datetime.timedelta(hours=24):
+					status = "OUTOFSYNC"
 
 		except tornado.httpclient.HTTPError as e:
 			http_status = e.code
