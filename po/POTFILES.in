@@ -78,11 +78,11 @@ src/templates/keys-import.html
 src/templates/keys-list.html
 src/templates/log.html
 src/templates/login.html
-src/templates/mirrors-delete.html
-src/templates/mirrors-detail.html
-src/templates/mirrors-edit.html
-src/templates/mirrors-list.html
-src/templates/mirrors-new.html
+src/templates/mirrors/delete.html
+src/templates/mirrors/detail.html
+src/templates/mirrors/edit.html
+src/templates/mirrors/list.html
+src/templates/mirrors/new.html
 src/templates/modules/bugs-table.html
 src/templates/modules/builders/load.html
 src/templates/modules/build-headline.html

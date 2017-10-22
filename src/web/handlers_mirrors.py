@@ -27,7 +27,7 @@ class MirrorListHandler(BaseHandler):
 		# Get recent log messages.
 		kwargs["log"] = self.pakfire.mirrors.get_history(limit=5)
 
-		self.render("mirrors-list.html", **kwargs)
+		self.render("mirrors/list.html", **kwargs)
 
 
 class MirrorDetailHandler(BaseHandler):
@@ -38,7 +38,7 @@ class MirrorDetailHandler(BaseHandler):
 
 		log = self.pakfire.mirrors.get_history(mirror=mirror, limit=10)
 
-		self.render("mirrors-detail.html", mirror=mirror, log=log)
+		self.render("mirrors/detail.html", mirror=mirror, log=log)
 
 
 class MirrorActionHandler(BaseHandler):
@@ -55,7 +55,7 @@ class MirrorActionHandler(BaseHandler):
 class MirrorNewHandler(MirrorActionHandler):
 	@tornado.web.authenticated
 	def get(self, hostname="", path="", hostname_missing=False, path_invalid=False):
-		self.render("mirrors-new.html", _hostname=hostname, path=path,
+		self.render("mirrors/new.html", _hostname=hostname, path=path,
 			hostname_missing=hostname_missing, path_invalid=path_invalid)
 
 	@tornado.web.authenticated
@@ -91,7 +91,7 @@ class MirrorEditHandler(MirrorActionHandler):
 		if not mirror:
 			raise tornado.web.HTTPError(404, "Could not find mirror: %s" % hostname)
 
-		self.render("mirrors-edit.html", mirror=mirror)
+		self.render("mirrors/edit.html", mirror=mirror)
 
 	@tornado.web.authenticated
 	def post(self, hostname):
@@ -123,4 +123,4 @@ class MirrorDeleteHandler(MirrorActionHandler):
 			self.redirect("/mirrors")
 			return
 
-		self.render("mirrors-delete.html", mirror=mirror)
+		self.render("mirrors/delete.html", mirror=mirror)

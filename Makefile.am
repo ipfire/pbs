@@ -187,11 +187,6 @@ dist_templates_DATA = \
 	src/templates/keys-list.html \
 	src/templates/log.html \
 	src/templates/login.html \
-	src/templates/mirrors-delete.html \
-	src/templates/mirrors-detail.html \
-	src/templates/mirrors-edit.html \
-	src/templates/mirrors-list.html \
-	src/templates/mirrors-new.html \
 	src/templates/package-detail.html \
 	src/templates/package-detail-list.html \
 	src/templates/package-properties.html \
@@ -245,6 +240,15 @@ dist_templates_errors_DATA = \
 	src/templates/errors/error-404.html
 
 templates_errorsdir = $(templatesdir)/errors
+
+dist_templates_mirrors_DATA = \
+	src/templates/mirrors/delete.html \
+	src/templates/mirrors/detail.html \
+	src/templates/mirrors/edit.html \
+	src/templates/mirrors/list.html \
+	src/templates/mirrors/new.html
+
+templates_mirrorsdir = $(templatesdir)/mirrors
 
 dist_templates_modules_DATA = \
 	src/templates/modules/bugs-table.html \
