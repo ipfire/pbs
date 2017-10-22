@@ -106,13 +106,10 @@ class Bugzilla(base.Object):
 
 		return method(kwargs)
 
-	def bug_url(self, bugid):
+	def bug_url(self, bug_id):
 		url = self.settings.get("bugzilla_url", None)
 
-		try:
-			return url % { "bugid" : bugid }
-		except:
-			return "#"
+		return url % { "bug_id" : bug_id }
 
 	def enter_url(self, component):
 		args = {
