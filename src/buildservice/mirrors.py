@@ -17,22 +17,23 @@ log.propagate = 1
 from .decorators import lazy_property
 
 class Mirrors(base.Object):
-	def __iter__(self):
-		res = self.db.query("SELECT * FROM mirrors \
-			WHERE deleted IS FALSE ORDER BY hostname")
-
-		mirrors = []
-		for row in res:
-			mirror = Mirror(self.backend, row.id, data=row)
-			mirrors.append(mirror)
-
-		return iter(mirrors)
-
 	def _get_mirror(self, query, *args):
 		res = self.db.get(query, *args)
 
 		if res:
 			return Mirror(self.backend, res.id, data=res)
+
+	def _get_mirrors(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Mirror(self.backend, row.id, data=row)
+
+	def __iter__(self):
+		mirrors = self._get_mirrors("SELECT * FROM mirrors \
+			WHERE deleted IS FALSE ORDER BY hostname")
+
+		return iter(mirrors)
 
 	def create(self, hostname, path="", owner=None, contact=None, user=None):
 		mirror = self._get_mirror("INSERT INTO mirrors(hostname, path, owner, contact) \
