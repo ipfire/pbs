@@ -693,7 +693,7 @@ class Job(base.DataObject):
 
 	def resolvdep(self):
 		config = pakfire.config.Config(files=["general.conf"])
-		config.parse(self.get_config())
+		config.parse(self.get_config(local=True))
 
 		# The filename of the source file.
 		filename = os.path.join(PACKAGES_DIR, self.build.pkg.path)
