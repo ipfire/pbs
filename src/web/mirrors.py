@@ -118,7 +118,8 @@ class MirrorDeleteHandler(MirrorActionHandler):
 
 		confirmed = self.get_argument("confirmed", None)	
 		if confirmed:
-			mirror.set_status("deleted", user=self.current_user)
+			with self.db.transaction():
+				mirror.deleted = True
 
 			self.redirect("/mirrors")
 			return

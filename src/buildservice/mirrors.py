@@ -146,6 +146,11 @@ class Mirror(base.DataObject):
 
 	hostname = property(lambda self: self.data.hostname, set_hostname)
 
+	def set_deleted(self, deleted):
+		self._set_attribute("deleted", deleted)
+
+	deleted = property(lambda s: s.data.deleted, set_deleted)
+
 	@property
 	def path(self):
 		return self.data.path
