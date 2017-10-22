@@ -19,14 +19,6 @@ class UIModule(tornado.web.UIModule):
 	def backend(self):
 		return self.handler.application.backend
 
-	@property
-	def pakfire(self):
-		return self.backend
-
-	@property
-	def settings(self):
-		return self.pakfire.settings
-
 
 class TextModule(UIModule):
 	BUGZILLA_PATTERN = re.compile(r"(?:bug\s?|#)(\d+)")
@@ -108,7 +100,7 @@ class JobsStatusModule(UIModule):
 
 class BuildersLoadModule(UIModule):
 	def render(self):
-		load = self.pakfire.builders.get_load()
+		load = self.backend.builders.get_load()
 
 		return self.render_string("modules/builders/load.html", load=load)
 
@@ -122,7 +114,7 @@ class BugsTableModule(UIModule):
 class ChangelogModule(UIModule):
 	def render(self, name=None, builds=None, *args, **kwargs):
 		if not builds:
-			builds = self.pakfire.builds.get_changelog(name, *args, **kwargs)
+			builds = self.backend.builds.get_changelog(name, *args, **kwargs)
 
 		return self.render_string("modules/changelog/index.html", builds=builds)
 
@@ -378,7 +370,7 @@ class CommentsTableModule(UIModule):
 					pkg = pkgs[comment.pkg_id]
 				except KeyError:
 					pkg = pkgs[comment.pkg_id] = \
-						self.pakfire.packages.get_by_id(comment.pkg_id)
+						self.backend.packages.get_by_id(comment.pkg_id)
 
 				comment["pkg"] = pkg
 
@@ -387,7 +379,7 @@ class CommentsTableModule(UIModule):
 					user = users[comment.user_id]
 				except KeyError:
 					user = users[comment.user_id] = \
-						self.pakfire.users.get_by_id(comment.user_id)
+						self.backend.users.get_by_id(comment.user_id)
 
 				comment["user"] = user
 
@@ -453,10 +445,10 @@ class LogTableModule(UIModule):
 				pass
 
 			if message.build_id:
-				message["build"] = self.pakfire.builds.get_by_id(message.build_id)
+				message["build"] = self.backend.builds.get_by_id(message.build_id)
 
 			elif message.pkg_id:
-				message["pkg"] = self.pakfire.packages.get_by_id(message.pkg_id)
+				message["pkg"] = self.backend.packages.get_by_id(message.pkg_id)
 
 		return self.render_string("modules/log-table.html",
 			messages=messages, links=links)
