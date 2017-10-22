@@ -164,8 +164,10 @@ class Repository(base.DataObject):
 			"description = %s - %s" % (self.distro.name, self.summary),
 			"enabled = 1",
 			"baseurl = %s" % self.url,
-			"mirrors = %s" % self.mirrorlist,
 		]
+
+		if self.mirrored:
+			lines.append("mirrors = %s" % self.mirrorlist)
 
 		if self.priority:
 			lines.append("priority = %s" % self.priority)
@@ -212,9 +214,10 @@ class Repository(base.DataObject):
 	def arches(self):
 		return self.distro.arches + ["src"]
 
-	@property
-	def mirrored(self):
-		return self.data.mirrored
+	def set_mirrored(self, mirrored):
+		self._set_attribute("mirrored", mirrored)
+
+	mirrored = property(lambda s: s.data.mirrored, set_mirrored)
 
 	def set_enabled_for_builds(self, state):
 		self._set_attribute("enabled_for_builds", state)
