@@ -334,13 +334,6 @@ class Builder(base.DataObject):
 		return self.data.space_free
 
 	@property
-	def overload(self):
-		if not self.cpu_count or not self.loadavg1:
-			return None
-
-		return self.loadavg1 >= self.cpu_count
-
-	@property
 	def host_key_id(self):
 		return self.data.host_key_id
 

@@ -80,15 +80,6 @@
 		</div>
 	{% end %}
 
-	{% if builder.overload %}
-		<div class="alert alert-block alert-warning">
-			<h4 class="alert-heading">{{ _("Warning") }}!</h4>
-			{{ _("This builder is overloaded.") }}
-			{{ _("That means it will not take any additional jobs although it has not reached its threshold of running jobs, yet.") }}
-			{{ _("New jobs will be started automatically after the load decreased.") }}
-		</div>
-	{% end %}
-
 	<div class="row">
 		<div class="span5">
 			<table class="table table-striped table-hover">
@@ -192,9 +183,6 @@
 						<td>{{ _("Load average") }}</td>
 						<td>
 							{{ builder.loadavg or _("N/A") }}
-							{% if builder.overload %}
-									<span class="label label-important">{{ _("Overload") }}</span>
-							{% end %}
 						</td>
 					</tr>
 					<tr>

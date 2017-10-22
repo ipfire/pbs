@@ -563,7 +563,6 @@ CREATE TABLE builders (
     cpu_arch text,
     cpu_bogomips double precision,
     memory bigint DEFAULT 0 NOT NULL,
-    overload builders_overload DEFAULT 'N'::builders_overload NOT NULL,
     free_space bigint DEFAULT 0 NOT NULL,
     host_key_id text,
     time_created timestamp without time zone DEFAULT now() NOT NULL,

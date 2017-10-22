@@ -42,9 +42,6 @@
 							</td>
 							<td>
 								<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
-								{% if builder.overload %}
-										<span class="label label-important pull-right">{{ _("Overload") }}</span>
-								{% end %}
 								<br>
 								{{ builder.cpu_model or _("Unknown CPU") }}
 								{% if builder.mem_total %}
