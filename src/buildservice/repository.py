@@ -118,6 +118,15 @@ class Repository(base.DataObject):
 
 	priority = property(lambda s: s.data.priority, set_priority)
 
+	def get_user(self):
+		if self.data.user_id:
+			return self.backend.users.get_by_id(self.data.user_id)
+
+	def set_user(self, user):
+		self._set_attribute("user_id", user.id)
+
+	user = property(get_user, set_user)
+
 	@property
 	def info(self):
 		return {

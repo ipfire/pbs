@@ -1564,7 +1564,8 @@ CREATE TABLE repositories (
     update_started timestamp without time zone,
     update_ended timestamp without time zone,
     deleted boolean DEFAULT false NOT NULL,
-    priority integer
+    priority integer,
+    user_id integer
 );
 
 
@@ -3270,6 +3271,14 @@ ALTER TABLE ONLY repositories
 
 ALTER TABLE ONLY repositories
     ADD CONSTRAINT repositories_parent_id FOREIGN KEY (parent_id) REFERENCES repositories(id);
+
+
+--
+-- Name: repositories_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories
+    ADD CONSTRAINT repositories_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 
 
 --
