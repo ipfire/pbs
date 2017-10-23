@@ -7,6 +7,9 @@
 # Remaster repositories
 */5 * * * *	pakfire	pakfire-build-service remaster-repositories &>/dev/null
 
+# Cleanup repositories
+5 * * * *	pakfire	pakfire-build-service cleanup-repositories &>/dev/null
+
 # Pull sources
 */5 * * * *	pakfire	pakfire-build-service pull-sources &>/dev/null
 

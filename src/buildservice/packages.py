@@ -12,6 +12,9 @@ from . import base
 from . import database
 from . import misc
 
+log = logging.getLogger("packages")
+log.propagate = 1
+
 from .constants import *
 from .decorators import *
 
@@ -375,12 +378,29 @@ class Package(base.DataObject):
 		return self.data.path
 
 	@property
+	def filename(self):
+		return os.path.basename(self.path)
+
+	@property
 	def hash_sha512(self):
 		return self.data.hash_sha512
 
 	@property
 	def filesize(self):
 		return self.data.filesize
+
+	def copy(self, dst):
+		if os.path.isdir(dst):
+			dst = os.path.join(dst, self.filename)
+
+		if os.path.exists(dst):
+			raise IOError("Destination file exists: %s" % dst)
+
+		src = os.path.join(PACKAGES_DIR, self.path)
+
+		log.debug("Copying %s to %s" % (src, dst))
+
+		shutil.copy2(src, dst)
 
 	def move(self, target_dir):
 		# Create directory if it does not exist, yet.

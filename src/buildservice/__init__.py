@@ -140,7 +140,9 @@ class Backend(object):
 			if not row.path:
 				continue
 
-			path = os.path.join(PACKAGES_DIR, row.path)
+			path = row.path
+			if not path.startswith("/"):
+				path = os.path.join(PACKAGES_DIR, path)
 
 			try:
 				logging.debug("Removing %s..." % path)

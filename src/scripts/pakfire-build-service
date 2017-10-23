@@ -23,6 +23,9 @@ class Cli(object):
 			# Cleanup files
 			"cleanup-files" : self.backend.cleanup_files,
 
+			# Cleanup repositories
+			"cleanup-repositories" : self.backend.repos.cleanup,
+
 			# Cleanup sessions
 			"cleanup-sessions" : self.backend.sessions.cleanup,
 

@@ -3,6 +3,8 @@
 import logging
 import os.path
 
+import pakfire
+
 log = logging.getLogger("repositories")
 log.propagate = 1
 
@@ -72,6 +74,14 @@ class Repositories(base.Object):
 
 			with self.db.transaction():
 				repo.remaster()
+
+	def cleanup(self):
+		"""
+			Cleans up all repositories
+		"""
+		for repo in self:
+			with self.db.transaction():
+				repo.cleanup()
 
 
 class Repository(base.DataObject):
@@ -148,7 +158,7 @@ class Repository(base.DataObject):
 
 	@property
 	def path(self):
-		return os.path.join(REPOS_DIR, self.basepath, "%{arch}")
+		return os.path.join(REPOS_DIR, self.basepath)
 
 	@property
 	def url(self):
@@ -156,7 +166,6 @@ class Repository(base.DataObject):
 			self.settings.get("baseurl", "https://pakfire.ipfire.org"),
 			"repositories",
 			self.basepath,
-			"%{arch}"
 		)
 
 	@property
@@ -173,7 +182,7 @@ class Repository(base.DataObject):
 			"[repo:%s]" % self.identifier,
 			"description = %s - %s" % (self.distro.name, self.summary),
 			"enabled = 1",
-			"baseurl = %s" % (self.path if local else self.url),
+			"baseurl = %s/%{arch}" % (self.path if local else self.url),
 		]
 
 		if self.mirrored and not local:
@@ -312,41 +321,22 @@ class Repository(base.DataObject):
 
 		return _builds
 
-	def _get_packages(self, arch):
-		if arch.name == "src":
-			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
-				JOIN builds ON builds.pkg_id = packages.id \
-				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
-				WHERE packages.arch = %s AND repositories_builds.repo_id = %s",
-				arch.name, self.id)
-
-		else:
-			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
-				JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
-				JOIN jobs ON jobs_packages.job_id = jobs.id \
-				JOIN builds ON builds.id = jobs.build_id \
-				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
-				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
-				repositories_builds.repo_id = %s",
-				arch.name, "noarch", self.id)
-
-		return pkgs
-
 	def get_packages(self, arch):
-		pkgs =  [self.pakfire.packages.get_by_id(p.id) for p in self._get_packages(arch)]
-		pkgs.sort()
+		if arch == "src":
+			return self.backend.packages._get_packages("SELECT packages.* FROM repositories_builds \
+				LEFT JOIN builds ON repositories_builds.build_id = builds.id \
+				LEFT JOIN packages ON builds.pkg_id = packages.id \
+				WHERE repositories_builds.repo_id = %s", self.id)
 
-		return pkgs
-
-	def get_paths(self, arch):
-		paths = [p.path for p in self._get_packages(arch)]
-		paths.sort()
-
-		return paths
-
-	@property
-	def packages(self):
-		return self.get_packages()
+		return self.backend.packages._get_packages("SELECT packages.* FROM repositories_builds \
+				LEFT JOIN builds ON repositories_builds.build_id = builds.id \
+				LEFT JOIN jobs ON builds.id = jobs.build_id \
+				LEFT JOIN jobs_packages ON jobs.id = jobs_packages.job_id \
+				LEFT JOIN packages ON jobs_packages.pkg_id = packages.id \
+				WHERE repositories_builds.repo_id = %s \
+					AND (jobs.arch = %s OR jobs.arch = %s) \
+					AND (packages.arch = %s OR packages.arch = %s)",
+				self.id, arch, "noarch", arch, "noarch")
 
 	@property
 	def unpushed_builds(self):
@@ -373,84 +363,75 @@ class Repository(base.DataObject):
 	def remaster(self):
 		log.info("Going to update repository %s..." % self.name)
 
-		# Update the timestamp when we started at last.
-		self.updated()
-
 		for arch in self.arches:
 			changed = False
 
-			# Get all package paths that are to be included in this repository.
-			paths = self.get_paths(arch)
-
-			repo_path = os.path.join(
-				REPOS_DIR,
-				self.distro.identifier,
-				self.identifier,
-				arch
-			)
+			repo_path = os.path.join(self.path, arch)
+			log.debug("  Path: %s" % repo_path)
 
 			if not os.path.exists(repo_path):
 				os.makedirs(repo_path)
 
-			source_files = []
-			remove_files = []
+			# Get all packages that are to be included in this repository
+			packages = []
+			for p in self.get_packages(arch):
+				path = os.path.join(repo_path, p.filename)
+				packages.append(path)
 
-			for filename in os.listdir(repo_path):
-				path = os.path.join(repo_path, filename)
-
-				if not os.path.isfile(path):
+				# Nothing to do if the package already exists
+				if os.path.exists(path):
 					continue
 
-				remove_files.append(path)
+				# Copy the package into the repository
+				log.info("Adding %s..." % p)
+				p.copy(repo_path)
 
-			for path in paths:
-				filename = os.path.basename(path)
+				# XXX need to sign the new package here
 
-				source_file = os.path.join(PACKAGES_DIR, path)
-				target_file = os.path.join(repo_path, filename)
-
-				# Do not add duplicate files twice.
-				if source_file in source_files:
-					continue
-
-				source_files.append(source_file)
-
-				try:
-					remove_files.remove(target_file)
-				except ValueError:
-					changed = True
-
-			if remove_files:
+				# The repository has been changed
 				changed = True
 
-			# If nothing in the repository data has changed, there
-			# is nothing to do.
-			if changed:
-				log.info("The repository has updates...")
-			else:
-				log.info("Nothing to update.")
+			# No need to regenerate the index if the repository hasn't changed
+			if not changed:
 				continue
+
+			# Update the timestamp when we started at last
+			self.updated()
 
 			# Find the key to sign the package.
 			key_id = None
-			if repo.key:
+			if self.key:
 				key_id = self.key.fingerprint
 
 			# Create package index.
 			p = pakfire.PakfireServer(arch=arch)
-
-			p.repo_create(repo_path, source_files,
+			p.repo_create(repo_path, packages,
 				name="%s - %s.%s" % (self.distro.name, self.name, arch),
 				key_id=key_id)
 
-			# Remove files afterwards.
-			for file in remove_files:
-				file = os.path.join(repo_path, file)
+	def cleanup(self):
+		log.info("Cleaning up repository %s..." % self.name)
 
+		for arch in self.arches:
+			repo_path = os.path.join(self.path, arch)
+
+			# Get a list of all files in the repository directory right now
+			filelist = [e for e in os.listdir(repo_path)
+				if os.path.isfile(os.path.join(repo_path, e))]
+
+			# Get a list of all packages that should be in the repository
+			# and remove them from the filelist
+			for p in self.get_packages(arch):
 				try:
-					os.remove(file)
-				except OSError:
-					log.warning("Could not remove %s." % file)
+					filelist.remove(p.filename)
+				except ValueError:
+					pass
+
+			# For any files that do not belong into the repository
+			# any more, we will just delete them
+			for filename in filelist:
+				path = os.path.join(repo_path, filename)
+				self.backend.delete_file(path)
 
 	def get_history(self, **kwargs):
 		kwargs.update({
