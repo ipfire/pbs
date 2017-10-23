@@ -694,7 +694,7 @@ class Build(base.DataObject):
 
 	@property
 	def download_prefix(self):
-		return "/".join((self.backend.settings.get("download_baseurl"), "packages"))
+		return "/".join((self.backend.settings.get("baseurl"), "packages"))
 
 	@property
 	def source_download(self):
