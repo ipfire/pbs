@@ -236,7 +236,7 @@ class Job(base.DataObject):
 
 		# Remove all logfiles
 		for logfile in self.logfiles:
-			self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", logfile.path)
+			self.backend.delete_file(os.path.join(PACKAGES_DIR, logfile.path))
 
 		self.db.execute("DELETE FROM logfiles WHERE job_id = %s", self.id)
 

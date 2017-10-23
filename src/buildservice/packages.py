@@ -211,7 +211,7 @@ class Package(base.DataObject):
 			return pakfire.util.version_compare(self.backend, self.friendly_name, other.friendly_name) < 0
 
 	def delete(self):
-		self.db.execute("INSERT INTO queue_delete(path) VALUES(%s)", self.path)
+		self.backend.delete_file(os.path.join(PACKAGES_DIR, self.path))
 
 		# Delete all files from the filelist.
 		self.db.execute("DELETE FROM filelists WHERE pkg_id = %s", self.id)
