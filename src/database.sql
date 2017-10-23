@@ -1563,7 +1563,8 @@ CREATE TABLE repositories (
     time_max integer DEFAULT 0 NOT NULL,
     deleted boolean DEFAULT false NOT NULL,
     priority integer,
-    user_id integer
+    user_id integer,
+    update_forced boolean DEFAULT false NOT NULL
 );
 
 

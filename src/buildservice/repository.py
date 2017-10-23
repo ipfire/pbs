@@ -255,6 +255,11 @@ class Repository(base.DataObject):
 	def time_max(self):
 		return self.data.time_max
 
+	def set_update_forced(self, update_forced):
+		self._set_attribute("update_forced", update_forced)
+
+	update_forced = property(lambda s: s.data.update_forced, set_update_forced)
+
 	def _log_build(self, action, build, from_repo=None, to_repo=None, user=None):
 		user_id = None
 		if user:
@@ -285,12 +290,18 @@ class Repository(base.DataObject):
 		self.db.execute("DELETE FROM repositories_builds \
 			WHERE repo_id = %s AND build_id = %s", self.id, build.id)
 
+		# Force regenerating the index
+		self.update_forced = True
+
 		if log:
 			self._log_build("removed", build, from_repo=self, user=user)
 
 	def move_build(self, build, to_repo, user=None, log=True):
 		self.db.execute("UPDATE repositories_builds SET repo_id = %s, time_added = NOW() \
 			WHERE repo_id = %s AND build_id = %s", to_repo.id, self.id, build.id)
+
+		# Force regenerating the index
+		self.update_forced = True
 
 		# Update bug status.
 		build._update_bugs_helper(to_repo)
@@ -360,6 +371,9 @@ class Repository(base.DataObject):
 		self.db.execute("UPDATE repositories SET last_update = NOW() \
 			WHERE id = %s", self.id)
 
+		# Reset forced update flag
+		self.update_forced = False
+
 	def remaster(self):
 		log.info("Going to update repository %s..." % self.name)
 
@@ -392,11 +406,8 @@ class Repository(base.DataObject):
 				changed = True
 
 			# No need to regenerate the index if the repository hasn't changed
-			if not changed:
+			if not changed and not self.update_forced:
 				continue
-
-			# Update the timestamp when we started at last
-			self.updated()
 
 			# Find the key to sign the package.
 			key_id = None
@@ -408,6 +419,9 @@ class Repository(base.DataObject):
 			p.repo_create(repo_path, packages,
 				name="%s - %s.%s" % (self.distro.name, self.name, arch),
 				key_id=key_id)
+
+		# Update the timestamp when we started at last
+		self.updated()
 
 	def cleanup(self):
 		log.info("Cleaning up repository %s..." % self.name)
