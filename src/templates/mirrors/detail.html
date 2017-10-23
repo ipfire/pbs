@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "../base.html" %}
 
 {% block title %}{{ _("Mirror: %s") % mirror.hostname }}{% end block %}
 
@@ -88,7 +88,7 @@
 							</tr>
 						{% end %}
 
-						{% if mirror.last_check.last_sync_at %}
+						{% if mirror.last_check and mirror.last_check.last_sync_at %}
 							<tr>
 								<td>{{ _("Last sync") }}</td>
 								<td>

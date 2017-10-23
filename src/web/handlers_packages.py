@@ -32,7 +32,7 @@ class PackageListHandler(BaseHandler):
 			states = ["building", "stable", "testing"]
 
 		# Get all packages that fulfill the required parameters.
-		pkgs = self.pakfire.packages.get_all_names(public=self.public,
+		pkgs = self.pakfire.packages.get_all_names(
 			user=self.current_user, states=states)
 
 		# Sort all packages in an array like "<first char>" --> [packages, ...]
@@ -50,7 +50,7 @@ class PackageListHandler(BaseHandler):
 
 class PackageNameHandler(BaseHandler):
 	def get(self, name):
-		builds = self.pakfire.builds.get_active_builds(name, public=self.public)
+		builds = self.pakfire.builds.get_active_builds(name)
 		if not builds:
 			raise tornado.web.HTTPError(404, "Package '%s' was not found" % name)
 
@@ -70,12 +70,12 @@ class PackageScratchBuildsHandler(BaseHandler):
 		limit  = self.get_argument("limit", 10)
 
 		scratch_builds = self.pakfire.builds.get_by_name(name, type="scratch",
-			public=self.public, limit=limit, offset=offset)
+			limit=limit, offset=offset)
 
 		if scratch_builds:
 			latest_build = scratch_builds[0]
 		else:
-			release_builds = self.pakfire.builds.get_by_name(name, type="release", public=self.public, limit=1)
+			release_builds = self.pakfire.builds.get_by_name(name, type="release", limit=1)
 			if not release_builds:
 				raise tornado.web.HTTPError(404, "Could not find any build with this name: %s" % name)
 
@@ -149,7 +149,7 @@ class PackageDetailHandler(BaseHandler):
 class PackagePropertiesHandler(BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
-		build = self.pakfire.builds.get_latest_by_name(name, public=self.public)
+		build = self.pakfire.builds.get_latest_by_name(name)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Package '%s' was not found" % name)
@@ -164,7 +164,7 @@ class PackagePropertiesHandler(BaseHandler):
 
 	@tornado.web.authenticated
 	def post(self, name):
-		build = self.pakfire.builds.get_latest_by_name(name, public=self.public)
+		build = self.pakfire.builds.get_latest_by_name(name)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Package '%s' was not found" % name)
@@ -190,11 +190,12 @@ class PackageFileDownloadHandler(BaseHandler):
 			raise tornado.web.HTTPError(404, "Package not found: %s" % pkg_uuid)
 
 		# Check if the package has got a file with the given name.
-		if not filename in [f.name for f in pkg.filelist]:
+		file = pkg.get_file(filename)
+		if not file:
 			raise tornado.web.HTTPError(404, "Package %s does not contain file %s" % (pkg, filename))
 
 		# Open the package in the filesystem.
-		pkg_file = pkg.get_file()
+		pkg_file = pkg.open()
 		if not pkg_file:
 			raise tornado.web.HTTPError(404, "Could not open package %s" % pkg.path)
 
@@ -245,16 +246,14 @@ class PackageFileViewHandler(PackageFileDownloadHandler):
 
 class PackageBuildsTimesHandler(BaseHandler):
 	def get(self, name):
-		latest_build = self.pakfire.builds.get_latest_by_name(name, type="release",
-			public=self.public)
+		latest_build = self.pakfire.builds.get_latest_by_name(name, type="release")
 
 		# If no build with this name was found, we cannot go on.
 		if not latest_build:
 			raise tornado.web.HTTPError(404)
 
 		# Get the summary stats.
-		build_times_summary = self.pakfire.builds.get_build_times_summary(name,
-			job_type="build")
+		build_times_summary = self.pakfire.builds.get_build_times_summary(name)
 
 		self.render("packages/builds/times.html", pkg=latest_build.pkg,
 			build_times_summary=build_times_summary)

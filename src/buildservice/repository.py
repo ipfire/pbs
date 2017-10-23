@@ -3,6 +3,8 @@
 import logging
 import os.path
 
+import pakfire
+
 log = logging.getLogger("repositories")
 log.propagate = 1
 
@@ -73,6 +75,14 @@ class Repositories(base.Object):
 			with self.db.transaction():
 				repo.remaster()
 
+	def cleanup(self):
+		"""
+			Cleans up all repositories
+		"""
+		for repo in self:
+			with self.db.transaction():
+				repo.cleanup()
+
 
 class Repository(base.DataObject):
 	table = "repositories"
@@ -98,6 +108,9 @@ class Repository(base.DataObject):
 
 		return res.len
 
+	def __nonzero__(self):
+		return True
+
 	@lazy_property
 	def next(self):
 		return self.backend.repos._get_repository("SELECT * FROM repositories \
@@ -113,6 +126,20 @@ class Repository(base.DataObject):
 	def distro(self):
 		return self.backend.distros.get_by_id(self.data.distro_id)
 
+	def set_priority(self, priority):
+		self._set_attribute("priority", priority)
+
+	priority = property(lambda s: s.data.priority, set_priority)
+
+	def get_user(self):
+		if self.data.user_id:
+			return self.backend.users.get_by_id(self.data.user_id)
+
+	def set_user(self, user):
+		self._set_attribute("user_id", user.id)
+
+	user = property(get_user, set_user)
+
 	@property
 	def info(self):
 		return {
@@ -123,49 +150,46 @@ class Repository(base.DataObject):
 		}
 
 	@property
-	def url(self):
-		url = os.path.join(
-			self.settings.get("repository_baseurl", "http://pakfire.ipfire.org/repositories/"),
+	def basepath(self):
+		return "/".join((
 			self.distro.identifier,
 			self.identifier,
-			"%{arch}"
-		)
+		))
 
-		return url
+	@property
+	def path(self):
+		return os.path.join(REPOS_DIR, self.basepath)
+
+	@property
+	def url(self):
+		return os.path.join(
+			self.settings.get("baseurl", "https://pakfire.ipfire.org"),
+			"repositories",
+			self.basepath,
+		)
 
 	@property
 	def mirrorlist(self):
-		url = os.path.join(
-			self.settings.get("mirrorlist_baseurl", "https://pakfire.ipfire.org/"),
+		return os.path.join(
+			self.settings.get("baseurl", "https://pakfire.ipfire.org"),
 			"distro", self.distro.identifier,
 			"repo", self.identifier,
 			"mirrorlist?arch=%{arch}"
 		)
 
-		return url
-
-	def get_conf(self):
-		prioritymap = {
-			"stable"   : 500,
-			"unstable" : 200,
-			"testing"  : 100,
-		}
-
-		try:
-			priority = prioritymap[self.type]
-		except KeyError:
-			priority = None
-
+	def get_conf(self, local=False):
 		lines = [
 			"[repo:%s]" % self.identifier,
 			"description = %s - %s" % (self.distro.name, self.summary),
 			"enabled = 1",
-			"baseurl = %s" % self.url,
-			"mirrors = %s" % self.mirrorlist,
+			"baseurl = %s/%{arch}" % (self.path if local else self.url),
 		]
 
-		if priority:
-			lines.append("priority = %s" % priority)
+		if self.mirrored and not local:
+			lines.append("mirrors = %s" % self.mirrorlist)
+
+		if self.priority:
+			lines.append("priority = %s" % self.priority)
 
 		return "\n".join(lines)
 
@@ -209,9 +233,10 @@ class Repository(base.DataObject):
 	def arches(self):
 		return self.distro.arches + ["src"]
 
-	@property
-	def mirrored(self):
-		return self.data.mirrored
+	def set_mirrored(self, mirrored):
+		self._set_attribute("mirrored", mirrored)
+
+	mirrored = property(lambda s: s.data.mirrored, set_mirrored)
 
 	def set_enabled_for_builds(self, state):
 		self._set_attribute("enabled_for_builds", state)
@@ -229,6 +254,11 @@ class Repository(base.DataObject):
 	@property
 	def time_max(self):
 		return self.data.time_max
+
+	def set_update_forced(self, update_forced):
+		self._set_attribute("update_forced", update_forced)
+
+	update_forced = property(lambda s: s.data.update_forced, set_update_forced)
 
 	def _log_build(self, action, build, from_repo=None, to_repo=None, user=None):
 		user_id = None
@@ -260,12 +290,18 @@ class Repository(base.DataObject):
 		self.db.execute("DELETE FROM repositories_builds \
 			WHERE repo_id = %s AND build_id = %s", self.id, build.id)
 
+		# Force regenerating the index
+		self.update_forced = True
+
 		if log:
 			self._log_build("removed", build, from_repo=self, user=user)
 
 	def move_build(self, build, to_repo, user=None, log=True):
 		self.db.execute("UPDATE repositories_builds SET repo_id = %s, time_added = NOW() \
 			WHERE repo_id = %s AND build_id = %s", to_repo.id, self.id, build.id)
+
+		# Force regenerating the index
+		self.update_forced = True
 
 		# Update bug status.
 		build._update_bugs_helper(to_repo)
@@ -296,41 +332,22 @@ class Repository(base.DataObject):
 
 		return _builds
 
-	def _get_packages(self, arch):
-		if arch.name == "src":
-			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
-				JOIN builds ON builds.pkg_id = packages.id \
-				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
-				WHERE packages.arch = %s AND repositories_builds.repo_id = %s",
-				arch.name, self.id)
-
-		else:
-			pkgs = self.db.query("SELECT packages.id AS id, packages.path AS path FROM packages \
-				JOIN jobs_packages ON jobs_packages.pkg_id = packages.id \
-				JOIN jobs ON jobs_packages.job_id = jobs.id \
-				JOIN builds ON builds.id = jobs.build_id \
-				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
-				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
-				repositories_builds.repo_id = %s",
-				arch.name, "noarch", self.id)
-
-		return pkgs
-
 	def get_packages(self, arch):
-		pkgs =  [self.pakfire.packages.get_by_id(p.id) for p in self._get_packages(arch)]
-		pkgs.sort()
+		if arch == "src":
+			return self.backend.packages._get_packages("SELECT packages.* FROM repositories_builds \
+				LEFT JOIN builds ON repositories_builds.build_id = builds.id \
+				LEFT JOIN packages ON builds.pkg_id = packages.id \
+				WHERE repositories_builds.repo_id = %s", self.id)
 
-		return pkgs
-
-	def get_paths(self, arch):
-		paths = [p.path for p in self._get_packages(arch)]
-		paths.sort()
-
-		return paths
-
-	@property
-	def packages(self):
-		return self.get_packages()
+		return self.backend.packages._get_packages("SELECT packages.* FROM repositories_builds \
+				LEFT JOIN builds ON repositories_builds.build_id = builds.id \
+				LEFT JOIN jobs ON builds.id = jobs.build_id \
+				LEFT JOIN jobs_packages ON jobs.id = jobs_packages.job_id \
+				LEFT JOIN packages ON jobs_packages.pkg_id = packages.id \
+				WHERE repositories_builds.repo_id = %s \
+					AND (jobs.arch = %s OR jobs.arch = %s) \
+					AND (packages.arch = %s OR packages.arch = %s)",
+				self.id, arch, "noarch", arch, "noarch")
 
 	@property
 	def unpushed_builds(self):
@@ -354,87 +371,81 @@ class Repository(base.DataObject):
 		self.db.execute("UPDATE repositories SET last_update = NOW() \
 			WHERE id = %s", self.id)
 
+		# Reset forced update flag
+		self.update_forced = False
+
 	def remaster(self):
 		log.info("Going to update repository %s..." % self.name)
-
-		# Update the timestamp when we started at last.
-		self.updated()
 
 		for arch in self.arches:
 			changed = False
 
-			# Get all package paths that are to be included in this repository.
-			paths = self.get_paths(arch)
-
-			repo_path = os.path.join(
-				REPOS_DIR,
-				self.distro.identifier,
-				self.identifier,
-				arch
-			)
+			repo_path = os.path.join(self.path, arch)
+			log.debug("  Path: %s" % repo_path)
 
 			if not os.path.exists(repo_path):
 				os.makedirs(repo_path)
 
-			source_files = []
-			remove_files = []
+			# Get all packages that are to be included in this repository
+			packages = []
+			for p in self.get_packages(arch):
+				path = os.path.join(repo_path, p.filename)
+				packages.append(path)
 
-			for filename in os.listdir(repo_path):
-				path = os.path.join(repo_path, filename)
-
-				if not os.path.isfile(path):
+				# Nothing to do if the package already exists
+				if os.path.exists(path):
 					continue
 
-				remove_files.append(path)
+				# Copy the package into the repository
+				log.info("Adding %s..." % p)
+				p.copy(repo_path)
 
-			for path in paths:
-				filename = os.path.basename(path)
+				# XXX need to sign the new package here
 
-				source_file = os.path.join(PACKAGES_DIR, path)
-				target_file = os.path.join(repo_path, filename)
-
-				# Do not add duplicate files twice.
-				if source_file in source_files:
-					continue
-
-				source_files.append(source_file)
-
-				try:
-					remove_files.remove(target_file)
-				except ValueError:
-					changed = True
-
-			if remove_files:
+				# The repository has been changed
 				changed = True
 
-			# If nothing in the repository data has changed, there
-			# is nothing to do.
-			if changed:
-				log.info("The repository has updates...")
-			else:
-				log.info("Nothing to update.")
+			# No need to regenerate the index if the repository hasn't changed
+			if not changed and not self.update_forced:
 				continue
 
 			# Find the key to sign the package.
 			key_id = None
-			if repo.key:
+			if self.key:
 				key_id = self.key.fingerprint
 
 			# Create package index.
 			p = pakfire.PakfireServer(arch=arch)
-
-			p.repo_create(repo_path, source_files,
+			p.repo_create(repo_path, packages,
 				name="%s - %s.%s" % (self.distro.name, self.name, arch),
 				key_id=key_id)
 
-			# Remove files afterwards.
-			for file in remove_files:
-				file = os.path.join(repo_path, file)
+		# Update the timestamp when we started at last
+		self.updated()
 
+	def cleanup(self):
+		log.info("Cleaning up repository %s..." % self.name)
+
+		for arch in self.arches:
+			repo_path = os.path.join(self.path, arch)
+
+			# Get a list of all files in the repository directory right now
+			filelist = [e for e in os.listdir(repo_path)
+				if os.path.isfile(os.path.join(repo_path, e))]
+
+			# Get a list of all packages that should be in the repository
+			# and remove them from the filelist
+			for p in self.get_packages(arch):
 				try:
-					os.remove(file)
-				except OSError:
-					log.warning("Could not remove %s." % file)
+					filelist.remove(p.filename)
+				except ValueError:
+					pass
+
+			# For any files that do not belong into the repository
+			# any more, we will just delete them
+			for filename in filelist:
+				path = os.path.join(repo_path, filename)
+				self.backend.delete_file(path)
 
 	def get_history(self, **kwargs):
 		kwargs.update({
@@ -481,7 +492,7 @@ class RepositoryAux(base.DataObject):
 	def distro(self):
 		return self.pakfire.distros.get_by_id(self.data.distro_id)
 
-	def get_conf(self):
+	def get_conf(self, local=False):
 		lines = [
 			"[repo:%s]" % self.identifier,
 			"description = %s - %s" % (self.distro.name, self.name),

@@ -224,13 +224,7 @@ class UsersBuildsHandler(BaseHandler):
 			if not user:
 				raise tornado.web.HTTPError(404, "User not found: %s" % name)
 
-		# By default users see only public builds.
-		# Admins are allowed to see all builds.
-		public = True
-		if self.current_user and self.current_user.is_admin():
-			public = None
-
 		# Get a list of the builds this user has built.
-		builds = self.pakfire.builds.get_by_user(user, public=public)
+		builds = self.pakfire.builds.get_by_user(user)
 
 		self.render("user-profile-builds.html", user=user, builds=builds)

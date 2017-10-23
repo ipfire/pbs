@@ -16,48 +16,15 @@ from ..constants import *
 
 class UIModule(tornado.web.UIModule):
 	@property
-	def pakfire(self):
+	def backend(self):
 		return self.handler.application.backend
-
-	@property
-	def settings(self):
-		return self.pakfire.settings
 
 
 class TextModule(UIModule):
-	__cache = {}
+	BUGZILLA_PATTERN = re.compile(r"(?:bug\s?|#)(\d+)")
+	CVE_PATTERN      = re.compile(r"(?:CVE)[\s\-](\d{4}\-\d{4})")
 
-	LINK = """<a href="%s" target="_blank">%s</a>"""
-
-	@property
-	def bugzilla_url(self):
-		return self.settings.get("bugzilla_url", "")
-
-	@property
-	def bugzilla_pattern(self):
-		if not self.__cache.has_key("bugzilla_pattern"):
-			self.__cache["bugzilla_pattern"] = re.compile(BUGZILLA_PATTERN)
-
-		return self.__cache["bugzilla_pattern"]
-
-	@property
-	def bugzilla_repl(self):
-		return self.LINK % (self.bugzilla_url % { "bugid" : r"\2" }, r"\1\2")
-
-	@property
-	def cve_url(self):
-		return self.settings.get("cve_url", "")
-
-	@property
-	def cve_pattern(self):
-		if not self.__cache.has_key("cve_pattern"):
-			self.__cache["cve_pattern"] = re.compile(CVE_PATTERN)
-
-		return self.__cache["cve_pattern"]
-
-	@property
-	def cve_repl(self):
-		return self.LINK % (self.cve_url % r"\3", r"\1\2\3")
+	LINK = """<a href="%s" target="_blank" rel="noopener">%s</a>"""
 
 	def split_paragraphs(self, s):
 		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=str.isspace):
@@ -68,28 +35,35 @@ class TextModule(UIModule):
 			yield paragraph.replace("\n", " ")
 
 	def render(self, text, pre=False, remove_linebreaks=True):
-		link = """<a href="%s" target="_blank">%s</a>"""
-
 		if remove_linebreaks:
 			text = text.replace("\n", " ")
 
 		# Escape the text and create make urls clickable.
 		text = tornado.escape.xhtml_escape(text)
 		text = tornado.escape.linkify(text, shorten=True,
-			extra_params='target="_blank"')
+			extra_params="target=\"_blank\" rel=\"noopener\"")
 
-		# Search for bug ids that need to be linked to bugzilla.
-		if self.bugzilla_url:
-			text = re.sub(self.bugzilla_pattern, self.bugzilla_repl, text, re.I|re.U)
+		# Search for bug ids that need to be linked to bugzilla
+		text = re.sub(self.BUGZILLA_PATTERN, self._bugzilla_repl, text, re.I|re.U)
 
 		# Search for CVE numbers and create hyperlinks.
-		if self.cve_url:
-			text = re.sub(self.cve_pattern, self.cve_repl, text, re.I|re.U)
+		text = re.sub(self.CVE_PATTERN, self._cve_repl, text, re.I|re.U)
 
 		if pre:
 			return "<pre>%s</pre>" % text
 
 		return text
+
+	def _bugzilla_repl(self, m):
+		bug_id = m.group(1)
+
+		# Get the URL
+		bug_url = self.backend.bugzilla.bug_url(bug_id)
+
+		return self.LINK % (bug_url, m.group(0))
+
+	def _cve_repl(self, m):
+		return self.LINK % ("http://cve.mitre.org/cgi-bin/cvename.cgi?name=%s" % m.group(1), m.group(0))
 
 
 class CommitMessageModule(TextModule):
@@ -124,13 +98,6 @@ class JobsStatusModule(UIModule):
 			build=build, jobs=build.jobs)
 
 
-class BuildersLoadModule(UIModule):
-	def render(self):
-		load = self.pakfire.builders.get_load()
-
-		return self.render_string("modules/builders/load.html", load=load)
-
-
 class BugsTableModule(UIModule):
 	def render(self, pkg, bugs):
 		return self.render_string("modules/bugs-table.html",
@@ -140,7 +107,7 @@ class BugsTableModule(UIModule):
 class ChangelogModule(UIModule):
 	def render(self, name=None, builds=None, *args, **kwargs):
 		if not builds:
-			builds = self.pakfire.builds.get_changelog(name, *args, **kwargs)
+			builds = self.backend.builds.get_changelog(name, *args, **kwargs)
 
 		return self.render_string("modules/changelog/index.html", builds=builds)
 
@@ -396,7 +363,7 @@ class CommentsTableModule(UIModule):
 					pkg = pkgs[comment.pkg_id]
 				except KeyError:
 					pkg = pkgs[comment.pkg_id] = \
-						self.pakfire.packages.get_by_id(comment.pkg_id)
+						self.backend.packages.get_by_id(comment.pkg_id)
 
 				comment["pkg"] = pkg
 
@@ -405,7 +372,7 @@ class CommentsTableModule(UIModule):
 					user = users[comment.user_id]
 				except KeyError:
 					user = users[comment.user_id] = \
-						self.pakfire.users.get_by_id(comment.user_id)
+						self.backend.users.get_by_id(comment.user_id)
 
 				comment["user"] = user
 
@@ -471,10 +438,10 @@ class LogTableModule(UIModule):
 				pass
 
 			if message.build_id:
-				message["build"] = self.pakfire.builds.get_by_id(message.build_id)
+				message["build"] = self.backend.builds.get_by_id(message.build_id)
 
 			elif message.pkg_id:
-				message["pkg"] = self.pakfire.packages.get_by_id(message.pkg_id)
+				message["pkg"] = self.backend.packages.get_by_id(message.pkg_id)
 
 		return self.render_string("modules/log-table.html",
 			messages=messages, links=links)

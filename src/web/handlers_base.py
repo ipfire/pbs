@@ -122,16 +122,3 @@ class BaseHandler(tornado.web.RequestHandler):
 	@property
 	def mirrors(self):
 		return self.pakfire.mirrors
-
-	@property
-	def public(self):
-		"""
-			Indicates what level of public/non-public things a user
-			may see.
-		"""
-		if self.current_user and self.current_user.is_admin():
-			public = None
-		else:
-			public = True
-
-		return public

@@ -6,30 +6,26 @@ import os
 import subprocess
 
 from . import base
+from .decorators import *
 
 class Repo(base.Object):
-	def __init__(self, pakfire, source, mode="normal"):
-		base.Object.__init__(self, pakfire)
-
+	def init(self, source, mode="normal"):
 		assert mode in ("normal", "bare", "mirror")
 
-		# Get the source object.
 		self.source = source
 		self.mode = mode
 
-	@property
+	def __enter__(self):
+		return RepoContext(self.backend, self)
+
+	def __exit__(self, type, value, traceback):
+		pass
+
+	@lazy_property
 	def path(self):
-		return os.path.join("/var/cache/pakfire/git-repos", self.source.identifier, self.mode)
+		path = os.path.join("~/.pakfire/cache/git-repos", self.source.identifier, self.mode)
 
-	def git(self, cmd, path=None):
-		if not path:
-			path = self.path
-
-		cmd = "cd %s && git %s" % (path, cmd)
-
-		logging.debug("Running command: %s" % cmd)
-
-		return subprocess.check_output(["/bin/sh", "-c", cmd])
+		return os.path.expanduser(path)
 
 	@property
 	def cloned(self):
@@ -38,50 +34,75 @@ class Repo(base.Object):
 		"""
 		return os.path.exists(self.path)
 
+
+class RepoContext(base.Object):
+	def init(self, repo):
+		self.repo = repo
+
+		# Clone repository if not cloned, yet
+		if not self.repo.cloned:
+			self.clone()
+
+		self._lock()
+
+	def __del__(self):
+		self._release()
+
+	def _lock(self):
+		pass # XXX needs to be implemented
+
+	def _release(self):
+		pass
+
+	def git(self, cmd, path=None):
+		if not path:
+			path = self.repo.path
+
+		cmd = "cd %s && git %s" % (path, cmd)
+
+		logging.debug("Running command: %s" % cmd)
+
+		return subprocess.check_output(["/bin/sh", "-c", cmd])
+
 	def clone(self):
-		if self.cloned:
+		if self.repo.cloned:
 			return
 
-		path = os.path.dirname(self.path)
-		repo = os.path.basename(self.path)
+		path, repo = os.path.dirname(self.repo.path), os.path.basename(self.repo.path)
 
 		# Create the repository home directory if not exists.
 		if not os.path.exists(path):
 			os.makedirs(path)
 
 		command = ["clone"]
-		if self.mode == "bare":
+		if self.repo.mode == "bare":
 			command.append("--bare")
-		elif self.mode == "mirror":
+		elif self.repo.mode == "mirror":
 			command.append("--mirror")
 
-		command.append(self.source.url)
+		command.append(self.repo.source.url)
 		command.append(repo)
 
 		# Clone the repository.
 		try:
 			self.git(" ".join(command), path=path)
 		except Exception:
-			shutil.rmtree(self.path)
+			shutil.rmtree(self.repo.path)
 			raise
 
 	def fetch(self):
-		# Make sure, the repository was already cloned.
-		if not self.cloned:
-			self.clone()
-
 		self.git("fetch")
 
 	def rev_list(self, revision=None):
 		if not revision:
-			if self.source.head_revision:
-				revision = self.source.head_revision.revision
+			if self.repo.source.head_revision:
+				revision = self.repo.source.head_revision.revision
 			else:
-				revision = self.source.start_revision
+				revision = self.repo.source.start_revision
 
-		command = "rev-list %s..%s" % (revision, self.source.branch)
+		command = "rev-list %s..%s" % (revision, self.repo.source.branch)
 
-		# Get all merge commits.
+		# Get all merge commits
 		merges = self.git("%s --merges" % command).splitlines()
 
 		revisions = []
@@ -112,8 +133,8 @@ class Repo(base.Object):
 		rev_date      = datetime.datetime.utcfromtimestamp(float(rev_date))
 
 		# Create a new commit object in the database
-		return self.source.create_commit(revision, rev_author, rev_committer,
-			rev_subject, rev_body, rev_date)
+		return self.repo.source.create_commit(revision,
+			rev_author, rev_committer, rev_subject, rev_body, rev_date)
 
 	def checkout(self, revision, update=False):
 		for update in (0, 1):
@@ -132,9 +153,9 @@ class Repo(base.Object):
 	def changed_files(self, revision):
 		files = self.git("diff --name-only %s^ %s" % (revision, revision))
 
-		return [os.path.join(self.path, f) for f in files.splitlines()]
+		return [os.path.join(self.repo.path, f) for f in files.splitlines()]
 
 	def get_all_files(self):
 		files = self.git("ls-files")
 
-		return [os.path.join(self.path, f) for f in files.splitlines()]
+		return [os.path.join(self.repo.path, f) for f in files.splitlines()]

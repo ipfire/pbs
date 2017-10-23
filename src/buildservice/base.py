@@ -12,10 +12,6 @@ class Object(object):
 	def __init__(self, backend, *args, **kwargs):
 		self.backend = backend
 
-		# Shortcut to settings.
-		if hasattr(self.pakfire, "settings"):
-			self.settings = self.backend.settings
-
 		# Call custom constructor
 		self.init(*args, **kwargs)
 
@@ -39,6 +35,10 @@ class Object(object):
 			all other code has been updated to use self.backend.
 		"""
 		return self.backend
+
+	@lazy_property
+	def settings(self):
+		return self.backend.settings
 
 
 class DataObject(Object):

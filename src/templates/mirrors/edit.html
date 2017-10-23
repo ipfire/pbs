@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "../base.html" %}
 
 {% block title %}{{ _("Manage mirror %s") % mirror.hostname }}{% end block %}
 
@@ -40,11 +40,11 @@
 			</div>
 
 			<div class="control-group">
-				<label class="control-label" for="enabled">{{ _("Enabled") }}</label>
+				<label class="control-label">{{ _("Supports HTTPS") }}</label>
 				<div class="controls">
 					<label class="checkbox">
-						<input type="checkbox" id="enabled" name="enabled" {% if mirror.enabled %}checked="checked"{% end %}>
-						{{ _("Only enabled mirrors will be pushed out to the clients.") }}
+						<input type="checkbox" name="supports_https" {% if mirror.supports_https %}checked{% end %}>
+						{{ _("Check if this mirror server supports HTTPS.") }}
 					</label>
 				</div>
 			</div>

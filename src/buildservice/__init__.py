@@ -6,6 +6,7 @@ import ConfigParser
 import logging
 import os
 import pakfire
+import shutil
 
 from . import arches
 from . import bugtracker
@@ -16,6 +17,7 @@ from . import database
 from . import distribution
 from . import geoip
 from . import jobqueue
+from . import jobs
 from . import keys
 from . import logs
 from . import messages
@@ -50,7 +52,7 @@ class Backend(object):
 		self.builds      = builds.Builds(self)
 		self.cache       = cache.Cache(self)
 		self.geoip       = geoip.GeoIP(self)
-		self.jobs        = builds.Jobs(self)
+		self.jobs        = jobs.Jobs(self)
 		self.builders    = builders.Builders(self)
 		self.distros     = distribution.Distributions(self)
 		self.jobqueue    = jobqueue.JobQueue(self)
@@ -127,37 +129,26 @@ class Backend(object):
 
 		return database.Connection(hostname, name, user=user, password=password)
 
+	def delete_file(self, path, not_before=None):
+		self.db.execute("INSERT INTO queue_delete(path, not_before) \
+			VALUES(%s, %s)", path, not_before)
+
 	def cleanup_files(self):
-		query = self.db.query("SELECT * FROM queue_delete")
+		query = self.db.query("SELECT * FROM queue_delete \
+			WHERE (not_before IS NULL OR not_before <= NOW())")
 
 		for row in query:
-			if not row.path:
-				continue
+			path = row.path
 
-			path = os.path.join(PACKAGES_DIR, row.path)
+			if not path or not paths.startswith("%s/" % PAKFIRE_DIR):
+				log.warning("Cannot delete file outside of the tree")
+				continue
 
 			try:
 				logging.debug("Removing %s..." % path)
-				os.unlink(path)
-			except OSError, e:
+				shutil.rmtree(path)
+			except shutil.Error as e:
 				logging.error("Could not remove %s: %s" % (path, e))
-
-			while True:			
-				path = os.path.dirname(path)
-
-				# Stop if we are running outside of the tree.
-				if not path.startswith(PACKAGES_DIR):
-					break
-
-				# If the directory is not empty, we cannot remove it.
-				if os.path.exists(path) and os.listdir(path):
-					break
-
-				try:
-					logging.debug("Removing %s..." % path)
-					os.rmdir(path)
-				except OSError, e:
-					logging.error("Could not remove %s: %s" % (path, e))
-					break
+				continue
 
 			self.db.execute("DELETE FROM queue_delete WHERE id = %s", row.id)

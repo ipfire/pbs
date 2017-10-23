@@ -40,6 +40,10 @@ class BaseHandler(LongPollMixin, tornado.web.RequestHandler):
 		"""
 		return self.application.backend
 
+	@property
+	def db(self):
+		return self.backend.db
+
 	def get_basic_auth_credentials(self):
 		"""
 			This handles HTTP Basic authentication.
@@ -151,10 +155,11 @@ class UploadsCreateHandler(BaseHandler):
 		filesize = self.get_argument_int("filesize")
 		filehash = self.get_argument("hash")
 
-		upload = uploads.Upload.create(self.backend, filename, filesize,
-			filehash, user=self.user, builder=self.builder)
+		with self.db.transaction():
+			upload = self.backend.uploads.create(filename, filesize,
+				filehash, user=self.user, builder=self.builder)
 
-		self.finish(upload.uuid)
+			self.finish(upload.uuid)
 
 
 class UploadsSendChunkHandler(BaseHandler):
@@ -181,7 +186,8 @@ class UploadsSendChunkHandler(BaseHandler):
 			raise tornado.web.HTTPError(400, "Checksum mismatch")
 
 		# Append the data to file.
-		upload.append(data)
+		with self.db.transaction():
+			upload.append(data)
 
 
 class UploadsFinishedHandler(BaseHandler):
@@ -207,7 +213,8 @@ class UploadsFinishedHandler(BaseHandler):
 
 		# In case the download was corrupted or incomplete, we delete it
 		# and tell the client to start over.
-		upload.remove()
+		with self.db.transaction():
+			upload.remove()
 
 		self.finish("ERROR: CORRUPTED OR INCOMPLETE FILE")
 
@@ -223,7 +230,8 @@ class UploadsDestroyHandler(BaseHandler):
 			raise tornado.web.HTTPError(403, "Removing an other host's file.")
 
 		# Remove the upload from the database and trash the data.
-		upload.remove()
+		with self.db.transaction():
+			upload.remove()
 
 
 # Builds
@@ -242,20 +250,6 @@ class BuildsCreateHandler(BaseHandler):
 		if arches == "":
 			arches = None
 
-		# Process build type.
-		build_type = self.get_argument("build_type")
-		if build_type == "release":
-			check_for_duplicates = True
-		elif build_type == "scratch":
-			check_for_duplicates = False
-		else:
-			raise tornado.web.HTTPError(400, "Invalid build type")
-
-		## Check if the user has permission to create a build.
-		# Users only have the permission to create scratch builds.
-		if self.user and not build_type == "scratch":
-			raise tornado.web.HTTPError(403, "Users are only allowed to upload scratch builds")
-
 		# Get previously uploaded file to create this build from.
 		upload = self.backend.uploads.get_by_uuid(upload_id)
 		if not upload:
@@ -263,10 +257,10 @@ class BuildsCreateHandler(BaseHandler):
 
 		# Check if the uploaded file belongs to this user/builder.
 		if self.user and not upload.user == self.user:
-			raise tornado.web.HTTPError(400, "Upload does not belong to this user.")
+			raise tornado.web.HTTPError(400, "Upload does not belong to this user")
 
 		elif self.builder and not upload.builder == self.builder:
-			raise tornado.web.HTTPError(400, "Upload does not belong to this builder.")
+			raise tornado.web.HTTPError(400, "Upload does not belong to this builder")
 
 		# Get distribution this package should be built for.
 		distro = self.backend.distros.get_by_ident(distro_ident)
@@ -275,17 +269,9 @@ class BuildsCreateHandler(BaseHandler):
 
 		# Open the package that was uploaded earlier and add it to
 		# the database. Create a new build object from the uploaded package.
-		args = {
-			"arches"               : arches,
-			"check_for_duplicates" : check_for_duplicates,
-			"distro"               : distro,
-			"type"                 : build_type,
-		}
-		if self.user:
-			args["owner"] = self.user
-
 		try:
-			pkg, build = builds.import_from_package(self.backend, upload.path, **args)
+			build = self.backend.builds.create_from_source_package(upload.path, distro=distro,
+				type="scratch", arches=arches, owner=self.user)
 
 		except:
 			# Raise any exception.
@@ -312,7 +298,7 @@ class BuildsGetHandler(BaseHandler):
 			"name"         : build.name,
 			"package"      : build.pkg.uuid,
 			"priority"     : build.priority,
-			"score"        : build.credits,
+			"score"        : build.score,
 			"severity"     : build.severity,
 			"state"        : build.state,
 			"sup_arches"   : build.supported_arches,
@@ -340,7 +326,7 @@ class JobsBaseHandler(BaseHandler):
 			"packages"     : [p.uuid for p in job.packages],
 			"state"        : job.state,
 			"time_created" : job.time_created.isoformat(),
-			"type"         : job.type,
+			"type"         : "test" if job.test else "release",
 			"uuid"         : job.uuid,
 		}
 
@@ -406,15 +392,6 @@ class JobsGetHandler(JobsBaseHandler):
 		job = self.backend.jobs.get_by_uuid(job_uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Could not find job: %s" % job_uuid)
-
-		# Check if user is allowed to view this job.
-		if job.build.public == False:
-			if not self.user:
-				raise tornado.web.HTTPError(401)
-
-			# Check if an authenticated user has permission to see this build.
-			if not job.build.has_perm(self.user):
-				raise tornado.web.HTTPError(403)
 
 		ret = self.job2json(job)
 		self.finish(ret)
@@ -538,22 +515,15 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 			logging.warning("Connection closed")
 			return
 
-		# Check if there is a job for us.
-		job = self.builder.get_next_job()
+		with self.db.transaction():
+			# Check if there is a job for us.
+			job = self.builder.get_next_job()
 
-		# Got no job, wait and try again.
-		if not job:
-			# Check if we have been running for too long.
-			if self.runtime >= self.max_runtime:
-				logging.debug("Exceeded max. runtime. Finishing request.")
-				return self.finish()
+			# Got no job, wait and try again.
+			if not job:
+				return self.add_timeout(10, self.callback)
 
-			# Try again in a jiffy.
-			self.add_timeout(self.heartbeat, self.callback)
-			return
-
-		try:
-			# Set job to dispatching state.
+			# We got a job!
 			job.state = "dispatching"
 
 			# Set our build host.
@@ -564,28 +534,12 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 				"arch"               : job.arch,
 				"source_url"         : job.build.source_download,
 				"source_hash_sha512" : job.build.source_hash_sha512,
-				"type"               : job.type,
+				"type"               : "test" if job.test else "release",
 				"config"             : job.get_config(),
 			}
 
 			# Send build information to the builder.
 			self.finish(ret)
-		except:
-			# If anything went wrong, we reset the state.
-			job.state = "pending"
-			raise
-
-	@property
-	def heartbeat(self):
-		return 15 # 15 seconds
-
-	@property
-	def max_runtime(self):
-		timeout = self.get_argument_int("timeout", None)
-		if timeout:
-			return timeout - self.heartbeat
-
-		return 300 # 5 min
 
 
 class BuildersJobsStateHandler(BuildersBaseHandler):

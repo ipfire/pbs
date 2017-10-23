@@ -101,18 +101,6 @@ CREATE TYPE builds_history_action AS ENUM (
 ALTER TYPE builds_history_action OWNER TO pakfire;
 
 --
--- Name: builds_public; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_public AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builds_public OWNER TO pakfire;
-
---
 -- Name: builds_severity; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -575,7 +563,6 @@ CREATE TABLE builders (
     cpu_arch text,
     cpu_bogomips double precision,
     memory bigint DEFAULT 0 NOT NULL,
-    overload builders_overload DEFAULT 'N'::builders_overload NOT NULL,
     free_space bigint DEFAULT 0 NOT NULL,
     host_key_id text,
     time_created timestamp without time zone DEFAULT now() NOT NULL,
@@ -660,18 +647,17 @@ CREATE TABLE builds (
     uuid text NOT NULL,
     pkg_id integer NOT NULL,
     type builds_type DEFAULT 'release'::builds_type NOT NULL,
-    state builds_state DEFAULT 'building'::builds_state NOT NULL,
+    state text DEFAULT 'building'::text NOT NULL,
     severity builds_severity,
     message text,
-    time_created timestamp without time zone NOT NULL,
+    time_created timestamp without time zone DEFAULT now() NOT NULL,
     update_year integer,
     update_num integer,
     depends_on integer,
     distro_id integer NOT NULL,
     owner_id integer,
-    public builds_public DEFAULT 'Y'::builds_public NOT NULL,
     priority integer DEFAULT 0 NOT NULL,
-    auto_move builds_auto_move DEFAULT 'N'::builds_auto_move NOT NULL
+    auto_move boolean DEFAULT false NOT NULL
 );
 
 
@@ -759,7 +745,7 @@ CREATE TABLE builds_comments (
     build_id integer NOT NULL,
     user_id integer NOT NULL,
     text text NOT NULL,
-    credit integer NOT NULL,
+    score integer NOT NULL,
     time_created timestamp without time zone NOT NULL,
     time_updated timestamp without time zone
 );
@@ -847,95 +833,24 @@ ALTER SEQUENCE builds_id_seq OWNED BY builds.id;
 
 
 --
--- Name: packages; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE packages (
-    id integer NOT NULL,
-    name text NOT NULL,
-    epoch integer NOT NULL,
-    version text NOT NULL,
-    release text NOT NULL,
-    type packages_type NOT NULL,
-    arch text NOT NULL,
-    groups text NOT NULL,
-    maintainer text NOT NULL,
-    license text NOT NULL,
-    url text NOT NULL,
-    summary text NOT NULL,
-    description text NOT NULL,
-    size bigint NOT NULL,
-    supported_arches text,
-    uuid text NOT NULL,
-    commit_id integer,
-    build_id text NOT NULL,
-    build_host text NOT NULL,
-    build_time timestamp without time zone NOT NULL,
-    path text NOT NULL,
-    filesize bigint NOT NULL,
-    hash_sha512 text NOT NULL
-);
-
-
-ALTER TABLE packages OWNER TO pakfire;
-
---
--- Name: repositories_builds; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE repositories_builds (
-    id integer NOT NULL,
-    repo_id integer NOT NULL,
-    build_id bigint NOT NULL,
-    time_added timestamp without time zone NOT NULL
-);
-
-
-ALTER TABLE repositories_builds OWNER TO pakfire;
-
---
--- Name: builds_latest; Type: VIEW; Schema: public; Owner: pakfire
---
-
-CREATE VIEW builds_latest AS
- SELECT builds.id AS build_id,
-    builds.type AS build_type,
-    builds.state AS build_state,
-    packages.name AS package_name,
-    builds.public
-   FROM (builds
-     LEFT JOIN packages ON ((builds.pkg_id = packages.id)))
-  WHERE ((builds.id IN ( SELECT repositories_builds.build_id
-           FROM repositories_builds)) OR ((builds.time_created >= ( SELECT builds_1.time_created
-           FROM ((builds builds_1
-             LEFT JOIN repositories_builds ON ((builds_1.id = repositories_builds.build_id)))
-             LEFT JOIN packages p ON ((builds_1.pkg_id = p.id)))
-          WHERE (p.name = packages.name)
-          ORDER BY builds_1.time_created
-         LIMIT 1)) AND (builds.state <> ALL (ARRAY['obsolete'::builds_state, 'broken'::builds_state]))));
-
-
-ALTER TABLE builds_latest OWNER TO pakfire;
-
---
 -- Name: jobs; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
 CREATE TABLE jobs (
     id integer NOT NULL,
     uuid text NOT NULL,
-    type jobs_type DEFAULT 'build'::jobs_type NOT NULL,
     build_id integer NOT NULL,
     state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
     arch text NOT NULL,
-    time_created timestamp without time zone NOT NULL,
+    time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_started timestamp without time zone,
     time_finished timestamp without time zone,
     start_not_before timestamp without time zone,
     builder_id integer,
-    tries integer DEFAULT 0 NOT NULL,
     aborted_state integer DEFAULT 0 NOT NULL,
-    message text
+    message text,
+    test boolean DEFAULT true NOT NULL,
+    superseeded_by integer
 );
 
 
@@ -946,13 +861,11 @@ ALTER TABLE jobs OWNER TO pakfire;
 --
 
 CREATE VIEW builds_times AS
- SELECT builds.id AS build_id,
+ SELECT jobs.build_id,
     jobs.arch,
-    jobs.type AS job_type,
     (jobs.time_finished - jobs.time_started) AS duration
-   FROM (jobs
-     LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-  WHERE (jobs.state = 'finished'::jobs_state);
+   FROM jobs
+  WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::jobs_state));
 
 
 ALTER TABLE builds_times OWNER TO pakfire;
@@ -1075,7 +988,7 @@ CREATE TABLE filelists (
     size bigint NOT NULL,
     hash_sha512 text,
     type integer NOT NULL,
-    config filelists_config NOT NULL,
+    config boolean NOT NULL,
     mode integer NOT NULL,
     "user" text NOT NULL,
     "group" text NOT NULL,
@@ -1126,7 +1039,6 @@ ALTER SEQUENCE images_types_id_seq OWNED BY images_types.id;
 CREATE VIEW jobs_active AS
  SELECT jobs.id,
     jobs.uuid,
-    jobs.type,
     jobs.build_id,
     jobs.state,
     jobs.arch,
@@ -1135,7 +1047,6 @@ CREATE VIEW jobs_active AS
     jobs.time_finished,
     jobs.start_not_before,
     jobs.builder_id,
-    jobs.tries,
     jobs.aborted_state,
     jobs.message
    FROM jobs
@@ -1151,7 +1062,6 @@ ALTER TABLE jobs_active OWNER TO pakfire;
 
 CREATE TABLE jobs_buildroots (
     job_id integer NOT NULL,
-    tries integer NOT NULL,
     pkg_uuid text NOT NULL,
     pkg_name text NOT NULL
 );
@@ -1238,7 +1148,7 @@ ALTER SEQUENCE jobs_packages_id_seq OWNED BY jobs_packages.id;
 CREATE VIEW jobs_queue AS
  WITH queue AS (
          SELECT jobs.id,
-            rank() OVER (ORDER BY jobs.type, builds.priority DESC, jobs.tries, jobs.time_created) AS rank
+            rank() OVER (ORDER BY (NOT jobs.test), builds.priority DESC, jobs.time_created) AS rank
            FROM (jobs
              LEFT JOIN builds ON ((jobs.build_id = builds.id)))
           WHERE (jobs.state = 'pending'::jobs_state)
@@ -1380,7 +1290,8 @@ CREATE TABLE mirrors (
     path text NOT NULL,
     owner text,
     contact text,
-    deleted boolean DEFAULT false NOT NULL
+    deleted boolean DEFAULT false NOT NULL,
+    supports_https boolean DEFAULT false NOT NULL
 );
 
 
@@ -1482,6 +1393,39 @@ ALTER SEQUENCE mirrors_id_seq OWNED BY mirrors.id;
 
 
 --
+-- Name: packages; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE TABLE packages (
+    id integer NOT NULL,
+    name text NOT NULL,
+    epoch integer NOT NULL,
+    version text NOT NULL,
+    release text NOT NULL,
+    type packages_type NOT NULL,
+    arch text NOT NULL,
+    groups text NOT NULL,
+    maintainer text NOT NULL,
+    license text NOT NULL,
+    url text NOT NULL,
+    summary text NOT NULL,
+    description text NOT NULL,
+    size bigint NOT NULL,
+    supported_arches text,
+    uuid text NOT NULL,
+    commit_id integer,
+    build_id text NOT NULL,
+    build_host text NOT NULL,
+    build_time timestamp without time zone NOT NULL,
+    path text NOT NULL,
+    filesize bigint NOT NULL,
+    hash_sha512 text NOT NULL
+);
+
+
+ALTER TABLE packages OWNER TO pakfire;
+
+--
 -- Name: packages_deps; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -1522,7 +1466,7 @@ ALTER SEQUENCE packages_id_seq OWNED BY packages.id;
 CREATE TABLE packages_properties (
     id integer NOT NULL,
     name text NOT NULL,
-    critical_path packages_properties_critical_path DEFAULT 'N'::packages_properties_critical_path NOT NULL,
+    critical_path boolean DEFAULT false NOT NULL,
     priority integer DEFAULT 0 NOT NULL
 );
 
@@ -1556,7 +1500,8 @@ ALTER SEQUENCE packages_properties_id_seq OWNED BY packages_properties.id;
 
 CREATE TABLE queue_delete (
     id integer NOT NULL,
-    path text NOT NULL
+    path text NOT NULL,
+    not_before timestamp without time zone
 );
 
 
@@ -1616,9 +1561,10 @@ CREATE TABLE repositories (
     last_update timestamp without time zone,
     time_min integer DEFAULT 0 NOT NULL,
     time_max integer DEFAULT 0 NOT NULL,
-    update_started timestamp without time zone,
-    update_ended timestamp without time zone,
-    deleted boolean DEFAULT false NOT NULL
+    deleted boolean DEFAULT false NOT NULL,
+    priority integer,
+    user_id integer,
+    update_forced boolean DEFAULT false NOT NULL
 );
 
 
@@ -1660,6 +1606,20 @@ ALTER TABLE repositories_aux_id_seq OWNER TO pakfire;
 
 ALTER SEQUENCE repositories_aux_id_seq OWNED BY repositories_aux.id;
 
+
+--
+-- Name: repositories_builds; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE TABLE repositories_builds (
+    id integer NOT NULL,
+    repo_id integer NOT NULL,
+    build_id bigint NOT NULL,
+    time_added timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE repositories_builds OWNER TO pakfire;
 
 --
 -- Name: repositories_builds_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
@@ -1772,39 +1732,6 @@ CREATE TABLE settings (
 ALTER TABLE settings OWNER TO pakfire;
 
 --
--- Name: slogans; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE slogans (
-    id integer NOT NULL,
-    message text NOT NULL
-);
-
-
-ALTER TABLE slogans OWNER TO pakfire;
-
---
--- Name: slogans_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
---
-
-CREATE SEQUENCE slogans_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE slogans_id_seq OWNER TO pakfire;
-
---
--- Name: slogans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
---
-
-ALTER SEQUENCE slogans_id_seq OWNED BY slogans.id;
-
-
---
 -- Name: sources; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -1836,7 +1763,8 @@ CREATE TABLE sources_commits (
     subject text NOT NULL,
     body text NOT NULL,
     date timestamp without time zone NOT NULL,
-    state sources_commits_state DEFAULT 'pending'::sources_commits_state NOT NULL
+    state sources_commits_state DEFAULT 'pending'::sources_commits_state NOT NULL,
+    imported_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -1897,7 +1825,7 @@ CREATE TABLE uploads (
     hash text NOT NULL,
     size bigint NOT NULL,
     progress bigint DEFAULT 0 NOT NULL,
-    finished uploads_finished DEFAULT 'N'::uploads_finished NOT NULL,
+    finished boolean DEFAULT false NOT NULL,
     time_started timestamp without time zone DEFAULT now() NOT NULL,
     time_finished timestamp without time zone
 );
@@ -2271,13 +2199,6 @@ ALTER TABLE ONLY sessions ALTER COLUMN id SET DEFAULT nextval('sessions_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
 --
 
-ALTER TABLE ONLY slogans ALTER COLUMN id SET DEFAULT nextval('slogans_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
---
-
 ALTER TABLE ONLY sources ALTER COLUMN id SET DEFAULT nextval('sources_id_seq'::regclass);
 
 
@@ -2540,14 +2461,6 @@ ALTER TABLE ONLY repositories_builds
 
 
 --
--- Name: idx_2198207_primary; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
---
-
-ALTER TABLE ONLY slogans
-    ADD CONSTRAINT idx_2198207_primary PRIMARY KEY (id);
-
-
---
 -- Name: idx_2198213_primary; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2620,6 +2533,14 @@ ALTER TABLE ONLY mirrors_checks
 
 
 --
+-- Name: repositories_builds_unique; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY repositories_builds
+    ADD CONSTRAINT repositories_builds_unique UNIQUE (repo_id, build_id);
+
+
+--
 -- Name: sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2675,6 +2596,15 @@ CREATE UNIQUE INDEX distributions_sname ON distributions USING btree (sname) WHE
 --
 
 CREATE INDEX filelists_name ON filelists USING btree (name);
+
+
+--
+-- Name: filelists_pkg_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX filelists_pkg_id ON filelists USING btree (pkg_id);
+
+ALTER TABLE filelists CLUSTER ON filelists_pkg_id;
 
 
 --
@@ -2734,13 +2664,6 @@ CREATE INDEX idx_2198018_user_id ON builds_comments USING btree (user_id);
 
 
 --
--- Name: idx_2198052_pkg_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198052_pkg_id ON filelists USING btree (pkg_id);
-
-
---
 -- Name: idx_2198063_build_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2762,24 +2685,10 @@ CREATE INDEX idx_2198063_time_finished ON jobs USING btree (time_finished);
 
 
 --
--- Name: idx_2198063_type; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198063_type ON jobs USING btree (type);
-
-
---
 -- Name: idx_2198063_uuid; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
 CREATE UNIQUE INDEX idx_2198063_uuid ON jobs USING btree (uuid);
-
-
---
--- Name: idx_2198074_job_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198074_job_id ON jobs_buildroots USING btree (job_id);
 
 
 --
@@ -2906,6 +2815,15 @@ CREATE INDEX idx_2198256_user_id ON users_emails USING btree (user_id);
 --
 
 CREATE INDEX jobs_arch ON jobs USING btree (arch);
+
+
+--
+-- Name: jobs_buildroots_job_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_buildroots_job_id ON jobs_buildroots USING btree (job_id);
+
+ALTER TABLE jobs_buildroots CLUSTER ON jobs_buildroots_job_id;
 
 
 --
@@ -3312,6 +3230,14 @@ ALTER TABLE ONLY repositories
 
 ALTER TABLE ONLY repositories
     ADD CONSTRAINT repositories_parent_id FOREIGN KEY (parent_id) REFERENCES repositories(id);
+
+
+--
+-- Name: repositories_user_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY repositories
+    ADD CONSTRAINT repositories_user_id FOREIGN KEY (user_id) REFERENCES users(id);
 
 
 --

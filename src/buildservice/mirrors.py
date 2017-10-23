@@ -17,22 +17,23 @@ log.propagate = 1
 from .decorators import lazy_property
 
 class Mirrors(base.Object):
-	def __iter__(self):
-		res = self.db.query("SELECT * FROM mirrors \
-			WHERE deleted IS FALSE ORDER BY hostname")
-
-		mirrors = []
-		for row in res:
-			mirror = Mirror(self.backend, row.id, data=row)
-			mirrors.append(mirror)
-
-		return iter(mirrors)
-
 	def _get_mirror(self, query, *args):
 		res = self.db.get(query, *args)
 
 		if res:
 			return Mirror(self.backend, res.id, data=res)
+
+	def _get_mirrors(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Mirror(self.backend, row.id, data=row)
+
+	def __iter__(self):
+		mirrors = self._get_mirrors("SELECT * FROM mirrors \
+			WHERE deleted IS FALSE ORDER BY hostname")
+
+		return iter(mirrors)
 
 	def create(self, hostname, path="", owner=None, contact=None, user=None):
 		mirror = self._get_mirror("INSERT INTO mirrors(hostname, path, owner, contact) \
@@ -42,21 +43,6 @@ class Mirrors(base.Object):
 		mirror.log("created", user=user)
 
 		return mirror
-
-	def get_random(self, limit=None):
-		query = "SELECT id FROM mirrors WHERE status = 'enabled' ORDER BY RAND()"
-		args  = []
-
-		if limit:
-			query += " LIMIT %s"
-			args.append(limit)
-
-		mirrors = []
-		for mirror in self.db.query(query, *args):
-			mirror = Mirror(self.pakfire, mirror.id)
-			mirrors.append(mirror)
-
-		return mirrors
 
 	def get_by_id(self, id):
 		return self._get_mirror("SELECT * FROM mirrors WHERE id = %s", id)
@@ -75,10 +61,7 @@ class Mirrors(base.Object):
 		mirrors = []
 
 		# Walk through all mirrors
-		for mirror in self.get_all():
-			if not mirror.enabled:
-				continue
-
+		for mirror in self:
 			if mirror.country_code == country_code:
 				mirrors.append(mirror)
 
@@ -149,6 +132,11 @@ class Mirror(base.DataObject):
 
 	hostname = property(lambda self: self.data.hostname, set_hostname)
 
+	def set_deleted(self, deleted):
+		self._set_attribute("deleted", deleted)
+
+	deleted = property(lambda s: s.data.deleted, set_deleted)
+
 	@property
 	def path(self):
 		return self.data.path
@@ -163,12 +151,21 @@ class Mirror(base.DataObject):
 		return self.make_url()
 
 	def make_url(self, path=""):
-		url = "http://%s%s" % (self.hostname, self.path)
+		url = "%s://%s%s" % (
+			"https" if self.supports_https else "http",
+			self.hostname,
+			self.path
+		)
 
 		if path.startswith("/"):
 			path = path[1:]
 
 		return urlparse.urljoin(url, path)
+
+	def set_supports_https(self, supports_https):
+		self._set_attribute("supports_https", supports_https)
+
+	supports_https = property(lambda s: s.data.supports_https, set_supports_https)
 
 	def set_owner(self, owner):
 		self._set_attribute("owner", owner)
@@ -208,16 +205,22 @@ class Mirror(base.DataObject):
 			# in seconds since epoch UTC
 			try:
 				timestamp = int(response.body)
+
+			# If we could not parse the timestamp, we probably got
+			# an error page or something similar.
+			# So that's an error then...
 			except ValueError:
-				raise
+				status = "ERROR"
 
-			# Convert to datetime
-			last_sync_at = datetime.datetime.utcfromtimestamp(timestamp)
+			# Timestamp seems to be okay
+			else:
+				# Convert to datetime
+				last_sync_at = datetime.datetime.utcfromtimestamp(timestamp)
 
-			# Must have synced within 24 hours
-			now = datetime.datetime.utcnow()
-			if now - last_sync_at >= datetime.timedelta(hours=24):
-				status = "OUTOFSYNC"
+				# Must have synced within 24 hours
+				now = datetime.datetime.utcnow()
+				if now - last_sync_at >= datetime.timedelta(hours=24):
+					status = "OUTOFSYNC"
 
 		except tornado.httpclient.HTTPError as e:
 			http_status = e.code

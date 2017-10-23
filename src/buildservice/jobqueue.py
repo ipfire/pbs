@@ -77,3 +77,14 @@ class JobQueue(base.Object):
 					if job.arch == arch:
 						job.schedule("test")
 						break
+
+	def check_build_dependencies(self):
+		jobs = self.backend.jobs._get_jobs("SELECT * FROM jobs \
+			WHERE state = 'new' OR \
+				(state = 'dependency_error' AND time_finished < NOW() - '5 minutes'::interval) \
+			ORDER BY time_finished LIMIT 50")
+
+		for job in jobs:
+			with self.db.transaction():
+				# Resolve the dependencies
+				job.resolvdep()

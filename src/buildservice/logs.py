@@ -75,8 +75,8 @@ class CommentLogEntry(LogEntry):
 		return self.data.time_created
 
 	@property
-	def credit(self):
-		return self.data.credit
+	def score(self):
+		return self.data.score
 
 	@property
 	def build_id(self):
@@ -88,9 +88,9 @@ class CommentLogEntry(LogEntry):
 
 	@property
 	def vote(self):
-		if self.credit > 0:
+		if self.score > 0:
 			return "up"
-		elif self.credit < 0:
+		elif self.score < 0:
 			return "down"
 
 		return "none"

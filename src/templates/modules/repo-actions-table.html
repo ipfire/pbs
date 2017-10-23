@@ -15,10 +15,10 @@
 
 			<div id="action-info-{{ action.id }}">
 				<p>
-					{% if action.credits_needed %}
-						{{ _("%(credits)s more credit needed.", "%(credits)s more credits needed.", action.credits_needed) % { "credits" : action.credits_needed } }}
+					{% if action.score_needed %}
+						{{ _("One more score needed.", "%(score)s more scores needed.", action.score_needed) % { "score" : action.score_needed } }}
 					{% else %}
-						{{ _("No more credits needed.") }}
+						{{ _("No more scores needed.") }}
 					{% end %}
 					<br />
 					{% if action.pkg.maintainer %}

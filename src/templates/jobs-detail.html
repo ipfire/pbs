@@ -135,12 +135,6 @@
 									{{ format_date(job.time_finished, full_format=True) }}
 								</p>
 							{% end %}
-							{% if job.is_running() %}
-								<p>
-									<strong>{{ _("ETA") }}</strong><br>
-									{{ format_eta(job.eta) }}
-								</p>
-							{% end %}
 					</div>
 				</div>
 			</div>
@@ -154,11 +148,11 @@
 				<p class="muted">{{ _("No logs available, yet.") }}</p>
 			{% end %}
 
-			{% if job.has_buildroot() %}
+			{% if job.buildroot %}
 				<hr>
 				<p class="ac">
-					<a href="/job/{{ job.uuid }}/buildroot?tries={{ job.tries }}">{{ _("Buildroot") }}</a>
-					({{ _("%s package", "%s packages", job.has_buildroot()) % job.has_buildroot() }})
+					<a href="/job/{{ job.uuid }}/buildroot">{{ _("Buildroot") }}</a>
+					({{ _("%s package", "%s packages", len(job.buildroot)) % len(job.buildroot) }})
 				</p>
 			{% end %}
 		</div>

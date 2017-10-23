@@ -3,12 +3,16 @@
 import datetime
 import logging
 import os
+import pakfire
+import pakfire.config
+import shutil
 import subprocess
+import tempfile
 
 from . import base
-from . import database
 from . import git
 
+from .constants import *
 from .decorators import *
 
 class Sources(base.Object):
@@ -52,23 +56,6 @@ class Sources(base.Object):
 
 		return self.db.execute(query, revision, source_id)
 
-	def get_pending_commits(self, limit=None):
-		query = "SELECT id FROM sources_commits WHERE state = 'pending' ORDER BY id ASC"
-		args = []
-
-		if limit:
-			query += " LIMIT %s"
-			args.append(limit)
-
-		rows = self.db.query(query, *args)
-
-		commits = []
-		for row in rows:
-			commit = Commit(self.pakfire, row.id)
-			commits.append(commit)
-
-		return commits
-
 	def get_commit_by_id(self, commit_id):
 		commit = self.db.get("SELECT id FROM sources_commits WHERE id = %s", commit_id)
 
@@ -77,19 +64,85 @@ class Sources(base.Object):
 
 	def pull(self):
 		for source in self:
-			repo = git.Repo(self.backend, source, mode="mirror")
-
-			# If the repository is not yet cloned, we need to make a local
-			# clone to work with.
-			if not repo.cloned:
-				repo.clone()
-
-			# Otherwise we just fetch updates.
-			else:
+			with git.Repo(self.backend, source, mode="mirror") as repo:
+				# Fetch the latest updates
 				repo.fetch()
 
-			# Import all new revisions.
-			repo.import_revisions()
+				# Import all new revisions
+				repo.import_revisions()
+
+	def dist(self):
+		# Walk through all source repositories
+		for source in self:
+			# Get access to the git repo
+			with git.Repo(self.pakfire, source) as repo:
+				# Walk through all pending commits
+				for commit in source.pending_commits:
+					commit.state = "running"
+
+					logging.debug("Processing commit %s: %s" % (commit.revision, commit.subject))
+
+					# Navigate to the right revision.
+					repo.checkout(commit.revision)
+
+					# Get all changed makefiles.
+					deleted_files = []
+					updated_files = []
+
+					for file in repo.changed_files(commit.revision):
+						# Don't care about files that are not a makefile.
+						if not file.endswith(".%s" % MAKEFILE_EXTENSION):
+							continue
+
+						if os.path.exists(file):
+							updated_files.append(file)
+						else:
+							deleted_files.append(file)
+
+						if updated_files:
+							# Create a temporary directory where to put all the files
+							# that are generated here.
+							pkg_dir = tempfile.mkdtemp()
+
+							try:
+								config = pakfire.config.Config(["general.conf",])
+								config.parse(source.distro.get_config())
+
+								p = pakfire.PakfireServer(config=config)
+
+								pkgs = []
+								for file in updated_files:
+									try:
+										pkg_file = p.dist(file, pkg_dir)
+										pkgs.append(pkg_file)
+									except:
+										raise
+
+								# Import all packages in one swoop.
+								for pkg in pkgs:
+									with self.db.transaction():
+										self.backend.builds.create_from_source_package(pkg,
+											source.distro, commit=commit, type="release")
+
+							except:
+								if commit:
+									commit.state = "failed"
+
+								raise
+
+							finally:
+								if os.path.exists(pkg_dir):
+									shutil.rmtree(pkg_dir)
+
+						for file in deleted_files:
+							# Determine the name of the package.
+							name = os.path.basename(file)
+							name = name[:len(MAKEFILE_EXTENSION) + 1]
+
+							source.distro.delete_package(name)
+
+						if commit:
+							commit.state = "finished"
 
 
 class Commit(base.DataObject):
@@ -184,8 +237,8 @@ class Source(base.DataObject):
 
 	def create_commit(self, revision, author, committer, subject, body, date):
 		commit = self.backend.sources._get_commit("INSERT INTO sources_commits(source_id, \
-			revision, author, committer, subject, body, date) VALUES(%s, %s, %s, %s, %s, %s, %s)",
-			self.id, revision, author, committer, subject, body, date)
+			revision, author, committer, subject, body, date) VALUES(%s, %s, %s, %s, %s, %s, %s) \
+			RETURNING *", self.id, revision, author, committer, subject, body, date)
 
 		# Commit
 		commit.source = self
@@ -256,3 +309,8 @@ class Source(base.DataObject):
 		if commit:
 			commit.source = self
 			return commit
+
+	@property
+	def pending_commits(self):
+		return self.backend.sources._get_commits("SELECT * FROM sources_commits \
+			WHERE state = %s ORDER BY imported_at", "pending")

@@ -76,18 +76,6 @@ class Builders(base.Object):
 		return self._get_builder("SELECT * FROM builders \
 			WHERE name = %s AND deleted IS FALSE", name)
 
-	def get_load(self):
-		res1 = self.db.get("SELECT SUM(max_jobs) AS max_jobs FROM builders \
-			WHERE enabled IS TRUE and deleted IS FALSE")
-
-		res2 = self.db.get("SELECT COUNT(*) AS count FROM jobs \
-			WHERE state = 'dispatching' OR state = 'running' OR state = 'uploading'")
-
-		try:
-			return (res2.count * 100 / res1.max_jobs)
-		except:
-			return 0
-
 	def get_history(self, limit=None, offset=None, builder=None, user=None):
 		query = "SELECT * FROM builders_history"
 		args  = []
@@ -346,13 +334,6 @@ class Builder(base.DataObject):
 		return self.data.space_free
 
 	@property
-	def overload(self):
-		if not self.cpu_count or not self.loadavg1:
-			return None
-
-		return self.loadavg1 >= self.cpu_count
-
-	@property
 	def host_key_id(self):
 		return self.data.host_key_id
 
@@ -388,13 +369,17 @@ class Builder(base.DataObject):
 		"""
 			Returns the next job in line for this builder.
 		"""
+		# Don't send any jobs to disabled builders
+		if not self.enabled:
+			return
+
 		# Don't return anything if the builder has already too many jobs running
 		if self.too_many_jobs:
 			return
 
 		for job in self.jobqueue:
 			# Only allow building test jobs in test mode
-			if self.testmode and not job.type == "test":
+			if self.testmode and not job.test:
 				continue
 
 			return job

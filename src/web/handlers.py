@@ -10,7 +10,6 @@ from .handlers_builders import *
 from .handlers_distro import *
 from .handlers_jobs import *
 from .handlers_keys import *
-from .handlers_mirrors import *
 from .handlers_packages import *
 from .handlers_search import *
 from .handlers_updates import *
@@ -62,9 +61,7 @@ class UploadsHandler(BaseHandler):
 		if not self.current_user.is_admin():
 			raise tornado.web.HTTPError(403)
 
-		uploads = self.pakfire.uploads.get_all()
-
-		self.render("uploads-list.html", uploads=uploads)
+		self.render("uploads-list.html", uploads=self.backend.uploads)
 
 
 class DocsIndexHandler(BaseHandler):
@@ -204,6 +201,10 @@ class RepositoryMirrorlistHandler(BaseHandler):
 		if not repo:
 			raise tornado.web.HTTPError(404)
 
+		# Send nothing if repository isn't supposed to be mirrored
+		if not repo.mirrored:
+			raise tornado.web.HTTPError(404)
+
 		# This is a plaintext file.
 		self.set_header("Content-Type", "text/plain")
 
@@ -219,51 +220,27 @@ class RepositoryMirrorlistHandler(BaseHandler):
 		# A list with mirrors that are sent to the user.
 		mirrors = []
 
-		# Only search for mirrors on repositories that are supposed to be found
-		# on mirror servers.
+		# Select a list of preferred mirrors
+		for mirror in self.mirrors.get_for_location(self.current_address):
+			mirrors.append({
+				"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
+				"location"  : mirror.country_code,
+				"preferred" : 1,
+			})
 
-		if repo.mirrored:
-			# Select a list of preferred mirrors
-			for mirror in self.mirrors.get_for_location(self.current_address):
-				mirrors.append({
-					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
-					"location"  : mirror.country_code,
-					"preferred" : 1,
-				})
+		# Add all other mirrors at the end in a random order
+		remaining_mirrors = [m for m in self.backend.mirrors if not m in mirrors]
+		random.shuffle(remaining_mirrors)
 
-			# Add all other mirrors at the end in a random order
-			remaining_mirrors = [m for m in self.backend.mirrors if not m in mirrors]
-			random.shuffle(remaining_mirrors)
-
-			for mirror in remaining_mirrors:
-				mirrors.append({
-					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
-					"location"  : mirror.country_code,
-					"preferred" : 0,
-				})
-
-		else:
-			repo_baseurl = self.pakfire.settings.get("repository_baseurl")
-			if repo_baseurl.endswith("/"):
-				repo_baseurl = repo_baseurl[:-1]
-
-			for mirror in self.mirrors.get_all():
-				print mirror.url, repo_baseurl
-				if not mirror.url == repo_baseurl:
-					continue
-
-				mirror = {
-					"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
-					"location"  : mirror.country_code,
-					"preferred" : 0,
-				}
-
-				mirrors.append(mirror)
-				break
+		for mirror in remaining_mirrors:
+			mirrors.append({
+				"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
+				"location"  : mirror.country_code,
+				"preferred" : 0,
+			})
 
 		ret["mirrors"] = mirrors
-		self.write(ret)
-		
+		self.finish(ret)
 
 
 class RepoActionHandler(BaseHandler):

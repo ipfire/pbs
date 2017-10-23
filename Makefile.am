@@ -67,7 +67,6 @@ dist_doc_DATA = \
 dist_bin_SCRIPTS = \
 	src/scripts/pakfire-build-service \
 	src/scripts/pakfire-hub \
-	src/scripts/pakfire-manager \
 	src/scripts/pakfire-web
 
 dist_configs_DATA = \
@@ -89,6 +88,7 @@ buildservice_PYTHON = \
 	src/buildservice/geoip.py \
 	src/buildservice/git.py \
 	src/buildservice/jobqueue.py \
+	src/buildservice/jobs.py \
 	src/buildservice/keys.py \
 	src/buildservice/logs.py \
 	src/buildservice/messages.py \
@@ -96,7 +96,6 @@ buildservice_PYTHON = \
 	src/buildservice/misc.py \
 	src/buildservice/packages.py \
 	src/buildservice/repository.py \
-	src/buildservice/scheduler.py \
 	src/buildservice/sessions.py \
 	src/buildservice/settings.py \
 	src/buildservice/sources.py \
@@ -121,13 +120,6 @@ hub_PYTHON = \
 
 hubdir = $(buildservicedir)/hub
 
-manager_PYTHON = \
-	src/manager/__init__.py \
-	src/manager/base.py \
-	src/manager/builds.py
-
-managerdir = $(buildservicedir)/manager
-
 web_PYTHON = \
 	src/web/__init__.py \
 	src/web/handlers.py \
@@ -139,11 +131,11 @@ web_PYTHON = \
 	src/web/handlers_distro.py \
 	src/web/handlers_jobs.py \
 	src/web/handlers_keys.py \
-	src/web/handlers_mirrors.py \
 	src/web/handlers_packages.py \
 	src/web/handlers_search.py \
 	src/web/handlers_updates.py \
 	src/web/handlers_users.py \
+	src/web/mirrors.py \
 	src/web/ui_modules.py
 
 webdir = $(buildservicedir)/web
@@ -195,11 +187,6 @@ dist_templates_DATA = \
 	src/templates/keys-list.html \
 	src/templates/log.html \
 	src/templates/login.html \
-	src/templates/mirrors-delete.html \
-	src/templates/mirrors-detail.html \
-	src/templates/mirrors-edit.html \
-	src/templates/mirrors-list.html \
-	src/templates/mirrors-new.html \
 	src/templates/package-detail.html \
 	src/templates/package-detail-list.html \
 	src/templates/package-properties.html \
@@ -254,6 +241,15 @@ dist_templates_errors_DATA = \
 
 templates_errorsdir = $(templatesdir)/errors
 
+dist_templates_mirrors_DATA = \
+	src/templates/mirrors/delete.html \
+	src/templates/mirrors/detail.html \
+	src/templates/mirrors/edit.html \
+	src/templates/mirrors/list.html \
+	src/templates/mirrors/new.html
+
+templates_mirrorsdir = $(templatesdir)/mirrors
+
 dist_templates_modules_DATA = \
 	src/templates/modules/bugs-table.html \
 	src/templates/modules/build-headline.html \
@@ -289,11 +285,6 @@ dist_templates_modules_DATA = \
 	src/templates/modules/watchers-sidebar-table.html
 
 templates_modulesdir = $(templatesdir)/modules
-
-dist_templates_modules_builders_DATA = \
-	src/templates/modules/builders/load.html
-
-templates_modules_buildersdir = $(templates_modulesdir)/builders
 
 dist_templates_modules_changelog_DATA = \
 	src/templates/modules/changelog/entry.html \
