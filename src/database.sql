@@ -1561,8 +1561,6 @@ CREATE TABLE repositories (
     last_update timestamp without time zone,
     time_min integer DEFAULT 0 NOT NULL,
     time_max integer DEFAULT 0 NOT NULL,
-    update_started timestamp without time zone,
-    update_ended timestamp without time zone,
     deleted boolean DEFAULT false NOT NULL,
     priority integer,
     user_id integer
