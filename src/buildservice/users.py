@@ -132,7 +132,9 @@ class Users(base.Object):
 		return user
 
 	def register(self, name, password, email, realname, locale=None):
-		return User.new(self.pakfire, name, password, email, realname, locale)
+		user = User.new(self.pakfire, name, email, realname, locale)
+		user.passphrase = password
+		return user
 
 	def name_is_used(self, name):
 		users = self.db.query("SELECT id FROM users WHERE name = %s", name)
@@ -241,9 +243,9 @@ class User(base.Object):
 		return cmp(self.realname, other.realname)
 
 	@classmethod
-	def new(cls, pakfire, name, passphrase, email, realname, locale=None):
-		id = pakfire.db.execute("INSERT INTO users(name, passphrase, realname) \
-			VALUES(%s, %s, %s)", name, generate_password_hash(passphrase), realname)
+	def new(cls, pakfire, name , email, realname, locale=None):
+		id = pakfire.db.execute("INSERT INTO users(name, realname) \
+			VALUES(%s, %s)", name, realname)
 
 		# Add email address.
 		pakfire.db.execute("INSERT INTO users_emails(user_id, email, primary) \
