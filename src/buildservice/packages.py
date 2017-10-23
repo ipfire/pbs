@@ -466,20 +466,21 @@ class Package(base.DataObject):
 	## properties
 
 	def update_property(self, key, value):
-		if self.property:
-			self.db.execute("UPDATE packages_properties SET %s = %%s WHERE name = %%s" % key, value, self.name)
+		if self.properties:
+			self.db.execute("UPDATE packages_properties SET %s = %%s \
+				WHERE name = %%s" % key, value, self.name)
 		else:
-			self.db.execute("INSERT INTO packages_properties(name, %s) VALUES(%%s, %%s)" % key, self.name, value)
+			self.db.execute("INSERT INTO packages_properties(name, %s) \
+				VALUES(%%s, %%s)" % key, self.name, value)
 
 		# Update cache
-		self.property[key] = value
+		self.properties[key] = value
 
 	@lazy_property
 	def properties(self):
 		res = self.db.get("SELECT * FROM packages_properties WHERE name = %s", self.name)
 
 		ret = {}
-
 		if res:
 			for key in res:
 				if key in ("id", "name"):
