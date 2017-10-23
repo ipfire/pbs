@@ -55,12 +55,14 @@ class Cli(object):
 		}
 
 	def __call__(self, *args):
-		if not len(args) >= 2:
+		# Parse tornado settings
+		args = tornado.options.parse_command_line(args)
+
+		if not len(args) >= 1:
 			print >>sys.stderr, "Insufficient number of arguments"
 			return 2
 
 		args = list(args)
-		basename = args.pop(0)
 		command  = args.pop(0)
 
 		# Get called command
