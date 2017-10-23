@@ -128,8 +128,13 @@ class Backend(object):
 
 		return database.Connection(hostname, name, user=user, password=password)
 
+	def delete_file(self, path, not_before=None):
+		self.db.execute("INSERT INTO queue_delete(path, not_before) \
+			VALUES(%s, %s)", path, not_before)
+
 	def cleanup_files(self):
-		query = self.db.query("SELECT * FROM queue_delete")
+		query = self.db.query("SELECT * FROM queue_delete \
+			WHERE (not_before IS NULL OR not_before >= NOW())")
 
 		for row in query:
 			if not row.path:

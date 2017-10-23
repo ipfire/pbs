@@ -1500,7 +1500,8 @@ ALTER SEQUENCE packages_properties_id_seq OWNED BY packages_properties.id;
 
 CREATE TABLE queue_delete (
     id integer NOT NULL,
-    path text NOT NULL
+    path text NOT NULL,
+    not_before timestamp without time zone
 );
 
 
