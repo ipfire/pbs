@@ -6,6 +6,7 @@ import ConfigParser
 import logging
 import os
 import pakfire
+import shutil
 
 from . import arches
 from . import bugtracker
@@ -137,35 +138,20 @@ class Backend(object):
 			WHERE (not_before IS NULL OR not_before <= NOW())")
 
 		for row in query:
-			if not row.path:
-				continue
-
 			path = row.path
+
 			if not path.startswith("/"):
 				path = os.path.join(PACKAGES_DIR, path)
 
+			if not path or not paths.startswith("%s/" % PAKFIRE_DIR):
+				log.warning("Cannot delete file outside of the tree")
+				continue
+
 			try:
 				logging.debug("Removing %s..." % path)
-				os.unlink(path)
-			except OSError, e:
+				shutil.rmtree(path)
+			except shutil.Error as e:
 				logging.error("Could not remove %s: %s" % (path, e))
-
-			while True:			
-				path = os.path.dirname(path)
-
-				# Stop if we are running outside of the tree.
-				if not path.startswith(PACKAGES_DIR):
-					break
-
-				# If the directory is not empty, we cannot remove it.
-				if os.path.exists(path) and os.listdir(path):
-					break
-
-				try:
-					logging.debug("Removing %s..." % path)
-					os.rmdir(path)
-				except OSError, e:
-					logging.error("Could not remove %s: %s" % (path, e))
-					break
+				continue
 
 			self.db.execute("DELETE FROM queue_delete WHERE id = %s", row.id)
