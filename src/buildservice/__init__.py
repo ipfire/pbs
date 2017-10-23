@@ -134,7 +134,7 @@ class Backend(object):
 
 	def cleanup_files(self):
 		query = self.db.query("SELECT * FROM queue_delete \
-			WHERE (not_before IS NULL OR not_before >= NOW())")
+			WHERE (not_before IS NULL OR not_before <= NOW())")
 
 		for row in query:
 			if not row.path:
