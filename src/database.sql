@@ -2534,6 +2534,14 @@ ALTER TABLE ONLY mirrors_checks
 
 
 --
+-- Name: repositories_builds_unique; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY repositories_builds
+    ADD CONSTRAINT repositories_builds_unique UNIQUE (repo_id, build_id);
+
+
+--
 -- Name: sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
