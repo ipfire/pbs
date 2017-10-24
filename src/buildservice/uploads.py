@@ -139,7 +139,7 @@ class Upload(base.DataObject):
 			return False
 
 		# Calculate a hash to validate the upload.
-		hash = misc.calc_hash1(self.path)
+		hash = misc.calc_hash(self.path, "sha1")
 
 		if not self.hash == hash:
 			logging.error("Hash did not match: %s != %s" % (self.hash, hash))

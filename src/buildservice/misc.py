@@ -92,11 +92,6 @@ def calc_hash(filename, algo="sha512"):
 
 	return h.hexdigest()
 
-def calc_hash1(filename):
-	# XXX COMPAT FUNCTION
-	# to be removed
-	return calc_hash(filename, "sha1")
-
 def guess_filetype(filename):
 	# XXX very cheap check. Need to do better here.
 	if tarfile.is_tarfile(filename):
