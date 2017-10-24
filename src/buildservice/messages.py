@@ -80,8 +80,7 @@ class Messages(base.Object):
 			# Add the message to the queue that it is sent.
 			self.add(recipient, _subject, _body)
 
-	@staticmethod
-	def send_msg(msg):
+	def send_msg(self, msg):
 		if not msg.to:
 			logging.warning("Dropping message with empty recipient.")
 			return
