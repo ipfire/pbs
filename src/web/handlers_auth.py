@@ -105,8 +105,7 @@ class ActivationHandler(BaseHandler):
 		code = self.get_argument("code")
 
 		# Check if the activation code matches and then activate the account.
-		if user.activation_code == code:
-			user.activate()
+		if user.activate_email(code):
 
 			# If an admin activated another account, he impersonates it.
 			if self.current_user and self.current_user.is_admin():

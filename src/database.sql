@@ -1899,13 +1899,12 @@ CREATE TABLE users (
     id integer NOT NULL,
     name text NOT NULL,
     realname text,
-    passphrase text NOT NULL,
-    state users_state NOT NULL,
+    passphrase text,
+    state users_state DEFAULT 'user'::users_state NOT NULL,
     locale text,
     timezone text,
-    activated users_activated DEFAULT 'N'::users_activated NOT NULL,
-    activation_code text,
-    deleted users_deleted DEFAULT 'N'::users_deleted NOT NULL,
+    activated boolean DEFAULT false NOT NULL,
+    deleted boolean DEFAULT false NOT NULL,
     registered timestamp without time zone DEFAULT now() NOT NULL
 );
 
@@ -1920,7 +1919,9 @@ CREATE TABLE users_emails (
     id integer NOT NULL,
     user_id integer NOT NULL,
     email text NOT NULL,
-    "primary" users_emails_primary DEFAULT 'N'::users_emails_primary NOT NULL
+    "primary" boolean DEFAULT false NOT NULL,
+    activated boolean DEFAULT false NOT NULL,
+    activation_code text
 );
 
 
