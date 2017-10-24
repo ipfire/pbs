@@ -5,6 +5,7 @@ from __future__ import division
 import hashlib
 import os
 import re
+import tarfile
 
 from tornado.escape import xhtml_escape
 
