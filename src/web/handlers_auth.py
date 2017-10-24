@@ -64,14 +64,14 @@ class RegisterHandler(BaseHandler):
 
 		if not name:
 			msgs.append(_("No username provided."))
-		elif self.pakfire.users.name_is_used(name):
+		elif self.backend.users.get_by_name(name):
 			msgs.append(_("The given username is already taken."))
 
 		if not email:
 			msgs.append(_("No email address provided."))
 		elif not "@" in email:
 			msgs.append(_("Email address is invalid."))
-		elif self.pakfire.users.email_is_used(email):
+		elif self.backend.users.get_by_email(email):
 			msgs.append(_("The given email address is already used for another account."))
 
 		# Check if the passphrase is okay.
@@ -90,8 +90,17 @@ class RegisterHandler(BaseHandler):
 
 		# All provided data seems okay.
 		# Register the new user to the database.
-		user = self.pakfire.users.register(name, pass1, email, realname,
-			self.locale.code)
+		with self.db.transaction():
+			user = self.backend.users.create(name, realname=realname)
+
+			# Set passphrase
+			user.passphrase = pass1
+
+			# Add email address
+			user.add_email(email)
+
+			# Save locale
+			user.locale = self.locale.code
 
 		self.render("register-success.html", user=user)
 
@@ -105,22 +114,22 @@ class ActivationHandler(BaseHandler):
 		code = self.get_argument("code")
 
 		# Check if the activation code matches and then activate the account.
-		if user.activate_email(code):
+		with self.db.transaction():
+			if user.activate_email(code):
+				# If an admin activated another account, he impersonates it.
+				if self.current_user and self.current_user.is_admin():
+					self.session.start_impersonation(user)
 
-			# If an admin activated another account, he impersonates it.
-			if self.current_user and self.current_user.is_admin():
-				self.session.start_impersonation(user)
+				else:
+					# Automatically login the user.
+					session = sessions.Session.create(self.pakfire, user)
 
-			else:
-				# Automatically login the user.
-				session = sessions.Session.create(self.pakfire, user)
+					# Set a cookie and update the current user.
+					self.set_cookie("session_id", session.id, expires=session.valid_until)
+					self._current_user = user
 
-				# Set a cookie and update the current user.
-				self.set_cookie("session_id", session.id, expires=session.valid_until)
-				self._current_user = user
-
-			self.render("register-activation-success.html", user=user)
-			return
+				self.render("register-activation-success.html", user=user)
+				return
 
 		# Otherwise, show an error message.
 		self.render("register-activation-fail.html")

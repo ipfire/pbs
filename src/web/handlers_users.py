@@ -211,9 +211,7 @@ class UserEditHandler(BaseHandler):
 class UsersHandler(BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
-		users = self.pakfire.users.get_all()
-
-		self.render("user-list.html", users=users)
+		self.render("user-list.html", users=self.backend.users)
 
 
 class UsersBuildsHandler(BaseHandler):

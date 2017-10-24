@@ -346,7 +346,7 @@ class BuildWatchersAddHandler(BaseHandler):
 		watchers = build.get_watchers()
 
 		self.render("builds-watchers-add.html", error_msg=error_msg,
-			build=build, users=self.pakfire.users.get_all(), watchers=watchers)
+			build=build, users=self.pakfire.users, watchers=watchers)
 
 	@tornado.web.authenticated
 	def post(self, uuid):

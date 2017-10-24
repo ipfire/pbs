@@ -368,102 +368,6 @@ CREATE TYPE uploads_finished AS ENUM (
 ALTER TYPE uploads_finished OWNER TO pakfire;
 
 --
--- Name: users_activated; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_activated AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE users_activated OWNER TO pakfire;
-
---
--- Name: users_deleted; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_deleted AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE users_deleted OWNER TO pakfire;
-
---
--- Name: users_emails_primary; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_emails_primary AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_emails_primary OWNER TO pakfire;
-
---
--- Name: users_permissions_create_scratch_builds; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_create_scratch_builds AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE users_permissions_create_scratch_builds OWNER TO pakfire;
-
---
--- Name: users_permissions_maintain_builders; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_maintain_builders AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_maintain_builders OWNER TO pakfire;
-
---
--- Name: users_permissions_manage_critical_path; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_manage_critical_path AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_manage_critical_path OWNER TO pakfire;
-
---
--- Name: users_permissions_manage_mirrors; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_manage_mirrors AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_manage_mirrors OWNER TO pakfire;
-
---
--- Name: users_permissions_vote; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_vote AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_vote OWNER TO pakfire;
-
---
 -- Name: users_state; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -1977,11 +1881,11 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 CREATE TABLE users_permissions (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    create_scratch_builds users_permissions_create_scratch_builds DEFAULT 'N'::users_permissions_create_scratch_builds NOT NULL,
-    maintain_builders users_permissions_maintain_builders DEFAULT 'N'::users_permissions_maintain_builders NOT NULL,
-    manage_critical_path users_permissions_manage_critical_path DEFAULT 'N'::users_permissions_manage_critical_path NOT NULL,
-    manage_mirrors users_permissions_manage_mirrors DEFAULT 'N'::users_permissions_manage_mirrors NOT NULL,
-    vote users_permissions_vote DEFAULT 'N'::users_permissions_vote NOT NULL
+    create_scratch_builds boolean DEFAULT false NOT NULL,
+    maintain_builders boolean DEFAULT false NOT NULL,
+    manage_critical_path boolean DEFAULT false NOT NULL,
+    manage_mirrors boolean DEFAULT false NOT NULL,
+    vote boolean DEFAULT false NOT NULL
 );
 
 
