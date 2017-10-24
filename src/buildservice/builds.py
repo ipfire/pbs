@@ -31,6 +31,11 @@ class Builds(base.Object):
 		for row in res:
 			yield Build(self.backend, row.id, data=row)
 
+	def __iter__(self):
+		builds = self._get_builds("SELECT * FROM builds ORDER BY time_created DESC")
+
+		return iter(builds)
+
 	def get_by_id(self, id, data=None):
 		return Build(self.backend, id, data=data)
 
@@ -39,14 +44,6 @@ class Builds(base.Object):
 
 		if build:
 			return self.get_by_id(build.id)
-
-	def get_all(self, limit=50):
-		query = "SELECT * FROM builds ORDER BY time_created DESC"
-
-		if limit:
-			query += " LIMIT %d" % limit
-
-		return [self.get_by_id(b.id, b) for b in self.db.query(query)]
 
 	def get_by_user(self, user, type=None):
 		args = []

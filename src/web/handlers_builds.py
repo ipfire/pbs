@@ -12,7 +12,13 @@ class BuildsHandler(BaseHandler):
 		except (TypeError, ValueError):
 			limit = 25
 
-		builds = self.pakfire.builds.get_all(limit=limit)
+		builds = []
+		for build in self.backend.builds:
+			builds.append(build)
+
+			limit -= 1
+			if not limit:
+				break
 
 		self.render("build-index.html", builds=builds)
 
