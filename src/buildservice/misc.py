@@ -5,7 +5,6 @@ from __future__ import division
 import hashlib
 import os
 import re
-import tarfile
 
 from tornado.escape import xhtml_escape
 
@@ -76,7 +75,6 @@ def format_filemode(filetype, filemode):
 
 def calc_hash(filename, algo="sha512"):
 	assert algo in hashlib.algorithms
-	assert os.path.exists(filename)
 
 	f = open(filename, "rb")
 	h = hashlib.new(algo)
