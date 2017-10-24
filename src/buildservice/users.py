@@ -12,7 +12,7 @@ import ldap
 import tornado.locale
 
 from . import base
-from . import ldap_ipfire
+from . import ldap
 
 # A list of possible random characters.
 random_chars = string.ascii_letters + string.digits
@@ -73,7 +73,7 @@ def maintainer_split(s):
 
 class Users(base.Object):
 	def init(self):
-		self.ldap = ldap_ipfire.LDAP(self.backend)
+		self.ldap = ldap.LDAP(self.backend)
 
 	def auth(self, name, password):
 		# If either name or password is None, we don't check at all.

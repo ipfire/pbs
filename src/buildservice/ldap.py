@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
+from __future__ import absolute_import
+
 import logging
 import ldap
 import logging
 
 from . import base
 from .decorators import *
-
 
 class LDAP(base.Object):
 	@lazy_property
