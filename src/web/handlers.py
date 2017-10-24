@@ -111,6 +111,7 @@ class SessionsHandler(BaseHandler):
 		users = {}
 
 		for s in self.backend.sessions:
+			print s.user, s.user in users
 			try:
 				users[s.user].append(s)
 			except KeyError:

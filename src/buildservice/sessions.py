@@ -6,17 +6,21 @@ from . import users
 from .decorators import *
 
 class Sessions(base.Object):
+	def _get_session(self, query, *args):
+		res = self.db.get(query, *args)
+
+		if res:
+			return Session(self.backend, res.id, data=res)
+
+	def _get_sessions(self, query, *args):
+		res = self.db.query(query, *args)
+
+		for row in res:
+			yield Session(self.backend, row.id, data=row)
+
 	def __iter__(self):
-		query = "SELECT * FROM sessions WHERE valid_until >= NOW() \
-			ORDER BY valid_until DESC"
-
-		sessions = []
-		for row in self.db.query(query):
-			session = Session(self.backend, row.id, data=row)
-			sessions.append(session)
-
-		# Sort
-		sessions.sort()
+		sessions = self._get_sessions("SELECT * FROM sessions \
+			WHERE valid_until >= NOW() ORDER BY valid_until DESC")
 
 		return iter(sessions)
 
@@ -29,17 +33,12 @@ class Sessions(base.Object):
 		"""
 		session_id = users.generate_random_string(48)
 
-		res = self.db.get("INSERT INTO sessions(session_id, user_id, address, user_agent) \
+		return self._get_session("INSERT INTO sessions(session_id, user_id, address, user_agent) \
 			VALUES(%s, %s, %s, %s) RETURNING *", session_id, user.id, address, user_agent)
 
-		return Session(self.backend, res.id, data=res)
-
 	def get_by_session_id(self, session_id):
-		res = self.db.get("SELECT * FROM sessions \
+		return self._get_session("SELECT * FROM sessions \
 			WHERE session_id = %s AND valid_until >= NOW()", session_id)
-
-		if res:
-			return Session(self.backend, res.id, data=res)
 
 	# Alias function
 	get = get_by_session_id

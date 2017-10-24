@@ -246,6 +246,9 @@ class User(base.DataObject):
 	def __repr__(self):
 		return "<%s %s>" % (self.__class__.__name__, self.realname)
 
+	def __hash__(self):
+		return hash(self.id)
+
 	def __eq__(self, other):
 		if isinstance(other, self.__class__):
 			return self.id == other.id
@@ -445,6 +448,11 @@ class User(base.DataObject):
 
 		# All others must be checked individually.
 		return self.perms.get(perm, False) == True
+
+	@property
+	def sessions(self):
+		return self.backend.sessions._get_sessions("SELECT * FROM sessions \
+			WHERE user_id = %s AND valid_until >= NOW() ORDER BY created_at")
 
 
 class UserEmail(base.DataObject):
