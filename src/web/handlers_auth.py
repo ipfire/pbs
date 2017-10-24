@@ -80,7 +80,7 @@ class RegisterHandler(BaseHandler):
 		elif not pass1 == pass2:
 			msgs.append(_("Passwords do not match."))
 		else:
-			accepted, score = backend.users.check_password_strength(pass1)
+			accepted, score = self.backend.users.check_password_strength(pass1)
 			if not accepted:
 				msgs.append(_("Your password is too weak."))
 

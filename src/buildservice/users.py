@@ -60,43 +60,6 @@ def check_password_hash(password, password_hash):
 	# Re-generate the password hash and compare the result.
 	return password_hash == generate_password_hash(password, salt=salt, algo=algo)
 
-def check_password_strength(password):
-	score = 0
-	accepted = False
-
-	# Empty passwords cannot be used.
-	if len(password) == 0:
-		return False, 0
-
-	# Passwords with less than 6 characters are also too weak.
-	if len(password) < 6:
-		return False, 1
-
-	# Password with at least 8 characters are secure.
-	if len(password) >= 8:
-		score += 1
-
-	# 10 characters are even more secure.
-	if len(password) >= 10:
-		score += 1
-
-	# Digits in the password are good.
-	if re.search("\d+", password):
-		score += 1
-
-	# Check for lowercase AND uppercase characters.
-	if re.search("[a-z]", password) and re.search("[A-Z]", password):
-		score += 1
-
-	# Search for special characters.
-	if re.search(".[!,@,#,$,%,^,&,*,?,_,~,-,(,)]", password):
-		score += 1
-
-	if score >= 3:
-		accepted = True
-
-	return accepted, score
-
 def maintainer_split(s):
 	m = re.match(r"(.*) <(.*)>", s)
 	if m:
@@ -212,6 +175,44 @@ class Users(base.Object):
 			return
 
 		return self.get_by_id(user.user_id)
+	
+	@staticmethod
+	def check_password_strength(password):
+		score = 0
+		accepted = False
+
+		# Empty passwords cannot be used.
+		if len(password) == 0:
+			return False, 0
+
+		# Passwords with less than 6 characters are also too weak.
+		if len(password) < 6:
+			return False, 1
+
+		# Password with at least 8 characters are secure.
+		if len(password) >= 8:
+			score += 1
+
+		# 10 characters are even more secure.
+		if len(password) >= 10:
+			score += 1
+
+		# Digits in the password are good.
+		if re.search("\d+", password):
+			score += 1
+
+		# Check for lowercase AND uppercase characters.
+		if re.search("[a-z]", password) and re.search("[A-Z]", password):
+			score += 1
+
+		# Search for special characters.
+		if re.search(".[!,@,#,$,%,^,&,*,?,_,~,-,(,)]", password):
+			score += 1
+
+		if score >= 3:
+			accepted = True
+
+		return accepted, score
 
 
 class User(base.Object):
