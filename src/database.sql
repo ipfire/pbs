@@ -26,30 +26,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- Name: arches_binary; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE arches_binary AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE arches_binary OWNER TO pakfire;
-
---
--- Name: builders_disabled; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_disabled AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_disabled OWNER TO pakfire;
-
---
 -- Name: builders_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -62,30 +38,6 @@ CREATE TYPE builders_history_action AS ENUM (
 
 
 ALTER TYPE builders_history_action OWNER TO pakfire;
-
---
--- Name: builders_overload; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_overload AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_overload OWNER TO pakfire;
-
---
--- Name: builds_auto_move; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_auto_move AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE builds_auto_move OWNER TO pakfire;
 
 --
 -- Name: builds_history_action; Type: TYPE; Schema: public; Owner: pakfire
@@ -115,21 +67,6 @@ CREATE TYPE builds_severity AS ENUM (
 ALTER TYPE builds_severity OWNER TO pakfire;
 
 --
--- Name: builds_state; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_state AS ENUM (
-    'building',
-    'testing',
-    'stable',
-    'obsolete',
-    'broken'
-);
-
-
-ALTER TYPE builds_state OWNER TO pakfire;
-
---
 -- Name: builds_type; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -140,18 +77,6 @@ CREATE TYPE builds_type AS ENUM (
 
 
 ALTER TYPE builds_type OWNER TO pakfire;
-
---
--- Name: filelists_config; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE filelists_config AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE filelists_config OWNER TO pakfire;
 
 --
 -- Name: jobs_history_action; Type: TYPE; Schema: public; Owner: pakfire
@@ -213,18 +138,6 @@ CREATE TYPE jobs_state AS ENUM (
 ALTER TYPE jobs_state OWNER TO pakfire;
 
 --
--- Name: jobs_type; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE jobs_type AS ENUM (
-    'build',
-    'test'
-);
-
-
-ALTER TYPE jobs_type OWNER TO pakfire;
-
---
 -- Name: mirrors_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -256,18 +169,6 @@ CREATE TYPE packages_deps_type AS ENUM (
 ALTER TYPE packages_deps_type OWNER TO pakfire;
 
 --
--- Name: packages_properties_critical_path; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE packages_properties_critical_path AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE packages_properties_critical_path OWNER TO pakfire;
-
---
 -- Name: packages_type; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -292,18 +193,6 @@ CREATE TYPE repositories_aux_status AS ENUM (
 ALTER TYPE repositories_aux_status OWNER TO pakfire;
 
 --
--- Name: repositories_enabled_for_builds; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE repositories_enabled_for_builds AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE repositories_enabled_for_builds OWNER TO pakfire;
-
---
 -- Name: repositories_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -315,18 +204,6 @@ CREATE TYPE repositories_history_action AS ENUM (
 
 
 ALTER TYPE repositories_history_action OWNER TO pakfire;
-
---
--- Name: repositories_mirrored; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE repositories_mirrored AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE repositories_mirrored OWNER TO pakfire;
 
 --
 -- Name: repositories_type; Type: TYPE; Schema: public; Owner: pakfire
@@ -354,18 +231,6 @@ CREATE TYPE sources_commits_state AS ENUM (
 
 
 ALTER TYPE sources_commits_state OWNER TO pakfire;
-
---
--- Name: uploads_finished; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE uploads_finished AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE uploads_finished OWNER TO pakfire;
 
 --
 -- Name: users_state; Type: TYPE; Schema: public; Owner: pakfire
