@@ -122,11 +122,12 @@ class ActivationHandler(BaseHandler):
 
 				else:
 					# Automatically login the user.
-					session = sessions.Session.create(self.pakfire, user)
+					self.session = self.backend.sessions.create(user,
+						self.current_address, user_agent=self.user_agent)
 
-					# Set a cookie and update the current user.
-					self.set_cookie("session_id", session.id, expires=session.valid_until)
-					self._current_user = user
+					# Set a session cookie
+					self.set_cookie("session_id", self.session.session_id,
+						expires=self.session.valid_until)
 
 				self.render("register-activation-success.html", user=user)
 				return
@@ -153,10 +154,16 @@ class LogoutHandler(BaseHandler):
 	def get(self):
 		# Destroy the user's session.
 		with self.db.transaction():
-			self.session.destroy()
+			# If impersonating, we will just stop the impersonation
+			if self.session.impersonated_user:
+				self.session.stop_impersonation()
 
-		# Remove the cookie, that identifies the user.
-		self.clear_cookie("session_id")
+			# Otherwise we destroy the session
+			else:
+				self.session.destroy()
+
+				# Remove the session cookie
+				self.clear_cookie("session_id")
 
 		# Redirect the user to the front page.
 		self.redirect("/")

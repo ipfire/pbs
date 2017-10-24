@@ -147,20 +147,13 @@
 													{{ session.user.realname }}
 												</a>
 											</li>
-											<li>
-												<a href="/user/impersonate?action=stop">
-													<i class="icon-off"></i>
-													{{ _("End impersonation") }}
-												</a>
-											</li>
-										{% else %}
-											<li>
-												<a href="/logout">
-													<i class="icon-off"></i>
-													{{ _("Logout") }}
-												</a>
-											</li>
 										{% end %}
+										<li>
+											<a href="/logout">
+												<i class="icon-off"></i>
+												{{ _("Logout") }}
+											</a>
+										</li>
 									</ul>
 								</li>
 							{% else %}

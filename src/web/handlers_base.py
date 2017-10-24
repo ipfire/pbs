@@ -30,11 +30,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		# Search for a valid database session
 		if session_id:
-			session = self.backend.sessions.get(session_id)
-
-			# Found a valid session
-			if session:
-				return session
+			return self.backend.sessions.get(session_id)
 
 	def get_current_user(self):
 		if self.session:

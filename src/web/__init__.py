@@ -109,7 +109,7 @@ class Application(tornado.web.Application):
 
 			# User profiles
 			(r"/users", UsersHandler),
-			(r"/user/impersonate", UserImpersonateHandler),
+			(r"/user/(\w+)/impersonate", UserImpersonateHandler),
 			(r"/user/(\w+)/passwd", UserPasswdHandler),
 			(r"/user/(\w+)/delete", UserDeleteHandler),
 			(r"/user/(\w+)/edit", UserEditHandler),

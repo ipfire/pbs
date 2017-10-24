@@ -98,7 +98,7 @@
 										{% if not current_user == user and current_user.is_admin() %}
 											<li class="divider"></li>
 											<li>
-												<a href="/user/impersonate?user={{ user.name }}">{{ _("Impersonate user") }}</a>
+												<a href="/user/{{ user.name }}/impersonate">{{ _("Impersonate User") }}</a>
 											</li>
 										{% end %}
 									</ul>

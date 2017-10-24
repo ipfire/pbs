@@ -22,39 +22,30 @@ class UserHandler(BaseHandler):
 
 class UserImpersonateHandler(BaseHandler):
 	@tornado.web.authenticated
-	def get(self):
-		action = self.get_argument("action", "start")
-
-		if action == "stop":
-			if self.current_user.session:
-				self.current_user.session.stop_impersonation()
-			self.redirect("/")
-			return
-
+	def get(self, username):
 		# You must be an admin to do this.
 		if not self.current_user.is_admin():
-			raise tornado.web.HTTPError(403, "You are not allowed to do this.")
+			raise tornado.web.HTTPError(403, "You are not allowed to do this")
 
-		username = self.get_argument("user", "")
-		user = self.pakfire.users.get_by_name(username)
+		user = self.backend.users.get_by_name(username)
 		if not user:
 			raise tornado.web.HTTPError(404, "User not found: %s" % username)
 
 		self.render("user-impersonation.html", user=user)
 
 	@tornado.web.authenticated
-	def post(self):
+	def post(self, username):
 		# You must be an admin to do this.
 		if not self.current_user.is_admin():
-			raise tornado.web.HTTPError(403, "You are not allowed to do this.")
+			raise tornado.web.HTTPError(403, "You are not allowed to do this")
 
-		username = self.get_argument("user")
-		user = self.pakfire.users.get_by_name(username)
+		user = self.backend.users.get_by_name(username)
 		if not user:
-			raise tornado.web.HTTPError(404, "User does not exist: %s" % username)
+			raise tornado.web.HTTPError(404, "User not found: %s" % username)
 
-		if self.current_user.session:
-			self.current_user.session.start_impersonation(user)
+		# Start impersonation
+		with self.db.transaction():
+			self.session.start_impersonation(user)
 
 		# Redirect to start page.
 		self.redirect("/")
