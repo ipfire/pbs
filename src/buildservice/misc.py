@@ -91,13 +91,3 @@ def calc_hash(filename, algo="sha512"):
 	f.close()
 
 	return h.hexdigest()
-
-def guess_filetype(filename):
-	# XXX very cheap check. Need to do better here.
-	if tarfile.is_tarfile(filename):
-		return "pkg"
-
-	elif filename.endswith(".log"):
-		return "log"
-
-	return "unknown"
