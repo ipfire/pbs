@@ -2,9 +2,11 @@
 
 from __future__ import absolute_import
 
-import logging
 import ldap
 import logging
+
+log = logging.getLogger("ldap")
+log.propagate = 1
 
 from . import base
 from .decorators import *
@@ -13,10 +15,14 @@ class LDAP(base.Object):
 	@lazy_property
 	def ldap(self):
 		ldap_uri = self.settings.get("ldap_uri")
+
+		log.debug("Connecting to %s..." % ldap_uri)
+
+		# Establish LDAP connection
 		return ldap.initialize(ldap_uri)
-	
+
 	def search(self, query, attrlist=None, limit=0):
-		logging.debug("Performing LDAP query: %s" % query)
+		log.debug("Performing LDAP query: %s" % query)
 
 		search_base = self.settings.get("ldap_search_base")
 
@@ -26,11 +32,11 @@ class LDAP(base.Object):
 		return results
 
 	def auth(self, username, password):
-		logging.debug("Checking credentials for %s" % username)
+		log.debug("Checking credentials for %s" % username)
 
 		dn = self.get_dn_by_uid(username)
 		if not dn:
-			logging.debug("Could not resolve username %s to dn" % username)
+			log.debug("Could not resolve username %s to dn" % username)
 			return False
 
 		return self.bind(dn, password)
@@ -39,10 +45,11 @@ class LDAP(base.Object):
 		try:
 			self.ldap.simple_bind_s(dn, password)
 		except ldap.INVALID_CREDENTIALS:
-			logging.debug("Account credentials are invalid.")
+			log.debug("Account credentials for %s are invalid" % dn)
 			return False
 
-		logging.debug("Successfully authenticated.")
+		log.debug("Successfully authenticated %s" % dn)
+
 		return True 
 
 	def get_dn_by_uid(self, uid):
@@ -50,8 +57,8 @@ class LDAP(base.Object):
 
 		if not dn:
 			return
-		
-		logging.debug("DN for uid %s is: %s" % (uid, dn))
+
+		log.debug("DN for uid %s is: %s" % (uid, dn))
 		return dn
 
 	def get_user(self, uid, **kwargs):
