@@ -417,9 +417,12 @@ class User(base.DataObject):
 		return self.data.registered
 
 	def gravatar_icon(self, size=128):
+		h = hashlib.new("md5")
+		if self.email:
+			h.update("%s" % self.email)
+
 		# construct the url
-		gravatar_url = "http://www.gravatar.com/avatar/" + \
-			hashlib.md5(self.email.lower()).hexdigest() + "?"       
+		gravatar_url = "http://www.gravatar.com/avatar/%s?" % h.hexdigest()
 		gravatar_url += urllib.urlencode({'d': "mm", 's': str(size)})
 
 		return gravatar_url
