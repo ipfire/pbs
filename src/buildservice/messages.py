@@ -41,10 +41,13 @@ class Messages(base.Object):
 		while True:
 			messages = self.get_all(limit=10)
 
-			for message in messages:
-				self.send_msg(message)
-			else:
+			# If no emails are available, we end here
+			if not messages:
 				break
+
+			for message in messages:
+				with self.db.transaction():
+					self.send_msg(message)
 
 	def send_to_all(self, recipients, subject, body, format=None):
 		"""
