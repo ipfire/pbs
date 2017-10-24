@@ -80,7 +80,7 @@ class RegisterHandler(BaseHandler):
 		elif not pass1 == pass2:
 			msgs.append(_("Passwords do not match."))
 		else:
-			accepted, score = backend.users.check_password_strength(pass1)
+			accepted, score = self.backend.users.check_password_strength(pass1)
 			if not accepted:
 				msgs.append(_("Your password is too weak."))
 
@@ -105,8 +105,7 @@ class ActivationHandler(BaseHandler):
 		code = self.get_argument("code")
 
 		# Check if the activation code matches and then activate the account.
-		if user.activation_code == code:
-			user.activate()
+		if user.activate_email(code):
 
 			# If an admin activated another account, he impersonates it.
 			if self.current_user and self.current_user.is_admin():

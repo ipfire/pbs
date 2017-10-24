@@ -158,51 +158,52 @@ class UserEditHandler(BaseHandler):
 		if not user:
 			raise tornado.web.HTTPError(404)
 
-		email = self.get_argument("email", user.email)
-		realname = self.get_argument("realname", user.realname)
-		pass1 = self.get_argument("pass1", None)
-		pass2 = self.get_argument("pass2", None)
-		locale = self.get_argument("locale", "")
+		with self.db.transaction():
+			email = self.get_argument("primary_email_address")
+			realname = self.get_argument("realname", user.realname)
+			pass1 = self.get_argument("pass1", None)
+			pass2 = self.get_argument("pass2", None)
+			locale = self.get_argument("locale", "")
 
-		# Only an admin can alter the state of a user.
-		if self.current_user.is_admin():
-			state = self.get_argument("state", user.state)
-		else:
-			state = user.state
+			# Only an admin can alter the state of a user.
+			if self.current_user.is_admin():
+				state = self.get_argument("state", user.state)
+			else:
+				state = user.state
 
-		# Collect error messages
-		msgs = []
+			# Collect error messages
+			msgs = []
 
-		if not email:
-			msgs.append(_("No email address provided."))
-		elif not "@" in email:
-			msgs.append(_("Email address is invalid."))
+			if not email:
+				msgs.append(_("No email address provided."))
+			elif not "@" in email:
+				msgs.append(_("Email address is invalid."))
 
-		# Check if the passphrase is okay.
-		if pass1 and not len(pass1) >= 8:
-			msgs.append(_("Password has less than 8 characters."))
-		elif not pass1 == pass2:
-			msgs.append(_("Passwords do not match."))
+			# Check if the passphrase is okay.
+			if pass1 and not len(pass1) >= 8:
+				msgs.append(_("Password has less than 8 characters."))
+			elif not pass1 == pass2:
+				msgs.append(_("Passwords do not match."))
 
-		if msgs:
-			self.render("user-profile-edit-fail.html", messages=msgs)
-			return
+			if msgs:
+				self.render("user-profile-edit-fail.html", messages=msgs)
+				return
 
-		# Everything is okay, we can save the new settings.
-		user.locale = locale
-		user.email = email
-		user.realname = realname
-		if pass1:
-			user.passphrase = pass1
-		user.state = state
+			# Everything is okay, we can save the new settings.
+			user.locale = locale
+			user.set_primary_email(email)
+			user.realname = realname
+			if pass1:
+				user.passphrase = pass1
+			user.state = state
 
-		# Get the timezone settings.
-		tz = self.get_argument("timezone", None)
-		user.timezone = tz
+			# Get the timezone settings.
+			tz = self.get_argument("timezone", None)
+			user.timezone = tz
 
-		if not user.activated:
-			self.render("user-profile-need-activation.html", user=user)
-			return
+			if not user.activated:
+				self.render("user-profile-need-activation.html", user=user)
+				return
 
 		self.redirect("/user/%s" % user.name)
 
