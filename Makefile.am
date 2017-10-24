@@ -90,6 +90,7 @@ buildservice_PYTHON = \
 	src/buildservice/jobqueue.py \
 	src/buildservice/jobs.py \
 	src/buildservice/keys.py \
+	src/buildservice/ldap_ipfire.py \
 	src/buildservice/logs.py \
 	src/buildservice/messages.py \
 	src/buildservice/mirrors.py \

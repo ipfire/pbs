@@ -7,10 +7,12 @@ import random
 import re
 import string
 import urllib
+import ldap
 
 import tornado.locale
 
 from . import base
+from . import ldap_ipfire
 
 # A list of possible random characters.
 random_chars = string.ascii_letters + string.digits
@@ -70,6 +72,9 @@ def maintainer_split(s):
 	return name, email
 
 class Users(base.Object):
+	def init(self):
+		self.ldap = ldap_ipfire.LDAP(self.backend)
+
 	def auth(self, name, password):
 		# If either name or password is None, we don't check at all.
 		if None in (name, password):
@@ -78,10 +83,15 @@ class Users(base.Object):
 		# Search for the username in the database.
 		# The user must not be deleted and must be activated.
 		user = self.db.get("SELECT id FROM users WHERE name = %s AND \
-			activated = 'Y' AND deleted = 'N'", name)
+			activated IS TRUE AND deleted IS FALSE", name)
 
 		if not user:
-			return
+			# we should check if we get an ldap user
+			if self.ldap.auth(name, password):
+				user = self.register_from_ldap(name)
+
+			if not user:
+				return
 
 		# Get the whole User object from the database.
 		user = self.get_by_id(user.id)
@@ -100,6 +110,19 @@ class Users(base.Object):
 		user.add_email(email)
 		return user
 
+	def register_from_ldap(self, name):
+		logging.debug("Register LDAP user %s" % name)
+
+		dn, attr = self.ldap.get_user(name, attrlist=["uid", "cn", "mail"])
+		realname = attr["cn"][0]
+		user = User.new(self.pakfire, name, realname, ldap_dn=dn)
+		for email in attr["mail"]:
+			user.add_email(email, activated=True)
+		# Activate the user
+		user.activate()
+
+		return user
+
 	def name_is_used(self, name):
 		users = self.db.query("SELECT id FROM users WHERE name = %s", name)
 
@@ -109,7 +132,7 @@ class Users(base.Object):
 		return False
 
 	def email_is_used(self, email):
-		users = self.db.query("SELECT id FROM users_emails \
+		users = self.db.get("SELECT id FROM users_emails \
 			WHERE email = %s AND activated IS TRUE", email)
 
 		if users:
@@ -118,8 +141,8 @@ class Users(base.Object):
 		return False
 
 	def get_all(self):
-		users = self.db.query("""SELECT id FROM users WHERE activated = 'Y' AND
-			deleted = 'N' ORDER BY name ASC""")
+		users = self.db.query("""SELECT id FROM users WHERE activated IS TRUE AND
+			deleted IS FALSE ORDER BY name ASC""")
 
 		return [User(self.pakfire, u.id) for u in users]
 
@@ -141,7 +164,7 @@ class Users(base.Object):
 
 	def count(self):
 		users = self.db.get("SELECT COUNT(*) AS count FROM users \
-			WHERE activated = 'Y' AND deleted = 'N'")
+			WHERE activated IS TRUE AND deleted IS FALSE")
 
 		if users:
 			return users.count
@@ -150,8 +173,8 @@ class Users(base.Object):
 		pattern = "%%%s%%" % pattern
 
 		query = "SELECT id FROM users \
-			WHERE (name LIKE %s OR realname LIKE %s) AND activated = %s AND deleted = %s"
-		args  = [pattern, pattern, "Y", "N"]
+			WHERE (name LIKE %s OR realname LIKE %s) AND activated IS %s AND deleted IS %s"
+		args  = [pattern, pattern, True, False]
 
 		if limit:
 			query += " LIMIT %s"
@@ -246,9 +269,9 @@ class User(base.Object):
 		return cmp(self.realname, other.realname)
 
 	@classmethod
-	def new(cls, pakfire, name, realname, locale=None):
-		res = pakfire.db.get("INSERT INTO users(name, realname) \
-			VALUES(%s, %s) RETURNING id", name, realname)
+	def new(cls, pakfire, name, realname, locale=None, ldap_dn=None):
+		res = pakfire.db.get("INSERT INTO users(name, realname, ldap_dn) \
+			VALUES(%s, %s, %s) RETURNING id", name, realname, ldap_dn)
 
 		# Create row in permissions table.
 		pakfire.db.execute("INSERT INTO users_permissions(user_id) VALUES(%s)", res.id)
@@ -270,17 +293,19 @@ class User(base.Object):
 		return self._data
 
 	def delete(self):
-		self.db.execute("UPDATE users SET deleted = 'Y' WHERE id = %s", self.id)
+		self.db.execute("UPDATE users SET deleted = TRUE WHERE id = %s", self.id)
 		self._data = None
 
 	def activate(self):
-		self.db.execute("UPDATE users SET activated = 'Y', activation_code = NULL \
-			WHERE id = %s", self.id)
+		self.db.execute("UPDATE users SET activated = TRUE WHERE id = %s", self.id)
 
 	def check_password(self, password):
 		"""
 			Compare the given password with the one stored in the database.
 		"""
+		if self.ldap_dn:
+			return self.backend.users.ldap.bind(self.ldap_dn, password)
+
 		return check_password_hash(password, self.data.passphrase)
 
 	def set_passphrase(self, passphrase):
@@ -309,6 +334,10 @@ class User(base.Object):
 	@property
 	def name(self):
 		return self.data.name
+
+	@property
+	def ldap_dn(self):
+		return self.data.ldap_dn
 
 	@property
 	def firstname(self):
@@ -354,16 +383,18 @@ class User(base.Object):
 		return (row.email for row in res)
 
 	def get_email_activation_code(self, email):
-		return self.db.query("SELECT activation_code FROM users_emails WHERE user_id = %s AND \
+		res = self.db.get("SELECT activation_code FROM users_emails WHERE user_id = %s AND \
 		email = %s", self.id, email)
+
+		return res.activation_code
 
 		# XXX We need to check if the email is already activated
 	def activate_email(self, code):
 		if self.db.query("SELECT * FROM users_emails WHERE user_id = %s AND \
 		activation_code = %s AND activated = FALSE", self.id, code):
 			# We activate the email and the user to
-			self.db.execute("UPDATE users_emails SET activated = TRUE \
-				WHERE user_id = %s AND activation_code = NULL", self.id)
+			self.db.execute("UPDATE users_emails SET activated = TRUE, activation_code = NULL \
+				WHERE user_id = %s AND activation_code = %s", self.id, code)
 			self.activate()
 
 	def has_email_address(self):
@@ -377,32 +408,34 @@ class User(base.Object):
 	# Te activated flag is useful for LDAP users
 	def add_email(self, email, activated=False):
 		# Check if the email is in use
-		if self.users.email_is_used(email):
+		if self.backend.users.email_is_used(email):
 			raise ValueError("Email %s is already in use" % email)
 
 		activation_code = None
 		if not activated:
 			activation_code = generate_random_string(64)
 
-		if not self.user.has_email_address():
+		if not self.has_email_address():
 			# The user has no email address in the moment do we can safely guess that he has new
 			# registered
 			self.db.execute("INSERT INTO users_emails(user_id, email, \
-				'primary', activation_code, activated) VALUES(%s, %s, TRUE, %s, %s)",
+				\"primary\", activation_code, activated) VALUES(%s, %s, TRUE, %s, %s)",
 				self.id, email, activation_code, activated)
-			self.send_activation_mail()
+			if not activated:
+				self.send_activation_mail()
 			return
 
 		# Add just another email address.
-		self.db.execute("INSERT INTO users_emails(user_id, email, 'primary') \
-			VALUES(%s, %s, FALSE, %s)", id, email, activation_code, activated)
-		self.send_email_activation_mail(email)
+		self.db.execute("INSERT INTO users_emails(user_id, email, \"primary\", activation_code, activated) \
+			VALUES(%s, %s, FALSE, %s, %s)", self.id, email, activation_code, activated)
+		if not activated:
+			self.send_email_activation_mail(email)
 		return
 
 	def remove_email(self, email):
 		# We delete this mail if the emial address is not primary and belong to this user
 		self.db.execute("DELETE FROM users_emails \
-			WHERE id = %s AND email = %s AND 'primary' = FALSE",
+			WHERE id = %s AND email = %s AND \"primary\" = FALSE",
 			self.id, email)
 
 		self._data = self._emails = None
@@ -491,7 +524,7 @@ class User(base.Object):
 			return True
 
 		# All others must be checked individually.
-		return self.perms.get(perm, "N") == "Y"
+		return self.perms.get(perm, False) == True
 
 	def send_activation_mail(self):
 		logging.debug("Sending activation mail to %s" % self.email)
@@ -508,7 +541,7 @@ class User(base.Object):
 		message += "\n"*2
 		message += "    %(baseurl)s/user/%(name)s/activate?code=%(activation_code)s" \
 			% { "baseurl" : self.settings.get("baseurl"), "name" : self.name,
-				"activation_code" : self.activation_code, }
+				"activation_code" : self.get_email_activation_code(self.email), }
 		message += "\n"*2
 		message += "Sincerely,\n    The Pakfire Build Service"
 

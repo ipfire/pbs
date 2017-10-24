@@ -17,7 +17,7 @@ class Messages(base.Object):
 		if not frm:
 			frm = self.pakfire.settings.get("email_from")
 
-		self.db.execute("INSERT INTO user_messages(frm, to, subject, text)"
+		self.db.execute("INSERT INTO user_messages(frm, \"to\", subject, text)"
 			" VALUES(%s, %s, %s, %s)", frm, to, subject, text)
 
 	def get_all(self, limit=None):
