@@ -3294,7 +3294,7 @@ ALTER TABLE ONLY uploads
 --
 
 ALTER TABLE ONLY users_emails
-    ADD CONSTRAINT users_emails_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+    ADD CONSTRAINT users_emails_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
 --
@@ -3302,7 +3302,7 @@ ALTER TABLE ONLY users_emails
 --
 
 ALTER TABLE ONLY users_permissions
-    ADD CONSTRAINT users_permissions_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+    ADD CONSTRAINT users_permissions_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
 --
