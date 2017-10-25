@@ -2,9 +2,9 @@
 
 import tornado.web
 
-from .handlers_base import *
+from . import base
 
-class LoginHandler(BaseHandler):
+class LoginHandler(base.BaseHandler):
 	def get(self):
 		# If the user is already logged in, we just send him back
 		# to the start page.
@@ -41,7 +41,7 @@ class LoginHandler(BaseHandler):
 		self.redirect(next)
 
 
-class RegisterHandler(BaseHandler):
+class RegisterHandler(base.BaseHandler):
 	def get(self):
 		# If the user is already logged in, we just send him back
 		# to the start page.
@@ -105,7 +105,7 @@ class RegisterHandler(BaseHandler):
 		self.render("register-success.html", user=user)
 
 
-class ActivationHandler(BaseHandler):
+class ActivationHandler(base.BaseHandler):
 	def get(self, _user):
 		user = self.pakfire.users.get_by_name(_user)
 		if not user:
@@ -136,7 +136,7 @@ class ActivationHandler(BaseHandler):
 		self.render("register-activation-fail.html")
 
 
-class PasswordRecoveryHandler(BaseHandler):
+class PasswordRecoveryHandler(base.BaseHandler):
 	def get(self):
 		return self.render("user-forgot-password.html")
 
@@ -149,7 +149,7 @@ class PasswordRecoveryHandler(BaseHandler):
 		# XXX TODO
 
 
-class LogoutHandler(BaseHandler):
+class LogoutHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
 		# Destroy the user's session.

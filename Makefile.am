@@ -123,10 +123,10 @@ hubdir = $(buildservicedir)/hub
 
 web_PYTHON = \
 	src/web/__init__.py \
+	src/web/base.py \
 	src/web/handlers.py \
 	src/web/handlers_api.py \
 	src/web/handlers_auth.py \
-	src/web/handlers_base.py \
 	src/web/handlers_builders.py \
 	src/web/handlers_builds.py \
 	src/web/handlers_distro.py \

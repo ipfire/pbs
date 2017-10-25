@@ -2,8 +2,8 @@
 
 import tornado.web
 
-from .handlers_base import BaseHandler
+from . import base
 
-class UpdatesHandler(BaseHandler):
+class UpdatesHandler(base.BaseHandler):
 	def get(self):
 		self.render("updates-index.html")

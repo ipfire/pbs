@@ -2,9 +2,9 @@
 
 import tornado.web
 
-from .handlers_base import BaseHandler
+from . import base
 
-class JobsIndexHandler(BaseHandler):
+class JobsIndexHandler(base.BaseHandler):
 	def get(self):
 		# Filter for a certain arch.
 		arch = self.get_argument("arch", None)
@@ -29,14 +29,14 @@ class JobsIndexHandler(BaseHandler):
 			date=date)
 
 
-class JobsFilterHandler(BaseHandler):
+class JobsFilterHandler(base.BaseHandler):
 	def get(self):
 		builders = self.pakfire.builders.get_all()
 
 		self.render("jobs-filter.html", arches=self.backend.arches, builders=builders)
 
 
-class JobDetailHandler(BaseHandler):
+class JobDetailHandler(base.BaseHandler):
 	def get(self, uuid):
 		job = self.pakfire.jobs.get_by_uuid(uuid)
 		if not job:
@@ -48,7 +48,7 @@ class JobDetailHandler(BaseHandler):
 		self.render("jobs-detail.html", job=job, build=job.build, log=log)
 
 
-class JobBuildrootHandler(BaseHandler):
+class JobBuildrootHandler(base.BaseHandler):
 	def get(self, uuid):
 		job = self.pakfire.jobs.get_by_uuid(uuid)
 		if not job:
@@ -70,7 +70,7 @@ class JobBuildrootHandler(BaseHandler):
 			buildroot_size=buildroot_size)
 
 
-class JobScheduleHandler(BaseHandler):
+class JobScheduleHandler(base.BaseHandler):
 	allowed_types = ("test", "rebuild",)
 
 	@tornado.web.authenticated
@@ -110,7 +110,7 @@ class JobScheduleHandler(BaseHandler):
 		self.redirect("/job/%s" % job.uuid)
 
 
-class JobAbortHandler(BaseHandler):
+class JobAbortHandler(base.BaseHandler):
 	def get_job(self, uuid):
 		job = self.pakfire.jobs.get_by_uuid(uuid)
 		if not job:

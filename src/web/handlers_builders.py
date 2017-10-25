@@ -4,14 +4,14 @@ import tornado.web
 
 from .. import builders
 
-from .handlers_base import *
+from . import base
 
-class BuilderListHandler(BaseHandler):
+class BuilderListHandler(base.BaseHandler):
 	def get(self):
 		self.render("builders/list.html", builders=self.backend.builders)
 
 
-class BuilderDetailHandler(BaseHandler):
+class BuilderDetailHandler(base.BaseHandler):
 	def get(self, hostname):
 		builder = self.pakfire.builders.get_by_name(hostname)
 
@@ -37,7 +37,7 @@ class BuilderDetailHandler(BaseHandler):
 		self.redirect("/builder/%s" % builder.hostname)
 
 
-class BuilderNewHandler(BaseHandler):
+class BuilderNewHandler(base.BaseHandler):
 	def get(self):
 		self.render("builders/new.html")
 
@@ -56,7 +56,7 @@ class BuilderNewHandler(BaseHandler):
 			passphrase=passphrase)
 
 
-class BuilderEditHandler(BaseHandler):
+class BuilderEditHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, hostname):
 		builder = self.pakfire.builders.get_by_name(hostname)
@@ -93,7 +93,7 @@ class BuilderEditHandler(BaseHandler):
 		self.redirect("/builder/%s" % builder.hostname)
 
 
-class BuilderRenewPassphraseHandler(BaseHandler):
+class BuilderRenewPassphraseHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
 		builder = self.pakfire.builders.get_by_name(name)
@@ -104,7 +104,7 @@ class BuilderRenewPassphraseHandler(BaseHandler):
 			passphrase=passphrase)
 
 
-class BuilderDeleteHandler(BaseHandler):
+class BuilderDeleteHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
 		builder = self.pakfire.builders.get_by_name(name)
@@ -126,7 +126,7 @@ class BuilderDeleteHandler(BaseHandler):
 		self.render("builders/delete.html", builder=builder)
 
 
-class BuilderStatusChangeHandler(BaseHandler):
+class BuilderStatusChangeHandler(base.BaseHandler):
 	enabled = None
 
 	@tornado.web.authenticated

@@ -5,9 +5,9 @@ import datetime
 import tornado.locale
 import tornado.web
 
-from .handlers_base import *
+from . import base
 
-class UserHandler(BaseHandler):
+class UserHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name=None):
 		user = self.current_user
@@ -20,7 +20,7 @@ class UserHandler(BaseHandler):
 		self.render("user-profile.html", user=user)
 
 
-class UserImpersonateHandler(BaseHandler):
+class UserImpersonateHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, username):
 		# You must be an admin to do this.
@@ -51,7 +51,7 @@ class UserImpersonateHandler(BaseHandler):
 		self.redirect("/")
 
 
-class UserActionHandler(BaseHandler):
+class UserActionHandler(base.BaseHandler):
 	def get_user(self, name):
 		user = self.pakfire.users.get_by_name(name)
 		if not user:
@@ -63,7 +63,7 @@ class UserActionHandler(BaseHandler):
 		return user
 
 
-class UserDeleteHandler(BaseHandler):
+class UserDeleteHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
 		user = self.get_user(name)
@@ -129,7 +129,7 @@ class UserPasswdHandler(UserActionHandler):
 		self.render("user-profile-passwd-ok.html", user=user)
 
 
-class UserEditHandler(BaseHandler):
+class UserEditHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
 		user = self.pakfire.users.get_by_name(name)
@@ -199,13 +199,13 @@ class UserEditHandler(BaseHandler):
 		self.redirect("/user/%s" % user.name)
 
 
-class UsersHandler(BaseHandler):
+class UsersHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
 		self.render("user-list.html", users=self.backend.users)
 
 
-class UsersBuildsHandler(BaseHandler):
+class UsersBuildsHandler(base.BaseHandler):
 	def get(self, name=None):
 		if name is None:
 			user = self.current_user

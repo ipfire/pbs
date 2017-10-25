@@ -1,8 +1,5 @@
 #!/usr/bin/python
 
-import pakfire
-
-import datetime
 import httplib
 import pytz
 import time
@@ -118,3 +115,7 @@ class BaseHandler(tornado.web.RequestHandler):
 	@property
 	def mirrors(self):
 		return self.pakfire.mirrors
+
+
+class ApiBaseHandler(BaseHandler):
+	pass

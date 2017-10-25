@@ -4,15 +4,15 @@ import tornado.web
 
 from .. import mirrors
 
-from .handlers_base import BaseHandler
+from . import base
 
-class MirrorListHandler(BaseHandler):
+class MirrorListHandler(base.BaseHandler):
 	def get(self):
 		self.render("mirrors/list.html", mirrors=self.backend.mirrors,
 			log=self.backend.mirrors.get_history(limit=5))
 
 
-class MirrorDetailHandler(BaseHandler):
+class MirrorDetailHandler(base.BaseHandler):
 	def get(self, hostname):
 		mirror = self.backend.mirrors.get_by_hostname(hostname)
 		if not mirror:
@@ -23,7 +23,7 @@ class MirrorDetailHandler(BaseHandler):
 		self.render("mirrors/detail.html", mirror=mirror, log=log)
 
 
-class MirrorActionHandler(BaseHandler):
+class MirrorActionHandler(base.BaseHandler):
 	"""
 		A handler that makes sure if the user has got sufficent rights to
 		do actions.

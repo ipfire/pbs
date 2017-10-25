@@ -2,9 +2,9 @@
 
 import tornado.web
 
-from .handlers_base import BaseHandler
+from . import base
 
-class KeysActionHandler(BaseHandler):
+class KeysActionHandler(base.BaseHandler):
 	def prepare(self):
 		if not self.current_user.has_perm("manage_keys"):
 			raise tornado.web.HTTPError(403)
@@ -41,14 +41,14 @@ class KeysDeleteHandler(KeysActionHandler):
 		self.render("keys-delete.html", key=key)
 
 
-class KeysListHandler(BaseHandler):
+class KeysListHandler(base.BaseHandler):
 	def get(self):
 		keys = self.pakfire.keys.get_all()
 
 		self.render("keys-list.html", keys=keys)
 
 
-class KeysDownloadHandler(BaseHandler):
+class KeysDownloadHandler(base.BaseHandler):
 	def get(self, fingerprint):
 		key = self.pakfire.keys.get_by_fpr(fingerprint)
 		if not key:
