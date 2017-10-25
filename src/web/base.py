@@ -91,22 +91,25 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		return ns
 
-	def get_error_html(self, status_code, exception=None, **kwargs):
-		error_document = "errors/error.html"
-
-		kwargs.update({
-			"code"      : status_code,
-			"message"   : httplib.responses[status_code],
-		})
-
+	def write_error(self, status_code, exc_info=None, **kwargs):
 		if status_code in (400, 403, 404):
 			error_document = "errors/error-%s.html" % status_code
+		else:
+			error_document = "errors/error.html"
+
+		try:
+			status_message = httplib.responses[status_code]
+		except KeyError:
+			status_message = None
 
 		# Collect more information about the exception if possible.
-		if exception:
-			exception = traceback.format_exc()
+		if exc_info:
+			tb = traceback.format_exception(*exc_info)
+		else:
+			tb = None
 
-		return self.render_string(error_document, exception=exception, **kwargs)
+		self.render(error_document, status_code=status_code,
+			status_message=status_message, exc_info=exc_info, tb=tb, **kwargs)
 
 	@property
 	def pakfire(self):

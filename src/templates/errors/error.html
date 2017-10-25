@@ -29,15 +29,15 @@
 					<tbody>
 						<tr>
 							<td>{{ _("Error code") }}</td>
-							<td>{{ code }} - {{ message }}</td>
+							<td>{{ status_code }} - {{ status_message }}</td>
 						</tr>
 
-						{% if current_user and current_user.is_admin() and exception %}
+						{% if current_user and current_user.is_admin() and tb %}
 							<tr>
 								<td colspan="2">
 									{{ _("Exception (traceback):") }}
 									<br><br>
-									<pre>{{ exception }}</pre>
+									<pre>{{ "\n".join(tb) }}</pre>
 								</td>
 							</tr>
 						{% end %}
