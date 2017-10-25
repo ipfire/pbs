@@ -342,7 +342,7 @@ class Builds(base.Object):
 			query += " WHERE %s" % " AND ".join(conditions)
 
 		# Grouping and sorting.
-		query += " GROUP BY arch ORDER BY arch DESC"
+		query += " GROUP BY builds_times.arch ORDER BY builds_times.arch DESC"
 
 		return self.db.query(query, *args)
 
