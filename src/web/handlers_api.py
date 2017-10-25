@@ -2,13 +2,9 @@
 
 import tornado.web
 
-from handlers_base import *
+from . import base
 
-class ApiBaseHandler(BaseHandler):
-	pass
-
-
-class ApiPackagesAutocomplete(BaseHandler):
+class ApiPackagesAutocomplete(base.ApiBaseHandler):
 	def get(self):
 		query = self.get_argument("q")
 		if not query:

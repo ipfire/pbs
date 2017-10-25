@@ -3,8 +3,9 @@
 import random
 import tornado.web
 
+from . import base
+
 from .handlers_auth import *
-from .handlers_base import *
 from .handlers_builds import *
 from .handlers_builders import *
 from .handlers_distro import *
@@ -15,7 +16,7 @@ from .handlers_search import *
 from .handlers_updates import *
 from .handlers_users import *
 
-class IndexHandler(BaseHandler):
+class IndexHandler(base.BaseHandler):
 	def get(self):
 		jobs = self.pakfire.jobs.get_active()
 		jobs += self.pakfire.jobs.get_latest(age="24 hours", limit=5)
@@ -32,30 +33,7 @@ class IndexHandler(BaseHandler):
 		self.render("index.html", jobs=jobs, updates=updates)
 
 
-class Error404Handler(BaseHandler):
-	def get(self):
-		raise tornado.web.HTTPError(404)
-
-
-class StatisticsMainHandler(BaseHandler):
-	def get(self):
-		args = {}
-
-		# Build statistics.
-		args.update({
-			"builds_count" : self.pakfire.builds.count(),
-		})
-
-		# Job statistics.
-		args.update({
-			"jobs_count_all"      : self.pakfire.jobs.count(),
-			"jobs_avg_build_time" : self.pakfire.jobs.get_average_build_time(),
-		})
-
-		self.render("statistics/index.html", **args)
-
-
-class UploadsHandler(BaseHandler):
+class UploadsHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
 		if not self.current_user.is_admin():
@@ -64,27 +42,27 @@ class UploadsHandler(BaseHandler):
 		self.render("uploads-list.html", uploads=self.backend.uploads)
 
 
-class DocsIndexHandler(BaseHandler):
+class DocsIndexHandler(base.BaseHandler):
 	def get(self):
 		self.render("docs-index.html")
 
 
-class DocsBuildsHandler(BaseHandler):
+class DocsBuildsHandler(base.BaseHandler):
 	def get(self):
 		self.render("docs-build.html")
 
 
-class DocsUsersHandler(BaseHandler):
+class DocsUsersHandler(base.BaseHandler):
 	def get(self):
 		self.render("docs-users.html")
 
 
-class DocsWhatsthisHandler(BaseHandler):
+class DocsWhatsthisHandler(base.BaseHandler):
 	def get(self):
 		self.render("docs-whatsthis.html")
 
 
-class FileDetailHandler(BaseHandler):
+class FileDetailHandler(base.BaseHandler):
 	def get(self, uuid):
 		pkg, file = self.pakfire.packages.get_with_file_by_uuid(uuid)
 
@@ -94,12 +72,12 @@ class FileDetailHandler(BaseHandler):
 		self.render("file-detail.html", pkg=pkg, file=file)
 
 
-class LogHandler(BaseHandler):
+class LogHandler(base.BaseHandler):
 	def get(self):
 		self.render("log.html", log=self.pakfire.log)
 
 
-class SessionsHandler(BaseHandler):
+class SessionsHandler(base.BaseHandler):
 	def prepare(self):
 		# This is only accessible for administrators.
 		if not self.current_user.is_admin():
@@ -111,6 +89,7 @@ class SessionsHandler(BaseHandler):
 		users = {}
 
 		for s in self.backend.sessions:
+			print s.user, s.user in users
 			try:
 				users[s.user].append(s)
 			except KeyError:
@@ -121,7 +100,7 @@ class SessionsHandler(BaseHandler):
 		self.render("sessions/index.html", sessions=sessions)
 
 
-class RepositoryDetailHandler(BaseHandler):
+class RepositoryDetailHandler(base.BaseHandler):
 	def get(self, distro, repo):
 		distro = self.pakfire.distros.get_by_name(distro)
 		if not distro:
@@ -155,7 +134,7 @@ class RepositoryDetailHandler(BaseHandler):
 			obsolete_builds=obsolete_builds, build_times=build_times)
 
 
-class RepositoryEditHandler(BaseHandler):
+class RepositoryEditHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, distro, repo):
 		distro = self.pakfire.distros.get_by_name(distro)
@@ -171,7 +150,7 @@ class RepositoryEditHandler(BaseHandler):
 		self.render("repository-edit.html", distro=distro, repo=repo)
 
 
-class RepositoryConfHandler(BaseHandler):
+class RepositoryConfHandler(base.BaseHandler):
 	def get(self, distro, repo):
 		distro = self.pakfire.distros.get_by_name(distro)
 		if not distro:
@@ -191,7 +170,7 @@ class RepositoryConfHandler(BaseHandler):
 		self.finish()
 
 
-class RepositoryMirrorlistHandler(BaseHandler):
+class RepositoryMirrorlistHandler(base.BaseHandler):
 	def get(self, distro, repo):
 		distro = self.pakfire.distros.get_by_name(distro)
 		if not distro:
@@ -217,33 +196,23 @@ class RepositoryMirrorlistHandler(BaseHandler):
 			"version" : 1,
 		}
 
-		# A list with mirrors that are sent to the user.
 		mirrors = []
-
-		# Select a list of preferred mirrors
-		for mirror in self.mirrors.get_for_location(self.current_address):
+		for mirror in self.mirrors.make_mirrorlist(self.current_address):
 			mirrors.append({
-				"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
+				"url"       : "/".join((mirror.url, repo.basepath, arch)),
 				"location"  : mirror.country_code,
-				"preferred" : 1,
 			})
 
-		# Add all other mirrors at the end in a random order
-		remaining_mirrors = [m for m in self.backend.mirrors if not m in mirrors]
-		random.shuffle(remaining_mirrors)
-
-		for mirror in remaining_mirrors:
-			mirrors.append({
-				"url"       : "/".join((mirror.url, distro.identifier, repo.identifier, arch)),
-				"location"  : mirror.country_code,
-				"preferred" : 0,
-			})
+		# Always use the buildservice itself as last resort
+		mirrors.append({
+			"url" : repo.url,
+		})
 
 		ret["mirrors"] = mirrors
 		self.finish(ret)
 
 
-class RepoActionHandler(BaseHandler):
+class RepoActionHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def post(self, type):
 		assert type in ("run", "remove")

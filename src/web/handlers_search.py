@@ -2,9 +2,9 @@
 
 import re
 
-from .handlers_base import *
+from . import base
 
-class SearchHandler(BaseHandler):
+class SearchHandler(base.BaseHandler):
 	def get(self):
 		pattern = self.get_argument("q", "")
 		if not pattern:

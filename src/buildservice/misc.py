@@ -76,7 +76,6 @@ def format_filemode(filetype, filemode):
 
 def calc_hash(filename, algo="sha512"):
 	assert algo in hashlib.algorithms
-	assert os.path.exists(filename)
 
 	f = open(filename, "rb")
 	h = hashlib.new(algo)
@@ -91,18 +90,3 @@ def calc_hash(filename, algo="sha512"):
 	f.close()
 
 	return h.hexdigest()
-
-def calc_hash1(filename):
-	# XXX COMPAT FUNCTION
-	# to be removed
-	return calc_hash(filename, "sha1")
-
-def guess_filetype(filename):
-	# XXX very cheap check. Need to do better here.
-	if tarfile.is_tarfile(filename):
-		return "pkg"
-
-	elif filename.endswith(".log"):
-		return "log"
-
-	return "unknown"

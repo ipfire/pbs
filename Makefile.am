@@ -90,6 +90,7 @@ buildservice_PYTHON = \
 	src/buildservice/jobqueue.py \
 	src/buildservice/jobs.py \
 	src/buildservice/keys.py \
+	src/buildservice/ldap.py \
 	src/buildservice/logs.py \
 	src/buildservice/messages.py \
 	src/buildservice/mirrors.py \
@@ -122,10 +123,11 @@ hubdir = $(buildservicedir)/hub
 
 web_PYTHON = \
 	src/web/__init__.py \
+	src/web/base.py \
+	src/web/errors.py \
 	src/web/handlers.py \
 	src/web/handlers_api.py \
 	src/web/handlers_auth.py \
-	src/web/handlers_base.py \
 	src/web/handlers_builders.py \
 	src/web/handlers_builds.py \
 	src/web/handlers_distro.py \
@@ -326,11 +328,6 @@ dist_templates_sessions_DATA = \
 	src/templates/sessions/index.html
 
 templates_sessionsdir = $(templatesdir)/sessions
-
-dist_templates_statistics_DATA = \
-	src/templates/statistics/index.html
-
-templates_statisticsdir = $(templatesdir)/statistics
 
 # ------------------------------------------------------------------------------
 #

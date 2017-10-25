@@ -332,6 +332,17 @@ class Repository(base.DataObject):
 
 		return _builds
 
+	def get_builds_by_name(self, name):
+		"""
+			Returns an ordered list of all builds that match this name
+		"""
+		builds = self.backend.builds._get_builds("SELECT builds.* FROM repositories_builds \
+			LEFT JOIN builds ON repositories_builds.build_id = builds.id \
+			LEFT JOIN packages ON builds.pkg_id = packages.id \
+			WHERE repositories_builds.repo_id = %s AND packages.name = %s", self.id, name)
+
+		return sorted(builds)
+
 	def get_packages(self, arch):
 		if arch == "src":
 			return self.backend.packages._get_packages("SELECT packages.* FROM repositories_builds \

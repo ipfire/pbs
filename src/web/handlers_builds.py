@@ -2,9 +2,9 @@
 
 import tornado.web
 
-from .handlers_base import BaseHandler
+from . import base
 
-class BuildsHandler(BaseHandler):
+class BuildsHandler(base.BaseHandler):
 	def get(self):
 		limit = self.get_argument("limit", None)
 		try:
@@ -12,12 +12,18 @@ class BuildsHandler(BaseHandler):
 		except (TypeError, ValueError):
 			limit = 25
 
-		builds = self.pakfire.builds.get_all(limit=limit)
+		builds = []
+		for build in self.backend.builds:
+			builds.append(build)
+
+			limit -= 1
+			if not limit:
+				break
 
 		self.render("build-index.html", builds=builds)
 
 
-class BuildBaseHandler(BaseHandler):
+class BuildBaseHandler(base.BaseHandler):
 	def get_build(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)
 		if not build:
@@ -70,7 +76,7 @@ class BuildDeleteHandler(BuildBaseHandler):
 		self.render("build-delete.html", build=build)
 
 
-class BuildBugsHandler(BaseHandler):
+class BuildBugsHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)
@@ -127,7 +133,7 @@ class BuildBugsHandler(BaseHandler):
 		self.redirect("/build/%s/bugs" % build.uuid)
 
 
-class BuildsCommentsHandler(BaseHandler):
+class BuildsCommentsHandler(base.BaseHandler):
 	def get(self, user_name=None):
 		user = None
 		if user_name:
@@ -158,7 +164,7 @@ class BuildsCommentsHandler(BaseHandler):
 			offset=offset + limit, user=user, have_prev=have_prev, have_next=have_next)
 
 
-class BuildStateHandler(BaseHandler):
+class BuildStateHandler(base.BaseHandler):
 	def get(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)
 		if not build:
@@ -195,13 +201,13 @@ class BuildStateHandler(BaseHandler):
 		self.redirect("/build/%s" % build.uuid)
 
 
-class BuildQueueHandler(BaseHandler):
+class BuildQueueHandler(base.BaseHandler):
 	def get(self):
 		self.render("build-queue.html", jobs=self.backend.jobqueue,
 			average_waiting_time=self.backend.jobqueue.average_waiting_time)
 
 
-class BuildDetailCommentHandler(BaseHandler):
+class BuildDetailCommentHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def post(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)
@@ -228,7 +234,7 @@ class BuildDetailCommentHandler(BaseHandler):
 		self.redirect("/build/%s" % build.uuid)
 
 
-class BuildManageHandler(BaseHandler):
+class BuildManageHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)
@@ -285,7 +291,7 @@ class BuildManageHandler(BaseHandler):
 		self.redirect("/build/%s" % build.uuid)
 
 
-class BuildPriorityHandler(BaseHandler):
+class BuildPriorityHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)
@@ -320,7 +326,7 @@ class BuildPriorityHandler(BaseHandler):
 		self.redirect("/build/%s" % build.uuid)
 
 
-class BuildWatchersHandler(BaseHandler):
+class BuildWatchersHandler(base.BaseHandler):
 	def get(self, uuid):
 		build = self.pakfire.builds.get_by_uuid(uuid)
 
@@ -334,7 +340,7 @@ class BuildWatchersHandler(BaseHandler):
 		self.render("builds-watchers-list.html", build=build, watchers=watchers)
 
 
-class BuildWatchersAddHandler(BaseHandler):
+class BuildWatchersAddHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid, error_msg=None):
 		build = self.pakfire.builds.get_by_uuid(uuid)
@@ -346,7 +352,7 @@ class BuildWatchersAddHandler(BaseHandler):
 		watchers = build.get_watchers()
 
 		self.render("builds-watchers-add.html", error_msg=error_msg,
-			build=build, users=self.pakfire.users.get_all(), watchers=watchers)
+			build=build, users=self.pakfire.users, watchers=watchers)
 
 	@tornado.web.authenticated
 	def post(self, uuid):
@@ -376,7 +382,7 @@ class BuildWatchersAddHandler(BaseHandler):
 		self.redirect("/build/%s" % build.uuid)
 
 
-class BuildListHandler(BaseHandler):
+class BuildListHandler(base.BaseHandler):
 	def get(self):
 		builder = self.get_argument("builder", None)
 		state = self.get_argument("state", None)
@@ -387,7 +393,7 @@ class BuildListHandler(BaseHandler):
 		self.render("build-list.html", builds=builds)
 
 
-class BuildFilterHandler(BaseHandler):
+class BuildFilterHandler(base.BaseHandler):
 	def get(self):
 		builders = self.pakfire.builders.get_all()
 		distros  = self.pakfire.distros.get_all()

@@ -2,9 +2,9 @@
 
 import tornado.web
 
-from .handlers_base import *
+from . import base
 
-class LoginHandler(BaseHandler):
+class LoginHandler(base.BaseHandler):
 	def get(self):
 		# If the user is already logged in, we just send him back
 		# to the start page.
@@ -41,7 +41,7 @@ class LoginHandler(BaseHandler):
 		self.redirect(next)
 
 
-class RegisterHandler(BaseHandler):
+class RegisterHandler(base.BaseHandler):
 	def get(self):
 		# If the user is already logged in, we just send him back
 		# to the start page.
@@ -64,14 +64,14 @@ class RegisterHandler(BaseHandler):
 
 		if not name:
 			msgs.append(_("No username provided."))
-		elif self.pakfire.users.name_is_used(name):
+		elif self.backend.users.get_by_name(name):
 			msgs.append(_("The given username is already taken."))
 
 		if not email:
 			msgs.append(_("No email address provided."))
 		elif not "@" in email:
 			msgs.append(_("Email address is invalid."))
-		elif self.pakfire.users.email_is_used(email):
+		elif self.backend.users.get_by_email(email):
 			msgs.append(_("The given email address is already used for another account."))
 
 		# Check if the passphrase is okay.
@@ -80,7 +80,7 @@ class RegisterHandler(BaseHandler):
 		elif not pass1 == pass2:
 			msgs.append(_("Passwords do not match."))
 		else:
-			accepted, score = backend.users.check_password_strength(pass1)
+			accepted, score = self.backend.users.check_password_strength(pass1)
 			if not accepted:
 				msgs.append(_("Your password is too weak."))
 
@@ -90,13 +90,22 @@ class RegisterHandler(BaseHandler):
 
 		# All provided data seems okay.
 		# Register the new user to the database.
-		user = self.pakfire.users.register(name, pass1, email, realname,
-			self.locale.code)
+		with self.db.transaction():
+			user = self.backend.users.create(name, realname=realname)
+
+			# Set passphrase
+			user.passphrase = pass1
+
+			# Add email address
+			user.add_email(email)
+
+			# Save locale
+			user.locale = self.locale.code
 
 		self.render("register-success.html", user=user)
 
 
-class ActivationHandler(BaseHandler):
+class ActivationHandler(base.BaseHandler):
 	def get(self, _user):
 		user = self.pakfire.users.get_by_name(_user)
 		if not user:
@@ -105,29 +114,29 @@ class ActivationHandler(BaseHandler):
 		code = self.get_argument("code")
 
 		# Check if the activation code matches and then activate the account.
-		if user.activation_code == code:
-			user.activate()
+		with self.db.transaction():
+			if user.activate_email(code):
+				# If an admin activated another account, he impersonates it.
+				if self.current_user and self.current_user.is_admin():
+					self.session.start_impersonation(user)
 
-			# If an admin activated another account, he impersonates it.
-			if self.current_user and self.current_user.is_admin():
-				self.session.start_impersonation(user)
+				else:
+					# Automatically login the user.
+					self.session = self.backend.sessions.create(user,
+						self.current_address, user_agent=self.user_agent)
 
-			else:
-				# Automatically login the user.
-				session = sessions.Session.create(self.pakfire, user)
+					# Set a session cookie
+					self.set_cookie("session_id", self.session.session_id,
+						expires=self.session.valid_until)
 
-				# Set a cookie and update the current user.
-				self.set_cookie("session_id", session.id, expires=session.valid_until)
-				self._current_user = user
-
-			self.render("register-activation-success.html", user=user)
-			return
+				self.render("register-activation-success.html", user=user)
+				return
 
 		# Otherwise, show an error message.
 		self.render("register-activation-fail.html")
 
 
-class PasswordRecoveryHandler(BaseHandler):
+class PasswordRecoveryHandler(base.BaseHandler):
 	def get(self):
 		return self.render("user-forgot-password.html")
 
@@ -140,15 +149,21 @@ class PasswordRecoveryHandler(BaseHandler):
 		# XXX TODO
 
 
-class LogoutHandler(BaseHandler):
+class LogoutHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
 		# Destroy the user's session.
 		with self.db.transaction():
-			self.session.destroy()
+			# If impersonating, we will just stop the impersonation
+			if self.session.impersonated_user:
+				self.session.stop_impersonation()
 
-		# Remove the cookie, that identifies the user.
-		self.clear_cookie("session_id")
+			# Otherwise we destroy the session
+			else:
+				self.session.destroy()
+
+				# Remove the session cookie
+				self.clear_cookie("session_id")
 
 		# Redirect the user to the front page.
 		self.redirect("/")

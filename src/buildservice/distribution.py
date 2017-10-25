@@ -53,6 +53,9 @@ class Distribution(base.DataObject):
 	def __repr__(self):
 		return "<%s %s>" % (self.__class__.__name__, self.name)
 
+	def __iter__(self):
+		return iter(self.repositories)
+
 	@property
 	def info(self):
 		return {

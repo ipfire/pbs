@@ -55,18 +55,26 @@
 					</span>
 				</div>
 			</div>
+		</fieldset>
+
+		<fieldset>
+			<legend>{{ _("Email Adresses") }}</legend>
 
 			<div class="control-group">
-				<label class="control-label" for="inputEmail">{{ _("Email address") }}</label>
+				<label class="control-label">{{ _("Primary email address") }}</label>
 				<div class="controls">
-					<input type="text" class="input-xlarge" id="inputEmail" name="email" placeholder="{{ _("Email address") }}"
-						value="{{ user.email }}">
+					<select class="input-xlarge" name="primary_email_address">
+						{% for email in user.emails %}
+							<option {% if user.email == email %}selected{% end %}>{{ email }}</option>
+						{% end %}
+					</select>
 
 					<span class="help-block">
-						{{ _("If the email address is changed, your account will be disabled until you confirm the new email address.") }}
+						{{ _("This email address will be used for all messages to you.") }}
 					</span>
 				</div>
 			</div>
+
 		</fieldset>
 
 		{% if current_user.is_admin() %}

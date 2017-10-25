@@ -1,13 +1,15 @@
 #!/usr/bin/python
 
-from .handlers_base import *
+import tornado.web
 
-class DistributionListHandler(BaseHandler):
+from . import base
+
+class DistributionListHandler(base.BaseHandler):
 	def get(self):
 		self.render("distro-list.html", distros=self.backend.distros)
 
 
-class DistributionDetailHandler(BaseHandler):
+class DistributionDetailHandler(base.BaseHandler):
 	def get(self, name):
 		distro = self.pakfire.distros.get_by_name(name)
 		if not distro:
@@ -16,7 +18,7 @@ class DistributionDetailHandler(BaseHandler):
 		self.render("distro-detail.html", distro=distro)
 
 
-class DistributionEditHandler(BaseHandler):
+class DistributionEditHandler(base.BaseHandler):
 	def prepare(self):
 		self.sources = self.pakfire.sources.get_all()
 
@@ -65,7 +67,7 @@ class DistributionEditHandler(BaseHandler):
 		self.redirect("/distribution/%s" % distro.sname)
 
 
-class DistroSourceDetailHandler(BaseHandler):
+class DistroSourceDetailHandler(base.BaseHandler):
 	def get(self, distro_ident, source_ident):
 		distro = self.pakfire.distros.get_by_name(distro_ident)
 		if not distro:
@@ -83,7 +85,7 @@ class DistroSourceDetailHandler(BaseHandler):
 			commits=commits)
 
 
-class DistroSourceCommitsHandler(BaseHandler):
+class DistroSourceCommitsHandler(base.BaseHandler):
 	def get(self, distro_ident, source_ident):
 		distro = self.pakfire.distros.get_by_name(distro_ident)
 		if not distro:
@@ -112,7 +114,7 @@ class DistroSourceCommitsHandler(BaseHandler):
 			commits=commits, limit=limit, offset=offset, number=50)
 
 
-class DistroSourceCommitDetailHandler(BaseHandler):
+class DistroSourceCommitDetailHandler(base.BaseHandler):
 	def get(self, distro_ident, source_ident, commit_ident):
 		distro = self.pakfire.distros.get_by_name(distro_ident)
 		if not distro:
@@ -132,7 +134,7 @@ class DistroSourceCommitDetailHandler(BaseHandler):
 			source=source, commit=commit)
 
 
-class DistroSourceCommitResetHandler(BaseHandler):
+class DistroSourceCommitResetHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, distro_ident, source_ident, commit_ident):
 		distro = self.pakfire.distros.get_by_name(distro_ident)
@@ -164,7 +166,7 @@ class DistroSourceCommitResetHandler(BaseHandler):
 			source=source, commit=commit)
 
 
-class DistroUpdateCreateHandler(BaseHandler):
+class DistroUpdateCreateHandler(base.BaseHandler):
 	def get(self, distro_ident):
 		distro = self.pakfire.distros.get_by_name(distro_ident)
 		if not distro:
@@ -182,7 +184,7 @@ class DistroUpdateCreateHandler(BaseHandler):
 			distro=distro, builds=builds)
 
 
-class DistroUpdateDetailHandler(BaseHandler):
+class DistroUpdateDetailHandler(base.BaseHandler):
 	def get(self, distro_ident, year, num):
 		distro = self.pakfire.distros.get_by_name(distro_ident)
 		if not distro:
@@ -196,14 +198,14 @@ class DistroUpdateDetailHandler(BaseHandler):
 			update=update, repo=update.repo, user=update.user)
 
 # XXX currently unused
-class SourceListHandler(BaseHandler):
+class SourceListHandler(base.BaseHandler):
 	def get(self):
 		sources = self.pakfire.sources.get_all()
 
 		self.render("source-list.html", sources=sources)
 
 
-class SourceDetailHandler(BaseHandler):
+class SourceDetailHandler(base.BaseHandler):
 	def get(self, id):
 		source = self.pakfire.sources.get_by_id(id)
 

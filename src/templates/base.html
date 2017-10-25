@@ -88,13 +88,6 @@
 										</li>
 									{% end %}
 
-									<li>
-										<a href="/statistics">
-											<i class="icon-align-left"></i>
-											{{ _("Statistics") }}
-										</a>
-									</li>
-
 									{% if current_user and current_user.is_admin() %}
 										<li class="divider"></li>
 										<li class="nav-header">
@@ -147,20 +140,13 @@
 													{{ session.user.realname }}
 												</a>
 											</li>
-											<li>
-												<a href="/user/impersonate?action=stop">
-													<i class="icon-off"></i>
-													{{ _("End impersonation") }}
-												</a>
-											</li>
-										{% else %}
-											<li>
-												<a href="/logout">
-													<i class="icon-off"></i>
-													{{ _("Logout") }}
-												</a>
-											</li>
 										{% end %}
+										<li>
+											<a href="/logout">
+												<i class="icon-off"></i>
+												{{ _("Logout") }}
+											</a>
+										</li>
 									</ul>
 								</li>
 							{% else %}

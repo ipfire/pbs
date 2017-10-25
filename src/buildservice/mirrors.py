@@ -35,6 +35,14 @@ class Mirrors(base.Object):
 
 		return iter(mirrors)
 
+	@property
+	def random(self):
+		"""
+			Returns all mirrors in a random order
+		"""
+		return self._get_mirrors("SELECT * FROM mirrors \
+			WHERE deleted IS FALSE ORDER BY RANDOM()")
+
 	def create(self, hostname, path="", owner=None, contact=None, user=None):
 		mirror = self._get_mirror("INSERT INTO mirrors(hostname, path, owner, contact) \
 			VALUES(%s, %s, %s, %s) RETURNING *", hostname, path, owner, contact)
@@ -51,21 +59,18 @@ class Mirrors(base.Object):
 		return self._get_mirror("SELECT * FROM mirrors \
 			WHERE hostname = %s AND deleted IS FALSE", hostname)
 
-	def get_for_location(self, address):
-		country_code = self.backend.geoip.guess_from_address(address)
+	def make_mirrorlist(self, client_address=None):
+		country_code = self.backend.geoip.guess_from_address(client_address)
 
-		# Cannot return any good mirrors if location is unknown
-		if not country_code:
-			return []
-
+		# Walk through all mirrors in a random order
+		# and put all preferred mirrors to the front of the list
+		# and everything else at the end
 		mirrors = []
-
-		# Walk through all mirrors
-		for mirror in self:
-			if mirror.country_code == country_code:
+		for mirror in self.random:
+			if mirror.is_preferred_for_country(country_code):
+				mirrors.insert(0, mirror)
+			else:
 				mirrors.append(mirror)
-
-			# XXX needs to search for nearby countries
 
 		return mirrors
 
@@ -257,6 +262,10 @@ class Mirror(base.DataObject):
 	@property
 	def address(self):
 		return socket.gethostbyname(self.hostname)
+
+	def is_preferred_for_country(self, country_code):
+		if country_code and self.country_code:
+			return self.country_code == country_code
 
 	@lazy_property
 	def country_code(self):

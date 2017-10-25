@@ -16,6 +16,7 @@ from ..decorators import *
 from .handlers import *
 
 from . import handlers_api
+from . import errors
 from . import mirrors
 from . import ui_modules
 
@@ -109,7 +110,7 @@ class Application(tornado.web.Application):
 
 			# User profiles
 			(r"/users", UsersHandler),
-			(r"/user/impersonate", UserImpersonateHandler),
+			(r"/user/(\w+)/impersonate", UserImpersonateHandler),
 			(r"/user/(\w+)/passwd", UserPasswdHandler),
 			(r"/user/(\w+)/delete", UserDeleteHandler),
 			(r"/user/(\w+)/edit", UserEditHandler),
@@ -213,9 +214,6 @@ class Application(tornado.web.Application):
 			(r"/key/([A-Z0-9]+)", KeysDownloadHandler),
 			(r"/key/([A-Z0-9]+)/delete", KeysDeleteHandler),
 
-			# Statistics
-			(r"/statistics", StatisticsMainHandler),
-
 			# Documents
 			(r"/documents", DocsIndexHandler),
 			(r"/documents/builds", DocsBuildsHandler),
@@ -236,7 +234,7 @@ class Application(tornado.web.Application):
 
 			# API handlers
 			(r"/api/packages/autocomplete", handlers_api.ApiPackagesAutocomplete),
-		], **settings)
+		], default_handler_class=errors.Error404Handler, **settings)
 
 		logging.info("Successfully initialied application")
 

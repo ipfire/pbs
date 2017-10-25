@@ -17,7 +17,7 @@ class Messages(base.Object):
 		if not frm:
 			frm = self.pakfire.settings.get("email_from")
 
-		self.db.execute("INSERT INTO user_messages(frm, to, subject, text)"
+		self.db.execute("INSERT INTO user_messages(frm, \"to\", subject, text)"
 			" VALUES(%s, %s, %s, %s)", frm, to, subject, text)
 
 	def get_all(self, limit=None):
@@ -41,10 +41,13 @@ class Messages(base.Object):
 		while True:
 			messages = self.get_all(limit=10)
 
-			for message in messages:
-				self.send_msg(message)
-			else:
+			# If no emails are available, we end here
+			if not messages:
 				break
+
+			for message in messages:
+				with self.db.transaction():
+					self.send_msg(message)
 
 	def send_to_all(self, recipients, subject, body, format=None):
 		"""
@@ -80,8 +83,7 @@ class Messages(base.Object):
 			# Add the message to the queue that it is sent.
 			self.add(recipient, _subject, _body)
 
-	@staticmethod
-	def send_msg(msg):
+	def send_msg(self, msg):
 		if not msg.to:
 			logging.warning("Dropping message with empty recipient.")
 			return

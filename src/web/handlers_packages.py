@@ -4,11 +4,11 @@ import mimetypes
 import os.path
 import tornado.web
 
-from .handlers_base import BaseHandler
+from . import base
 
 from ..constants import BUFFER_SIZE
 
-class PackageIDDetailHandler(BaseHandler):
+class PackageIDDetailHandler(base.BaseHandler):
 	def get(self, id):
 		package = self.packages.get_by_id(id)
 		if not package:
@@ -17,7 +17,7 @@ class PackageIDDetailHandler(BaseHandler):
 		self.render("package-detail.html", package=package)
 
 
-class PackageListHandler(BaseHandler):
+class PackageListHandler(base.BaseHandler):
 	def get(self):
 		packages = {}
 
@@ -48,7 +48,7 @@ class PackageListHandler(BaseHandler):
 		self.render("packages-list.html", packages=packages)
 
 
-class PackageNameHandler(BaseHandler):
+class PackageNameHandler(base.BaseHandler):
 	def get(self, name):
 		builds = self.pakfire.builds.get_active_builds(name)
 		if not builds:
@@ -64,7 +64,7 @@ class PackageNameHandler(BaseHandler):
 			latest_build=latest_build, pkg=latest_build.pkg, bugs=bugs)
 
 
-class PackageScratchBuildsHandler(BaseHandler):
+class PackageScratchBuildsHandler(base.BaseHandler):
 	def get(self, name):
 		offset = self.get_argument("offset", 0)
 		limit  = self.get_argument("limit", 10)
@@ -85,7 +85,7 @@ class PackageScratchBuildsHandler(BaseHandler):
 			pkg=latest_build.pkg)
 
 
-class PackageChangelogHandler(BaseHandler):
+class PackageChangelogHandler(base.BaseHandler):
 	def get(self, name):
 		limit = self.get_argument("limit", 10)
 		try:
@@ -120,7 +120,7 @@ class PackageChangelogHandler(BaseHandler):
 			limit=limit, offset=offset, have_prev=have_prev, have_next=have_next)
 
 
-class PackageDetailHandler(BaseHandler):
+class PackageDetailHandler(base.BaseHandler):
 	def get(self, uuid):
 		pkg = self.pakfire.packages.get_by_uuid(uuid)
 		if not pkg:
@@ -146,7 +146,7 @@ class PackageDetailHandler(BaseHandler):
 		self.render("package-detail.html", pkg=pkg)
 
 
-class PackagePropertiesHandler(BaseHandler):
+class PackagePropertiesHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
 		build = self.pakfire.builds.get_latest_by_name(name)
@@ -182,7 +182,7 @@ class PackagePropertiesHandler(BaseHandler):
 		build.pkg.update_property("critical_path", critical_path)
 
 
-class PackageFileDownloadHandler(BaseHandler):
+class PackageFileDownloadHandler(base.BaseHandler):
 	def get_file(self, pkg_uuid, filename):
 		# Fetch package.
 		pkg = self.pakfire.packages.get_by_uuid(pkg_uuid)
@@ -244,9 +244,9 @@ class PackageFileViewHandler(PackageFileDownloadHandler):
 			mimetype=mimetype, content=content, filesize=f.size)
 
 
-class PackageBuildsTimesHandler(BaseHandler):
+class PackageBuildsTimesHandler(base.BaseHandler):
 	def get(self, name):
-		latest_build = self.pakfire.builds.get_latest_by_name(name, type="release")
+		latest_build = self.pakfire.builds.get_latest_by_name(name)
 
 		# If no build with this name was found, we cannot go on.
 		if not latest_build:

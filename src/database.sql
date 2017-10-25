@@ -26,30 +26,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- Name: arches_binary; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE arches_binary AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE arches_binary OWNER TO pakfire;
-
---
--- Name: builders_disabled; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_disabled AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_disabled OWNER TO pakfire;
-
---
 -- Name: builders_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -62,30 +38,6 @@ CREATE TYPE builders_history_action AS ENUM (
 
 
 ALTER TYPE builders_history_action OWNER TO pakfire;
-
---
--- Name: builders_overload; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_overload AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE builders_overload OWNER TO pakfire;
-
---
--- Name: builds_auto_move; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_auto_move AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE builds_auto_move OWNER TO pakfire;
 
 --
 -- Name: builds_history_action; Type: TYPE; Schema: public; Owner: pakfire
@@ -115,21 +67,6 @@ CREATE TYPE builds_severity AS ENUM (
 ALTER TYPE builds_severity OWNER TO pakfire;
 
 --
--- Name: builds_state; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_state AS ENUM (
-    'building',
-    'testing',
-    'stable',
-    'obsolete',
-    'broken'
-);
-
-
-ALTER TYPE builds_state OWNER TO pakfire;
-
---
 -- Name: builds_type; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -140,18 +77,6 @@ CREATE TYPE builds_type AS ENUM (
 
 
 ALTER TYPE builds_type OWNER TO pakfire;
-
---
--- Name: filelists_config; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE filelists_config AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE filelists_config OWNER TO pakfire;
 
 --
 -- Name: jobs_history_action; Type: TYPE; Schema: public; Owner: pakfire
@@ -213,18 +138,6 @@ CREATE TYPE jobs_state AS ENUM (
 ALTER TYPE jobs_state OWNER TO pakfire;
 
 --
--- Name: jobs_type; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE jobs_type AS ENUM (
-    'build',
-    'test'
-);
-
-
-ALTER TYPE jobs_type OWNER TO pakfire;
-
---
 -- Name: mirrors_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -256,18 +169,6 @@ CREATE TYPE packages_deps_type AS ENUM (
 ALTER TYPE packages_deps_type OWNER TO pakfire;
 
 --
--- Name: packages_properties_critical_path; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE packages_properties_critical_path AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE packages_properties_critical_path OWNER TO pakfire;
-
---
 -- Name: packages_type; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -292,18 +193,6 @@ CREATE TYPE repositories_aux_status AS ENUM (
 ALTER TYPE repositories_aux_status OWNER TO pakfire;
 
 --
--- Name: repositories_enabled_for_builds; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE repositories_enabled_for_builds AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE repositories_enabled_for_builds OWNER TO pakfire;
-
---
 -- Name: repositories_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -315,18 +204,6 @@ CREATE TYPE repositories_history_action AS ENUM (
 
 
 ALTER TYPE repositories_history_action OWNER TO pakfire;
-
---
--- Name: repositories_mirrored; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE repositories_mirrored AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE repositories_mirrored OWNER TO pakfire;
 
 --
 -- Name: repositories_type; Type: TYPE; Schema: public; Owner: pakfire
@@ -354,114 +231,6 @@ CREATE TYPE sources_commits_state AS ENUM (
 
 
 ALTER TYPE sources_commits_state OWNER TO pakfire;
-
---
--- Name: uploads_finished; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE uploads_finished AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE uploads_finished OWNER TO pakfire;
-
---
--- Name: users_activated; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_activated AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE users_activated OWNER TO pakfire;
-
---
--- Name: users_deleted; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_deleted AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE users_deleted OWNER TO pakfire;
-
---
--- Name: users_emails_primary; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_emails_primary AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_emails_primary OWNER TO pakfire;
-
---
--- Name: users_permissions_create_scratch_builds; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_create_scratch_builds AS ENUM (
-    'Y',
-    'N'
-);
-
-
-ALTER TYPE users_permissions_create_scratch_builds OWNER TO pakfire;
-
---
--- Name: users_permissions_maintain_builders; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_maintain_builders AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_maintain_builders OWNER TO pakfire;
-
---
--- Name: users_permissions_manage_critical_path; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_manage_critical_path AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_manage_critical_path OWNER TO pakfire;
-
---
--- Name: users_permissions_manage_mirrors; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_manage_mirrors AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_manage_mirrors OWNER TO pakfire;
-
---
--- Name: users_permissions_vote; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_permissions_vote AS ENUM (
-    'N',
-    'Y'
-);
-
-
-ALTER TYPE users_permissions_vote OWNER TO pakfire;
 
 --
 -- Name: users_state; Type: TYPE; Schema: public; Owner: pakfire
@@ -863,7 +632,7 @@ ALTER TABLE jobs OWNER TO pakfire;
 CREATE VIEW builds_times AS
  SELECT jobs.build_id,
     jobs.arch,
-    (jobs.time_finished - jobs.time_started) AS duration
+    date_part('epoch'::text, (jobs.time_finished - jobs.time_started)) AS duration
    FROM jobs
   WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::jobs_state));
 
@@ -1899,14 +1668,14 @@ CREATE TABLE users (
     id integer NOT NULL,
     name text NOT NULL,
     realname text,
-    passphrase text NOT NULL,
-    state users_state NOT NULL,
+    passphrase text,
+    state users_state DEFAULT 'user'::users_state NOT NULL,
     locale text,
     timezone text,
-    activated users_activated DEFAULT 'N'::users_activated NOT NULL,
-    activation_code text,
-    deleted users_deleted DEFAULT 'N'::users_deleted NOT NULL,
-    registered timestamp without time zone DEFAULT now() NOT NULL
+    activated boolean DEFAULT false NOT NULL,
+    deleted boolean DEFAULT false NOT NULL,
+    registered timestamp without time zone DEFAULT now() NOT NULL,
+    ldap_dn text
 );
 
 
@@ -1920,7 +1689,9 @@ CREATE TABLE users_emails (
     id integer NOT NULL,
     user_id integer NOT NULL,
     email text NOT NULL,
-    "primary" users_emails_primary DEFAULT 'N'::users_emails_primary NOT NULL
+    "primary" boolean DEFAULT false NOT NULL,
+    activated boolean DEFAULT false NOT NULL,
+    activation_code text
 );
 
 
@@ -1975,11 +1746,11 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 CREATE TABLE users_permissions (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    create_scratch_builds users_permissions_create_scratch_builds DEFAULT 'N'::users_permissions_create_scratch_builds NOT NULL,
-    maintain_builders users_permissions_maintain_builders DEFAULT 'N'::users_permissions_maintain_builders NOT NULL,
-    manage_critical_path users_permissions_manage_critical_path DEFAULT 'N'::users_permissions_manage_critical_path NOT NULL,
-    manage_mirrors users_permissions_manage_mirrors DEFAULT 'N'::users_permissions_manage_mirrors NOT NULL,
-    vote users_permissions_vote DEFAULT 'N'::users_permissions_vote NOT NULL
+    create_scratch_builds boolean DEFAULT false NOT NULL,
+    maintain_builders boolean DEFAULT false NOT NULL,
+    manage_critical_path boolean DEFAULT false NOT NULL,
+    manage_mirrors boolean DEFAULT false NOT NULL,
+    vote boolean DEFAULT false NOT NULL
 );
 
 
@@ -3293,7 +3064,7 @@ ALTER TABLE ONLY uploads
 --
 
 ALTER TABLE ONLY users_emails
-    ADD CONSTRAINT users_emails_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+    ADD CONSTRAINT users_emails_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
 --
@@ -3301,7 +3072,7 @@ ALTER TABLE ONLY users_emails
 --
 
 ALTER TABLE ONLY users_permissions
-    ADD CONSTRAINT users_permissions_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+    ADD CONSTRAINT users_permissions_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
 --

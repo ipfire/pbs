@@ -117,30 +117,6 @@ class Jobs(base.Object):
 
 		return [Job(self.backend, j.id, j) for j in self.db.query(query, *args)]
 
-	def get_average_build_time(self):
-		"""
-			Returns the average build time of all finished builds from the
-			last 3 months.
-		"""
-		result = self.db.get("SELECT AVG(time_finished - time_started) as average \
-			FROM jobs WHERE type = 'build' AND state = 'finished' AND \
-			time_finished >= NOW() - '3 months'::interval")
-
-		if result:
-			return result.average
-
-	def count(self, *states):
-		query = "SELECT COUNT(*) AS count FROM jobs"
-		args  = []
-
-		if states:
-			query += " WHERE state IN %s"
-			args.append(states)
-
-		jobs = self.db.get(query, *args)
-		if jobs:
-			return jobs.count
-
 	def restart_failed(self):
 		jobs = self._get_jobs("SELECT jobs.* FROM jobs \
 			JOIN builds ON builds.id = jobs.build_id \
