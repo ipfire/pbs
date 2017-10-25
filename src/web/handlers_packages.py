@@ -246,7 +246,7 @@ class PackageFileViewHandler(PackageFileDownloadHandler):
 
 class PackageBuildsTimesHandler(BaseHandler):
 	def get(self, name):
-		latest_build = self.pakfire.builds.get_latest_by_name(name, type="release")
+		latest_build = self.pakfire.builds.get_latest_by_name(name)
 
 		# If no build with this name was found, we cannot go on.
 		if not latest_build:

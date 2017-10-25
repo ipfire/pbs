@@ -111,44 +111,33 @@ class Builds(base.Object):
 
 		return [Build(self.backend, b.id, b) for b in self.db.query(query, *args)]
 
-	def get_latest_by_name(self, name, type=None):
-		query = "\
-			SELECT * FROM builds \
-				LEFT JOIN builds_latest ON builds.id = builds_latest.build_id \
-			WHERE builds_latest.package_name = %s"
-		args = [name,]
-
-		if type:
-			query += " AND builds_latest.build_type = %s"
-			args.append(type)
-
-		# Get the last one only.
-		# Prefer release builds over scratch builds.
-		query += "\
-			ORDER BY \
-				CASE builds.type WHEN 'release' THEN 0 ELSE 1 END, \
-				builds.time_created DESC \
-			LIMIT 1"
-
-		res = self.db.get(query, *args)
-
-		if res:
-			return Build(self.backend, res.id, res)
+	def get_latest_by_name(self, name):
+		return self._get_build("SELECT builds.* FROM builds \
+			LEFT JOIN packages ON builds.pkg_id = packages.id \
+			WHERE packages.name = %s ORDER BY builds.time_created DESC \
+			LIMIT 1", name)
 
 	def get_active_builds(self, name):
-		query = "\
-			SELECT * FROM builds \
-				LEFT JOIN builds_latest ON builds.id = builds_latest.build_id \
-			WHERE builds_latest.package_name = %s AND builds.type = %s"
-		args = [name, "release"]
-
+		"""
+			Returns a list of all builds that are in a repository
+			and the successors of the latest builds.
+		"""
 		builds = []
-		for row in self.db.query(query, *args):
-			b = Build(self.backend, row.id, row)
-			builds.append(b)
 
-		# Sort the result. Lastest build first.
-		builds.sort(reverse=True)
+		for distro in self.backend.distros:
+			for repo in distro:
+				builds += repo.get_builds_by_name(name)
+
+		if builds:
+			# The latest build should be at the end of the list
+			latest_build = builds[-1]
+
+			# We will add all successors that are not broken
+			builds += (b for b in latest_build.successors
+				if not b.is_broken() and not b in builds)
+
+		# Order from newest to oldest
+		builds.reverse()
 
 		return builds
 
@@ -948,6 +937,15 @@ class Build(base.DataObject):
 				self._update = updates.Update(self.backend, update.id)
 
 		return self._update
+
+	@lazy_property
+	def successors(self):
+		builds = self.backend.builds._get_builds("SELECT builds.* FROM builds \
+			LEFT JOIN packages ON builds.pkg_id = packages.id \
+			WHERE packages.name = %s AND builds.type = %s AND \
+			builds.time_created >= %s", self.pkg.name, "release", self.created)
+
+		return sorted(builds)
 
 	@lazy_property
 	def repo(self):
