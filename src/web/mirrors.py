@@ -8,26 +8,8 @@ from .handlers_base import BaseHandler
 
 class MirrorListHandler(BaseHandler):
 	def get(self):
-		mirrors = self.backend.mirrors
-		mirrors_nearby = self.backend.mirrors.get_for_location(self.current_address)
-
-		mirrors_worldwide = []
-		for mirror in mirrors:
-			if mirror in mirrors_nearby:
-				continue
-
-			mirrors_worldwide.append(mirror)
-
-		kwargs = {
-			"mirrors" : mirrors,
-			"mirrors_nearby" : mirrors_nearby,
-			"mirrors_worldwide" : mirrors_worldwide,
-		}
-
-		# Get recent log messages.
-		kwargs["log"] = self.backend.mirrors.get_history(limit=5)
-
-		self.render("mirrors/list.html", **kwargs)
+		self.render("mirrors/list.html", mirrors=self.backend.mirrors,
+			log=self.backend.mirrors.get_history(limit=5))
 
 
 class MirrorDetailHandler(BaseHandler):
