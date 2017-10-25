@@ -66,7 +66,7 @@ class Uploads(base.Object):
 		return upload
 
 	def cleanup(self):
-		for upload in self.get_all():
+		for upload in self:
 			upload.cleanup()
 
 
