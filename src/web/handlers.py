@@ -225,6 +225,11 @@ class RepositoryMirrorlistHandler(BaseHandler):
 				"location"  : mirror.country_code,
 			})
 
+		# Always use the buildservice itself as last resort
+		mirrors.append({
+			"url" : repo.url,
+		})
+
 		ret["mirrors"] = mirrors
 		self.finish(ret)
 
