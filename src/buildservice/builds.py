@@ -141,11 +141,6 @@ class Builds(base.Object):
 
 		return builds
 
-	def count(self):
-		builds = self.db.get("SELECT COUNT(*) AS count FROM builds")
-		if builds:
-			return builds.count
-
 	def get_obsolete(self, repo=None):
 		"""
 			Get all obsoleted builds.

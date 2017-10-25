@@ -328,11 +328,6 @@ dist_templates_sessions_DATA = \
 
 templates_sessionsdir = $(templatesdir)/sessions
 
-dist_templates_statistics_DATA = \
-	src/templates/statistics/index.html
-
-templates_statisticsdir = $(templatesdir)/statistics
-
 # ------------------------------------------------------------------------------
 #
 dist_static_DATA = \

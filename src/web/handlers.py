@@ -37,24 +37,6 @@ class Error404Handler(BaseHandler):
 		raise tornado.web.HTTPError(404)
 
 
-class StatisticsMainHandler(BaseHandler):
-	def get(self):
-		args = {}
-
-		# Build statistics.
-		args.update({
-			"builds_count" : self.pakfire.builds.count(),
-		})
-
-		# Job statistics.
-		args.update({
-			"jobs_count_all"      : self.pakfire.jobs.count(),
-			"jobs_avg_build_time" : self.pakfire.jobs.get_average_build_time(),
-		})
-
-		self.render("statistics/index.html", **args)
-
-
 class UploadsHandler(BaseHandler):
 	@tornado.web.authenticated
 	def get(self):

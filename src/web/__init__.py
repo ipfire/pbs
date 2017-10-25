@@ -213,9 +213,6 @@ class Application(tornado.web.Application):
 			(r"/key/([A-Z0-9]+)", KeysDownloadHandler),
 			(r"/key/([A-Z0-9]+)/delete", KeysDeleteHandler),
 
-			# Statistics
-			(r"/statistics", StatisticsMainHandler),
-
 			# Documents
 			(r"/documents", DocsIndexHandler),
 			(r"/documents/builds", DocsBuildsHandler),
