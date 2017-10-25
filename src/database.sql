@@ -632,7 +632,7 @@ ALTER TABLE jobs OWNER TO pakfire;
 CREATE VIEW builds_times AS
  SELECT jobs.build_id,
     jobs.arch,
-    (jobs.time_finished - jobs.time_started) AS duration
+    date_part('epoch'::text, (jobs.time_finished - jobs.time_started)) AS duration
    FROM jobs
   WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::jobs_state));
 
