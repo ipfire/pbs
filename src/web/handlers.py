@@ -33,11 +33,6 @@ class IndexHandler(base.BaseHandler):
 		self.render("index.html", jobs=jobs, updates=updates)
 
 
-class Error404Handler(base.BaseHandler):
-	def get(self):
-		raise tornado.web.HTTPError(404)
-
-
 class UploadsHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
