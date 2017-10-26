@@ -131,7 +131,7 @@ class Application(tornado.web.Application):
 			(r"/profile/builds", users.UsersBuildsHandler),
 
 			# Packages
-			(r"/packages", packages.PackageListHandler),
+			(r"/packages", packages.IndexHandler),
 			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", packages.PackageDetailHandler),
 			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/download(.*)", packages.PackageFileDownloadHandler),
 			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/view(.*)", packages.PackageFileViewHandler),

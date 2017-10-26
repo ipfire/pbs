@@ -127,7 +127,7 @@ src/templates/package-properties.html
 src/templates/packages/builds/scratch.html
 src/templates/packages/builds/times.html
 src/templates/packages/changelog.html
-src/templates/packages-list.html
+src/templates/packages/index.html
 src/templates/packages/view-file.html
 src/templates/queue.html
 src/templates/register-activation-fail.html

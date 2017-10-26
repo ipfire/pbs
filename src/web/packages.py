@@ -8,6 +8,23 @@ from . import base
 
 from ..constants import BUFFER_SIZE
 
+class IndexHandler(base.BaseHandler):
+	def get(self):
+		# Sort all packages in an array like "<first char>" --> [packages, ...]
+		# to print them in a table for each letter of the alphabet.
+		packages = {}
+
+		for pkg in self.backend.packages.get_list():
+			c = pkg.name[0].lower()
+
+			try:
+				packages[c].append(pkg)
+			except KeyError:
+				packages[c] = [pkg]
+
+		self.render("packages/index.html", packages=packages)
+
+
 class PackageIDDetailHandler(base.BaseHandler):
 	def get(self, id):
 		package = self.packages.get_by_id(id)
@@ -15,37 +32,6 @@ class PackageIDDetailHandler(base.BaseHandler):
 			return tornado.web.HTTPError(404, "Package not found: %s" % id)
 
 		self.render("package-detail.html", package=package)
-
-
-class PackageListHandler(base.BaseHandler):
-	def get(self):
-		packages = {}
-
-		show = self.get_argument("show", None)
-		if show == "all":
-			states = None
-		elif show == "obsoletes":
-			states = ["obsolete"]
-		elif show == "broken":
-			states = ["broken"]
-		else:
-			states = ["building", "stable", "testing"]
-
-		# Get all packages that fulfill the required parameters.
-		pkgs = self.backend.packages.get_all_names(
-			user=self.current_user, states=states)
-
-		# Sort all packages in an array like "<first char>" --> [packages, ...]
-		# to print them in a table for each letter of the alphabet.
-		for pkg in pkgs:
-			c = pkg[0][0].lower()
-
-			if not packages.has_key(c):
-				packages[c] = []
-
-			packages[c].append(pkg)
-
-		self.render("packages-list.html", packages=packages)
 
 
 class PackageNameHandler(base.BaseHandler):
@@ -90,6 +76,7 @@ class PackageChangelogHandler(base.BaseHandler):
 		limit = self.get_argument("limit", 10)
 		try:
 			limit = int(limit)
+
 		except ValueError:
 			limit = 10
 

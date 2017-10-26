@@ -190,7 +190,6 @@ dist_templates_DATA = \
 	src/templates/package-detail.html \
 	src/templates/package-detail-list.html \
 	src/templates/package-properties.html \
-	src/templates/packages-list.html \
 	src/templates/queue.html \
 	src/templates/register-activation-fail.html \
 	src/templates/register-activation-success.html \
@@ -313,6 +312,7 @@ templates_modules_selectdir = $(templates_modulesdir)/select
 
 dist_templates_packages_DATA = \
 	src/templates/packages/changelog.html \
+	src/templates/packages/index.html \
 	src/templates/packages/view-file.html
 
 templates_packagesdir = $(templatesdir)/packages
