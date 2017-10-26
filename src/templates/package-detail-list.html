@@ -54,10 +54,10 @@
 				<h4>
 					<div class="pull-right">
 						<div class="btn-group">
-							<a class="btn btn-mini" href="{{ bugtracker.enter_url(pkg.name) }}" target="_blank">
+							<a class="btn btn-mini" href="{{ backend.bugtracker.enter_url(pkg.name) }}" target="_blank">
 								<i class="icon-asterisk"></i> {{ _("File new bug") }}
 							</a>
-							<a class="btn btn-mini" href="{{ bugtracker.buglist_url(pkg.name) }}" target="_blank">
+							<a class="btn btn-mini" href="{{ backend.bugtracker.buglist_url(pkg.name) }}" target="_blank">
 								{{ _("Show all bugs") }}
 							</a>
 						</div>

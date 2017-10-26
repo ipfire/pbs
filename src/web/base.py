@@ -77,7 +77,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		ns.update({
 			"backend"         : self.backend,
-			"bugtracker"      : self.backend.bugzilla,
 			"hostname"        : self.request.host,
 			"format_date"     : self.format_date,
 			"format_size"     : misc.format_size,
