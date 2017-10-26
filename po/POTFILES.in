@@ -165,10 +165,10 @@ src/web/base.py
 src/web/builders.py
 src/web/builds.py
 src/web/distributions.py
-src/web/mirrors.py
 src/web/handlers.py
 src/web/jobs.py
-src/web/handlers_keys.py
+src/web/keys.py
+src/web/mirrors.py
 src/web/handlers_packages.py
 src/web/handlers_search.py
 src/web/handlers_updates.py

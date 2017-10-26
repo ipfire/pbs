@@ -22,6 +22,7 @@ from . import builds
 from . import distributions
 from . import errors
 from . import jobs
+from . import keys
 from . import mirrors
 from . import ui_modules
 
@@ -214,10 +215,10 @@ class Application(tornado.web.Application):
 			(r"/mirror/([\w\-\.]+)",		mirrors.MirrorDetailHandler),
 
 			# Key management
-			(r"/keys", KeysListHandler),
-			(r"/key/import", KeysImportHandler),
-			(r"/key/([A-Z0-9]+)", KeysDownloadHandler),
-			(r"/key/([A-Z0-9]+)/delete", KeysDeleteHandler),
+			(r"/keys", keys.KeysListHandler),
+			(r"/key/import", keys.KeysImportHandler),
+			(r"/key/([A-Z0-9]+)", keys.KeysDownloadHandler),
+			(r"/key/([A-Z0-9]+)/delete", keys.KeysDeleteHandler),
 
 			# Documents
 			(r"/documents", DocsIndexHandler),

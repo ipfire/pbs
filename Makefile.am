@@ -132,12 +132,12 @@ web_PYTHON = \
 	src/web/errors.py \
 	src/web/handlers.py \
 	src/web/jobs.py \
-	src/web/handlers_keys.py \
+	src/web/keys.py \
+	src/web/mirrors.py \
 	src/web/handlers_packages.py \
 	src/web/handlers_search.py \
 	src/web/handlers_updates.py \
 	src/web/handlers_users.py \
-	src/web/mirrors.py \
 	src/web/ui_modules.py
 
 webdir = $(buildservicedir)/web
