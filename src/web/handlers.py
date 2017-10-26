@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import random
 import tornado.web
 
 from . import base
