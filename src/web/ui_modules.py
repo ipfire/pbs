@@ -8,9 +8,9 @@ import math
 import pytz
 import re
 import string
-import tornado.escape
 import tornado.web
 
+from .. import sources
 from .. import users
 from ..constants import *
 
@@ -35,13 +35,11 @@ class TextModule(UIModule):
 			yield paragraph.replace("\n", " ")
 
 	def render(self, text, pre=False, remove_linebreaks=True):
+		if isinstance(text, sources.Commit):
+			text = self._get_commit_message(text)
+
 		if remove_linebreaks:
 			text = text.replace("\n", " ")
-
-		# Escape the text and create make urls clickable.
-		text = tornado.escape.xhtml_escape(text)
-		text = tornado.escape.linkify(text, shorten=True,
-			extra_params="target=\"_blank\" rel=\"noopener\"")
 
 		# Search for bug ids that need to be linked to bugzilla
 		text = re.sub(self.BUGZILLA_PATTERN, self._bugzilla_repl, text, re.I|re.U)
@@ -65,15 +63,10 @@ class TextModule(UIModule):
 	def _cve_repl(self, m):
 		return self.LINK % ("http://cve.mitre.org/cgi-bin/cvename.cgi?name=%s" % m.group(1), m.group(0))
 
+	def _get_commit_message(self, commit):
+		text = (commit.subject, commit.message)
 
-class CommitMessageModule(TextModule):
-	def render(self, commit):
-		s = "h5. %s\n\n" % commit.subject
-
-		paragraphs = self.split_paragraphs(commit.message)
-		s += "\n\n".join(paragraphs)
-
-		return TextModule.render(self, s, remove_linebreaks=False)
+		return "\n\n".join(text)
 
 
 class ModalModule(UIModule):

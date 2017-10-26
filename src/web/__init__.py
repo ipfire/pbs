@@ -73,7 +73,6 @@ class Application(tornado.web.Application):
 				# Packages
 				"PackagesDependencyTable" : ui_modules.PackagesDependencyTableModule,
 
-				"CommitMessage"      : ui_modules.CommitMessageModule,
 				"CommitsTable"       : ui_modules.CommitsTableModule,
 				"JobsBoxes"          : ui_modules.JobsBoxesModule,
 				"JobState"           : ui_modules.JobStateModule,
