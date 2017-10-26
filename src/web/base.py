@@ -111,7 +111,3 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		self.render(error_document, status_code=status_code,
 			status_message=status_message, exc_info=exc_info, tb=tb, **kwargs)
-
-
-class ApiBaseHandler(BaseHandler):
-	pass
