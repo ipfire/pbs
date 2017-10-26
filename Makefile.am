@@ -136,9 +136,9 @@ web_PYTHON = \
 	src/web/mirrors.py \
 	src/web/packages.py \
 	src/web/search.py \
-	src/web/handlers_updates.py \
-	src/web/handlers_users.py \
-	src/web/ui_modules.py
+	src/web/ui_modules.py \
+	src/web/updates.py \
+	src/web/handlers_users.py
 
 webdir = $(buildservicedir)/web
 

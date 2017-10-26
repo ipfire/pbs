@@ -13,8 +13,7 @@ from .. import Backend
 from ..constants import *
 from ..decorators import *
 
-from .handlers import *
-
+# Import all handlers
 from . import api
 from . import auth
 from . import builders
@@ -26,6 +25,9 @@ from . import keys
 from . import mirrors
 from . import packages
 from . import search
+from . import updates
+from .handlers import *
+
 from . import ui_modules
 
 # Enable logging
