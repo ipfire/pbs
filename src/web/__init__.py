@@ -15,7 +15,7 @@ from ..decorators import *
 
 from .handlers import *
 
-from . import handlers_api
+from . import api
 from . import errors
 from . import mirrors
 from . import ui_modules
@@ -233,7 +233,7 @@ class Application(tornado.web.Application):
 			(r"/sessions", SessionsHandler),
 
 			# API handlers
-			(r"/api/packages/autocomplete", handlers_api.ApiPackagesAutocomplete),
+			(r"/api/packages/autocomplete", api.ApiPackagesAutocomplete),
 		], default_handler_class=errors.Error404Handler, **settings)
 
 		logging.info("Successfully initialied application")
