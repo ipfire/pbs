@@ -1004,12 +1004,8 @@ class Build(base.DataObject):
 
 		query = self.db.get("SELECT NOW() - time_added AS duration FROM repositories_builds \
 			WHERE build_id = %s", self.id)
-		duration = query.duration
 
-		if duration >= self.repo.time_min:
-			return True
-
-		return False
+		return query.duration.total_seconds() >= self.repo.time_min
 
 	## Bugs
 
