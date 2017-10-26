@@ -164,8 +164,8 @@ src/web/auth.py
 src/web/base.py
 src/web/builders.py
 src/web/builds.py
+src/web/distributions.py
 src/web/mirrors.py
-src/web/handlers_distro.py
 src/web/handlers_jobs.py
 src/web/handlers_keys.py
 src/web/handlers_packages.py

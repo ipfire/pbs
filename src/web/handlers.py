@@ -5,7 +5,6 @@ import tornado.web
 
 from . import base
 
-from .handlers_distro import *
 from .handlers_jobs import *
 from .handlers_keys import *
 from .handlers_packages import *

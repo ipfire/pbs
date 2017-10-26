@@ -19,6 +19,7 @@ from . import api
 from . import auth
 from . import builders
 from . import builds
+from . import distributions
 from . import errors
 from . import mirrors
 from . import ui_modules
@@ -171,12 +172,12 @@ class Application(tornado.web.Application):
 			(r"/builder/([A-Za-z0-9\-\.]+)", builders.BuilderDetailHandler),
 
 			# Distributions
-			(r"/distros", DistributionListHandler),
-			(r"/distro/([A-Za-z0-9\-\.]+)", DistributionDetailHandler),
+			(r"/distros", distributions.DistributionListHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)", distributions.DistributionDetailHandler),
 
 			# XXX THOSE URLS ARE DEPRECATED
-			(r"/distribution/delete/([A-Za-z0-9\-\.]+)", DistributionDetailHandler),
-			(r"/distribution/edit/([A-Za-z0-9\-\.]+)", DistributionEditHandler),
+			(r"/distribution/delete/([A-Za-z0-9\-\.]+)", distributions.DistributionDetailHandler),
+			(r"/distribution/edit/([A-Za-z0-9\-\.]+)", distributions.DistributionEditHandler),
 
 			(r"/distro/([A-Za-z0-9\-\.]+)/repo/([A-Za-z0-9\-]+)",
 				RepositoryDetailHandler),
@@ -188,18 +189,18 @@ class Application(tornado.web.Application):
 				RepositoryEditHandler),
 
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)",
-				DistroSourceDetailHandler),
+				distributions.DistroSourceDetailHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/commits",
-				DistroSourceCommitsHandler),
+				distributions.DistroSourceCommitsHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/([\w]{40})",
-				DistroSourceCommitDetailHandler),
+				distributions.DistroSourceCommitDetailHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/([\w]{40})/reset",
-				DistroSourceCommitResetHandler),
+				distributions.DistroSourceCommitResetHandler),
 
 			(r"/distro/([A-Za-z0-9\-\.]+)/update/create",
-				DistroUpdateCreateHandler),
+				distributions.DistroUpdateCreateHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/update/(\d+)/(\d+)",
-				DistroUpdateDetailHandler),
+				distributions.DistroUpdateDetailHandler),
 
 			# Updates
 			(r"/updates", UpdatesHandler),

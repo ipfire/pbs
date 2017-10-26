@@ -128,9 +128,9 @@ web_PYTHON = \
 	src/web/base.py \
 	src/web/builders.py \
 	src/web/builds.py \
+	src/web/distributions.py \
 	src/web/errors.py \
 	src/web/handlers.py \
-	src/web/handlers_distro.py \
 	src/web/handlers_jobs.py \
 	src/web/handlers_keys.py \
 	src/web/handlers_packages.py \
