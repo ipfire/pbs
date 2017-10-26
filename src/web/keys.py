@@ -19,7 +19,7 @@ class KeysImportHandler(KeysActionHandler):
 	def post(self):
 		data = self.get_argument("data")
 
-		key = self.pakfire.keys.create(data)
+		key = self.backend.keys.create(data)
 		assert key
 
 		self.redirect("/keys")
@@ -28,7 +28,7 @@ class KeysImportHandler(KeysActionHandler):
 class KeysDeleteHandler(KeysActionHandler):
 	@tornado.web.authenticated
 	def get(self, fingerprint):
-		key = self.pakfire.keys.get_by_fpr(fingerprint)
+		key = self.backend.keys.get_by_fpr(fingerprint)
 		if not key:
 			raise tornado.web.HTTPError(404, "Could not find key: %s" % fingerprint)
 
@@ -43,14 +43,14 @@ class KeysDeleteHandler(KeysActionHandler):
 
 class KeysListHandler(base.BaseHandler):
 	def get(self):
-		keys = self.pakfire.keys.get_all()
+		keys = self.backend.keys.get_all()
 
 		self.render("keys-list.html", keys=keys)
 
 
 class KeysDownloadHandler(base.BaseHandler):
 	def get(self, fingerprint):
-		key = self.pakfire.keys.get_by_fpr(fingerprint)
+		key = self.backend.keys.get_by_fpr(fingerprint)
 		if not key:
 			raise tornado.web.HTTPError(404, "Could not find key: %s" % fingerprint)
 

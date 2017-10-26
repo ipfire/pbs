@@ -6,14 +6,14 @@ from . import base
 
 class IndexHandler(base.BaseHandler):
 	def get(self):
-		jobs = self.pakfire.jobs.get_active()
-		jobs += self.pakfire.jobs.get_latest(age="24 hours", limit=5)
+		jobs = self.backend.jobs.get_active()
+		jobs += self.backend.jobs.get_latest(age="24 hours", limit=5)
 
 		# Updates
 		updates = []
 		active = True
 		for type in ("stable", "unstable", "testing"):
-			u = self.pakfire.updates.get_latest(type=type)
+			u = self.backend.updates.get_latest(type=type)
 			if u:
 				updates.append((type, u, active))
 				active = False
@@ -52,7 +52,7 @@ class DocsWhatsthisHandler(base.BaseHandler):
 
 class FileDetailHandler(base.BaseHandler):
 	def get(self, uuid):
-		pkg, file = self.pakfire.packages.get_with_file_by_uuid(uuid)
+		pkg, file = self.backend.packages.get_with_file_by_uuid(uuid)
 
 		if not file:
 			raise tornado.web.HTTPError(404, "File not found")
@@ -62,7 +62,7 @@ class FileDetailHandler(base.BaseHandler):
 
 class LogHandler(base.BaseHandler):
 	def get(self):
-		self.render("log.html", log=self.pakfire.log)
+		self.render("log.html", log=self.backend.log)
 
 
 class SessionsHandler(base.BaseHandler):
@@ -90,7 +90,7 @@ class SessionsHandler(base.BaseHandler):
 
 class RepositoryDetailHandler(base.BaseHandler):
 	def get(self, distro, repo):
-		distro = self.pakfire.distros.get_by_name(distro)
+		distro = self.backend.distros.get_by_name(distro)
 		if not distro:
 			raise tornado.web.HTTPError(404)
 
@@ -125,7 +125,7 @@ class RepositoryDetailHandler(base.BaseHandler):
 class RepositoryEditHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, distro, repo):
-		distro = self.pakfire.distros.get_by_name(distro)
+		distro = self.backend.distros.get_by_name(distro)
 		if not distro:
 			raise tornado.web.HTTPError(404)
 
@@ -140,7 +140,7 @@ class RepositoryEditHandler(base.BaseHandler):
 
 class RepositoryConfHandler(base.BaseHandler):
 	def get(self, distro, repo):
-		distro = self.pakfire.distros.get_by_name(distro)
+		distro = self.backend.distros.get_by_name(distro)
 		if not distro:
 			raise tornado.web.HTTPError(404)
 
@@ -160,7 +160,7 @@ class RepositoryConfHandler(base.BaseHandler):
 
 class RepositoryMirrorlistHandler(base.BaseHandler):
 	def get(self, distro, repo):
-		distro = self.pakfire.distros.get_by_name(distro)
+		distro = self.backend.distros.get_by_name(distro)
 		if not distro:
 			raise tornado.web.HTTPError(404)
 
@@ -207,7 +207,7 @@ class RepoActionHandler(base.BaseHandler):
 
 		action_id = self.get_argument("id")
 
-		action = self.pakfire.repos.get_action_by_id(action_id)
+		action = self.backend.repos.get_action_by_id(action_id)
 		if not action:
 			raise tornado.web.HTTPError(400)
 

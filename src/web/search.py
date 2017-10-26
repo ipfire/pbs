@@ -16,19 +16,19 @@ class SearchHandler(base.BaseHandler):
 			# Search for a matching object and redirect to it.
 
 			# Search in packages.
-			pkg = self.pakfire.packages.get_by_uuid(pattern)
+			pkg = self.backend.packages.get_by_uuid(pattern)
 			if pkg:
 				self.redirect("/package/%s" % pkg.uuid)
 				return
 
 			# Search in builds.
-			build = self.pakfire.builds.get_by_uuid(pattern)
+			build = self.backend.builds.get_by_uuid(pattern)
 			if build:
 				self.redirect("/build/%s" % build.uuid)
 				return
 
 			# Search in jobs.
-			job = self.pakfire.jobs.get_by_uuid(pattern)
+			job = self.backend.jobs.get_by_uuid(pattern)
 			if job:
 				self.redirect("/job/%s" % job.uuid)
 				return
@@ -37,14 +37,14 @@ class SearchHandler(base.BaseHandler):
 
 		if pattern.startswith("/"):
 			# Do a file search.
-			files = self.pakfire.packages.search_by_filename(pattern, limit=50)
+			files = self.backend.packages.search_by_filename(pattern, limit=50)
 
 		else:
 			# Make fulltext search in the packages.
-			pkgs = self.pakfire.packages.search(pattern, limit=50)
+			pkgs = self.backend.packages.search(pattern, limit=50)
 
 			# Search for users.
-			users = self.pakfire.users.search(pattern, limit=50)
+			users = self.backend.users.search(pattern, limit=50)
 
 		if len(pkgs) == 1 and not files and not users:
 			pkg = pkgs[0]

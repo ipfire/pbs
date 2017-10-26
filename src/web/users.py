@@ -11,7 +11,7 @@ class UserHandler(base.BaseHandler):
 		user = self.current_user
 
 		if name:
-			user = self.pakfire.users.get_by_name(name)
+			user = self.backend.users.get_by_name(name)
 			if not user:
 				raise tornado.web.HTTPError(404, "User does not exist: %s" % name)
 
@@ -51,7 +51,7 @@ class UserImpersonateHandler(base.BaseHandler):
 
 class UserActionHandler(base.BaseHandler):
 	def get_user(self, name):
-		user = self.pakfire.users.get_by_name(name)
+		user = self.backend.users.get_by_name(name)
 		if not user:
 			raise tornado.web.HTTPError(404)
 
@@ -130,7 +130,7 @@ class UserPasswdHandler(UserActionHandler):
 class UserEditHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
-		user = self.pakfire.users.get_by_name(name)
+		user = self.backend.users.get_by_name(name)
 		if not user:
 			raise tornado.web.HTTPError(404)
 
@@ -143,7 +143,7 @@ class UserEditHandler(base.BaseHandler):
 	def post(self, name):
 		_ = self.locale.translate
 
-		user = self.pakfire.users.get_by_name(name)
+		user = self.backend.users.get_by_name(name)
 		if not user:
 			raise tornado.web.HTTPError(404)
 
@@ -208,11 +208,11 @@ class UsersBuildsHandler(base.BaseHandler):
 		if name is None:
 			user = self.current_user
 		else:
-			user = self.pakfire.users.get_by_name(name)
+			user = self.backend.users.get_by_name(name)
 			if not user:
 				raise tornado.web.HTTPError(404, "User not found: %s" % name)
 
 		# Get a list of the builds this user has built.
-		builds = self.pakfire.builds.get_by_user(user)
+		builds = self.backend.builds.get_by_user(user)
 
 		self.render("user-profile-builds.html", user=user, builds=builds)

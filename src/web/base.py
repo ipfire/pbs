@@ -77,7 +77,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		ns.update({
 			"backend"         : self.backend,
-			"bugtracker"      : self.pakfire.bugzilla,
+			"bugtracker"      : self.backend.bugzilla,
 			"hostname"        : self.request.host,
 			"format_date"     : self.format_date,
 			"format_size"     : misc.format_size,
@@ -111,10 +111,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		self.render(error_document, status_code=status_code,
 			status_message=status_message, exc_info=exc_info, tb=tb, **kwargs)
-
-	@property
-	def pakfire(self):
-		return self.backend
 
 
 class ApiBaseHandler(BaseHandler):

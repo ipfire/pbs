@@ -11,10 +11,10 @@ class BuilderListHandler(base.BaseHandler):
 
 class BuilderDetailHandler(base.BaseHandler):
 	def get(self, hostname):
-		builder = self.pakfire.builders.get_by_name(hostname)
+		builder = self.backend.builders.get_by_name(hostname)
 
 		# Get running and pending jobs.
-		jobs = self.pakfire.jobs.get_active(builder=builder)
+		jobs = self.backend.jobs.get_active(builder=builder)
 		jobs += builder.jobqueue
 
 		# Get log.
@@ -27,7 +27,7 @@ class BuilderDetailHandler(base.BaseHandler):
 		if not self.current_user.has_perm("maintain_mirrors"):
 			raise tornado.web.HTTPError(403, "User is not allowed to do this.")
 
-		builder = self.pakfire.builders.get_by_name(hostname)
+		builder = self.backend.builders.get_by_name(hostname)
 
 		with self.db.transaction():
 			builder.description = self.get_argument("description", None)
@@ -57,7 +57,7 @@ class BuilderNewHandler(base.BaseHandler):
 class BuilderEditHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, hostname):
-		builder = self.pakfire.builders.get_by_name(hostname)
+		builder = self.backend.builders.get_by_name(hostname)
 		if not builder:
 			raise tornado.web.HTTPError(404, "Builder not found")
 
@@ -65,7 +65,7 @@ class BuilderEditHandler(base.BaseHandler):
 
 	@tornado.web.authenticated
 	def post(self, hostname):
-		builder = self.pakfire.builders.get_by_name(hostname)
+		builder = self.backend.builders.get_by_name(hostname)
 		if not builder:
 			raise tornado.web.HTTPError(404, "Builder not found: %s" % hostname)
 
@@ -94,7 +94,7 @@ class BuilderEditHandler(base.BaseHandler):
 class BuilderRenewPassphraseHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
-		builder = self.pakfire.builders.get_by_name(name)
+		builder = self.backend.builders.get_by_name(name)
 
 		passphrase = builder.regenerate_passphrase()
 
@@ -105,7 +105,7 @@ class BuilderRenewPassphraseHandler(base.BaseHandler):
 class BuilderDeleteHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
-		builder = self.pakfire.builders.get_by_name(name)
+		builder = self.backend.builders.get_by_name(name)
 		if not builder:
 			raise tornado.web.HTTPError(404, "Builder not found: %s" % name)
 
@@ -129,7 +129,7 @@ class BuilderStatusChangeHandler(base.BaseHandler):
 
 	@tornado.web.authenticated
 	def get(self, hostname):
-		builder = self.pakfire.builders.get_by_name(hostname)
+		builder = self.backend.builders.get_by_name(hostname)
 		if not builder:
 			raise tornado.web.HTTPError(404, "Builder not found: %s" % hostname)
 

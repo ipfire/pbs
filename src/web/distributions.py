@@ -11,7 +11,7 @@ class DistributionListHandler(base.BaseHandler):
 
 class DistributionDetailHandler(base.BaseHandler):
 	def get(self, name):
-		distro = self.pakfire.distros.get_by_name(name)
+		distro = self.backend.distros.get_by_name(name)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distro not found")
 
@@ -20,11 +20,11 @@ class DistributionDetailHandler(base.BaseHandler):
 
 class DistributionEditHandler(base.BaseHandler):
 	def prepare(self):
-		self.sources = self.pakfire.sources.get_all()
+		self.sources = self.backend.sources.get_all()
 
 	@tornado.web.authenticated
 	def get(self, name):
-		distro = self.pakfire.distros.get_by_name(name)
+		distro = self.backend.distros.get_by_name(name)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distro not found")
 
@@ -33,7 +33,7 @@ class DistributionEditHandler(base.BaseHandler):
 
 	@tornado.web.authenticated
 	def post(self, name):
-		distro = self.pakfire.distros.get_by_name(name)
+		distro = self.backend.distros.get_by_name(name)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distro not found")
 
@@ -69,7 +69,7 @@ class DistributionEditHandler(base.BaseHandler):
 
 class DistroSourceDetailHandler(base.BaseHandler):
 	def get(self, distro_ident, source_ident):
-		distro = self.pakfire.distros.get_by_name(distro_ident)
+		distro = self.backend.distros.get_by_name(distro_ident)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distro not found")
 
@@ -87,7 +87,7 @@ class DistroSourceDetailHandler(base.BaseHandler):
 
 class DistroSourceCommitsHandler(base.BaseHandler):
 	def get(self, distro_ident, source_ident):
-		distro = self.pakfire.distros.get_by_name(distro_ident)
+		distro = self.backend.distros.get_by_name(distro_ident)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distro not found")
 
@@ -116,7 +116,7 @@ class DistroSourceCommitsHandler(base.BaseHandler):
 
 class DistroSourceCommitDetailHandler(base.BaseHandler):
 	def get(self, distro_ident, source_ident, commit_ident):
-		distro = self.pakfire.distros.get_by_name(distro_ident)
+		distro = self.backend.distros.get_by_name(distro_ident)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distribution '%s' not found" % distro_ident)
 
@@ -137,7 +137,7 @@ class DistroSourceCommitDetailHandler(base.BaseHandler):
 class DistroSourceCommitResetHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, distro_ident, source_ident, commit_ident):
-		distro = self.pakfire.distros.get_by_name(distro_ident)
+		distro = self.backend.distros.get_by_name(distro_ident)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distribution '%s' not found" % distro_ident)
 
@@ -168,14 +168,14 @@ class DistroSourceCommitResetHandler(base.BaseHandler):
 
 class DistroUpdateCreateHandler(base.BaseHandler):
 	def get(self, distro_ident):
-		distro = self.pakfire.distros.get_by_name(distro_ident)
+		distro = self.backend.distros.get_by_name(distro_ident)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distribution '%s' not found" % distro_ident)
 
 		# Get all preset builds.
 		builds = []
 		for build in self.get_arguments("builds", []):
-			build = self.pakfire.builds.get_by_uuid(build)
+			build = self.backend.builds.get_by_uuid(build)
 			builds.append(build)
 
 		builds.sort()
@@ -186,7 +186,7 @@ class DistroUpdateCreateHandler(base.BaseHandler):
 
 class DistroUpdateDetailHandler(base.BaseHandler):
 	def get(self, distro_ident, year, num):
-		distro = self.pakfire.distros.get_by_name(distro_ident)
+		distro = self.backend.distros.get_by_name(distro_ident)
 		if not distro:
 			raise tornado.web.HTTPError(404, "Distribution '%s' not found" % distro_ident)
 
@@ -200,13 +200,13 @@ class DistroUpdateDetailHandler(base.BaseHandler):
 # XXX currently unused
 class SourceListHandler(base.BaseHandler):
 	def get(self):
-		sources = self.pakfire.sources.get_all()
+		sources = self.backend.sources.get_all()
 
 		self.render("source-list.html", sources=sources)
 
 
 class SourceDetailHandler(base.BaseHandler):
 	def get(self, id):
-		source = self.pakfire.sources.get_by_id(id)
+		source = self.backend.sources.get_by_id(id)
 
 		self.render("source-detail.html", source=source)

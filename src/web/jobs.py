@@ -19,7 +19,7 @@ class ShowQueueHandler(base.BaseHandler):
 
 class JobDetailHandler(base.BaseHandler):
 	def get(self, uuid):
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "No such job: %s" % job)
 
@@ -31,7 +31,7 @@ class JobDetailHandler(base.BaseHandler):
 
 class JobBuildrootHandler(base.BaseHandler):
 	def get(self, uuid):
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
@@ -59,7 +59,7 @@ class JobScheduleHandler(base.BaseHandler):
 		type = self.get_argument("type")
 		assert type in self.allowed_types
 
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
@@ -70,7 +70,7 @@ class JobScheduleHandler(base.BaseHandler):
 		type = self.get_argument("type")
 		assert type in self.allowed_types
 
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
@@ -93,7 +93,7 @@ class JobScheduleHandler(base.BaseHandler):
 
 class JobAbortHandler(base.BaseHandler):
 	def get_job(self, uuid):
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 

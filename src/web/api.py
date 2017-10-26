@@ -11,7 +11,7 @@ class ApiPackagesAutocomplete(base.ApiBaseHandler):
 			raise tornado.web.HTTPError(400)
 
 		# Query database.
-		packages = self.pakfire.packages.autocomplete(query, limit=8)
+		packages = self.backend.packages.autocomplete(query, limit=8)
 
 		res = {
 			"query"    : query,

@@ -19,7 +19,7 @@ class LoginHandler(base.BaseHandler):
 		passphrase = self.get_argument("pass", None)
 
 		# Log in the user
-		user = self.pakfire.users.auth(name, passphrase)
+		user = self.backend.users.auth(name, passphrase)
 
 		# If the login was unsuccessful
 		if not user:
@@ -107,7 +107,7 @@ class RegisterHandler(base.BaseHandler):
 
 class ActivationHandler(base.BaseHandler):
 	def get(self, _user):
-		user = self.pakfire.users.get_by_name(_user)
+		user = self.backend.users.get_by_name(_user)
 		if not user:
 			raise tornado.web.HTTPError(404)
 
