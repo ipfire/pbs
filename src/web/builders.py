@@ -2,8 +2,6 @@
 
 import tornado.web
 
-from .. import builders
-
 from . import base
 
 class BuilderListHandler(base.BaseHandler):

@@ -17,6 +17,7 @@ from .handlers import *
 
 from . import api
 from . import auth
+from . import builders
 from . import errors
 from . import mirrors
 from . import ui_modules
@@ -159,14 +160,14 @@ class Application(tornado.web.Application):
 			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/schedule", JobScheduleHandler),
 
 			# Builders
-			(r"/builders", BuilderListHandler),
-			(r"/builder/new", BuilderNewHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/enable", BuilderEnableHander),
-			(r"/builder/([A-Za-z0-9\-\.]+)/disable", BuilderDisableHander),
-			(r"/builder/([A-Za-z0-9\-\.]+)/delete", BuilderDeleteHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/edit", BuilderEditHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/renew", BuilderRenewPassphraseHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)", BuilderDetailHandler),
+			(r"/builders", builders.BuilderListHandler),
+			(r"/builder/new", builders.BuilderNewHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/enable", builders.BuilderEnableHander),
+			(r"/builder/([A-Za-z0-9\-\.]+)/disable", builders.BuilderDisableHander),
+			(r"/builder/([A-Za-z0-9\-\.]+)/delete", builders.BuilderDeleteHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/edit", builders.BuilderEditHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/renew", builders.BuilderRenewPassphraseHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)", builders.BuilderDetailHandler),
 
 			# Distributions
 			(r"/distros", DistributionListHandler),

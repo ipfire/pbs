@@ -161,7 +161,6 @@ src/hub/__init__.py
 src/web/api.py
 src/web/handlers_auth.py
 src/web/handlers_base.py
-src/web/handlers_builders.py
 src/web/handlers_builds.py
 src/web/handlers_distro.py
 src/web/handlers_jobs.py
