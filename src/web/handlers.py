@@ -197,7 +197,7 @@ class RepositoryMirrorlistHandler(base.BaseHandler):
 		}
 
 		mirrors = []
-		for mirror in self.mirrors.make_mirrorlist(self.current_address):
+		for mirror in self.backend.mirrors.make_mirrorlist(self.current_address):
 			mirrors.append({
 				"url"       : "/".join((mirror.url, repo.basepath, arch)),
 				"location"  : mirror.country_code,

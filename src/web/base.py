@@ -115,10 +115,6 @@ class BaseHandler(tornado.web.RequestHandler):
 	def pakfire(self):
 		return self.backend
 
-	@property
-	def mirrors(self):
-		return self.pakfire.mirrors
-
 
 class ApiBaseHandler(BaseHandler):
 	pass
