@@ -25,6 +25,7 @@ from . import jobs
 from . import keys
 from . import mirrors
 from . import packages
+from . import search
 from . import ui_modules
 
 # Enable logging
@@ -228,7 +229,7 @@ class Application(tornado.web.Application):
 			(r"/documents/what-is-the-pakfire-build-service", DocsWhatsthisHandler),
 
 			# Search
-			(r"/search", SearchHandler),
+			(r"/search", search.SearchHandler),
 
 			# Uploads
 			(r"/uploads", UploadsHandler),
