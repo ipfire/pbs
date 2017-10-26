@@ -21,6 +21,7 @@ from . import builders
 from . import builds
 from . import distributions
 from . import errors
+from . import jobs
 from . import mirrors
 from . import ui_modules
 
@@ -154,12 +155,12 @@ class Application(tornado.web.Application):
 			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/delete", builds.BuildDeleteHandler),
 
 			# Jobs
-			(r"/jobs", JobsIndexHandler),
-			(r"/jobs/filter", JobsFilterHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", JobDetailHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/abort", JobAbortHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/buildroot", JobBuildrootHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/schedule", JobScheduleHandler),
+			(r"/jobs", jobs.JobsIndexHandler),
+			(r"/jobs/filter", jobs.JobsFilterHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", jobs.JobDetailHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/abort", jobs.JobAbortHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/buildroot", jobs.JobBuildrootHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/schedule", jobs.JobScheduleHandler),
 
 			# Builders
 			(r"/builders", builders.BuilderListHandler),

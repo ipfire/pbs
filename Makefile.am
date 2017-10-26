@@ -131,7 +131,7 @@ web_PYTHON = \
 	src/web/distributions.py \
 	src/web/errors.py \
 	src/web/handlers.py \
-	src/web/handlers_jobs.py \
+	src/web/jobs.py \
 	src/web/handlers_keys.py \
 	src/web/handlers_packages.py \
 	src/web/handlers_search.py \
