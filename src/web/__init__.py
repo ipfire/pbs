@@ -24,6 +24,7 @@ from . import errors
 from . import jobs
 from . import keys
 from . import mirrors
+from . import packages
 from . import ui_modules
 
 # Enable logging
@@ -126,15 +127,15 @@ class Application(tornado.web.Application):
 			(r"/profile/builds", UsersBuildsHandler),
 
 			# Packages
-			(r"/packages", PackageListHandler),
-			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", PackageDetailHandler),
-			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/download(.*)", PackageFileDownloadHandler),
-			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/view(.*)", PackageFileViewHandler),
-			(r"/package/([\w\-\+]+)", PackageNameHandler),
-			(r"/package/([\w\-\+]+)/builds/scratch", PackageScratchBuildsHandler),
-			(r"/package/([\w\-\+]+)/builds/times", PackageBuildsTimesHandler),
-			(r"/package/([\w\-\+]+)/changelog", PackageChangelogHandler),
-			(r"/package/([\w\-\+]+)/properties", PackagePropertiesHandler),
+			(r"/packages", packages.PackageListHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", packages.PackageDetailHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/download(.*)", packages.PackageFileDownloadHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/view(.*)", packages.PackageFileViewHandler),
+			(r"/package/([\w\-\+]+)", packages.PackageNameHandler),
+			(r"/package/([\w\-\+]+)/builds/scratch", packages.PackageScratchBuildsHandler),
+			(r"/package/([\w\-\+]+)/builds/times", packages.PackageBuildsTimesHandler),
+			(r"/package/([\w\-\+]+)/changelog", packages.PackageChangelogHandler),
+			(r"/package/([\w\-\+]+)/properties", packages.PackagePropertiesHandler),
 
 			# Files
 			(r"/file/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", FileDetailHandler),

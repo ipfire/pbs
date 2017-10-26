@@ -134,7 +134,7 @@ web_PYTHON = \
 	src/web/jobs.py \
 	src/web/keys.py \
 	src/web/mirrors.py \
-	src/web/handlers_packages.py \
+	src/web/packages.py \
 	src/web/handlers_search.py \
 	src/web/handlers_updates.py \
 	src/web/handlers_users.py \
