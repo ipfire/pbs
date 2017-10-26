@@ -73,7 +73,12 @@
 
 	<ul class="nav nav-pills">
 		<li>
-			<a href="/jobs">{{ _("Show more build jobs") }}</a>
+			<a href="/queue">
+				{{ _("Job Queue") }}
+
+				<!-- should be a badge -->
+				({{ len(backend.jobqueue) }})
+			</a>
 		</li>
 	</ul>
 {% end %}

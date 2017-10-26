@@ -182,8 +182,6 @@ dist_templates_DATA = \
 	src/templates/job-schedule-rebuild.html \
 	src/templates/job-schedule-test.html \
 	src/templates/jobs-detail.html \
-	src/templates/jobs-filter.html \
-	src/templates/jobs-index.html \
 	src/templates/keys-delete.html \
 	src/templates/keys-import.html \
 	src/templates/keys-list.html \
@@ -193,6 +191,7 @@ dist_templates_DATA = \
 	src/templates/package-detail-list.html \
 	src/templates/package-properties.html \
 	src/templates/packages-list.html \
+	src/templates/queue.html \
 	src/templates/register-activation-fail.html \
 	src/templates/register-activation-success.html \
 	src/templates/register-fail.html \

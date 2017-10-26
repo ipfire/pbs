@@ -4,36 +4,17 @@ import tornado.web
 
 from . import base
 
-class JobsIndexHandler(base.BaseHandler):
-	def get(self):
-		# Filter for a certain arch.
-		arch = self.get_argument("arch", None)
-		if not arch or not self.backend.arches.exists(arch):
-			raise tornado.web.HTTPError(400, "Architecture does not exist")
+class ShowQueueHandler(base.BaseHandler):
+	def get(self, arch=None):
+		if arch:
+			if not self.backend.arches.exists(arch):
+				raise tornado.web.HTTPError(400, "Architecture does not exist")
 
-		# Check if we need to filter for a certain builder.
-		builder_name = self.get_argument("builder", None)
-		if builder_name:
-			builder = self.pakfire.builders.get_by_name(builder_name)
+			queue = self.backend.jobqueue.for_arches([arch, "noarch"])
 		else:
-			builder = None
+			queue = self.backend.jobqueue
 
-		# Filter for a certain date.
-		date = self.get_argument("date", None)
-
-		# Get all jobs, that fulfill the criteria.
-		jobs = self.pakfire.jobs.get_latest(limit=50, arch=arch, builder=builder,
-			date=date)
-
-		self.render("jobs-index.html", jobs=jobs, arch=arch, builder=builder,
-			date=date)
-
-
-class JobsFilterHandler(base.BaseHandler):
-	def get(self):
-		builders = self.pakfire.builders.get_all()
-
-		self.render("jobs-filter.html", arches=self.backend.arches, builders=builders)
+		self.render("queue.html", arch=arch, queue=queue)
 
 
 class JobDetailHandler(base.BaseHandler):

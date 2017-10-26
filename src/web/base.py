@@ -76,6 +76,7 @@ class BaseHandler(tornado.web.RequestHandler):
 		ns = tornado.web.RequestHandler.get_template_namespace(self)
 
 		ns.update({
+			"backend"         : self.backend,
 			"bugtracker"      : self.pakfire.bugzilla,
 			"hostname"        : self.request.host,
 			"format_date"     : self.format_date,
