@@ -16,6 +16,7 @@ from ..decorators import *
 from .handlers import *
 
 from . import api
+from . import auth
 from . import errors
 from . import mirrors
 from . import ui_modules
@@ -103,10 +104,10 @@ class Application(tornado.web.Application):
 			(r"/", IndexHandler),
 
 			# Handle all the users logins/logouts/registers and stuff.
-			(r"/login", LoginHandler),
-			(r"/logout", LogoutHandler),
-			(r"/register", RegisterHandler),
-			(r"/password-recovery", PasswordRecoveryHandler),
+			(r"/login", auth.LoginHandler),
+			(r"/logout", auth.LogoutHandler),
+			(r"/register", auth.RegisterHandler),
+			(r"/password-recovery", auth.PasswordRecoveryHandler),
 
 			# User profiles
 			(r"/users", UsersHandler),
@@ -114,7 +115,7 @@ class Application(tornado.web.Application):
 			(r"/user/(\w+)/passwd", UserPasswdHandler),
 			(r"/user/(\w+)/delete", UserDeleteHandler),
 			(r"/user/(\w+)/edit", UserEditHandler),
-			(r"/user/(\w+)/activate", ActivationHandler),
+			(r"/user/(\w+)/activate", auth.ActivationHandler),
 			(r"/user/(\w+)", UserHandler),
 			(r"/profile", UserHandler),
 			(r"/profile/builds", UsersBuildsHandler),
