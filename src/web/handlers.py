@@ -5,8 +5,6 @@ import tornado.web
 
 from . import base
 
-from .handlers_users import *
-
 class IndexHandler(base.BaseHandler):
 	def get(self):
 		jobs = self.pakfire.jobs.get_active()

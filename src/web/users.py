@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import datetime
-
 import tornado.locale
 import tornado.web
 

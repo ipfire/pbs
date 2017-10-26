@@ -138,7 +138,7 @@ web_PYTHON = \
 	src/web/search.py \
 	src/web/ui_modules.py \
 	src/web/updates.py \
-	src/web/handlers_users.py
+	src/web/users.py
 
 webdir = $(buildservicedir)/web
 

@@ -26,6 +26,7 @@ from . import mirrors
 from . import packages
 from . import search
 from . import updates
+from . import users
 from .handlers import *
 
 from . import ui_modules
@@ -119,15 +120,15 @@ class Application(tornado.web.Application):
 			(r"/password-recovery", auth.PasswordRecoveryHandler),
 
 			# User profiles
-			(r"/users", UsersHandler),
-			(r"/user/(\w+)/impersonate", UserImpersonateHandler),
-			(r"/user/(\w+)/passwd", UserPasswdHandler),
-			(r"/user/(\w+)/delete", UserDeleteHandler),
-			(r"/user/(\w+)/edit", UserEditHandler),
+			(r"/users", users.UsersHandler),
+			(r"/user/(\w+)/impersonate", users.UserImpersonateHandler),
+			(r"/user/(\w+)/passwd", users.UserPasswdHandler),
+			(r"/user/(\w+)/delete", users.UserDeleteHandler),
+			(r"/user/(\w+)/edit", users.UserEditHandler),
 			(r"/user/(\w+)/activate", auth.ActivationHandler),
-			(r"/user/(\w+)", UserHandler),
-			(r"/profile", UserHandler),
-			(r"/profile/builds", UsersBuildsHandler),
+			(r"/user/(\w+)", users.UserHandler),
+			(r"/profile", users.UserHandler),
+			(r"/profile/builds", users.UsersBuildsHandler),
 
 			# Packages
 			(r"/packages", packages.PackageListHandler),
@@ -209,7 +210,7 @@ class Application(tornado.web.Application):
 				distributions.DistroUpdateDetailHandler),
 
 			# Updates
-			(r"/updates", UpdatesHandler),
+			(r"/updates", updates.UpdatesHandler),
 
 			# Mirrors
 			(r"/mirrors",					mirrors.MirrorListHandler),
