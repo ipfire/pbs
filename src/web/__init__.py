@@ -18,6 +18,7 @@ from .handlers import *
 from . import api
 from . import auth
 from . import builders
+from . import builds
 from . import errors
 from . import mirrors
 from . import ui_modules
@@ -136,20 +137,20 @@ class Application(tornado.web.Application):
 			(r"/file/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", FileDetailHandler),
 
 			# Builds
-			(r"/builds", BuildsHandler),
-			(r"/builds/filter", BuildFilterHandler),
-			(r"/builds/queue", BuildQueueHandler),
-			(r"/builds/comments", BuildsCommentsHandler),
-			(r"/builds/comments/(\w+)", BuildsCommentsHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", BuildDetailHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/bugs", BuildBugsHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/manage", BuildManageHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/comment", BuildDetailCommentHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/priority", BuildPriorityHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/state", BuildStateHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watch", BuildWatchersAddHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watchers", BuildWatchersHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/delete", BuildDeleteHandler),
+			(r"/builds", builds.BuildsHandler),
+			(r"/builds/filter", builds.BuildFilterHandler),
+			(r"/builds/queue", builds.BuildQueueHandler),
+			(r"/builds/comments", builds.BuildsCommentsHandler),
+			(r"/builds/comments/(\w+)", builds.BuildsCommentsHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", builds.BuildDetailHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/bugs", builds.BuildBugsHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/manage", builds.BuildManageHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/comment", builds.BuildDetailCommentHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/priority", builds.BuildPriorityHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/state", builds.BuildStateHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watch", builds.BuildWatchersAddHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watchers", builds.BuildWatchersHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/delete", builds.BuildDeleteHandler),
 
 			# Jobs
 			(r"/jobs", JobsIndexHandler),
