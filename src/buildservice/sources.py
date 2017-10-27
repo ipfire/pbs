@@ -181,13 +181,13 @@ class Commit(base.DataObject):
 
 	state = property(lambda s: s.data.state, set_state)
 
-	@property
+	@lazy_property
 	def author(self):
-		return self.data.author
+		return self.backend.users.find_maintainer(self.data.author) or self.data.author
 
-	@property
+	@lazy_property
 	def committer(self):
-		return self.data.committer
+		return self.backend.users.find_maintainer(self.data.committer) or self.data.committer
 
 	@property
 	def subject(self):
@@ -262,6 +262,30 @@ class Commit(base.DataObject):
 				values.append(m.group(1))
 
 		return values
+
+	@lazy_property
+	def contributors(self):
+		contributors = [
+			self.data.author,
+			self.data.committer,
+		]
+
+		for tag in ("Acked-by", "Cc", "Reported-by", "Reviewed-by", "Signed-off-by", "Suggested-by", "Tested-by"):
+			contributors += self.get_tag(tag)
+
+		# Get all user accounts that we know
+		users = self.backend.users.find_maintainers(contributors)
+
+		# Add all email addresses where a user could not be found
+		for contributor in contributors[:]:
+			for user in users:
+				if user.has_email_address(contributor):
+					try:
+						contributors.remove(contributor)
+					except:
+						pass
+
+		return sorted(contributors + users)
 
 	@property
 	def date(self):

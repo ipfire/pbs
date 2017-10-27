@@ -184,6 +184,23 @@ class Users(base.Object):
 			LEFT JOIN users_emails ON users.id = users_emails.user_id \
 			WHERE users_emails.email = %s", email)
 
+	def find_maintainers(self, maintainers):
+		email_addresses = []
+
+		# Make a unique list of all email addresses
+		for maintainer in maintainers:
+			name, email_address = email.utils.parseaddr(maintainer)
+
+			if not email_address in email_addresses:
+				email_addresses.append(email_address)
+
+		users = self._get_users("SELECT DISTINCT users.* FROM users \
+			LEFT JOIN users_emails ON users.id = users_emails.user_id \
+			WHERE users_emails.activated IS TRUE \
+			AND users_emails.email = ANY(%s)", email_addresses)
+
+		return sorted(users)
+
 	def find_maintainer(self, s):
 		name, email_address = email.utils.parseaddr(s)
 
@@ -341,6 +358,14 @@ class User(base.DataObject):
 		self.db.execute("UPDATE users_emails SET \"primary\" = TRUE \
 			WHERE user_id = %s AND email = %s AND activated IS TRUE",
 			self.id, email)
+
+	def has_email_address(self, email_address):
+		try:
+			mail, email_address = email.utils.parseaddr(email_address)
+		except:
+			pass
+
+		return email_address in self.emails
 
 	def activate_email(self, code):
 		# Search email by activation code
