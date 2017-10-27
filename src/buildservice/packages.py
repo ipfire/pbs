@@ -40,35 +40,9 @@ class Packages(base.Object):
 			Returns a list with all package names and the summary line
 			that have at one time been part of the distribution
 		"""
-		res = self.db.query("SELECT DISTINCT packages.name AS name, packages.summary AS summary FROM builds \
+		return self.db.query("SELECT DISTINCT packages.name AS name, packages.summary AS summary FROM builds \
 			LEFT JOIN packages ON builds.pkg_id = packages.id \
 			WHERE builds.type = %s AND builds.state != %s", "release", "obsolete")
-
-		return res
-
-	def get_all_names(self, user=None, states=None):
-		query = "SELECT DISTINCT packages.name AS name, summary FROM packages \
-			JOIN builds ON builds.pkg_id = packages.id \
-			WHERE packages.type = 'source'"
-
-		conditions = []
-		args = []
-
-		if user and not user.is_admin():
-			conditions.append("builds.owner_id = %s")
-			args.append(user.id)
-
-		if states:
-			for state in states:
-				conditions.append("builds.state = %s")
-				args.append(state)
-
-		if conditions:
-			query += " AND (%s)" % " OR ".join(conditions)
-		
-		query += " ORDER BY packages.name"
-
-		return [(n.name, n.summary) for n in self.db.query(query, *args)]
 
 	def get_by_uuid(self, uuid):
 		pkg = self.db.get("SELECT * FROM packages WHERE uuid = %s LIMIT 1", uuid)
