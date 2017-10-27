@@ -231,14 +231,6 @@ class Commit(base.DataObject):
 
 		return "\n\n".join(message)
 
-	def split_paragraphs(self, s):
-		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=str.isspace):
-			if group_seperator:
-				continue
-
-			paragraph = "".join(line_iteration)
-			yield paragraph.replace("\n", " ")
-
 	@property
 	def message_full(self):
 		msg = [self.subject, ""] + self.message.splitlines()
