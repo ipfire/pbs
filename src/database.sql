@@ -2449,13 +2449,6 @@ CREATE INDEX idx_2198063_state ON jobs USING btree (state);
 
 
 --
--- Name: idx_2198063_time_finished; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198063_time_finished ON jobs USING btree (time_finished);
-
-
---
 -- Name: idx_2198063_uuid; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2602,6 +2595,13 @@ ALTER TABLE jobs_buildroots CLUSTER ON jobs_buildroots_job_id;
 --
 
 CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
+
+
+--
+-- Name: jobs_time_finished; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_time_finished ON jobs USING btree (time_finished DESC) WHERE (time_finished IS NOT NULL);
 
 
 --

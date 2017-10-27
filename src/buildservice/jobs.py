@@ -78,44 +78,11 @@ class Jobs(base.Object):
 
 		return [Job(self.backend, j.id, j) for j in self.db.query(query, *args)]
 
-	def get_latest(self, arch=None, builder=None, limit=None, age=None, date=None):
-		query = "SELECT * FROM jobs"
-		args  = []
+	def get_recently_ended(self, limit=None):
+		jobs = self._get_jobs("SELECT jobs.* FROM jobs \
+			WHERE time_finished IS NOT NULL ORDER BY time_finished DESC LIMIT %s", limit)
 
-		where = ["(state = 'finished' OR state = 'failed' OR state = 'aborted')"]
-
-		if arch:
-			where.append("arch = %s")
-			args.append(arch)
-
-		if builder:
-			where.append("builder_id = %s")
-			args.append(builder.id)
-
-		if date:
-			try:
-				year, month, day = date.split("-", 2)
-				date = datetime.date(int(year), int(month), int(day))
-			except ValueError:
-				pass
-			else:
-				where.append("(time_created::date = %s OR \
-					time_started::date = %s OR time_finished::date = %s)")
-				args += (date, date, date)
-
-		if age:
-			where.append("time_finished >= NOW() - '%s'::interval" % age)
-
-		if where:
-			query += " WHERE %s" % " AND ".join(where)
-
-		query += " ORDER BY time_finished DESC"
-
-		if limit:
-			query += " LIMIT %s"
-			args.append(limit)
-
-		return [Job(self.backend, j.id, j) for j in self.db.query(query, *args)]
+		return jobs
 
 	def restart_failed(self):
 		jobs = self._get_jobs("SELECT jobs.* FROM jobs \

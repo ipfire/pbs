@@ -7,7 +7,7 @@ from . import base
 class IndexHandler(base.BaseHandler):
 	def get(self):
 		jobs = self.backend.jobs.get_active()
-		jobs += self.backend.jobs.get_latest(age="24 hours", limit=5)
+		jobs += self.backend.jobs.get_recently_ended(limit=12)
 
 		# Updates
 		updates = []

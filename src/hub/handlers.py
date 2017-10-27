@@ -359,7 +359,7 @@ class JobsGetLatestHandler(JobsBaseHandler):
 		limit = self.get_argument_int("limit", 5)
 
 		# Get the latest jobs.
-		jobs = self.backend.jobs.get_latest(age="24 HOUR", limit=limit)
+		jobs = self.backend.jobs.get_recently_ended(limit=limit)
 
 		args = {
 			"jobs" : [self.job2json(j) for j in jobs],
