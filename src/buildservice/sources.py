@@ -233,9 +233,12 @@ class Commit(base.DataObject):
 
 	@property
 	def message_full(self):
-		msg = [self.subject, ""] + self.message.splitlines()
+		message = self.subject
 
-		return "\n".join(msg)
+		if self.message:
+			message += "\n\n%s" % self.message
+
+		return message
 
 	def get_tag(self, tag):
 		"""
