@@ -5,6 +5,7 @@ import logging
 import os
 import pakfire
 import pakfire.config
+import re
 import shutil
 import subprocess
 import tempfile
@@ -14,6 +15,17 @@ from . import git
 
 from .constants import *
 from .decorators import *
+
+VALID_TAGS = (
+	"Acked-by",
+	"Cc",
+	"Fixes",
+	"Reported-by",
+	"Reviewed-by",
+	"Signed-off-by",
+	"Suggested-by",
+	"Tested-by",
+)
 
 class Sources(base.Object):
 	def _get_source(self, query, *args):
@@ -182,14 +194,55 @@ class Commit(base.DataObject):
 		return self.data.subject.strip()
 
 	@property
-	def message(self):
+	def body(self):
 		return self.data.body.strip()
+
+	@lazy_property
+	def message(self):
+		"""
+			Returns the message without any Git tags
+		"""
+		# Compile regex
+		r = re.compile("^(%s):" % "|".join(VALID_TAGS), re.IGNORECASE)
+
+		message = []
+		for line in self.body.splitlines():
+			# Find lines that start with a known Git tag
+			if r.match(line):
+				continue
+
+			message.append(line)
+
+		return "\n".join(message)
 
 	@property
 	def message_full(self):
 		msg = [self.subject, ""] + self.message.splitlines()
 
 		return "\n".join(msg)
+
+	def get_tag(self, tag):
+		"""
+			Returns a list of the values of this Git tag
+		"""
+		if not tag in VALID_TAGS:
+			raise ValueError("Unknown tag: %s" % tag)
+
+		# Compile regex
+		r = re.compile("^%s: (.*)$" % tag, re.IGNORECASE)
+
+		values = []
+		for line in self.body.splitlines():
+			# Skip all empty lines
+			if not line:
+				continue
+
+			# Check if line matches the regex
+			m = r.match(line)
+			if m:
+				values.append(m.group(1))
+
+		return values
 
 	@property
 	def date(self):
