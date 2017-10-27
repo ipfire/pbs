@@ -1,0 +1,16 @@
+{% if isinstance(user, users.User) %}
+	{% if user.is_admin() %}
+		<i class="icon-star"></i>
+	{% else %}
+		<i class="icon-user"></i>
+	{% end %}
+	<a href="/user/{{ user.name }}">
+		{{ user.realname }}
+	</a>
+{% elif user %}
+	{% import email.utils %}
+	{% set name, email_address = email.utils.parseaddr(user) %}
+
+	<i class="icon-envelope"></i>
+	<a href="mailto:{{ email_address }}">{{ name or email_address }}</a>
+{% end %}

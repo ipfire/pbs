@@ -263,13 +263,13 @@ dist_templates_modules_DATA = \
 	src/templates/modules/files-table.html \
 	src/templates/modules/footer.html \
 	src/templates/modules/jobs-table.html \
+	src/templates/modules/link-to-user.html \
 	src/templates/modules/log-entry-comment.html \
 	src/templates/modules/log-entry.html \
 	src/templates/modules/log-entry-small.html \
 	src/templates/modules/log-files-table.html \
 	src/templates/modules/log.html \
 	src/templates/modules/log-table.html \
-	src/templates/modules/maintainer.html \
 	src/templates/modules/modal-base.html \
 	src/templates/modules/modal-build-comment.html \
 	src/templates/modules/modal-build-push.html \

@@ -22,6 +22,6 @@
 
 	{% if pkg.maintainer %}
 		<dt>{{ _("Maintainer") }}</dt>
-		<dd>{% module Maintainer(pkg.maintainer) %}</dd>
+		<dd>{% module LinkToUser(pkg.maintainer) %}</dd>
 	{% end %}
 </dl>

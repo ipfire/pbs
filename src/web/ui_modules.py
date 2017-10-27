@@ -380,15 +380,9 @@ class LogEntryCommentModule(LogEntryModule):
 			entry=entry, u=entry.user, show_build=show_build, **args)
 
 
-class MaintainerModule(UIModule):
-	def render(self, maintainer):
-		if isinstance(maintainer, users.User):
-			type = "user"
-		else:
-			type = "string"
-
-		return self.render_string("modules/maintainer.html",
-			type=type, maintainer=maintainer)
+class LinkToUserModule(UIModule):
+	def render(self, user):
+		return self.render_string("modules/link-to-user.html", user=user, users=users)
 
 
 class BuildLogModule(UIModule):

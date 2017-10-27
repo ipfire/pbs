@@ -47,10 +47,10 @@
 						{% if show_user %}
 							{% if build.type == "scratch" and build.user %}
 								<td>
-									{% module Maintainer(build.user) %}
+									{% module LinkToUser(build.user) %}
 								</td>
 							{% elif build.type == "release" %}
-								<td>{% module Maintainer(build.pkg.maintainer) %}</td>
+								<td>{% module LinkToUser(build.pkg.maintainer) %}</td>
 							{% else %}
 								<td></td>
 							{% end %}
