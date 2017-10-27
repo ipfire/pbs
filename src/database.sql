@@ -513,9 +513,9 @@ CREATE TABLE builds_comments (
     id integer NOT NULL,
     build_id integer NOT NULL,
     user_id integer NOT NULL,
-    text text NOT NULL,
+    text text,
     score integer NOT NULL,
-    time_created timestamp without time zone NOT NULL,
+    time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_updated timestamp without time zone
 );
 

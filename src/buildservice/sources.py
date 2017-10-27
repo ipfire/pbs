@@ -133,8 +133,12 @@ class Sources(base.Object):
 								# Import all packages in one swoop.
 								for pkg in pkgs:
 									with self.db.transaction():
-										self.backend.builds.create_from_source_package(pkg,
+										build = self.backend.builds.create_from_source_package(pkg,
 											source.distro, commit=commit, type="release")
+
+										# Import any testers from the commit message
+										for tester in commit.testers:
+											build.upvote(tester)
 
 							except:
 								if commit:
@@ -286,6 +290,15 @@ class Commit(base.DataObject):
 						pass
 
 		return sorted(contributors + users)
+
+	@lazy_property
+	def testers(self):
+		users = []
+
+		for tag in ("Acked-by", "Reviewed-by", "Signed-off-by", "Tested-by"):
+			users += self.get_tag(tag)
+
+		return self.backend.users.find_maintainers(users)
 
 	@property
 	def date(self):

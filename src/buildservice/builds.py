@@ -843,6 +843,14 @@ class Build(base.DataObject):
 
 		return res.score or 0
 
+	def upvote(self, user, score=1):
+		# Creates an empty comment with a score
+		self.db.execute("INSERT INTO builds_comments(build_id, user_id, score) \
+			VALUES(%s, %s, %s)", self.id, user.id, score)
+
+		# Update cache
+		self.score += score
+
 	def get_commenters(self):
 		users = self.db.query("SELECT DISTINCT users.id AS id FROM builds_comments \
 			JOIN users ON builds_comments.user_id = users.id \
