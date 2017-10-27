@@ -213,9 +213,6 @@ class Builds(base.Object):
 		# Obsolete all other builds with the same name to track updates.
 		build.obsolete_others()
 
-		# Search for possible bug IDs in the commit message.
-		build.search_for_bugs()
-
 		return build
 
 	def create_from_source_package(self, filename, distro, commit=None, type="release",
@@ -239,6 +236,11 @@ class Builds(base.Object):
 
 		# Create a new build object from the package
 		build = self.create(pkg, type=type, owner=owner, distro=distro)
+
+		if commit:
+			# Import any fixed bugs
+			for bug in commit.fixed_bugs:
+				build.add_bug(bug)
 
 		# Create all automatic jobs
 		build.create_autojobs(arches=arches)
@@ -1042,26 +1044,6 @@ class Build(base.DataObject):
 		# Log the event.
 		if log:
 			self.log("bug_removed", user=user, bug_id=bug_id)
-
-	def search_for_bugs(self):
-		if not self.commit:
-			return
-
-		pattern = re.compile(r"(bug\s?|#)(\d+)")
-
-		for txt in (self.commit.subject, self.commit.message):
-			for bug in re.finditer(pattern, txt):
-				try:
-					bugid = int(bug.group(2))
-				except ValueError:
-					continue
-
-				# Check if a bug with the given ID exists in BZ.
-				bug = self.backend.bugzilla.get_bug(bugid)
-				if not bug:
-					continue
-
-				self.add_bug(bugid)
 
 	def get_bugs(self):
 		bugs = []

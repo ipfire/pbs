@@ -207,7 +207,7 @@ class Commit(base.DataObject):
 			Returns the message without any Git tags
 		"""
 		# Compile regex
-		r = re.compile("^(%s):" % "|".join(VALID_TAGS), re.IGNORECASE)
+		r = re.compile("^(%s):?" % "|".join(VALID_TAGS), re.IGNORECASE)
 
 		message = []
 		for line in self.body.splitlines():
@@ -252,7 +252,7 @@ class Commit(base.DataObject):
 			raise ValueError("Unknown tag: %s" % tag)
 
 		# Compile regex
-		r = re.compile("^%s: (.*)$" % tag, re.IGNORECASE)
+		r = re.compile("^%s:? (.*)$" % tag, re.IGNORECASE)
 
 		values = []
 		for line in self.body.splitlines():
@@ -299,6 +299,13 @@ class Commit(base.DataObject):
 			users += self.get_tag(tag)
 
 		return self.backend.users.find_maintainers(users)
+
+	@property
+	def fixed_bugs(self):
+		"""
+			Returns a list of all fixed bugs
+		"""
+		return self.get_tag("Fixes")
 
 	@property
 	def date(self):
