@@ -242,6 +242,10 @@ class Builds(base.Object):
 			for bug in commit.fixed_bugs:
 				build.add_bug(bug)
 
+			# Upvote the build for the testers
+			for tester in commit.testers:
+				build.upvote(tester)
+
 		# Create all automatic jobs
 		build.create_autojobs(arches=arches)
 

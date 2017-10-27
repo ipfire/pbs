@@ -133,12 +133,8 @@ class Sources(base.Object):
 								# Import all packages in one swoop.
 								for pkg in pkgs:
 									with self.db.transaction():
-										build = self.backend.builds.create_from_source_package(pkg,
+										self.backend.builds.create_from_source_package(pkg,
 											source.distro, commit=commit, type="release")
-
-										# Import any testers from the commit message
-										for tester in commit.testers:
-											build.upvote(tester)
 
 							except:
 								if commit:
