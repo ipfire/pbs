@@ -33,13 +33,10 @@ class TextModule(UIModule):
 			paragraph = "".join(line_iteration)
 			yield paragraph.replace("\n", " ")
 
-	def render(self, text, pre=False, remove_linebreaks=True):
+	def render(self, text, pre=False):
 		# Handle empty messages
 		if not text:
 			return ""
-
-		if remove_linebreaks:
-			text = text.replace("\n", " ")
 
 		# Search for bug ids that need to be linked to bugzilla
 		text = re.sub(self.BUGZILLA_PATTERN, self._bugzilla_repl, text, re.I|re.U)

@@ -16,7 +16,7 @@
 
 {% block message %}
 	{% if entry.get_message(current_user) %}
-		{% module Text(entry.get_message(current_user), remove_linebreaks=False) %}
+		{% module Text(entry.get_message(current_user)) %}
 	{% else %}
 		<p class="muted">
 			{{ _("No comment given.") }}
