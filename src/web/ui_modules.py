@@ -3,11 +3,9 @@
 from __future__ import division
 
 import datetime
-import itertools
 import math
 import pytz
 import re
-import string
 import tornado.web
 
 from .. import users
@@ -25,14 +23,6 @@ class TextModule(UIModule):
 
 	LINK = """<a href="%s" target="_blank" rel="noopener">%s</a>"""
 
-	def split_paragraphs(self, s):
-		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=str.isspace):
-			if group_seperator:
-				continue
-
-			paragraph = "".join(line_iteration)
-			yield paragraph.replace("\n", " ")
-
 	def render(self, text):
 		# Handle empty messages
 		if not text:
@@ -44,7 +34,7 @@ class TextModule(UIModule):
 		# Search for CVE numbers and create hyperlinks.
 		text = re.sub(self.CVE_PATTERN, self._cve_repl, text, re.I|re.U)
 
-		return text
+		return self.render_string("modules/text.html", paragraphs=text.split("\n\n"))
 
 	def _bugzilla_repl(self, m):
 		bug_id = m.group(1)

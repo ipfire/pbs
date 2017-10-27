@@ -1,0 +1,7 @@
+{% for paragraph in paragraphs %}
+    <p>
+            {% apply linkify %}
+                {{ paragraph }}
+            {% end %}
+    </p>
+{% end %}

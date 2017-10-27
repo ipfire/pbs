@@ -217,7 +217,27 @@ class Commit(base.DataObject):
 		if all((l == "" for l in message)):
 			return
 
-		return "\n".join(message)
+		# We will now break the message into paragraphs
+		paragraphs = re.split("\n\n+", "\n".join(message))
+		print paragraphs
+
+		message = []
+		for paragraph in paragraphs:
+			# Remove all line breaks that are not following a colon
+			# and where the next line does not start with a star.
+			paragraph = re.sub("(?<=\:)\n(?=[\*\s])", " ", paragraph)
+
+			message.append(paragraph)
+
+		return "\n\n".join(message)
+
+	def split_paragraphs(self, s):
+		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=str.isspace):
+			if group_seperator:
+				continue
+
+			paragraph = "".join(line_iteration)
+			yield paragraph.replace("\n", " ")
 
 	@property
 	def message_full(self):

@@ -281,6 +281,7 @@ dist_templates_modules_DATA = \
 	src/templates/modules/repo-actions-table.html \
 	src/templates/modules/repository-table.html \
 	src/templates/modules/source-table.html \
+	src/templates/modules/text.html \
 	src/templates/modules/updates-table.html \
 	src/templates/modules/user-table.html \
 	src/templates/modules/watchers-sidebar-table.html
