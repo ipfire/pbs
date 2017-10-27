@@ -33,7 +33,7 @@ class TextModule(UIModule):
 			paragraph = "".join(line_iteration)
 			yield paragraph.replace("\n", " ")
 
-	def render(self, text, pre=False):
+	def render(self, text):
 		# Handle empty messages
 		if not text:
 			return ""
@@ -43,9 +43,6 @@ class TextModule(UIModule):
 
 		# Search for CVE numbers and create hyperlinks.
 		text = re.sub(self.CVE_PATTERN, self._cve_repl, text, re.I|re.U)
-
-		if pre:
-			return "<pre>%s</pre>" % text
 
 		return text
 

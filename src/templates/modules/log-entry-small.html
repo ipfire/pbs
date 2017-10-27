@@ -6,6 +6,6 @@
 			{{ format_date(entry.time) }}
 		</p>
 
-		{% module Text(entry.get_message(current_user), pre=False) %}
+		{% module Text(entry.get_message(current_user)) %}
 	</div>
 </li>
