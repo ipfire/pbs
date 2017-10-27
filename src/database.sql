@@ -2605,6 +2605,13 @@ CREATE INDEX jobs_time_finished ON jobs USING btree (time_finished DESC) WHERE (
 
 
 --
+-- Name: jobs_time_started; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_time_started ON jobs USING btree (time_started) WHERE ((time_started IS NOT NULL) AND (time_finished IS NULL));
+
+
+--
 -- Name: mirrors_checks_sort; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 

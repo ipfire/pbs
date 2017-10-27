@@ -54,29 +54,12 @@ class Jobs(base.Object):
 	def get_by_uuid(self, uuid):
 		return self._get_job("SELECT * FROM jobs WHERE uuid = %s", uuid)
 
-	def get_active(self, host_id=None, builder=None, states=None):
-		if builder:
-			host_id = builder.id
+	def get_active(self, limit=None):
+		jobs = self._get_jobs("SELECT jobs.* FROM jobs \
+			WHERE time_started IS NOT NULL AND time_finished IS NULL \
+			ORDER BY time_started LIMIT %s", limit)
 
-		if states is None:
-			states = ["dispatching", "running", "uploading"]
-
-		query = "SELECT * FROM jobs WHERE state IN (%s)" % ", ".join(["%s"] * len(states))
-		args = states
-
-		if host_id:
-			query += " AND builder_id = %s" % host_id
-
-		query += " ORDER BY \
-			CASE \
-				WHEN jobs.state = 'running'     THEN 0 \
-				WHEN jobs.state = 'uploading'   THEN 1 \
-				WHEN jobs.state = 'dispatching' THEN 2 \
-				WHEN jobs.state = 'pending'     THEN 3 \
-				WHEN jobs.state = 'new'         THEN 4 \
-			END, time_started ASC"
-
-		return [Job(self.backend, j.id, j) for j in self.db.query(query, *args)]
+		return jobs
 
 	def get_recently_ended(self, limit=None):
 		jobs = self._get_jobs("SELECT jobs.* FROM jobs \

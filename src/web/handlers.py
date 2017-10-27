@@ -6,7 +6,12 @@ from . import base
 
 class IndexHandler(base.BaseHandler):
 	def get(self):
-		jobs = self.backend.jobs.get_active()
+		jobs = []
+
+		# Get all active jobs
+		jobs += self.backend.jobs.get_active()
+
+		# Get some recently finished jobs
 		jobs += self.backend.jobs.get_recently_ended(limit=12)
 
 		# Updates
