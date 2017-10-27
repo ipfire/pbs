@@ -34,6 +34,10 @@ class TextModule(UIModule):
 			yield paragraph.replace("\n", " ")
 
 	def render(self, text, pre=False, remove_linebreaks=True):
+		# Handle empty messages
+		if not text:
+			return ""
+
 		if remove_linebreaks:
 			text = text.replace("\n", " ")
 

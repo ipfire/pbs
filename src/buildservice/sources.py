@@ -213,6 +213,10 @@ class Commit(base.DataObject):
 
 			message.append(line)
 
+		# If all lines are empty lines, we send back an empty message
+		if all((l == "" for l in message)):
+			return
+
 		return "\n".join(message)
 
 	@property
