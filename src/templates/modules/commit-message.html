@@ -1,0 +1,5 @@
+<h4>{{ commit.subject }}</h4>
+
+{% apply linkify %}
+	{% module Text(commit.message) %}
+{% end %}

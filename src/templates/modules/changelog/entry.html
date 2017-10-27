@@ -28,9 +28,7 @@
 
 			{% if build.type == "release" %}
 				{% if build.commit %}
-					{% apply linkify %}
-						{% module Text(build.commit) %}
-					{% end %}
+					{% module CommitMessage(build.commit) %}
 
 					<hr>
 

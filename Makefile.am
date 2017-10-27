@@ -259,6 +259,7 @@ dist_templates_modules_DATA = \
 	src/templates/modules/build-table.html \
 	src/templates/modules/comments-table.html \
 	src/templates/modules/commits-table.html \
+	src/templates/modules/commit-message.html \
 	src/templates/modules/files-table.html \
 	src/templates/modules/footer.html \
 	src/templates/modules/jobs-table.html \

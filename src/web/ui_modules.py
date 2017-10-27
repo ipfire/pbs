@@ -10,7 +10,6 @@ import re
 import string
 import tornado.web
 
-from .. import sources
 from .. import users
 from ..constants import *
 
@@ -35,9 +34,6 @@ class TextModule(UIModule):
 			yield paragraph.replace("\n", " ")
 
 	def render(self, text, pre=False, remove_linebreaks=True):
-		if isinstance(text, sources.Commit):
-			text = self._get_commit_message(text)
-
 		if remove_linebreaks:
 			text = text.replace("\n", " ")
 
@@ -63,10 +59,10 @@ class TextModule(UIModule):
 	def _cve_repl(self, m):
 		return self.LINK % ("http://cve.mitre.org/cgi-bin/cvename.cgi?name=%s" % m.group(1), m.group(0))
 
-	def _get_commit_message(self, commit):
-		text = (commit.subject, commit.message)
 
-		return "\n\n".join(text)
+class CommitMessageModule(UIModule):
+	def render(self, commit):
+		return self.render_string("modules/commit-message.html", commit=commit)
 
 
 class ModalModule(UIModule):
