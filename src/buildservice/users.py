@@ -150,20 +150,21 @@ class Users(base.Object):
 		if None in (name, password):
 			return
 
-		# Search for the username in the database.
-		# The user must not be deleted and must be activated.
-		user = self._get_user("SELECT * FROM users WHERE name = %s AND \
-			activated IS TRUE AND deleted IS FALSE", name)
+		# usually we will get an email address as name
+		user = self.get_by_email(name) or self.get_by_name(name)
 
-		# If no user could be found, we search for a matching user in
-		# the LDAP database
 		if not user:
+			# If no user could be found, we search for a matching user in
+			# the LDAP database
 			if not self.ldap.auth(name, password):
 				return
 
 			# If a LDAP user is found (and password matches), we will
 			# create a new local user with the information from LDAP.
-			user = self.register_from_ldap(name)
+			user = self.create_from_ldap(name)
+
+		if not user.activated or user.deleted:
+			return
 
 		# Check if the password matches
 		if user.check_password(password):
@@ -439,6 +440,10 @@ class User(base.DataObject):
 	@property
 	def activated(self):
 		return self.data.activated
+
+	@property
+	def deleted(self):
+		return self.data.deleted
 
 	@property
 	def registered(self):
