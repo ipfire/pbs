@@ -245,11 +245,6 @@ class JobStateModule(UIModule):
 			classes.append("muted")
 			icon = "icon-warning-sign"
 
-		elif state == "dependency_error":
-			text = _("Dependency problem")
-			classes.append("text-warning")
-			icon = "icon-random"
-
 		elif state == "dispatching":
 			text = _("Dispatching")
 			classes.append("text-info")
@@ -264,11 +259,6 @@ class JobStateModule(UIModule):
 			text = _("Finished")
 			classes.append("text-success")
 			icon = "icon-ok"
-
-		elif state == "new":
-			text = _("New")
-			classes.append("muted")
-			icon = "icon-asterisk"
 
 		elif state == "pending":
 			text = _("Pending")

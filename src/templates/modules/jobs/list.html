@@ -14,7 +14,7 @@
 				<tr class="success">
 			{% elif job.state in ("dispatching", "uploading") %}
 				<tr class="info">
-			{% elif job.state in ("aborted", "dependency_error", "failed") %}
+			{% elif job.state in ("aborted", "failed") %}
 				<tr class="error">
 			{% else %}
 				<tr>

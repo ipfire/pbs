@@ -587,7 +587,7 @@ CREATE TABLE jobs (
     id integer NOT NULL,
     uuid text NOT NULL,
     build_id integer NOT NULL,
-    state text DEFAULT 'new'::text NOT NULL,
+    state text DEFAULT 'pending'::text NOT NULL,
     arch text NOT NULL,
     time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_started timestamp without time zone,
@@ -597,7 +597,10 @@ CREATE TABLE jobs (
     aborted_state integer DEFAULT 0 NOT NULL,
     message text,
     test boolean DEFAULT true NOT NULL,
-    superseeded_by integer
+    superseeded_by integer,
+    dependency_check_succeeded boolean,
+    dependency_check_at timestamp without time zone,
+    CONSTRAINT jobs_states CHECK ((state = ANY (ARRAY['pending'::text, 'running'::text, 'finished'::text, 'aborted'::text, 'download_error'::text, 'failed'::text])))
 );
 
 
@@ -874,7 +877,7 @@ CREATE VIEW jobs_queue AS
             rank() OVER (ORDER BY (NOT jobs.test), builds.priority DESC, jobs.time_created) AS rank
            FROM (jobs
              LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-          WHERE (jobs.state = 'pending'::text)
+          WHERE ((jobs.state = 'new'::text) AND (jobs.dependency_check_succeeded IS TRUE))
         )
  SELECT queue.id AS job_id,
     queue.rank
@@ -2549,6 +2552,13 @@ ALTER TABLE jobs_buildroots CLUSTER ON jobs_buildroots_job_id;
 --
 
 CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
+
+
+--
+-- Name: jobs_queue_ready; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_queue_ready ON jobs USING btree (id) WHERE ((state = 'new'::text) AND (dependency_check_succeeded IS TRUE));
 
 
 --

@@ -79,12 +79,20 @@ class JobQueue(base.Object):
 						break
 
 	def check_build_dependencies(self):
-		jobs = self.backend.jobs._get_jobs("SELECT * FROM jobs \
-			WHERE state = 'new' OR \
-				(state = 'dependency_error' AND time_finished < NOW() - '5 minutes'::interval) \
-			ORDER BY time_finished LIMIT 50")
+		# Check all jobs that have never being checked before
+		self._check_build_dependencies("SELECT * FROM jobs \
+			WHERE state = %s AND dependency_check_succeeded IS NULL \
+			ORDER BY time_created", "pending")
+
+		# Redo the check for all jobs that have recently failed
+		self._check_build_dependencies("SELECT * FROM jobs \
+			WHERE state = %s AND dependency_check_succeeeded IS FALSE \
+			AND dependency_check_at < NOW() - '5 minutes'::interval \
+			ORDER BY dependency_check_at", "pending")
+
+	def _check_build_dependencies(self, query, *args):
+		jobs = self.backend.jobs._get_jobs(query, *args)
 
 		for job in jobs:
 			with self.db.transaction():
-				# Resolve the dependencies
 				job.resolvdep()

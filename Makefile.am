@@ -364,7 +364,6 @@ dist_static_font_DATA = \
 static_fontdir = $(staticdir)/font
 
 dist_static_images_DATA = \
-	src/static/images/icons/build-dependency_error.png \
 	src/static/images/icons/build-dispatching.png \
 	src/static/images/icons/build-failed.png \
 	src/static/images/icons/build-finished.png \

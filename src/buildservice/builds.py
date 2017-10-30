@@ -543,7 +543,7 @@ class Build(base.DataObject):
 			remove = True
 
 			for job in self.jobs:
-				if job.state in ("new", "pending", "running", "dependency_error"):
+				if job.state in ("pending", "running"):
 					job.state = "aborted"
 
 		# If this build is in a repository, it will leave it.

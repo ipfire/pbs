@@ -286,7 +286,7 @@ class Job(base.DataObject):
 			self._set_attribute("state", state)
 
 			# Log the event.
-			if log and not state == "new":
+			if log:
 				self.log("state_change", state=state, user=user)
 
 		# Always clear the message when the status is changed.
@@ -297,7 +297,7 @@ class Job(base.DataObject):
 			# Set start time.
 			self._set_attribute("time_started", datetime.datetime.utcnow())
 
-		elif state in ("aborted", "dependency_error", "finished", "failed"):
+		elif state in ("aborted", "finished", "failed"):
 			self._set_attribute("time_finished", datetime.datetime.utcnow())
 
 			# Send messages to the user.
@@ -313,12 +313,14 @@ class Job(base.DataObject):
 
 	state = property(get_state, set_state)
 
-	@property
-	def message(self):
-		return self.data.message
+	def set_message(self, message):
+		self._set_attribute("message", "%s" % message)
 
+	message = property(lambda s: s.data.message, set_message)
+
+	# XXX DEPRECATED
 	def update_message(self, message):
-		self._set_attribute("message", message)
+		self.message = message
 
 	def get_builder(self):
 		if self.data.builder_id:
@@ -627,6 +629,18 @@ class Job(base.DataObject):
 
 		return "\n\n".join(confs)
 
+	def set_dependency_check_succeeded(self, value):
+		self._set_attribute("dependency_check_succeeded", value)
+		self._set_attribute("dependency_check_at", datetime.datetime.utcnow())
+
+		# Reset the message
+		if value is True:
+			self.message = None
+
+	dependency_check_succeeded = property(
+		lambda s: s.data.dependency_check_succeeded,
+		set_dependency_check_succeeded)
+
 	def resolvdep(self):
 		config = pakfire.config.Config(files=["general.conf"])
 		config.parse(self.get_config(local=True))
@@ -645,14 +659,9 @@ class Job(base.DataObject):
 
 		# Catch dependency errors and log the problem string.
 		except DependencyError, e:
-			self.state = "dependency_error"
+			self.dependency_check_succeeded = False
 			self.update_message("%s" % e)
 
+		# The dependency check has succeeded
 		else:
-			# If the build dependencies can be resolved, we set the build in
-			# pending state.
-			if solver.status is True:
-				if self.state in ("failed",):
-					return
-
-				self.state = "pending"
+			self.dependency_check_succeeded = True
