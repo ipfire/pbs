@@ -14,8 +14,7 @@ class BuilderDetailHandler(base.BaseHandler):
 		builder = self.backend.builders.get_by_name(hostname)
 
 		# Get running and pending jobs.
-		jobs = self.backend.jobs.get_active(builder=builder)
-		jobs += builder.jobqueue
+		jobs = builder.active_jobs + list(builder.jobqueue)
 
 		# Get log.
 		log = builder.get_history(limit=5)

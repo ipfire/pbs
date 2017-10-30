@@ -351,8 +351,12 @@ class Builder(base.DataObject):
 		return "online"
 
 	@lazy_property
-	def active_jobs(self, *args, **kwargs):
-		return self.pakfire.jobs.get_active(builder=self, *args, **kwargs)
+	def active_jobs(self):
+		jobs = self.backend.jobs._get_jobs("SELECT jobs.* FROM jobs \
+			WHERE time_started IS NOT NULL AND time_finished IS NULL \
+			AND builder_id = %s ORDER BY time_started", self.id)
+
+		return list(jobs)
 
 	@property
 	def too_many_jobs(self):
