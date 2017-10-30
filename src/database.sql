@@ -802,30 +802,6 @@ ALTER SEQUENCE images_types_id_seq OWNED BY images_types.id;
 
 
 --
--- Name: jobs_active; Type: VIEW; Schema: public; Owner: pakfire
---
-
-CREATE VIEW jobs_active AS
- SELECT jobs.id,
-    jobs.uuid,
-    jobs.build_id,
-    jobs.state,
-    jobs.arch,
-    jobs.time_created,
-    jobs.time_started,
-    jobs.time_finished,
-    jobs.start_not_before,
-    jobs.builder_id,
-    jobs.aborted_state,
-    jobs.message
-   FROM jobs
-  WHERE (jobs.state = ANY (ARRAY['dispatching'::jobs_state, 'running'::jobs_state, 'uploading'::jobs_state]))
-  ORDER BY jobs.time_started;
-
-
-ALTER TABLE jobs_active OWNER TO pakfire;
-
---
 -- Name: jobs_buildroots; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
