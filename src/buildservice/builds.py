@@ -594,9 +594,6 @@ class Build(base.DataObject):
 		if self.pkg and self.pkg.commit:
 			return self.pkg.commit
 
-	def update_message(self, message):
-		self._set_attribute("message", message)
-
 	def has_perm(self, user):
 		"""
 			Check, if the given user has the right to perform administrative

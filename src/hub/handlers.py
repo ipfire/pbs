@@ -553,10 +553,9 @@ class BuildersJobsStateHandler(BuildersBaseHandler):
 			raise tornado.web.HTTPError(403, "Altering another builder's build.")
 
 		# Save information to database.
-		job.state = state
-
-		message = self.get_argument("message", None)
-		job.update_message(message)
+		with self.db.transaction():
+			job.state = state
+			job.message = self.get_argument("message", None)
 
 		self.finish("OK")
 

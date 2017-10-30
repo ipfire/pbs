@@ -290,7 +290,7 @@ class Job(base.DataObject):
 				self.log("state_change", state=state, user=user)
 
 		# Always clear the message when the status is changed.
-		self.update_message(None)
+		self.message = None
 
 		# Update some more informations.
 		if state == "dispatching":
@@ -314,13 +314,12 @@ class Job(base.DataObject):
 	state = property(get_state, set_state)
 
 	def set_message(self, message):
-		self._set_attribute("message", "%s" % message)
+		if message:
+			message = "%s" % message
+
+		self._set_attribute("message", message)
 
 	message = property(lambda s: s.data.message, set_message)
-
-	# XXX DEPRECATED
-	def update_message(self, message):
-		self.message = message
 
 	def get_builder(self):
 		if self.data.builder_id:
@@ -660,7 +659,7 @@ class Job(base.DataObject):
 		# Catch dependency errors and log the problem string.
 		except DependencyError, e:
 			self.dependency_check_succeeded = False
-			self.update_message("%s" % e)
+			self.message = e
 
 		# The dependency check has succeeded
 		else:
