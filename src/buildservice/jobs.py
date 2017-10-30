@@ -333,6 +333,19 @@ class Job(base.DataObject):
 
 	builder = lazy_property(get_builder, set_builder)
 
+	@lazy_property
+	def candidate_builders(self):
+		"""
+			Returns all active builders that could build this job
+		"""
+		builders = self.backend.builders.get_for_arch(self.arch)
+
+		# Remove all builders that are not available
+		builders = (b for b in builders if b.enabled and b.is_online())
+
+		# Sort them by the fastest builder first
+		return sorted(builders, key=lambda b: -b.performance_index)
+
 	@property
 	def arch(self):
 		return self.data.arch
