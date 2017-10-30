@@ -198,6 +198,8 @@ class Package(base.DataObject):
 	def delete(self):
 		self.backend.delete_file(os.path.join(PACKAGES_DIR, self.path))
 
+		self.db.execute("DELETE FROM packages_deps WHERE pkg_id = %s", self.id)
+
 		# Delete all files from the filelist.
 		self.db.execute("DELETE FROM filelists WHERE pkg_id = %s", self.id)
 
