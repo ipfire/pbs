@@ -116,28 +116,6 @@ CREATE TYPE jobs_history_state AS ENUM (
 ALTER TYPE jobs_history_state OWNER TO pakfire;
 
 --
--- Name: jobs_state; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE jobs_state AS ENUM (
-    'new',
-    'pending',
-    'running',
-    'finished',
-    'dispatching',
-    'uploading',
-    'failed',
-    'aborted',
-    'temporary_failed',
-    'dependency_error',
-    'download_error',
-    'deleted'
-);
-
-
-ALTER TYPE jobs_state OWNER TO pakfire;
-
---
 -- Name: mirrors_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -609,7 +587,7 @@ CREATE TABLE jobs (
     id integer NOT NULL,
     uuid text NOT NULL,
     build_id integer NOT NULL,
-    state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
+    state text DEFAULT 'new'::text NOT NULL,
     arch text NOT NULL,
     time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_started timestamp without time zone,
@@ -634,7 +612,7 @@ CREATE VIEW builds_times AS
     jobs.arch,
     date_part('epoch'::text, (jobs.time_finished - jobs.time_started)) AS duration
    FROM jobs
-  WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::jobs_state));
+  WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::text));
 
 
 ALTER TABLE builds_times OWNER TO pakfire;
@@ -896,7 +874,7 @@ CREATE VIEW jobs_queue AS
             rank() OVER (ORDER BY (NOT jobs.test), builds.priority DESC, jobs.time_created) AS rank
            FROM (jobs
              LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-          WHERE (jobs.state = 'pending'::jobs_state)
+          WHERE (jobs.state = 'pending'::text)
         )
  SELECT queue.id AS job_id,
     queue.rank
