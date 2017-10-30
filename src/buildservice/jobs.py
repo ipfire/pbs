@@ -305,9 +305,6 @@ class Job(base.DataObject):
 				self.send_finished_message()
 
 			elif state == "failed":
-				# Remove all package files if a job is set to failed state.
-				self.__delete_packages()
-
 				self.send_failed_message()
 
 		# Automatically update the state of the build (not on test builds).
