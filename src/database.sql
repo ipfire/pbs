@@ -600,7 +600,7 @@ CREATE TABLE jobs (
     superseeded_by integer,
     dependency_check_succeeded boolean,
     dependency_check_at timestamp without time zone,
-    CONSTRAINT jobs_states CHECK ((state = ANY (ARRAY['pending'::text, 'running'::text, 'finished'::text, 'aborted'::text, 'download_error'::text, 'failed'::text])))
+    CONSTRAINT jobs_states CHECK ((state = ANY (ARRAY['pending'::text, 'dispatching'::text, 'running'::text, 'uploading'::text, 'finished'::text, 'aborted'::text, 'download_error'::text, 'failed'::text])))
 );
 
 
