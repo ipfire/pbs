@@ -600,9 +600,6 @@ class BuildersJobsAddFileHandler(BuildersBaseHandler):
 		if not upload.builder == self.builder:
 			raise tornado.web.HTTPError(403, "Using an other host's file.")
 
-		# Remove all files that have to be deleted, first.
-		self.backend.cleanup_files()
-
 		try:
 			job.add_file(upload.path)
 
