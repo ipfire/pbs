@@ -428,18 +428,15 @@ class Builder(base.DataObject):
 
 		for job in self.jobqueue:
 			logging.debug("Looking at %s..." % job)
+
 			# Only allow building test jobs in test mode
 			if self.testmode and not job.test:
 				continue
 
-			# If we are the fastest builder to handle this job, we will
-			# get it.
-			if job.candidate_builders:
-				fastest_builder = job.candidate_builders.pop(0)
-
-				if not self == fastest_builder:
-					logging.debug("We are not the fastest builder for this job (%s is)" % fastest_builder)
-					continue
+			# We will skip this job if we are not the designated builder
+			if job.designated_builder and not job.designated_builder == self:
+				logging.debug("We are not the designated builder for this job (%s is)" % job.designated_builder)
+				continue
 
 			return job
 
