@@ -524,10 +524,7 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 				return self.add_timeout(10, self.callback)
 
 			# We got a job!
-			job.state = "dispatching"
-
-			# Set our build host.
-			job.builder = self.builder
+			job.start(builder=self.builder)
 
 			ret = {
 				"id"                 : job.uuid,
@@ -552,10 +549,18 @@ class BuildersJobsStateHandler(BuildersBaseHandler):
 		if not job.builder == self.builder:
 			raise tornado.web.HTTPError(403, "Altering another builder's build.")
 
+		message = self.get_argument("message", None)
+
 		# Save information to database.
 		with self.db.transaction():
-			job.state = state
-			job.message = self.get_argument("message", None)
+			if state == "running":
+				job.running()
+			elif state == "failed":
+				job.failed(message)
+			elif state == "finished":
+				job.finished()
+			else:
+				job.state = state
 
 		self.finish("OK")
 

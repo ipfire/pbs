@@ -124,13 +124,61 @@ class Job(base.DataObject):
 		return res.len
 
 	@property
+	def uuid(self):
+		return self.data.uuid
+
+	@property
+	def name(self):
+		return "%s-%s.%s" % (self.pkg.name, self.pkg.friendly_version, self.arch)
+
+	@property
+	def build_id(self):
+		return self.data.build_id
+
+	@lazy_property
+	def build(self):
+		return self.backend.builds.get_by_id(self.build_id)
+
+	@property
+	def test(self):
+		return self.data.test
+
+	@property
+	def related_jobs(self):
+		ret = []
+
+		for job in self.build.jobs:
+			if job == self:
+				continue
+
+			ret.append(job)
+
+		return ret
+
+	@property
+	def pkg(self):
+		return self.build.pkg
+
+	@property
+	def size(self):
+		return sum((p.size for p in self.packages))
+
+	@lazy_property
+	def rank(self):
+		"""
+			Returns the rank in the build queue
+		"""
+		if not self.state == "pending":
+			return
+
+		res = self.db.get("SELECT rank FROM jobs_queue WHERE job_id = %s", self.id)
+
+		if res:
+			return res.rank
+
+	@property
 	def distro(self):
 		return self.build.distro
-
-	def restart(self):
-		# Copy the job and let it build again
-		return self.backend.jobs.create(self.build, self.arch,
-			test=self.test, superseeds=self)
 
 	def get_superseeded_by(self):
 		if self.data.superseeded_by:
@@ -140,9 +188,53 @@ class Job(base.DataObject):
 		assert isinstance(superseeded_by, self.__class__)
 
 		self._set_attribute("superseeded_by", superseeded_by.id)
-		self.superseeded_by = superseeded_by
 
 	superseeded_by = lazy_property(get_superseeded_by, set_superseeded_by)
+
+	def start(self, builder):
+		"""
+			Starts this job on builder
+		"""
+		self.builder = builder
+
+		# Start to dispatch the build job
+		self.state = "dispatching"
+
+	def running(self):
+		self.state = "running"
+
+		# Set start time
+		self.time_started  = datetime.datetime.utcnow()
+		self.time_finished = None
+
+	def finished(self):
+		self.state = "finished"
+
+		# Log end time
+		self.time_finished = datetime.datetime.utcnow()
+
+		# Notify users
+		self.send_finished_message()
+
+	def failed(self, message):
+		self.state = "failed"
+		self.message = message
+
+		# Log end time
+		self.time_finished = datetime.datetime.utcnow()
+
+		# Notify users
+		self.send_failed_message()
+
+	def restart(self, test=None, start_not_before=None):
+		# Copy the job and let it build again
+		job = self.backend.jobs.create(self.build, self.arch,
+			test=test or self.test, superseeds=self)
+
+		if start_not_before:
+			job.start_not_before = start_not_before
+
+		return job
 
 	def delete(self):
 		"""
@@ -218,59 +310,6 @@ class Job(base.DataObject):
 
 		return entries
 
-	@property
-	def uuid(self):
-		return self.data.uuid
-
-	@property
-	def test(self):
-		return self.data.test
-
-	@property
-	def build_id(self):
-		return self.data.build_id
-
-	@lazy_property
-	def build(self):
-		return self.backend.builds.get_by_id(self.build_id)
-
-	@property
-	def related_jobs(self):
-		ret = []
-
-		for job in self.build.jobs:
-			if job == self:
-				continue
-
-			ret.append(job)
-
-		return ret
-
-	@property
-	def pkg(self):
-		return self.build.pkg
-
-	@property
-	def name(self):
-		return "%s-%s.%s" % (self.pkg.name, self.pkg.friendly_version, self.arch)
-
-	@property
-	def size(self):
-		return sum((p.size for p in self.packages))
-
-	@lazy_property
-	def rank(self):
-		"""
-			Returns the rank in the build queue
-		"""
-		if not self.state == "pending":
-			return
-
-		res = self.db.get("SELECT rank FROM jobs_queue WHERE job_id = %s", self.id)
-
-		if res:
-			return res.rank
-
 	def is_running(self):
 		"""
 			Returns True if job is in a running state.
@@ -280,34 +319,10 @@ class Job(base.DataObject):
 	def get_state(self):
 		return self.data.state
 
-	def set_state(self, state, user=None, log=True):
-		# Nothing to do if the state remains.
-		if not self.state == state:
-			self._set_attribute("state", state)
+	def set_state(self, state):
+		self._set_attribute("state", state)
 
-			# Log the event.
-			if log:
-				self.log("state_change", state=state, user=user)
-
-		# Always clear the message when the status is changed.
-		self.message = None
-
-		# Update some more informations.
-		if state == "dispatching":
-			# Set start time.
-			self._set_attribute("time_started", datetime.datetime.utcnow())
-
-		elif state in ("aborted", "finished", "failed"):
-			self._set_attribute("time_finished", datetime.datetime.utcnow())
-
-			# Send messages to the user.
-			if state == "finished":
-				self.send_finished_message()
-
-			elif state == "failed":
-				self.send_failed_message()
-
-		# Automatically update the state of the build (not on test builds).
+		# Automatically update the state of the build (not on test builds)
 		if not self.test:
 			self.build.auto_update_state()
 
@@ -367,13 +382,20 @@ class Job(base.DataObject):
 	def time_created(self):
 		return self.data.time_created
 
-	@property
-	def time_started(self):
-		return self.data.time_started
+	def set_time_started(self, time_started):
+		self._set_attribute("time_started", time_started)
 
-	@property
-	def time_finished(self):
-		return self.data.time_finished
+	time_started = property(lambda s: s.data.time_started, set_time_started)
+
+	def set_time_finished(self, time_finished):
+		self._set_attribute("time_finished", time_finished)
+
+	time_finished = property(lambda s: s.data.time_finished, set_time_finished)
+
+	def set_start_not_before(self, start_not_before):
+		self._set_attribute("start_not_before", start_not_before)
+
+	start_not_before = property(lambda s: s.data.start_not_before, set_start_not_before)
 
 	def get_pkg_by_uuid(self, uuid):
 		pkg = self.backend.packages._get_package("SELECT packages.id FROM packages \
@@ -557,43 +579,6 @@ class Job(base.DataObject):
 		self.backend.messages.send_to_all(self.message_recipients,
 			MSG_BUILD_FAILED_SUBJECT, MSG_BUILD_FAILED, info)
 
-	def set_start_time(self, start_not_before):
-		self._set_attribute("start_not_before", start_not_before)
-
-	def schedule(self, type, start_time=None, user=None):
-		assert type in ("rebuild", "test")
-
-		if type == "rebuild":
-			if self.state == "finished":
-				return
-
-			job = self.restart()
-			job.set_start_time(start_time)
-
-			# Log the event.
-			self.log("schedule_rebuild", user=user)
-
-		elif type == "test":
-			if not self.state == "finished":
-				return
-
-			# Create a new job with same build and arch.
-			job = self.create(self.backend, self.build, self.arch, test=True)
-			job.set_start_time(start_time)
-
-			# Log the event.
-			self.log("schedule_test_job", test_job=job, user=user)
-
-			return job
-
-	def schedule_test(self, start_not_before=None, user=None):
-		# XXX to be removed
-		return self.schedule("test", start_time=start_not_before, user=user)
-
-	def schedule_rebuild(self, start_not_before=None, user=None):
-		# XXX to be removed
-		return self.schedule("rebuild", start_time=start_not_before, user=user)
-
 	def get_build_repos(self):
 		"""
 			Returns a list of all repositories that should be used when
@@ -641,6 +626,8 @@ class Job(base.DataObject):
 		set_dependency_check_succeeded)
 
 	def resolvdep(self):
+		log.info("Processing dependencies for %s..." % self)
+
 		config = pakfire.config.Config(files=["general.conf"])
 		config.parse(self.get_config(local=True))
 

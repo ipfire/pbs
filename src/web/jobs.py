@@ -81,14 +81,13 @@ class JobScheduleHandler(base.BaseHandler):
 		except TypeError:
 			offset = 0
 
-		# Submit the build.
-		if type == "test":
-			job = job.schedule_test(offset)
+		# Is this supposed to be a test job?
+		test = (type == "test")
 
-		elif type == "rebuild":
-			job.schedule_rebuild(offset)
+		with self.db.transaction():
+			new_job = job.restart(test=test)
 
-		self.redirect("/job/%s" % job.uuid)
+		self.redirect("/job/%s" % new_job.uuid)
 
 
 class JobAbortHandler(base.BaseHandler):
