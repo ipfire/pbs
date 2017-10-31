@@ -2831,6 +2831,14 @@ ALTER TABLE ONLY jobs_repos
 
 
 --
+-- Name: jobs_superseeded_by; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT jobs_superseeded_by FOREIGN KEY (superseeded_by) REFERENCES jobs(id);
+
+
+--
 -- Name: keys_subkeys_key_id; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
 --
 
