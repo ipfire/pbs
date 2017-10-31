@@ -2539,6 +2539,13 @@ CREATE INDEX jobs_arch ON jobs USING btree (arch);
 
 
 --
+-- Name: jobs_builders_active_jobs; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_builders_active_jobs ON jobs USING btree (builder_id) WHERE (state = ANY (ARRAY['dispatching'::text, 'running'::text]));
+
+
+--
 -- Name: jobs_buildroots_job_id; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 

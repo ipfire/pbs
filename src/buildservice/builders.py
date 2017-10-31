@@ -16,6 +16,11 @@ from .decorators import *
 
 from .users import generate_password_hash, check_password_hash, generate_random_string
 
+ACTIVE_STATES = [
+	"dispatching",
+	"running",
+]
+
 class Builders(base.Object):
 	def _get_builder(self, query, *args):
 		res = self.db.get(query, *args)
@@ -391,11 +396,18 @@ class Builder(base.DataObject):
 		return list(jobs)
 
 	@property
+	def num_active_jobs(self):
+		res = self.db.get("SELECT COUNT(*) AS count FROM jobs \
+			WHERE builder_id = %s AND state = ANY(%s)", self.id, ACTIVE_STATES)
+
+		return res.count
+
+	@property
 	def too_many_jobs(self):
 		"""
 			Tell if this host is already running enough or too many jobs.
 		"""
-		return len(self.active_jobs) >= self.max_jobs
+		return self.num_active_jobs >= self.max_jobs
 
 	@lazy_property
 	def jobqueue(self):
