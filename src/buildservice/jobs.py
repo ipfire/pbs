@@ -359,6 +359,9 @@ class Job(base.DataObject):
 		# Remove all builders that are not available
 		builders = (b for b in builders if b.enabled and b.is_online())
 
+		# Remove all builders that have too many jobs
+		builders = (b for b in builders if not b.too_many_jobs)
+
 		# Sort them by the fastest builder first
 		return sorted(builders, key=lambda b: -b.performance_index)
 
