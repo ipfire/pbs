@@ -140,7 +140,7 @@ class Backend(object):
 		for row in query:
 			path = row.path
 
-			if not path or not paths.startswith("%s/" % PAKFIRE_DIR):
+			if not path or not path.startswith("%s/" % PAKFIRE_DIR):
 				log.warning("Cannot delete file outside of the tree")
 				continue
 
