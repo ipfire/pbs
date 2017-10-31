@@ -877,7 +877,7 @@ CREATE VIEW jobs_queue AS
             rank() OVER (ORDER BY (NOT jobs.test), builds.priority DESC, jobs.time_created) AS rank
            FROM (jobs
              LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-          WHERE ((jobs.state = 'new'::text) AND (jobs.dependency_check_succeeded IS TRUE))
+          WHERE ((jobs.state = 'pending'::text) AND (jobs.dependency_check_succeeded IS TRUE))
         )
  SELECT queue.id AS job_id,
     queue.rank
