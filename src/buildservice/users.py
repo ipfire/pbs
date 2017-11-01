@@ -541,25 +541,10 @@ class UserEmail(base.DataObject):
 
 		self.user.send_template("messages/users/account-activation")
 
-	def send_email_activation_mail(self, email):
+	def send_email_activation_mail(self):
 		logging.debug("Sending email address activation mail to %s" % self.email)
 
-		# Get the saved locale from the user.
-		_ = self.user.locale.translate
-
-		subject = _("Email address Activation")
-
-		message  = _("You, or somebody using your email address, has add this email address to an account on the Pakfire Build Service.")
-		message += "\n"*2
-		message += _("To activate your this email address account, please click on the link below.")
-		message += "\n"*2
-		message += "    %(baseurl)s/user/%(name)s/activate?code=%(activation_code)s" \
-			% { "baseurl" : self.settings.get("baseurl"), "name" : self.user.name,
-				"activation_code" : self.activation_code, }
-		message += "\n"*2
-		message += "Sincerely,\n    The Pakfire Build Service"
-
-		self.backend.messages.add(self.recipient, subject, message)
+		self.user.send_template("messages/users/email-activation", email=self)
 
 
 # Some testing code.

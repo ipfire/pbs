@@ -244,7 +244,8 @@ templates_errorsdir = $(templatesdir)/errors
 templates_messagesdir = $(templatesdir)/messages
 
 dist_templates_messages_users_DATA = \
-	src/templates/messages/users/account-activation.markdown
+	src/templates/messages/users/account-activation.markdown \
+	src/templates/messages/users/email-activation.markdown
 
 templates_messages_usersdir = $(templates_messagesdir)/users
 
