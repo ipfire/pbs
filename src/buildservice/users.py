@@ -510,7 +510,7 @@ class UserEmail(base.DataObject):
 
 	@property
 	def recipient(self):
-		return "%s <%s>" % (self.user.name, self.email)
+		return "%s <%s>" % (self.user.realname, self.email)
 
 	@property
 	def email(self):
