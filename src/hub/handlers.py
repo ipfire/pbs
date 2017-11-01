@@ -521,7 +521,7 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 
 			# Got no job, wait and try again.
 			if not job:
-				return self.add_timeout(10, self.callback)
+				return self.add_timeout(self.heartbeat, self.callback)
 
 			# We got a job!
 			job.start(builder=self.builder)
@@ -537,6 +537,18 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 
 			# Send build information to the builder.
 			self.finish(ret)
+
+	@property
+	def heartbeat(self):
+		return 15 # 15 seconds
+
+	@property
+	def max_runtime(self):
+		timeout = self.get_argument_int("timeout", None)
+		if timeout:
+			return timeout - self.heartbeat
+
+		return 300 # 5 min
 
 
 class BuildersJobsStateHandler(BuildersBaseHandler):
