@@ -95,7 +95,7 @@
 							<hr>
 
 							<p class="muted">
-								{{ _("Author") }} {% module Maintainer(build.commit.author) %}
+								{{ _("Author") }} {% module LinkToUser(build.commit.author) %}
 								&dash;
 								{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
 							</p>

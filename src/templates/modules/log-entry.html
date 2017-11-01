@@ -33,7 +33,7 @@
 			{% end block %}
 
 			{% block message %}
-				{% module Text(entry.get_message(current_user), pre=False) %}
+				{% module Text(entry.get_message(current_user)) %}
 			{% end block %}
 		</div>
 	{% end block %}

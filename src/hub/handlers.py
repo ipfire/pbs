@@ -359,7 +359,7 @@ class JobsGetLatestHandler(JobsBaseHandler):
 		limit = self.get_argument_int("limit", 5)
 
 		# Get the latest jobs.
-		jobs = self.backend.jobs.get_latest(age="24 HOUR", limit=limit)
+		jobs = self.backend.jobs.get_recently_ended(limit=limit)
 
 		args = {
 			"jobs" : [self.job2json(j) for j in jobs],
@@ -524,10 +524,7 @@ class BuildersJobsQueueHandler(BuildersBaseHandler):
 				return self.add_timeout(10, self.callback)
 
 			# We got a job!
-			job.state = "dispatching"
-
-			# Set our build host.
-			job.builder = self.builder
+			job.start(builder=self.builder)
 
 			ret = {
 				"id"                 : job.uuid,
@@ -552,11 +549,18 @@ class BuildersJobsStateHandler(BuildersBaseHandler):
 		if not job.builder == self.builder:
 			raise tornado.web.HTTPError(403, "Altering another builder's build.")
 
-		# Save information to database.
-		job.state = state
-
 		message = self.get_argument("message", None)
-		job.update_message(message)
+
+		# Save information to database.
+		with self.db.transaction():
+			if state == "running":
+				job.running()
+			elif state == "failed":
+				job.failed(message)
+			elif state == "finished":
+				job.finished()
+			else:
+				job.state = state
 
 		self.finish("OK")
 
@@ -600,9 +604,6 @@ class BuildersJobsAddFileHandler(BuildersBaseHandler):
 
 		if not upload.builder == self.builder:
 			raise tornado.web.HTTPError(403, "Using an other host's file.")
-
-		# Remove all files that have to be deleted, first.
-		self.backend.cleanup_files()
 
 		try:
 			job.add_file(upload.path)

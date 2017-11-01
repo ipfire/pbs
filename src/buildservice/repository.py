@@ -182,7 +182,7 @@ class Repository(base.DataObject):
 			"[repo:%s]" % self.identifier,
 			"description = %s - %s" % (self.distro.name, self.summary),
 			"enabled = 1",
-			"baseurl = %s/%{arch}" % (self.path if local else self.url),
+			"baseurl = %s/%%{arch}" % (self.path if local else self.url),
 		]
 
 		if self.mirrored and not local:

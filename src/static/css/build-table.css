@@ -49,10 +49,6 @@ table.builds tr.build td.jobs a.running {
 	color: yellow;
 }
 
-table.builds tr.build td.jobs a.dependency_error {
-	color: blue;
-}
-
 table.builds tr.build td.jobs a.failed {
 	color: red;
 }

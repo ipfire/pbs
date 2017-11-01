@@ -76,6 +76,18 @@ class Builders(base.Object):
 		return self._get_builder("SELECT * FROM builders \
 			WHERE name = %s AND deleted IS FALSE", name)
 
+	def get_for_arch(self, arch):
+		# noarch can be built on any builder
+		if arch == "noarch":
+			return self
+
+		builds = self._get_builders("SELECT builders.* FROM builders \
+			LEFT JOIN arches_compat ON builders.cpu_arch = arches_compat.native_arch \
+			WHERE (builders.cpu_arch = %s OR arches_compat.build_arch = %s) \
+			AND builders.deleted IS FALSE", arch, arch)
+
+		return builds
+
 	def get_history(self, limit=None, offset=None, builder=None, user=None):
 		query = "SELECT * FROM builders_history"
 		args  = []
@@ -162,6 +174,12 @@ class Builder(base.DataObject):
 
 	description = property(lambda s: s.data.description or "", set_description)
 
+	def is_online(self):
+		"""
+			Returns True if the builder is online
+		"""
+		return self.keepalive >= datetime.datetime.utcnow() - datetime.timedelta(minutes=1)
+
 	@property
 	def keepalive(self):
 		"""
@@ -246,6 +264,20 @@ class Builder(base.DataObject):
 	@property
 	def passphrase(self):
 		return self.data.passphrase
+
+	@property
+	def performance_index(self):
+		"""
+			Returns a number that determines how "fast" the builder is
+		"""
+		# XXX needs to be something better
+		index = self.cpu_bogomips
+
+		# We devide the performance index by the number of already running
+		# builds to avoid that the fastest builder always gets all the jobs
+		index /= len(self.active_jobs) + 1
+
+		return index
 
 	# Load average
 
@@ -351,8 +383,12 @@ class Builder(base.DataObject):
 		return "online"
 
 	@lazy_property
-	def active_jobs(self, *args, **kwargs):
-		return self.pakfire.jobs.get_active(builder=self, *args, **kwargs)
+	def active_jobs(self):
+		jobs = self.backend.jobs._get_jobs("SELECT jobs.* FROM jobs \
+			WHERE time_started IS NOT NULL AND time_finished IS NULL \
+			AND builder_id = %s ORDER BY time_started", self.id)
+
+		return list(jobs)
 
 	@property
 	def too_many_jobs(self):
@@ -375,12 +411,23 @@ class Builder(base.DataObject):
 
 		# Don't return anything if the builder has already too many jobs running
 		if self.too_many_jobs:
+			logging.debug("%s has too many jobs running" % self)
 			return
 
 		for job in self.jobqueue:
+			logging.debug("Looking at %s..." % job)
 			# Only allow building test jobs in test mode
 			if self.testmode and not job.test:
 				continue
+
+			# If we are the fastest builder to handle this job, we will
+			# get it.
+			if job.candidate_builders:
+				fastest_builder = job.candidate_builders.pop(0)
+
+				if not self == fastest_builder:
+					logging.debug("We are not the fastest builder for this job (%s is)" % fastest_builder)
+					continue
 
 			return job
 

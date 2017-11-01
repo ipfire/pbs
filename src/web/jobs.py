@@ -4,41 +4,22 @@ import tornado.web
 
 from . import base
 
-class JobsIndexHandler(base.BaseHandler):
-	def get(self):
-		# Filter for a certain arch.
-		arch = self.get_argument("arch", None)
-		if not arch or not self.backend.arches.exists(arch):
-			raise tornado.web.HTTPError(400, "Architecture does not exist")
+class ShowQueueHandler(base.BaseHandler):
+	def get(self, arch=None):
+		if arch:
+			if not self.backend.arches.exists(arch):
+				raise tornado.web.HTTPError(400, "Architecture does not exist")
 
-		# Check if we need to filter for a certain builder.
-		builder_name = self.get_argument("builder", None)
-		if builder_name:
-			builder = self.pakfire.builders.get_by_name(builder_name)
+			queue = self.backend.jobqueue.for_arches([arch, "noarch"])
 		else:
-			builder = None
+			queue = self.backend.jobqueue
 
-		# Filter for a certain date.
-		date = self.get_argument("date", None)
-
-		# Get all jobs, that fulfill the criteria.
-		jobs = self.pakfire.jobs.get_latest(limit=50, arch=arch, builder=builder,
-			date=date)
-
-		self.render("jobs-index.html", jobs=jobs, arch=arch, builder=builder,
-			date=date)
-
-
-class JobsFilterHandler(base.BaseHandler):
-	def get(self):
-		builders = self.pakfire.builders.get_all()
-
-		self.render("jobs-filter.html", arches=self.backend.arches, builders=builders)
+		self.render("queue.html", arch=arch, queue=queue)
 
 
 class JobDetailHandler(base.BaseHandler):
 	def get(self, uuid):
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "No such job: %s" % job)
 
@@ -50,7 +31,7 @@ class JobDetailHandler(base.BaseHandler):
 
 class JobBuildrootHandler(base.BaseHandler):
 	def get(self, uuid):
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
@@ -78,7 +59,7 @@ class JobScheduleHandler(base.BaseHandler):
 		type = self.get_argument("type")
 		assert type in self.allowed_types
 
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
@@ -89,7 +70,7 @@ class JobScheduleHandler(base.BaseHandler):
 		type = self.get_argument("type")
 		assert type in self.allowed_types
 
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 
@@ -100,19 +81,18 @@ class JobScheduleHandler(base.BaseHandler):
 		except TypeError:
 			offset = 0
 
-		# Submit the build.
-		if type == "test":
-			job = job.schedule_test(offset)
+		# Is this supposed to be a test job?
+		test = (type == "test")
 
-		elif type == "rebuild":
-			job.schedule_rebuild(offset)
+		with self.db.transaction():
+			new_job = job.restart(test=test)
 
-		self.redirect("/job/%s" % job.uuid)
+		self.redirect("/job/%s" % new_job.uuid)
 
 
 class JobAbortHandler(base.BaseHandler):
 	def get_job(self, uuid):
-		job = self.pakfire.jobs.get_by_uuid(uuid)
+		job = self.backend.jobs.get_by_uuid(uuid)
 		if not job:
 			raise tornado.web.HTTPError(404, "Job not found: %s" % uuid)
 

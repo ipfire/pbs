@@ -35,29 +35,14 @@ class Packages(base.Object):
 		return self._get_package("SELECT * FROM packages \
 			WHERE id = %s", pkg_id)
 
-	def get_all_names(self, user=None, states=None):
-		query = "SELECT DISTINCT packages.name AS name, summary FROM packages \
-			JOIN builds ON builds.pkg_id = packages.id \
-			WHERE packages.type = 'source'"
-
-		conditions = []
-		args = []
-
-		if user and not user.is_admin():
-			conditions.append("builds.owner_id = %s")
-			args.append(user.id)
-
-		if states:
-			for state in states:
-				conditions.append("builds.state = %s")
-				args.append(state)
-
-		if conditions:
-			query += " AND (%s)" % " OR ".join(conditions)
-		
-		query += " ORDER BY packages.name"
-
-		return [(n.name, n.summary) for n in self.db.query(query, *args)]
+	def get_list(self):
+		"""
+			Returns a list with all package names and the summary line
+			that have at one time been part of the distribution
+		"""
+		return self.db.query("SELECT DISTINCT packages.name AS name, packages.summary AS summary FROM builds \
+			LEFT JOIN packages ON builds.pkg_id = packages.id \
+			WHERE builds.type = %s AND builds.state != %s", "release", "obsolete")
 
 	def get_by_uuid(self, uuid):
 		pkg = self.db.get("SELECT * FROM packages WHERE uuid = %s LIMIT 1", uuid)
@@ -212,6 +197,8 @@ class Package(base.DataObject):
 
 	def delete(self):
 		self.backend.delete_file(os.path.join(PACKAGES_DIR, self.path))
+
+		self.db.execute("DELETE FROM packages_deps WHERE pkg_id = %s", self.id)
 
 		# Delete all files from the filelist.
 		self.db.execute("DELETE FROM filelists WHERE pkg_id = %s", self.id)

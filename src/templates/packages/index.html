@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "../base.html" %}
 
 {% block title %}{{ _("Package list") }}{% end block %}
 
@@ -17,31 +17,10 @@
 		<h1>{{ _("Package list") }}</h1>
 	</div>
 
-	<div class="row">
-		<div class="span6">
-			<p>
-				{{ _("This is an alphabetically ordered list of all packages in the distribution.") }}
-				{{ _("Click on a link to see further information about the package.") }}
-			</p>
-		</div>
-
-		<div class="span6">
-			<div class="btn-group">
-				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-					{{ _("Selection") }}
-					<span class="caret"></span>
-				</a>
-				<ul class="dropdown-menu">
-					<li>
-						<a href="?show=broken">{{ _("Show broken packages") }}</a>
-					</li>
-					<li>
-						<a href="?show=all">{{ _("Show all packages") }}</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
+	<p>
+		{{ _("This is an alphabetically ordered list of all packages in the distribution.") }}
+		{{ _("Click on a link to see further information about the package.") }}
+	</p>
 
 	<div class="row">
 		<div class="span12">
@@ -67,16 +46,16 @@
 						<tr>
 							<td colspan="2">
 								<a name="{{ letter }}"></a>
-								<h2>{{ letter.upper() }} <small>({{ len(pkgs) }})</small></h2>
+								<h2>{{ letter.upper() }}</h2>
 							</td>
 						</tr>
-						{% for pkg, summary in pkgs %}
+						{% for pkg in pkgs %}
 							<tr>
 								<td>
-									<a href="/package/{{ pkg }}">{{ pkg }}</a>
+									<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
 								</td>
 								<td>
-									{{ summary }}
+									{{ pkg.summary }}
 								</td>
 							</tr>
 						{% end %}

@@ -3,12 +3,9 @@
 from __future__ import division
 
 import datetime
-import itertools
 import math
 import pytz
 import re
-import string
-import tornado.escape
 import tornado.web
 
 from .. import users
@@ -26,22 +23,10 @@ class TextModule(UIModule):
 
 	LINK = """<a href="%s" target="_blank" rel="noopener">%s</a>"""
 
-	def split_paragraphs(self, s):
-		for group_seperator, line_iteration in itertools.groupby(s.splitlines(True), key=str.isspace):
-			if group_seperator:
-				continue
-
-			paragraph = "".join(line_iteration)
-			yield paragraph.replace("\n", " ")
-
-	def render(self, text, pre=False, remove_linebreaks=True):
-		if remove_linebreaks:
-			text = text.replace("\n", " ")
-
-		# Escape the text and create make urls clickable.
-		text = tornado.escape.xhtml_escape(text)
-		text = tornado.escape.linkify(text, shorten=True,
-			extra_params="target=\"_blank\" rel=\"noopener\"")
+	def render(self, text):
+		# Handle empty messages
+		if not text:
+			return ""
 
 		# Search for bug ids that need to be linked to bugzilla
 		text = re.sub(self.BUGZILLA_PATTERN, self._bugzilla_repl, text, re.I|re.U)
@@ -49,10 +34,7 @@ class TextModule(UIModule):
 		# Search for CVE numbers and create hyperlinks.
 		text = re.sub(self.CVE_PATTERN, self._cve_repl, text, re.I|re.U)
 
-		if pre:
-			return "<pre>%s</pre>" % text
-
-		return text
+		return self.render_string("modules/text.html", paragraphs=text.split("\n\n"))
 
 	def _bugzilla_repl(self, m):
 		bug_id = m.group(1)
@@ -66,14 +48,9 @@ class TextModule(UIModule):
 		return self.LINK % ("http://cve.mitre.org/cgi-bin/cvename.cgi?name=%s" % m.group(1), m.group(0))
 
 
-class CommitMessageModule(TextModule):
+class CommitMessageModule(UIModule):
 	def render(self, commit):
-		s = "h5. %s\n\n" % commit.subject
-
-		paragraphs = self.split_paragraphs(commit.message)
-		s += "\n\n".join(paragraphs)
-
-		return TextModule.render(self, s, remove_linebreaks=False)
+		return self.render_string("modules/commit-message.html", commit=commit)
 
 
 class ModalModule(UIModule):
@@ -268,11 +245,6 @@ class JobStateModule(UIModule):
 			classes.append("muted")
 			icon = "icon-warning-sign"
 
-		elif state == "dependency_error":
-			text = _("Dependency problem")
-			classes.append("text-warning")
-			icon = "icon-random"
-
 		elif state == "dispatching":
 			text = _("Dispatching")
 			classes.append("text-info")
@@ -287,11 +259,6 @@ class JobStateModule(UIModule):
 			text = _("Finished")
 			classes.append("text-success")
 			icon = "icon-ok"
-
-		elif state == "new":
-			text = _("New")
-			classes.append("muted")
-			icon = "icon-asterisk"
 
 		elif state == "pending":
 			text = _("Pending")
@@ -403,15 +370,9 @@ class LogEntryCommentModule(LogEntryModule):
 			entry=entry, u=entry.user, show_build=show_build, **args)
 
 
-class MaintainerModule(UIModule):
-	def render(self, maintainer):
-		if isinstance(maintainer, users.User):
-			type = "user"
-		else:
-			type = "string"
-
-		return self.render_string("modules/maintainer.html",
-			type=type, maintainer=maintainer)
+class LinkToUserModule(UIModule):
+	def render(self, user):
+		return self.render_string("modules/link-to-user.html", user=user, users=users)
 
 
 class BuildLogModule(UIModule):

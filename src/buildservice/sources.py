@@ -5,6 +5,7 @@ import logging
 import os
 import pakfire
 import pakfire.config
+import re
 import shutil
 import subprocess
 import tempfile
@@ -14,6 +15,17 @@ from . import git
 
 from .constants import *
 from .decorators import *
+
+VALID_TAGS = (
+	"Acked-by",
+	"Cc",
+	"Fixes",
+	"Reported-by",
+	"Reviewed-by",
+	"Signed-off-by",
+	"Suggested-by",
+	"Tested-by",
+)
 
 class Sources(base.Object):
 	def _get_source(self, query, *args):
@@ -169,27 +181,127 @@ class Commit(base.DataObject):
 
 	state = property(lambda s: s.data.state, set_state)
 
-	@property
+	@lazy_property
 	def author(self):
-		return self.data.author
+		return self.backend.users.find_maintainer(self.data.author) or self.data.author
 
-	@property
+	@lazy_property
 	def committer(self):
-		return self.data.committer
+		return self.backend.users.find_maintainer(self.data.committer) or self.data.committer
 
 	@property
 	def subject(self):
 		return self.data.subject.strip()
 
 	@property
-	def message(self):
+	def body(self):
 		return self.data.body.strip()
+
+	@lazy_property
+	def message(self):
+		"""
+			Returns the message without any Git tags
+		"""
+		# Compile regex
+		r = re.compile("^(%s):?" % "|".join(VALID_TAGS), re.IGNORECASE)
+
+		message = []
+		for line in self.body.splitlines():
+			# Find lines that start with a known Git tag
+			if r.match(line):
+				continue
+
+			message.append(line)
+
+		# If all lines are empty lines, we send back an empty message
+		if all((l == "" for l in message)):
+			return
+
+		# We will now break the message into paragraphs
+		paragraphs = re.split("\n\n+", "\n".join(message))
+		print paragraphs
+
+		message = []
+		for paragraph in paragraphs:
+			# Remove all line breaks that are not following a colon
+			# and where the next line does not start with a star.
+			paragraph = re.sub("(?<=\:)\n(?=[\*\s])", " ", paragraph)
+
+			message.append(paragraph)
+
+		return "\n\n".join(message)
 
 	@property
 	def message_full(self):
-		msg = [self.subject, ""] + self.message.splitlines()
+		message = self.subject
 
-		return "\n".join(msg)
+		if self.message:
+			message += "\n\n%s" % self.message
+
+		return message
+
+	def get_tag(self, tag):
+		"""
+			Returns a list of the values of this Git tag
+		"""
+		if not tag in VALID_TAGS:
+			raise ValueError("Unknown tag: %s" % tag)
+
+		# Compile regex
+		r = re.compile("^%s:? (.*)$" % tag, re.IGNORECASE)
+
+		values = []
+		for line in self.body.splitlines():
+			# Skip all empty lines
+			if not line:
+				continue
+
+			# Check if line matches the regex
+			m = r.match(line)
+			if m:
+				values.append(m.group(1))
+
+		return values
+
+	@lazy_property
+	def contributors(self):
+		contributors = [
+			self.data.author,
+			self.data.committer,
+		]
+
+		for tag in ("Acked-by", "Cc", "Reported-by", "Reviewed-by", "Signed-off-by", "Suggested-by", "Tested-by"):
+			contributors += self.get_tag(tag)
+
+		# Get all user accounts that we know
+		users = self.backend.users.find_maintainers(contributors)
+
+		# Add all email addresses where a user could not be found
+		for contributor in contributors[:]:
+			for user in users:
+				if user.has_email_address(contributor):
+					try:
+						contributors.remove(contributor)
+					except:
+						pass
+
+		return sorted(contributors + users)
+
+	@lazy_property
+	def testers(self):
+		users = []
+
+		for tag in ("Acked-by", "Reviewed-by", "Signed-off-by", "Tested-by"):
+			users += self.get_tag(tag)
+
+		return self.backend.users.find_maintainers(users)
+
+	@property
+	def fixed_bugs(self):
+		"""
+			Returns a list of all fixed bugs
+		"""
+		return self.get_tag("Fixes")
 
 	@property
 	def date(self):

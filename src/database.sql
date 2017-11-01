@@ -116,28 +116,6 @@ CREATE TYPE jobs_history_state AS ENUM (
 ALTER TYPE jobs_history_state OWNER TO pakfire;
 
 --
--- Name: jobs_state; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE jobs_state AS ENUM (
-    'new',
-    'pending',
-    'running',
-    'finished',
-    'dispatching',
-    'uploading',
-    'failed',
-    'aborted',
-    'temporary_failed',
-    'dependency_error',
-    'download_error',
-    'deleted'
-);
-
-
-ALTER TYPE jobs_state OWNER TO pakfire;
-
---
 -- Name: mirrors_history_action; Type: TYPE; Schema: public; Owner: pakfire
 --
 
@@ -513,9 +491,9 @@ CREATE TABLE builds_comments (
     id integer NOT NULL,
     build_id integer NOT NULL,
     user_id integer NOT NULL,
-    text text NOT NULL,
+    text text,
     score integer NOT NULL,
-    time_created timestamp without time zone NOT NULL,
+    time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_updated timestamp without time zone
 );
 
@@ -609,7 +587,7 @@ CREATE TABLE jobs (
     id integer NOT NULL,
     uuid text NOT NULL,
     build_id integer NOT NULL,
-    state jobs_state DEFAULT 'new'::jobs_state NOT NULL,
+    state text DEFAULT 'pending'::text NOT NULL,
     arch text NOT NULL,
     time_created timestamp without time zone DEFAULT now() NOT NULL,
     time_started timestamp without time zone,
@@ -619,7 +597,10 @@ CREATE TABLE jobs (
     aborted_state integer DEFAULT 0 NOT NULL,
     message text,
     test boolean DEFAULT true NOT NULL,
-    superseeded_by integer
+    superseeded_by integer,
+    dependency_check_succeeded boolean,
+    dependency_check_at timestamp without time zone,
+    CONSTRAINT jobs_states CHECK ((state = ANY (ARRAY['pending'::text, 'dispatching'::text, 'running'::text, 'uploading'::text, 'finished'::text, 'aborted'::text, 'download_error'::text, 'failed'::text])))
 );
 
 
@@ -634,7 +615,7 @@ CREATE VIEW builds_times AS
     jobs.arch,
     date_part('epoch'::text, (jobs.time_finished - jobs.time_started)) AS duration
    FROM jobs
-  WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::jobs_state));
+  WHERE ((jobs.test IS FALSE) AND (jobs.state = 'finished'::text));
 
 
 ALTER TABLE builds_times OWNER TO pakfire;
@@ -802,30 +783,6 @@ ALTER SEQUENCE images_types_id_seq OWNED BY images_types.id;
 
 
 --
--- Name: jobs_active; Type: VIEW; Schema: public; Owner: pakfire
---
-
-CREATE VIEW jobs_active AS
- SELECT jobs.id,
-    jobs.uuid,
-    jobs.build_id,
-    jobs.state,
-    jobs.arch,
-    jobs.time_created,
-    jobs.time_started,
-    jobs.time_finished,
-    jobs.start_not_before,
-    jobs.builder_id,
-    jobs.aborted_state,
-    jobs.message
-   FROM jobs
-  WHERE (jobs.state = ANY (ARRAY['dispatching'::jobs_state, 'running'::jobs_state, 'uploading'::jobs_state]))
-  ORDER BY jobs.time_started;
-
-
-ALTER TABLE jobs_active OWNER TO pakfire;
-
---
 -- Name: jobs_buildroots; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -920,7 +877,7 @@ CREATE VIEW jobs_queue AS
             rank() OVER (ORDER BY (NOT jobs.test), builds.priority DESC, jobs.time_created) AS rank
            FROM (jobs
              LEFT JOIN builds ON ((jobs.build_id = builds.id)))
-          WHERE (jobs.state = 'pending'::jobs_state)
+          WHERE ((jobs.state = 'pending'::text) AND (jobs.dependency_check_succeeded IS TRUE))
         )
  SELECT queue.id AS job_id,
     queue.rank
@@ -2449,13 +2406,6 @@ CREATE INDEX idx_2198063_state ON jobs USING btree (state);
 
 
 --
--- Name: idx_2198063_time_finished; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE INDEX idx_2198063_time_finished ON jobs USING btree (time_finished);
-
-
---
 -- Name: idx_2198063_uuid; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -2602,6 +2552,27 @@ ALTER TABLE jobs_buildroots CLUSTER ON jobs_buildroots_job_id;
 --
 
 CREATE INDEX jobs_buildroots_pkg_uuid ON jobs_buildroots USING btree (pkg_uuid);
+
+
+--
+-- Name: jobs_queue_ready; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_queue_ready ON jobs USING btree (id) WHERE ((state = 'new'::text) AND (dependency_check_succeeded IS TRUE));
+
+
+--
+-- Name: jobs_time_finished; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_time_finished ON jobs USING btree (time_finished DESC) WHERE (time_finished IS NOT NULL);
+
+
+--
+-- Name: jobs_time_started; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX jobs_time_started ON jobs USING btree (time_started) WHERE ((time_started IS NOT NULL) AND (time_finished IS NULL));
 
 
 --
@@ -2857,6 +2828,14 @@ ALTER TABLE ONLY jobs_repos
 
 ALTER TABLE ONLY jobs_repos
     ADD CONSTRAINT jobs_repos_repo_id FOREIGN KEY (repo_id) REFERENCES repositories(id);
+
+
+--
+-- Name: jobs_superseeded_by; Type: FK CONSTRAINT; Schema: public; Owner: pakfire
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT jobs_superseeded_by FOREIGN KEY (superseeded_by) REFERENCES jobs(id);
 
 
 --

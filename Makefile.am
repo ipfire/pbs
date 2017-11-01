@@ -123,22 +123,22 @@ hubdir = $(buildservicedir)/hub
 
 web_PYTHON = \
 	src/web/__init__.py \
+	src/web/api.py \
+	src/web/auth.py \
 	src/web/base.py \
+	src/web/builders.py \
+	src/web/builds.py \
+	src/web/distributions.py \
 	src/web/errors.py \
 	src/web/handlers.py \
-	src/web/handlers_api.py \
-	src/web/handlers_auth.py \
-	src/web/handlers_builders.py \
-	src/web/handlers_builds.py \
-	src/web/handlers_distro.py \
-	src/web/handlers_jobs.py \
-	src/web/handlers_keys.py \
-	src/web/handlers_packages.py \
-	src/web/handlers_search.py \
-	src/web/handlers_updates.py \
-	src/web/handlers_users.py \
+	src/web/jobs.py \
+	src/web/keys.py \
 	src/web/mirrors.py \
-	src/web/ui_modules.py
+	src/web/packages.py \
+	src/web/search.py \
+	src/web/ui_modules.py \
+	src/web/updates.py \
+	src/web/users.py
 
 webdir = $(buildservicedir)/web
 
@@ -182,8 +182,6 @@ dist_templates_DATA = \
 	src/templates/job-schedule-rebuild.html \
 	src/templates/job-schedule-test.html \
 	src/templates/jobs-detail.html \
-	src/templates/jobs-filter.html \
-	src/templates/jobs-index.html \
 	src/templates/keys-delete.html \
 	src/templates/keys-import.html \
 	src/templates/keys-list.html \
@@ -192,7 +190,7 @@ dist_templates_DATA = \
 	src/templates/package-detail.html \
 	src/templates/package-detail-list.html \
 	src/templates/package-properties.html \
-	src/templates/packages-list.html \
+	src/templates/queue.html \
 	src/templates/register-activation-fail.html \
 	src/templates/register-activation-success.html \
 	src/templates/register-fail.html \
@@ -261,16 +259,17 @@ dist_templates_modules_DATA = \
 	src/templates/modules/build-table.html \
 	src/templates/modules/comments-table.html \
 	src/templates/modules/commits-table.html \
+	src/templates/modules/commit-message.html \
 	src/templates/modules/files-table.html \
 	src/templates/modules/footer.html \
 	src/templates/modules/jobs-table.html \
+	src/templates/modules/link-to-user.html \
 	src/templates/modules/log-entry-comment.html \
 	src/templates/modules/log-entry.html \
 	src/templates/modules/log-entry-small.html \
 	src/templates/modules/log-files-table.html \
 	src/templates/modules/log.html \
 	src/templates/modules/log-table.html \
-	src/templates/modules/maintainer.html \
 	src/templates/modules/modal-base.html \
 	src/templates/modules/modal-build-comment.html \
 	src/templates/modules/modal-build-push.html \
@@ -282,6 +281,7 @@ dist_templates_modules_DATA = \
 	src/templates/modules/repo-actions-table.html \
 	src/templates/modules/repository-table.html \
 	src/templates/modules/source-table.html \
+	src/templates/modules/text.html \
 	src/templates/modules/updates-table.html \
 	src/templates/modules/user-table.html \
 	src/templates/modules/watchers-sidebar-table.html
@@ -314,6 +314,7 @@ templates_modules_selectdir = $(templates_modulesdir)/select
 
 dist_templates_packages_DATA = \
 	src/templates/packages/changelog.html \
+	src/templates/packages/index.html \
 	src/templates/packages/view-file.html
 
 templates_packagesdir = $(templatesdir)/packages
@@ -363,7 +364,6 @@ dist_static_font_DATA = \
 static_fontdir = $(staticdir)/font
 
 dist_static_images_DATA = \
-	src/static/images/icons/build-dependency_error.png \
 	src/static/images/icons/build-dispatching.png \
 	src/static/images/icons/build-failed.png \
 	src/static/images/icons/build-finished.png \

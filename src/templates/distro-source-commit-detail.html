@@ -53,21 +53,17 @@
 					</tr>
 					<tr>
 						<td>{{ _("Author") }}</td>
-						<td>{% raw format_email(commit.author) %}</td>
+						<td>{% module LinkToUser(commit.author) %}</td>
 					</tr>
 					<tr>
 						<td>{{ _("Committer") }}</td>
-						<td>{% raw format_email(commit.committer) %}</td>
-					</tr>
-					<tr>
-						<td>{{ _("Subject") }}</td>
-						<td>{{ commit.subject }}</td>
+						<td>{% module LinkToUser(commit.committer) %}</td>
 					</tr>
 
 					{% if commit.message %}
 						<tr>
 							<td colspan="2">
-								{% module Text(commit.message, pre=True) %}
+								{% module CommitMessage(commit) %}
 							</td>
 						</tr>
 					{% end %}

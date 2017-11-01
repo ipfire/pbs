@@ -4,14 +4,14 @@ import tornado.web
 
 from . import base
 
-class ApiPackagesAutocomplete(base.ApiBaseHandler):
+class ApiPackagesAutocomplete(base.BaseHandler):
 	def get(self):
 		query = self.get_argument("q")
 		if not query:
 			raise tornado.web.HTTPError(400)
 
 		# Query database.
-		packages = self.pakfire.packages.autocomplete(query, limit=8)
+		packages = self.backend.packages.autocomplete(query, limit=8)
 
 		res = {
 			"query"    : query,

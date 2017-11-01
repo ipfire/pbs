@@ -213,9 +213,6 @@ class Builds(base.Object):
 		# Obsolete all other builds with the same name to track updates.
 		build.obsolete_others()
 
-		# Search for possible bug IDs in the commit message.
-		build.search_for_bugs()
-
 		return build
 
 	def create_from_source_package(self, filename, distro, commit=None, type="release",
@@ -239,6 +236,15 @@ class Builds(base.Object):
 
 		# Create a new build object from the package
 		build = self.create(pkg, type=type, owner=owner, distro=distro)
+
+		if commit:
+			# Import any fixed bugs
+			for bug in commit.fixed_bugs:
+				build.add_bug(bug)
+
+			# Upvote the build for the testers
+			for tester in commit.testers:
+				build.upvote(tester)
 
 		# Create all automatic jobs
 		build.create_autojobs(arches=arches)
@@ -537,7 +543,7 @@ class Build(base.DataObject):
 			remove = True
 
 			for job in self.jobs:
-				if job.state in ("new", "pending", "running", "dependency_error"):
+				if job.state in ("pending", "running"):
 					job.state = "aborted"
 
 		# If this build is in a repository, it will leave it.
@@ -587,9 +593,6 @@ class Build(base.DataObject):
 	def commit(self):
 		if self.pkg and self.pkg.commit:
 			return self.pkg.commit
-
-	def update_message(self, message):
-		self._set_attribute("message", message)
 
 	def has_perm(self, user):
 		"""
@@ -843,6 +846,14 @@ class Build(base.DataObject):
 
 		return res.score or 0
 
+	def upvote(self, user, score=1):
+		# Creates an empty comment with a score
+		self.db.execute("INSERT INTO builds_comments(build_id, user_id, score) \
+			VALUES(%s, %s, %s)", self.id, user.id, score)
+
+		# Update cache
+		self.score += score
+
 	def get_commenters(self):
 		users = self.db.query("SELECT DISTINCT users.id AS id FROM builds_comments \
 			JOIN users ON builds_comments.user_id = users.id \
@@ -1004,12 +1015,8 @@ class Build(base.DataObject):
 
 		query = self.db.get("SELECT NOW() - time_added AS duration FROM repositories_builds \
 			WHERE build_id = %s", self.id)
-		duration = query.duration
 
-		if duration >= self.repo.time_min:
-			return True
-
-		return False
+		return query.duration.total_seconds() >= self.repo.time_min
 
 	## Bugs
 
@@ -1038,26 +1045,6 @@ class Build(base.DataObject):
 		# Log the event.
 		if log:
 			self.log("bug_removed", user=user, bug_id=bug_id)
-
-	def search_for_bugs(self):
-		if not self.commit:
-			return
-
-		pattern = re.compile(r"(bug\s?|#)(\d+)")
-
-		for txt in (self.commit.subject, self.commit.message):
-			for bug in re.finditer(pattern, txt):
-				try:
-					bugid = int(bug.group(2))
-				except ValueError:
-					continue
-
-				# Check if a bug with the given ID exists in BZ.
-				bug = self.backend.bugzilla.get_bug(bugid)
-				if not bug:
-					continue
-
-				self.add_bug(bugid)
 
 	def get_bugs(self):
 		bugs = []

@@ -33,7 +33,7 @@
 					<hr>
 
 					<p class="muted">
-						{{ _("Author") }} {% module Maintainer(build.commit.author) %}
+						{{ _("Author") }} {% module LinkToUser(build.commit.author) %}
 						<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
 					</p>
 				{% else %}
@@ -45,7 +45,7 @@
 
 			{% elif build.type == "scratch" %}
 				<p class="muted">
-					{{ _("Owner") }} {% module Maintainer(build.owner) %}
+					{{ _("Owner") }} {% module LinkToUser(build.owner) %}
 
 					<span class="pull-right">{{ locale.format_date(build.created, shorter=True) }}</span>
 				</p>

@@ -75,7 +75,7 @@
 					{% if pkg.maintainer %}
 						<tr>
 							<td>{{ _("Maintainer") }}</td>
-							<td>{% module Maintainer(pkg.maintainer) %}</td>
+							<td>{% module LinkToUser(pkg.maintainer) %}</td>
 						</tr>
 					{% end %}
 					<tr>

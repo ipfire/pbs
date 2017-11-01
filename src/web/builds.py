@@ -25,7 +25,7 @@ class BuildsHandler(base.BaseHandler):
 
 class BuildBaseHandler(base.BaseHandler):
 	def get_build(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 		if not build:
 			raise tornado.web.HTTPError(404, "No such build: %s" % uuid)
 
@@ -79,7 +79,7 @@ class BuildDeleteHandler(BuildBaseHandler):
 class BuildBugsHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 		if not build:
 			raise tornado.web.HTTPError(404, "No such build: %s" % uuid)
 
@@ -91,7 +91,7 @@ class BuildBugsHandler(base.BaseHandler):
 		fixed_bugs = build.get_bugs()
 		open_bugs = []
 
-		for bug in self.pakfire.bugzilla.get_bugs_from_component(build.pkg.name):
+		for bug in self.backend.bugzilla.get_bugs_from_component(build.pkg.name):
 			if bug in fixed_bugs:
 				continue
 
@@ -102,7 +102,7 @@ class BuildBugsHandler(base.BaseHandler):
 
 	@tornado.web.authenticated
 	def post(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 		if not build:
 			raise tornado.web.HTTPError(404, "No such build: %s" % uuid)
 
@@ -137,7 +137,7 @@ class BuildsCommentsHandler(base.BaseHandler):
 	def get(self, user_name=None):
 		user = None
 		if user_name:
-			user = self.pakfire.users.get_by_name(user_name)
+			user = self.backend.users.get_by_name(user_name)
 
 		limit  = self.get_argument("limit", 10)
 		offset = self.get_argument("offset", 0)
@@ -150,7 +150,7 @@ class BuildsCommentsHandler(base.BaseHandler):
 
 		# Try to get one more comment than requested and check if there
 		# is a next page that it to be shown.
-		comments = self.pakfire.builds.get_comments(limit=limit + 1,
+		comments = self.backend.builds.get_comments(limit=limit + 1,
 			offset=offset, user=user)
 
 		# Set markers for next and prev pages.
@@ -166,7 +166,7 @@ class BuildsCommentsHandler(base.BaseHandler):
 
 class BuildStateHandler(base.BaseHandler):
 	def get(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 		if not build:
 			raise tornado.web.HTTPError(404, "No such build: %s" % uuid)
 
@@ -174,7 +174,7 @@ class BuildStateHandler(base.BaseHandler):
 
 	@tornado.web.authenticated
 	def post(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 		if not build:
 			raise tornado.web.HTTPError(404, "No such build: %s" % uuid)
 
@@ -210,7 +210,7 @@ class BuildQueueHandler(base.BaseHandler):
 class BuildDetailCommentHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def post(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found")
@@ -237,7 +237,7 @@ class BuildDetailCommentHandler(base.BaseHandler):
 class BuildManageHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found: %s" % uuid)
 
@@ -256,7 +256,7 @@ class BuildManageHandler(base.BaseHandler):
 
 	@tornado.web.authenticated
 	def post(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found: %s" % uuid)
 
@@ -294,7 +294,7 @@ class BuildManageHandler(base.BaseHandler):
 class BuildPriorityHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found")
@@ -303,7 +303,7 @@ class BuildPriorityHandler(base.BaseHandler):
 
 	@tornado.web.authenticated
 	def post(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found")
@@ -328,7 +328,7 @@ class BuildPriorityHandler(base.BaseHandler):
 
 class BuildWatchersHandler(base.BaseHandler):
 	def get(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found")
@@ -343,7 +343,7 @@ class BuildWatchersHandler(base.BaseHandler):
 class BuildWatchersAddHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, uuid, error_msg=None):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found")
@@ -352,11 +352,11 @@ class BuildWatchersAddHandler(base.BaseHandler):
 		watchers = build.get_watchers()
 
 		self.render("builds-watchers-add.html", error_msg=error_msg,
-			build=build, users=self.pakfire.users, watchers=watchers)
+			build=build, users=self.backend.users, watchers=watchers)
 
 	@tornado.web.authenticated
 	def post(self, uuid):
-		build = self.pakfire.builds.get_by_uuid(uuid)
+		build = self.backend.builds.get_by_uuid(uuid)
 
 		if not build:
 			raise tornado.web.HTTPError(404, "Build not found")
@@ -368,7 +368,7 @@ class BuildWatchersAddHandler(base.BaseHandler):
 			user_id = self.get_argument("user_id", self.current_user.id)
 		assert user_id
 
-		user = self.pakfire.users.get_by_id(user_id)
+		user = self.backend.users.get_by_id(user_id)
 		if not user:
 			_ = self.locale.translate
 			error_msg = _("User not found.")
@@ -387,7 +387,7 @@ class BuildListHandler(base.BaseHandler):
 		builder = self.get_argument("builder", None)
 		state = self.get_argument("state", None)
 
-		builds = self.pakfire.builds.get_latest(state=state, builder=builder,
+		builds = self.backend.builds.get_latest(state=state, builder=builder,
 			limit=25)
 
 		self.render("build-list.html", builds=builds)
@@ -395,8 +395,8 @@ class BuildListHandler(base.BaseHandler):
 
 class BuildFilterHandler(base.BaseHandler):
 	def get(self):
-		builders = self.pakfire.builders.get_all()
-		distros  = self.pakfire.distros.get_all()
+		builders = self.backend.builders.get_all()
+		distros  = self.backend.distros.get_all()
 
 		self.render("build-filter.html", builders=builders, distros=distros)
 

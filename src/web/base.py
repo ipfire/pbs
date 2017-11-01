@@ -76,7 +76,7 @@ class BaseHandler(tornado.web.RequestHandler):
 		ns = tornado.web.RequestHandler.get_template_namespace(self)
 
 		ns.update({
-			"bugtracker"      : self.pakfire.bugzilla,
+			"backend"         : self.backend,
 			"hostname"        : self.request.host,
 			"format_date"     : self.format_date,
 			"format_size"     : misc.format_size,
@@ -110,15 +110,3 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		self.render(error_document, status_code=status_code,
 			status_message=status_message, exc_info=exc_info, tb=tb, **kwargs)
-
-	@property
-	def pakfire(self):
-		return self.backend
-
-	@property
-	def mirrors(self):
-		return self.pakfire.mirrors
-
-
-class ApiBaseHandler(BaseHandler):
-	pass

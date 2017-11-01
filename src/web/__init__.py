@@ -13,11 +13,22 @@ from .. import Backend
 from ..constants import *
 from ..decorators import *
 
+# Import all handlers
+from . import api
+from . import auth
+from . import builders
+from . import builds
+from . import distributions
+from . import errors
+from . import jobs
+from . import keys
+from . import mirrors
+from . import packages
+from . import search
+from . import updates
+from . import users
 from .handlers import *
 
-from . import handlers_api
-from . import errors
-from . import mirrors
 from . import ui_modules
 
 # Enable logging
@@ -69,9 +80,9 @@ class Application(tornado.web.Application):
 				"JobsTable"          : ui_modules.JobsTableModule,
 				"CommentsTable"      : ui_modules.CommentsTableModule,
 				"FilesTable"         : ui_modules.FilesTableModule,
+				"LinkToUser"         : ui_modules.LinkToUserModule,
 				"LogTable"           : ui_modules.LogTableModule,
 				"LogFilesTable"      : ui_modules.LogFilesTableModule,
-				"Maintainer"         : ui_modules.MaintainerModule,
 				"PackagesTable"      : ui_modules.PackagesTableModule,
 				"PackageTable2"      : ui_modules.PackageTable2Module,
 				"PackageHeader"      : ui_modules.PackageHeaderModule,
@@ -103,77 +114,78 @@ class Application(tornado.web.Application):
 			(r"/", IndexHandler),
 
 			# Handle all the users logins/logouts/registers and stuff.
-			(r"/login", LoginHandler),
-			(r"/logout", LogoutHandler),
-			(r"/register", RegisterHandler),
-			(r"/password-recovery", PasswordRecoveryHandler),
+			(r"/login", auth.LoginHandler),
+			(r"/logout", auth.LogoutHandler),
+			(r"/register", auth.RegisterHandler),
+			(r"/password-recovery", auth.PasswordRecoveryHandler),
 
 			# User profiles
-			(r"/users", UsersHandler),
-			(r"/user/(\w+)/impersonate", UserImpersonateHandler),
-			(r"/user/(\w+)/passwd", UserPasswdHandler),
-			(r"/user/(\w+)/delete", UserDeleteHandler),
-			(r"/user/(\w+)/edit", UserEditHandler),
-			(r"/user/(\w+)/activate", ActivationHandler),
-			(r"/user/(\w+)", UserHandler),
-			(r"/profile", UserHandler),
-			(r"/profile/builds", UsersBuildsHandler),
+			(r"/users", users.UsersHandler),
+			(r"/user/(\w+)/impersonate", users.UserImpersonateHandler),
+			(r"/user/(\w+)/passwd", users.UserPasswdHandler),
+			(r"/user/(\w+)/delete", users.UserDeleteHandler),
+			(r"/user/(\w+)/edit", users.UserEditHandler),
+			(r"/user/(\w+)/activate", auth.ActivationHandler),
+			(r"/user/(\w+)", users.UserHandler),
+			(r"/profile", users.UserHandler),
+			(r"/profile/builds", users.UsersBuildsHandler),
 
 			# Packages
-			(r"/packages", PackageListHandler),
-			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", PackageDetailHandler),
-			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/download(.*)", PackageFileDownloadHandler),
-			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/view(.*)", PackageFileViewHandler),
-			(r"/package/([\w\-\+]+)", PackageNameHandler),
-			(r"/package/([\w\-\+]+)/builds/scratch", PackageScratchBuildsHandler),
-			(r"/package/([\w\-\+]+)/builds/times", PackageBuildsTimesHandler),
-			(r"/package/([\w\-\+]+)/changelog", PackageChangelogHandler),
-			(r"/package/([\w\-\+]+)/properties", PackagePropertiesHandler),
+			(r"/packages", packages.IndexHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", packages.PackageDetailHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/download(.*)", packages.PackageFileDownloadHandler),
+			(r"/package/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/view(.*)", packages.PackageFileViewHandler),
+			(r"/package/([\w\-\+]+)", packages.PackageNameHandler),
+			(r"/package/([\w\-\+]+)/builds/scratch", packages.PackageScratchBuildsHandler),
+			(r"/package/([\w\-\+]+)/builds/times", packages.PackageBuildsTimesHandler),
+			(r"/package/([\w\-\+]+)/changelog", packages.PackageChangelogHandler),
+			(r"/package/([\w\-\+]+)/properties", packages.PackagePropertiesHandler),
 
 			# Files
 			(r"/file/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", FileDetailHandler),
 
 			# Builds
-			(r"/builds", BuildsHandler),
-			(r"/builds/filter", BuildFilterHandler),
-			(r"/builds/queue", BuildQueueHandler),
-			(r"/builds/comments", BuildsCommentsHandler),
-			(r"/builds/comments/(\w+)", BuildsCommentsHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", BuildDetailHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/bugs", BuildBugsHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/manage", BuildManageHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/comment", BuildDetailCommentHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/priority", BuildPriorityHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/state", BuildStateHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watch", BuildWatchersAddHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watchers", BuildWatchersHandler),
-			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/delete", BuildDeleteHandler),
+			(r"/builds", builds.BuildsHandler),
+			(r"/builds/filter", builds.BuildFilterHandler),
+			(r"/builds/queue", builds.BuildQueueHandler),
+			(r"/builds/comments", builds.BuildsCommentsHandler),
+			(r"/builds/comments/(\w+)", builds.BuildsCommentsHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", builds.BuildDetailHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/bugs", builds.BuildBugsHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/manage", builds.BuildManageHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/comment", builds.BuildDetailCommentHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/priority", builds.BuildPriorityHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/state", builds.BuildStateHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watch", builds.BuildWatchersAddHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/watchers", builds.BuildWatchersHandler),
+			(r"/build/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/delete", builds.BuildDeleteHandler),
+
+			(r"/queue", jobs.ShowQueueHandler),
+			(r"/queue/([\w_]+)", jobs.ShowQueueHandler),
 
 			# Jobs
-			(r"/jobs", JobsIndexHandler),
-			(r"/jobs/filter", JobsFilterHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", JobDetailHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/abort", JobAbortHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/buildroot", JobBuildrootHandler),
-			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/schedule", JobScheduleHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", jobs.JobDetailHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/abort", jobs.JobAbortHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/buildroot", jobs.JobBuildrootHandler),
+			(r"/job/([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})/schedule", jobs.JobScheduleHandler),
 
 			# Builders
-			(r"/builders", BuilderListHandler),
-			(r"/builder/new", BuilderNewHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/enable", BuilderEnableHander),
-			(r"/builder/([A-Za-z0-9\-\.]+)/disable", BuilderDisableHander),
-			(r"/builder/([A-Za-z0-9\-\.]+)/delete", BuilderDeleteHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/edit", BuilderEditHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/renew", BuilderRenewPassphraseHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)", BuilderDetailHandler),
+			(r"/builders", builders.BuilderListHandler),
+			(r"/builder/new", builders.BuilderNewHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/enable", builders.BuilderEnableHander),
+			(r"/builder/([A-Za-z0-9\-\.]+)/disable", builders.BuilderDisableHander),
+			(r"/builder/([A-Za-z0-9\-\.]+)/delete", builders.BuilderDeleteHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/edit", builders.BuilderEditHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)/renew", builders.BuilderRenewPassphraseHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)", builders.BuilderDetailHandler),
 
 			# Distributions
-			(r"/distros", DistributionListHandler),
-			(r"/distro/([A-Za-z0-9\-\.]+)", DistributionDetailHandler),
+			(r"/distros", distributions.DistributionListHandler),
+			(r"/distro/([A-Za-z0-9\-\.]+)", distributions.DistributionDetailHandler),
 
 			# XXX THOSE URLS ARE DEPRECATED
-			(r"/distribution/delete/([A-Za-z0-9\-\.]+)", DistributionDetailHandler),
-			(r"/distribution/edit/([A-Za-z0-9\-\.]+)", DistributionEditHandler),
+			(r"/distribution/delete/([A-Za-z0-9\-\.]+)", distributions.DistributionDetailHandler),
+			(r"/distribution/edit/([A-Za-z0-9\-\.]+)", distributions.DistributionEditHandler),
 
 			(r"/distro/([A-Za-z0-9\-\.]+)/repo/([A-Za-z0-9\-]+)",
 				RepositoryDetailHandler),
@@ -185,21 +197,21 @@ class Application(tornado.web.Application):
 				RepositoryEditHandler),
 
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)",
-				DistroSourceDetailHandler),
+				distributions.DistroSourceDetailHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/commits",
-				DistroSourceCommitsHandler),
+				distributions.DistroSourceCommitsHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/([\w]{40})",
-				DistroSourceCommitDetailHandler),
+				distributions.DistroSourceCommitDetailHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/source/([A-Za-z0-9\-\.]+)/([\w]{40})/reset",
-				DistroSourceCommitResetHandler),
+				distributions.DistroSourceCommitResetHandler),
 
 			(r"/distro/([A-Za-z0-9\-\.]+)/update/create",
-				DistroUpdateCreateHandler),
+				distributions.DistroUpdateCreateHandler),
 			(r"/distro/([A-Za-z0-9\-\.]+)/update/(\d+)/(\d+)",
-				DistroUpdateDetailHandler),
+				distributions.DistroUpdateDetailHandler),
 
 			# Updates
-			(r"/updates", UpdatesHandler),
+			(r"/updates", updates.UpdatesHandler),
 
 			# Mirrors
 			(r"/mirrors",					mirrors.MirrorListHandler),
@@ -209,10 +221,10 @@ class Application(tornado.web.Application):
 			(r"/mirror/([\w\-\.]+)",		mirrors.MirrorDetailHandler),
 
 			# Key management
-			(r"/keys", KeysListHandler),
-			(r"/key/import", KeysImportHandler),
-			(r"/key/([A-Z0-9]+)", KeysDownloadHandler),
-			(r"/key/([A-Z0-9]+)/delete", KeysDeleteHandler),
+			(r"/keys", keys.KeysListHandler),
+			(r"/key/import", keys.KeysImportHandler),
+			(r"/key/([A-Z0-9]+)", keys.KeysDownloadHandler),
+			(r"/key/([A-Z0-9]+)/delete", keys.KeysDeleteHandler),
 
 			# Documents
 			(r"/documents", DocsIndexHandler),
@@ -221,7 +233,7 @@ class Application(tornado.web.Application):
 			(r"/documents/what-is-the-pakfire-build-service", DocsWhatsthisHandler),
 
 			# Search
-			(r"/search", SearchHandler),
+			(r"/search", search.SearchHandler),
 
 			# Uploads
 			(r"/uploads", UploadsHandler),
@@ -233,7 +245,7 @@ class Application(tornado.web.Application):
 			(r"/sessions", SessionsHandler),
 
 			# API handlers
-			(r"/api/packages/autocomplete", handlers_api.ApiPackagesAutocomplete),
+			(r"/api/packages/autocomplete", api.ApiPackagesAutocomplete),
 		], default_handler_class=errors.Error404Handler, **settings)
 
 		logging.info("Successfully initialied application")

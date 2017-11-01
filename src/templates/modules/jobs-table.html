@@ -15,9 +15,7 @@
 						<a href="/job/{{ job.uuid }}">{{ job.arch }}</a>
 					</td>
 					<td>
-						{% if job.state == "new" %}
-							{{ _("New") }}
-						{% elif job.state == "pending" %}
+						{% if job.state == "pending" %}
 							{{ _("Pending") }}
 						{% elif job.state == "failed" %}
 							{{ _("Failed") }}
@@ -29,8 +27,6 @@
 							{{ _("Running") }}
 						{% elif job.state == "aborted" %}
 							{{ _("Aborted") }}
-						{% elif job.state == "dependency_error" %}
-							{{ _("Dependency error") }}
 						{% else %}
 							{{ job.state }}
 						{% end %}

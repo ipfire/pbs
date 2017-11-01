@@ -150,20 +150,21 @@ class Users(base.Object):
 		if None in (name, password):
 			return
 
-		# Search for the username in the database.
-		# The user must not be deleted and must be activated.
-		user = self._get_user("SELECT * FROM users WHERE name = %s AND \
-			activated IS TRUE AND deleted IS FALSE", name)
+		# usually we will get an email address as name
+		user = self.get_by_email(name) or self.get_by_name(name)
 
-		# If no user could be found, we search for a matching user in
-		# the LDAP database
 		if not user:
+			# If no user could be found, we search for a matching user in
+			# the LDAP database
 			if not self.ldap.auth(name, password):
 				return
 
 			# If a LDAP user is found (and password matches), we will
 			# create a new local user with the information from LDAP.
-			user = self.register_from_ldap(name)
+			user = self.create_from_ldap(name)
+
+		if not user.activated or user.deleted:
+			return
 
 		# Check if the password matches
 		if user.check_password(password):
@@ -183,6 +184,23 @@ class Users(base.Object):
 		return self._get_user("SELECT users.* FROM users \
 			LEFT JOIN users_emails ON users.id = users_emails.user_id \
 			WHERE users_emails.email = %s", email)
+
+	def find_maintainers(self, maintainers):
+		email_addresses = []
+
+		# Make a unique list of all email addresses
+		for maintainer in maintainers:
+			name, email_address = email.utils.parseaddr(maintainer)
+
+			if not email_address in email_addresses:
+				email_addresses.append(email_address)
+
+		users = self._get_users("SELECT DISTINCT users.* FROM users \
+			LEFT JOIN users_emails ON users.id = users_emails.user_id \
+			WHERE users_emails.activated IS TRUE \
+			AND users_emails.email = ANY(%s)", email_addresses)
+
+		return sorted(users)
 
 	def find_maintainer(self, s):
 		name, email_address = email.utils.parseaddr(s)
@@ -342,6 +360,14 @@ class User(base.DataObject):
 			WHERE user_id = %s AND email = %s AND activated IS TRUE",
 			self.id, email)
 
+	def has_email_address(self, email_address):
+		try:
+			mail, email_address = email.utils.parseaddr(email_address)
+		except:
+			pass
+
+		return email_address in self.emails
+
 	def activate_email(self, code):
 		# Search email by activation code
 		email = self.backend.users._get_user_email("SELECT * FROM users_emails \
@@ -414,6 +440,10 @@ class User(base.DataObject):
 	@property
 	def activated(self):
 		return self.data.activated
+
+	@property
+	def deleted(self):
+		return self.data.deleted
 
 	@property
 	def registered(self):

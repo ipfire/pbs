@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Job Queue") }} - {{ arch or _("All Architectures") }}{% end block %}
+
+{% block body %}
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">{{ _("Home") }}</a>
+			<span class="divider">/</span>
+		</li>
+		<li {% if not arch %}class="active"{% end %}>
+			<a href="/queue">{{ _("Job Queue") }}</a>
+			{% if arch %}
+				<span class="divider">/</span>
+			{% end %}
+		</li>
+		{% if arch %}
+			<li class="active">
+				<a href="/queue/{{ arch }}">{{ arch }}</a>
+			</li>
+		{% end %}
+	</ul>
+
+	<div class="page-header">
+		<h2>{{ _("Job Queue") }}</h2>
+	</div>
+
+	<ul class="nav nav-pills">
+		<li {% if not arch %}class="active"{% end %}>
+			<a href="/queue">{{ _("All") }}</a>
+		</li>
+
+		{% for a in backend.arches %}
+			<li {% if a == arch %}class="active"{% end %}>
+				<a href="/queue/{{ a }}">{{ a }}</a>
+			</li>
+		{% end %}
+	</ul>
+
+	{% module JobsList(queue) %}
+{% end block %}
