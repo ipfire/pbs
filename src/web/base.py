@@ -34,13 +34,11 @@ class BaseHandler(tornado.web.RequestHandler):
 			return self.session.impersonated_user or self.session.user
 
 	def get_user_locale(self):
-		# Get the locale from the user settings.
-		if self.current_user and self.current_user.locale:
-			locale = tornado.locale.get(self.current_user.locale)
-			if locale:
-				return locale
+		# Get the locale from the user settings
+		if self.current_user:
+			return self.current_user.locale
 
-		# If no locale was provided, we take what ever the browser requested.
+		# If no locale was provided, we take what ever the browser requested
 		return self.get_browser_locale()
 
 	@property

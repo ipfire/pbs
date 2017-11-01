@@ -412,10 +412,13 @@ class User(base.DataObject):
 	def is_tester(self):
 		return self.state == "tester"
 
+	def get_locale(self):
+		return tornado.locale.get(self.data.locale)
+
 	def set_locale(self, locale):
 		self._set_attribute("locale", locale)
 
-	locale = property(lambda s: s.data.locale, set_locale)
+	locale = property(get_locale, set_locale)
 
 	def get_timezone(self, tz=None):
 		if tz is None:
@@ -554,7 +557,7 @@ class UserEmail(base.DataObject):
 		logging.debug("Sending email address activation mail to %s" % self.email)
 
 		# Get the saved locale from the user.
-		_ = tornado.locale.get(self.user.locale).translate
+		_ = self.user.locale.translate
 
 		subject = _("Email address Activation")
 
