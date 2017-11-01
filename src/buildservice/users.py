@@ -478,8 +478,8 @@ class User(base.DataObject):
 		return self.data.deleted
 
 	@property
-	def registered(self):
-		return self.data.registered
+	def registered_at(self):
+		return self.data.registered_at
 
 	def gravatar_icon(self, size=128):
 		h = hashlib.new("md5")

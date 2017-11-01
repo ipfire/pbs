@@ -1430,7 +1430,7 @@ CREATE TABLE users (
     timezone text,
     activated boolean DEFAULT false NOT NULL,
     deleted boolean DEFAULT false NOT NULL,
-    registered timestamp without time zone DEFAULT now() NOT NULL,
+    registered_at timestamp without time zone DEFAULT now() NOT NULL,
     ldap_dn text,
     password_recovery_code text,
     password_recovery_code_expires_at timestamp without time zone,
