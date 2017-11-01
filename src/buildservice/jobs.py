@@ -341,6 +341,8 @@ class Job(base.DataObject):
 			return self.backend.builders.get_by_id(self.data.builder_id)
 
 	def set_builder(self, builder, user=None):
+		log.info("Builder %s has been assigned to %s" % (builder.name, self.name))
+
 		self._set_attribute("builder_id", builder.id)
 
 		# Log the event.
