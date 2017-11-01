@@ -144,6 +144,10 @@ class Messages(base.Object):
 		# Send the message
 		self.send_to(user.email.recipient if user else recipient, message, sender=sender, headers=headers)
 
+	def send_template_to_many(self, recipients, *args, **kwargs):
+		for recipient in recipients:
+			self.send_template(recipient, *args, **kwargs)
+
 	def queue(self, message):
 		res = self.db.get("INSERT INTO messages(message) VALUES(%s) RETURNING id", message)
 

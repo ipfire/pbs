@@ -566,31 +566,15 @@ class Job(base.DataObject):
 		logging.debug("Sending finished message for job %s to %s" % \
 			(self.name, ", ".join(self.message_recipients)))
 
-		info = {
-			"build_name" : self.name,
-			"build_host" : self.builder.name,
-			"build_uuid" : self.uuid,
-		}
-
-		self.backend.messages.send_to_all(self.message_recipients,
-			MSG_BUILD_FINISHED_SUBJECT, MSG_BUILD_FINISHED, info)
+		self.backend.messages.send_template_to_many(self.message_recipients,
+			"messages/jobs/finished", job=self)
 
 	def send_failed_message(self):
 		logging.debug("Sending failed message for job %s to %s" % \
 			(self.name, ", ".join(self.message_recipients)))
 
-		build_host = "--"
-		if self.builder:
-			build_host = self.builder.name
-
-		info = {
-			"build_name" : self.name,
-			"build_host" : build_host,
-			"build_uuid" : self.uuid,
-		}
-
-		self.backend.messages.send_to_all(self.message_recipients,
-			MSG_BUILD_FAILED_SUBJECT, MSG_BUILD_FAILED, info)
+		self.backend.messages.send_template_to_many(self.message_recipients,
+			"messages/jobs/failed", job=self)
 
 	def get_build_repos(self):
 		"""

@@ -243,6 +243,12 @@ templates_errorsdir = $(templatesdir)/errors
 
 templates_messagesdir = $(templatesdir)/messages
 
+dist_templates_messages_jobs_DATA = \
+	src/templates/messages/jobs/failed.markdown \
+	src/templates/messages/jobs/finished.markdown
+
+templates_messages_jobsdir = $(templates_messagesdir)/jobs
+
 dist_templates_messages_users_DATA = \
 	src/templates/messages/users/account-activation.markdown \
 	src/templates/messages/users/email-activation.markdown

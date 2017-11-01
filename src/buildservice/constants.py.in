@@ -56,38 +56,6 @@ FILE_EXTENSIONS_VIEWABLE = (
 	"Makefile",
 )
 
-N_ = lambda x: x
-
-MSG_BUILD_FAILED_SUBJECT = N_("[%(build_name)s] Build job failed.")
-MSG_BUILD_FAILED = N_("""\
-The build job "%(build_name)s" has failed.
-
-This could have a couple of reasons and needs to be investigated by you.
-
-Here is more information about the incident:
-
-    Build name: %(build_name)s
-    Build host: %(build_host)s
-
-Click on this link to get all details about the build:
-    https://pakfire.ipfire.org/job/%(build_uuid)s
-
-Sincerely,
-    The Pakfire Build Service""")
-
-
-MSG_BUILD_FINISHED_SUBJECT = N_("[%(build_name)s] Build job finished.")
-MSG_BUILD_FINISHED = N_("""\
-The build job "%(build_name)s" has finished.
-
-If you are the maintainer, it is up to you to push it to one or more repositories.
-
-Click on this link to get all details about the build:
-    https://pakfire.ipfire.org/job/%(build_uuid)s
-
-Sincerely,
-    The Pakfire Build Service""")
-
 # Bug update messages.
 BUG_TESTING_MSG = """\
 %(package_name)s has been pushed to the %(distro_name)s %(repo_name)s repository.
