@@ -53,39 +53,31 @@ class LDAP(base.Object):
 		return True 
 
 	def get_dn_by_uid(self, uid):
-		dn, attrs = self.get_user(uid, attrlist=["uid"])
+		dn, attrs = self.get_user_by_uid(uid, attrlist=["uid"])
 
-		if not dn:
-			return
-
-		log.debug("DN for uid %s is: %s" % (uid, dn))
 		return dn
 
 	def get_dn_by_mail(self, mail):
-		result = self.search("(&(objectClass=posixAccount)(mail=%s))" % mail, limit=1, attrlist=["uid"])
+		dn, attrs = self.get_user_by_mail(mail, attrlist=["uid"])
 
-		for dn, attrs in result:
-			return dn
-
-		log.debug("DN for mail %s is: %s" % (mail, dn))
-		return None
+		return dn
 
 	def get_dn(self, name):
 		return self.get_dn_by_uid(name) or self.get_dn_by_mail(name)
 
+	def get_user_by_uid(self, uid, **kwargs):
+		result = self.search("(&(objectClass=posixAccount)(uid=%s))" % uid, limit=1, **kwargs)
+		for dn, attrs in result:
+			return dn, attrs
+
+		return None, None
+
 	def get_user_by_mail(self, mail, **kwargs):
 		result = self.search("(&(objectClass=posixAccount)(mail=%s))" % mail, limit=1, **kwargs)
 		for dn, attrs in result:
-			return (dn, attrs)
+			return dn, attrs
 
-		return None
-
-	def get_user_by_dn(self, uid, **kwargs):
-		result = self.search("(&(objectClass=posixAccount)(uid=%s))" % uid, limit=1, **kwargs)
-		for dn, attrs in result:
-			return (dn, attrs)
-
-		return None
+		return None, None
 
 	def get_user(self, name, **kwargs):
 		return self.get_user_by_dn(name, **kwargs) or self.get_user_by_mail(name, **kwargs)
