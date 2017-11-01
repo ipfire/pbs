@@ -1,115 +1,169 @@
 #!/usr/bin/python
 
+import email
+import email.mime.multipart
+import email.mime.text
 import logging
-import smtplib
+import markdown
 import subprocess
 import tornado.locale
-
-from email.mime.text import MIMEText
+import tornado.template
 
 from . import base
+from . import users
+
+from .constants import TEMPLATESDIR
 
 class Messages(base.Object):
-	def add(self, to, subject, text, frm=None):
-		subject = "%s %s" % (self.pakfire.settings.get("email_subject_prefix"), subject)
+	def init(self):
+		self.templates = tornado.template.Loader(TEMPLATESDIR)
 
-		# Get default sender from the settings.
-		if not frm:
-			frm = self.pakfire.settings.get("email_from")
+	def __iter__(self):
+		messages = self.db.query("SELECT * FROM messages \
+			WHERE sent_at IS NULL ORDER BY queued_at")
 
-		self.db.execute("INSERT INTO user_messages(frm, \"to\", subject, text)"
-			" VALUES(%s, %s, %s, %s)", frm, to, subject, text)
+		return iter(messages)
 
-	def get_all(self, limit=None):
-		query = "SELECT * FROM user_messages ORDER BY time_added ASC"
-		if limit:
-			query += " LIMIT %d" % limit
+	def __len__(self):
+		res = self.db.get("SELECT COUNT(*) AS count FROM messages \
+			WHERE sent_at IS NULL")
 
-		return self.db.query(query)
-
-	@property
-	def count(self):
-		ret = self.db.get("SELECT COUNT(*) as count FROM user_messages")
-
-		return ret.count
-
-	def delete(self, id):
-		self.db.execute("DELETE FROM user_messages WHERE id = %s", id)
+		return res.count
 
 	def process_queue(self):
-		# Get 10 messages at a time and send them one after the other
-		while True:
-			messages = self.get_all(limit=10)
-
-			# If no emails are available, we end here
-			if not messages:
-				break
-
-			for message in messages:
-				with self.db.transaction():
-					self.send_msg(message)
-
-	def send_to_all(self, recipients, subject, body, format=None):
 		"""
-			Sends an email to all recipients and does the translation.
+			Sends all emails in the queue
 		"""
-		if not format:
-			format = {}
+		for message in self:
+			with self.db.transaction():
+				self.__sendmail(message)
 
-		for recipient in recipients:
-			if not recipient:
-				logging.warning("Ignoring empty recipient.")
+		# Delete all old emails
+		with self.db.transaction():
+			self.cleanup()
+
+	def cleanup(self):
+		self.db.execute("DELETE FROM messages WHERE sent_at <= NOW() - INTERVAL '24 hours'")
+
+	def send_to(self, recipient, message, sender=None, headers={}):
+		# Parse the message
+		if not isinstance(message, email.message.Message):
+			message = email.message_from_string(message)
+
+		if not sender:
+			sender = self.backend.settings.get("email_from", "Pakfire Build Service <no-reply@ipfire.org>")
+
+		# Add sender
+		message.add_header("From", sender)
+
+		# Add recipient
+		message.add_header("To", recipient)
+
+		# Sending this message now
+		message.add_header("Date", email.utils.formatdate())
+
+		# Add sender program
+		message.add_header("X-Mailer", "Pakfire Build Service %s" % self.backend.version)
+
+		# Add any headers
+		for k, v in headers.items():
+			message.add_header(k, v)
+
+		# Queue the message
+		self.queue(message.as_string())
+
+	def send_template(self, recipient, name, sender=None, headers={}, **kwargs):
+		# Get user (if we have one)
+		if isinstance(recipient, users.User):
+			user = recipient
+		else:
+			user = self.backend.users.find_maintainer(recipient)
+
+		# Get the user's locale or use default
+		if user:
+			locale = user.locale
+		else:
+			locale = tornado.locale.get()
+
+		# Create namespace
+		namespace = {
+			"baseurl"	: self.settings.get("baseurl"),
+			"recipient"	: recipient,
+			"user"		: user,
+
+			# Locale
+			"locale"	: locale,
+			"_"			: locale.translate,
+		}
+		namespace.update(kwargs)
+
+		# Create a MIMEMultipart message.
+		message = email.mime.multipart.MIMEMultipart()
+
+		# Create an alternating multipart message to show HTML or text
+		alternative = email.mime.multipart.MIMEMultipart("alternative")
+
+		for fmt, mimetype in (("txt", "plain"), ("html", "html"), ("markdown", "html")):
+			try:
+				t = self.templates.load("%s.%s" % (name, fmt))
+			except IOError:
 				continue
 
-			# We try to get more information about the user from the database
-			# like the locale.
-			user = self.pakfire.users.get_by_email(recipient)
-			if user:
-				# Get locale that the user prefers.
-				locale = tornado.locale.get(user.locale)
-			else:
-				# Get the default locale.
-				locale = tornado.locale.get()
+			# Render the message
+			try:
+				part = t.generate(**namespace)
 
-			# Translate the message.
-			_subject = locale.translate(subject) % format
-			_body    = locale.translate(body) % format
+			# Reset the rendered template when it could not be rendered
+			except:
+				self.templates.reset()
+				raise
 
-			# If we know the real name of the user we add the realname to
-			# the recipient field.
-			if user:
-				recipient = "%s <%s>" % (user.realname, user.email)
+			# Parse the message
+			part = email.message_from_string(part)
 
-			# Add the message to the queue that it is sent.
-			self.add(recipient, _subject, _body)
+			# Extract the headers
+			for k, v in part.items():
+				message.add_header(k, v)
 
-	def send_msg(self, msg):
-		if not msg.to:
-			logging.warning("Dropping message with empty recipient.")
-			return
+			body = part.get_payload()
 
-		logging.debug("Sending mail to %s: %s" % (msg.to, msg.subject))
+			# Render markdown
+			if fmt == "markdown":
+				body = markdown.markdown(body)
 
-		# Preparing mail content.
-		mail = MIMEText(msg.text.encode("latin-1"))
-		mail["From"] = msg.frm.encode("latin-1")
-		mail["To"] = msg.to.encode("latin-1")
-		mail["Subject"] = msg.subject.encode("latin-1")
-		#mail["Content-type"] = "text/plain; charset=utf-8"
+			# Compile part again
+			part = email.mime.text.MIMEText(body, mimetype, "utf-8")
 
-		#smtp = smtplib.SMTP("localhost")
-		#smtp.sendmail(msg.frm, msg.to.split(", "), mail.as_string())
-		#smtp.quit()
+			# Attach the parts to the mime container
+			# According to RFC2046, the last part of a multipart message is preferred
+			alternative.attach(part)
 
-		# We use sendmail here to workaround problems with the mailserver
-		# communication.
-		# So, just call /usr/lib/sendmail, pipe the message in and see
-		# what sendmail tells us in return.
-		sendmail = ["/usr/lib/sendmail", "-t"]
-		p = subprocess.Popen(sendmail, bufsize=0, close_fds=True,
+		# Add alternative section to outer message
+		message.attach(alternative)
+
+		# Send the message
+		self.send_to(user.email.recipient if user else recipient, message, sender=sender, headers=headers)
+
+	def queue(self, message):
+		res = self.db.get("INSERT INTO messages(message) VALUES(%s) RETURNING id", message)
+
+		logging.info("Message queued as %s", res.id)
+
+	def __sendmail(self, message):
+		# Convert message from string
+		msg = email.message_from_string(message.message)
+
+		# Get some headers
+		recipient = msg.get("To")
+		subject   = msg.get("Subject")
+
+		logging.info("Sending mail to %s: %s" % (recipient, subject))
+
+		# Run sendmail and the email in
+		p = subprocess.Popen(["/usr/lib/sendmail", "-t"], bufsize=0, close_fds=True,
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
-		stdout, stderr = p.communicate(mail.as_string())
+		stdout, stderr = p.communicate(msg.as_string())
 
 		# Wait until sendmail has finished.
 		p.wait()
@@ -117,5 +171,5 @@ class Messages(base.Object):
 		if p.returncode:
 			raise Exception, "Could not send mail: %s" % stderr
 
-		# If everything was okay, we can delete the message in the database.
-		self.delete(msg.id)
+		# Mark message as sent
+		self.db.execute("UPDATE messages SET sent_at = NOW() WHERE id = %s", message.id)

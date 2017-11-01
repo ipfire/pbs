@@ -401,6 +401,9 @@ class User(base.DataObject):
 
 		return user_email
 
+	def send_template(self, *args, **kwargs):
+		return self.backend.messages.send_template(self, *args, **kwargs)
+
 	def set_state(self, state):
 		self._set_attribute("state", state)
 
@@ -536,22 +539,7 @@ class UserEmail(base.DataObject):
 
 		logging.debug("Sending activation mail to %s" % self.email)
 
-		# Get the saved locale from the user.
-		_ = tornado.locale.get(self.user.locale).translate
-
-		subject = _("Account Activation")
-
-		message  = _("You, or somebody using your email address, has registered an account on the Pakfire Build Service.")
-		message += "\n"*2
-		message += _("To activate your account, please click on the link below.")
-		message += "\n"*2
-		message += "    %(baseurl)s/user/%(name)s/activate?code=%(activation_code)s" \
-			% { "baseurl" : self.settings.get("baseurl"), "name" : self.user.name,
-				"activation_code" : self.activation_code, }
-		message += "\n"*2
-		message += "Sincerely,\n    The Pakfire Build Service"
-
-		self.backend.messages.add(self.recipient, subject, message)
+		self.user.send_template("messages/users/account-activation")
 
 	def send_email_activation_mail(self, email):
 		logging.debug("Sending email address activation mail to %s" % self.email)

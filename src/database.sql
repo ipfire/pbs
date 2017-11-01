@@ -1007,6 +1007,41 @@ ALTER SEQUENCE logfiles_id_seq OWNED BY logfiles.id;
 
 
 --
+-- Name: messages; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE TABLE messages (
+    id integer NOT NULL,
+    message text NOT NULL,
+    queued_at timestamp without time zone DEFAULT now() NOT NULL,
+    sent_at timestamp without time zone
+);
+
+
+ALTER TABLE messages OWNER TO pakfire;
+
+--
+-- Name: messages_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
+--
+
+CREATE SEQUENCE messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE messages_id_seq OWNER TO pakfire;
+
+--
+-- Name: messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
+--
+
+ALTER SEQUENCE messages_id_seq OWNED BY messages.id;
+
+
+--
 -- Name: mirrors; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -1581,43 +1616,6 @@ ALTER SEQUENCE uploads_id_seq OWNED BY uploads.id;
 
 
 --
--- Name: user_messages; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
---
-
-CREATE TABLE user_messages (
-    id integer NOT NULL,
-    frm text NOT NULL,
-    "to" text NOT NULL,
-    subject text NOT NULL,
-    text text NOT NULL,
-    time_added timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
-ALTER TABLE user_messages OWNER TO pakfire;
-
---
--- Name: user_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: pakfire
---
-
-CREATE SEQUENCE user_messages_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE user_messages_id_seq OWNER TO pakfire;
-
---
--- Name: user_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pakfire
---
-
-ALTER SEQUENCE user_messages_id_seq OWNED BY user_messages.id;
-
-
---
 -- Name: users; Type: TABLE; Schema: public; Owner: pakfire; Tablespace: 
 --
 
@@ -1857,6 +1855,13 @@ ALTER TABLE ONLY logfiles ALTER COLUMN id SET DEFAULT nextval('logfiles_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
 --
 
+ALTER TABLE ONLY messages ALTER COLUMN id SET DEFAULT nextval('messages_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
+--
+
 ALTER TABLE ONLY mirrors ALTER COLUMN id SET DEFAULT nextval('mirrors_id_seq'::regclass);
 
 
@@ -1942,13 +1947,6 @@ ALTER TABLE ONLY sources_commits ALTER COLUMN id SET DEFAULT nextval('sources_co
 --
 
 ALTER TABLE ONLY uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: pakfire
---
-
-ALTER TABLE ONLY user_messages ALTER COLUMN id SET DEFAULT nextval('user_messages_id_seq'::regclass);
 
 
 --
@@ -2240,7 +2238,7 @@ ALTER TABLE ONLY users_permissions
 -- Name: idx_2198274_primary; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
 --
 
-ALTER TABLE ONLY user_messages
+ALTER TABLE ONLY messages
     ADD CONSTRAINT idx_2198274_primary PRIMARY KEY (id);
 
 
@@ -2580,6 +2578,13 @@ CREATE INDEX jobs_time_finished ON jobs USING btree (time_finished DESC) WHERE (
 --
 
 CREATE INDEX jobs_time_started ON jobs USING btree (time_started) WHERE ((time_started IS NOT NULL) AND (time_finished IS NULL));
+
+
+--
+-- Name: messages_order; Type: INDEX; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+CREATE INDEX messages_order ON messages USING btree (queued_at) WHERE (sent_at IS NULL);
 
 
 --

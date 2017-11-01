@@ -241,6 +241,13 @@ dist_templates_errors_DATA = \
 
 templates_errorsdir = $(templatesdir)/errors
 
+templates_messagesdir = $(templatesdir)/messages
+
+dist_templates_messages_users_DATA = \
+	src/templates/messages/users/account-activation.markdown
+
+templates_messages_usersdir = $(templates_messagesdir)/users
+
 dist_templates_mirrors_DATA = \
 	src/templates/mirrors/delete.html \
 	src/templates/mirrors/detail.html \
