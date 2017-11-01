@@ -1630,7 +1630,9 @@ CREATE TABLE users (
     activated boolean DEFAULT false NOT NULL,
     deleted boolean DEFAULT false NOT NULL,
     registered timestamp without time zone DEFAULT now() NOT NULL,
-    ldap_dn text
+    ldap_dn text,
+    password_recovery_code text,
+    password_recovery_code_expires_at timestamp without time zone
 );
 
 
@@ -2280,6 +2282,14 @@ ALTER TABLE ONLY sessions
 
 ALTER TABLE ONLY sessions
     ADD CONSTRAINT sessions_session_id_key UNIQUE (session_id);
+
+
+--
+-- Name: users_password_recovery_code; Type: CONSTRAINT; Schema: public; Owner: pakfire; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_password_recovery_code UNIQUE (password_recovery_code);
 
 
 --
