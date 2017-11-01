@@ -198,7 +198,7 @@ class RepositoryMirrorlistHandler(base.BaseHandler):
 
 		# Always use the buildservice itself as last resort
 		mirrors.append({
-			"url" : repo.url,
+			"url" : "/".join((repo.url, arch)),
 		})
 
 		ret["mirrors"] = mirrors
