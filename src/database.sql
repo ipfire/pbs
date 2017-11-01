@@ -26,204 +26,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- Name: builders_history_action; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builders_history_action AS ENUM (
-    'created',
-    'enabled',
-    'disabled',
-    'deleted'
-);
-
-
-ALTER TYPE builders_history_action OWNER TO pakfire;
-
---
--- Name: builds_history_action; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_history_action AS ENUM (
-    'created',
-    'bug_added',
-    'bug_removed'
-);
-
-
-ALTER TYPE builds_history_action OWNER TO pakfire;
-
---
--- Name: builds_severity; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_severity AS ENUM (
-    'security update',
-    'bugfix update',
-    'enhancement',
-    'new package'
-);
-
-
-ALTER TYPE builds_severity OWNER TO pakfire;
-
---
--- Name: builds_type; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE builds_type AS ENUM (
-    'release',
-    'scratch'
-);
-
-
-ALTER TYPE builds_type OWNER TO pakfire;
-
---
--- Name: jobs_history_action; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE jobs_history_action AS ENUM (
-    'created',
-    'state_change',
-    'reset',
-    'schedule_rebuild',
-    'schedule_test_job'
-);
-
-
-ALTER TYPE jobs_history_action OWNER TO pakfire;
-
---
--- Name: jobs_history_state; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE jobs_history_state AS ENUM (
-    'new',
-    'pending',
-    'running',
-    'finished',
-    'dispatching',
-    'uploading',
-    'failed',
-    'temporary_failed',
-    'dependency_error',
-    'aborted',
-    'download_error',
-    'deleted'
-);
-
-
-ALTER TYPE jobs_history_state OWNER TO pakfire;
-
---
--- Name: mirrors_history_action; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE mirrors_history_action AS ENUM (
-    'created',
-    'enabled',
-    'disabled',
-    'deleted'
-);
-
-
-ALTER TYPE mirrors_history_action OWNER TO pakfire;
-
---
--- Name: packages_deps_type; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE packages_deps_type AS ENUM (
-    'requires',
-    'prerequires',
-    'provides',
-    'conflicts',
-    'obsoletes',
-    'suggests',
-    'recommends'
-);
-
-
-ALTER TYPE packages_deps_type OWNER TO pakfire;
-
---
--- Name: packages_type; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE packages_type AS ENUM (
-    'source',
-    'binary'
-);
-
-
-ALTER TYPE packages_type OWNER TO pakfire;
-
---
--- Name: repositories_aux_status; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE repositories_aux_status AS ENUM (
-    'enabled',
-    'disabled'
-);
-
-
-ALTER TYPE repositories_aux_status OWNER TO pakfire;
-
---
--- Name: repositories_history_action; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE repositories_history_action AS ENUM (
-    'added',
-    'removed',
-    'moved'
-);
-
-
-ALTER TYPE repositories_history_action OWNER TO pakfire;
-
---
--- Name: repositories_type; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE repositories_type AS ENUM (
-    'testing',
-    'unstable',
-    'stable'
-);
-
-
-ALTER TYPE repositories_type OWNER TO pakfire;
-
---
--- Name: sources_commits_state; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE sources_commits_state AS ENUM (
-    'pending',
-    'running',
-    'finished',
-    'failed'
-);
-
-
-ALTER TYPE sources_commits_state OWNER TO pakfire;
-
---
--- Name: users_state; Type: TYPE; Schema: public; Owner: pakfire
---
-
-CREATE TYPE users_state AS ENUM (
-    'user',
-    'tester',
-    'admin'
-);
-
-
-ALTER TYPE users_state OWNER TO pakfire;
-
---
 -- Name: on_update_current_timestamp_sources(); Type: FUNCTION; Schema: public; Owner: pakfire
 --
 
@@ -335,7 +137,7 @@ ALTER TABLE builders OWNER TO pakfire;
 CREATE TABLE builders_history (
     id integer NOT NULL,
     builder_id integer NOT NULL,
-    action builders_history_action NOT NULL,
+    action text NOT NULL,
     user_id integer,
     "time" timestamp without time zone NOT NULL
 );
@@ -393,9 +195,9 @@ CREATE TABLE builds (
     id integer NOT NULL,
     uuid text NOT NULL,
     pkg_id integer NOT NULL,
-    type builds_type DEFAULT 'release'::builds_type NOT NULL,
+    type text DEFAULT 'release'::text NOT NULL,
     state text DEFAULT 'building'::text NOT NULL,
-    severity builds_severity,
+    severity text,
     message text,
     time_created timestamp without time zone DEFAULT now() NOT NULL,
     update_year integer,
@@ -528,7 +330,7 @@ ALTER SEQUENCE builds_comments_id_seq OWNED BY builds_comments.id;
 CREATE TABLE builds_history (
     id integer NOT NULL,
     build_id integer NOT NULL,
-    action builds_history_action NOT NULL,
+    action text NOT NULL,
     user_id integer,
     "time" timestamp without time zone NOT NULL,
     bug_id integer
@@ -801,8 +603,8 @@ ALTER TABLE jobs_buildroots OWNER TO pakfire;
 
 CREATE TABLE jobs_history (
     job_id integer NOT NULL,
-    action jobs_history_action NOT NULL,
-    state jobs_history_state,
+    action text NOT NULL,
+    state text,
     user_id integer,
     "time" timestamp without time zone NOT NULL,
     builder_id integer,
@@ -1103,7 +905,7 @@ ALTER SEQUENCE mirrors_checks_id_seq OWNED BY mirrors_checks.id;
 CREATE TABLE mirrors_history (
     id integer NOT NULL,
     mirror_id integer NOT NULL,
-    action mirrors_history_action NOT NULL,
+    action text NOT NULL,
     user_id integer,
     "time" timestamp without time zone NOT NULL
 );
@@ -1163,7 +965,7 @@ CREATE TABLE packages (
     epoch integer NOT NULL,
     version text NOT NULL,
     release text NOT NULL,
-    type packages_type NOT NULL,
+    type text NOT NULL,
     arch text NOT NULL,
     groups text NOT NULL,
     maintainer text NOT NULL,
@@ -1192,7 +994,7 @@ ALTER TABLE packages OWNER TO pakfire;
 
 CREATE TABLE packages_deps (
     pkg_id integer NOT NULL,
-    type packages_deps_type NOT NULL,
+    type text NOT NULL,
     what text NOT NULL
 );
 
@@ -1311,7 +1113,7 @@ ALTER TABLE relation_sizes OWNER TO pakfire;
 CREATE TABLE repositories (
     id integer NOT NULL,
     name text NOT NULL,
-    type repositories_type DEFAULT 'testing'::repositories_type NOT NULL,
+    type text DEFAULT 'testing'::text NOT NULL,
     description text NOT NULL,
     distro_id integer NOT NULL,
     parent_id integer,
@@ -1341,7 +1143,7 @@ CREATE TABLE repositories_aux (
     description text,
     url text NOT NULL,
     distro_id integer NOT NULL,
-    status repositories_aux_status DEFAULT 'disabled'::repositories_aux_status NOT NULL
+    status text DEFAULT 'disabled'::text NOT NULL
 );
 
 
@@ -1409,7 +1211,7 @@ ALTER SEQUENCE repositories_builds_id_seq OWNED BY repositories_builds.id;
 
 CREATE TABLE repositories_history (
     build_id bigint NOT NULL,
-    action repositories_history_action NOT NULL,
+    action text NOT NULL,
     from_repo_id integer,
     to_repo_id integer,
     user_id integer,
@@ -1524,7 +1326,7 @@ CREATE TABLE sources_commits (
     subject text NOT NULL,
     body text NOT NULL,
     date timestamp without time zone NOT NULL,
-    state sources_commits_state DEFAULT 'pending'::sources_commits_state NOT NULL,
+    state text DEFAULT 'pending'::text NOT NULL,
     imported_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
@@ -1624,7 +1426,7 @@ CREATE TABLE users (
     name text NOT NULL,
     realname text,
     passphrase text,
-    state users_state DEFAULT 'user'::users_state NOT NULL,
+    state text DEFAULT 'user'::text NOT NULL,
     locale text,
     timezone text,
     activated boolean DEFAULT false NOT NULL,
