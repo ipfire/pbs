@@ -217,8 +217,8 @@ dist_templates_DATA = \
 	src/templates/user-profile-passwd-ok.html \
 	src/templates/user-requested-password-recovery.html \
 	src/templates/user-reset-password.html \
-	src/templates//user-reset-password-success.html \
-	src/templates//user-reset-password-fail.html
+	src/templates/user-reset-password-success.html \
+	src/templates/user-reset-password-fail.html
 
 templatesdir = $(datadir)/templates
 
