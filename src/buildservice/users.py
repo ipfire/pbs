@@ -474,9 +474,8 @@ class User(base.DataObject):
 		# Add a recovery code to the database and a timestamp when this code expires
 		self.password_recovery_code = generate_random_string(64)
 
-		# XXX
-		# We should send an email with the activation code
-
+		# Send an email with the activation code
+		self.send_template("messages/users/password-reset", user=self)
 
 	@property
 	def activated(self):

@@ -255,7 +255,8 @@ templates_messages_jobsdir = $(templates_messagesdir)/jobs
 
 dist_templates_messages_users_DATA = \
 	src/templates/messages/users/account-activation.markdown \
-	src/templates/messages/users/email-activation.markdown
+	src/templates/messages/users/email-activation.markdown \
+	src/templates/messages/users/password-reset.markdown
 
 templates_messages_usersdir = $(templates_messagesdir)/users
 
