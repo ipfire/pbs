@@ -21,25 +21,23 @@
 				</div>
 			</div>
 
-			{% if current_user.has_perm("vote") %}
-				<div class="control-group">
-					<label class="control-label">{{ _("Vote") }}</label>
-					<div class="controls">
-						<label class="radio">
-							<input type="radio" name="vote" id="vote1" value="option1" checked>
-							{{ _("Not tested.") }}
-						</label>
-						<label class="radio">
-							<input type="radio" name="vote" id="vote2" value="up">
-							{{ _("Works for me.") }}
-						</label>
-						<label class="radio">
-							<input type="radio" name="vote" id="vote3" value="down">
-							{{ _("Does not work.") }}
-						</label>
-					</div>
+			<div class="control-group">
+				<label class="control-label">{{ _("Vote") }}</label>
+				<div class="controls">
+					<label class="radio">
+						<input type="radio" name="vote" id="vote1" value="option1" checked>
+						{{ _("Not tested.") }}
+					</label>
+					<label class="radio">
+						<input type="radio" name="vote" id="vote2" value="up">
+						{{ _("Works for me.") }}
+					</label>
+					<label class="radio">
+						<input type="radio" name="vote" id="vote3" value="down">
+						{{ _("Does not work.") }}
+					</label>
 				</div>
-			{% end %}
+			</div>
 		</fieldset>
 	{% else %}
 		<p>

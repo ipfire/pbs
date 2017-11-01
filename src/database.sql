@@ -1426,7 +1426,6 @@ CREATE TABLE users (
     name text NOT NULL,
     realname text,
     passphrase text,
-    state text DEFAULT 'user'::text NOT NULL,
     locale text,
     timezone text,
     activated boolean DEFAULT false NOT NULL,
@@ -1434,7 +1433,8 @@ CREATE TABLE users (
     registered timestamp without time zone DEFAULT now() NOT NULL,
     ldap_dn text,
     password_recovery_code text,
-    password_recovery_code_expires_at timestamp without time zone
+    password_recovery_code_expires_at timestamp without time zone,
+    admin boolean DEFAULT false NOT NULL
 );
 
 

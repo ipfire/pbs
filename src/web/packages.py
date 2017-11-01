@@ -122,13 +122,8 @@ class PackageDetailHandler(base.BaseHandler):
 		action = self.get_argument("action", None)
 
 		if action == "comment":
-			vote = self.get_argument("vote", None)
-			if not self.current_user.is_tester() and \
-					not self.current_user.is_admin():
-				vote = None
-
 			pkg.comment(self.current_user.id, self.get_argument("text"),
-				vote or "none")
+				self.get_argument("vote", None) or "none")
 
 		self.render("package-detail.html", pkg=pkg)
 

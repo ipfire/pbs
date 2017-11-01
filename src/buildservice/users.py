@@ -413,16 +413,8 @@ class User(base.DataObject):
 	def send_template(self, *args, **kwargs):
 		return self.backend.messages.send_template(self, *args, **kwargs)
 
-	def set_state(self, state):
-		self._set_attribute("state", state)
-
-	state = property(lambda s: s.data.state, set_state)
-
 	def is_admin(self):
-		return self.state == "admin"
-
-	def is_tester(self):
-		return self.state == "tester"
+		return self.data.admin is True
 
 	def get_locale(self):
 		return tornado.locale.get(self.data.locale)
@@ -510,10 +502,6 @@ class User(base.DataObject):
 		"""
 		# Admins have the permission for everything.
 		if self.is_admin():
-			return True
-
-		# Exception for voting. All testers are allowed to vote.
-		if perm == "vote" and self.is_tester():
 			return True
 
 		# All others must be checked individually.

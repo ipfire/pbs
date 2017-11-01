@@ -48,8 +48,6 @@
 						<td>
 							{% if user.is_admin() %}
 								{{ _("Admin") }}
-							{% elif user.is_tester() %}
-								{{ _("Tester") }}
 							{% else %}
 								{{ _("User") }}
 							{% end %}
