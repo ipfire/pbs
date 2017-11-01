@@ -426,7 +426,10 @@ class Builder(base.DataObject):
 			logging.debug("%s has too many jobs running" % self)
 			return
 
-		for job in self.jobqueue:
+		# Get all jobs from the job queue this builder can build
+		jobs = self.backend.jobqueue.for_arches(self.supported_arches)
+
+		for job in jobs:
 			logging.debug("Looking at %s..." % job)
 
 			# Only allow building test jobs in test mode
@@ -438,7 +441,11 @@ class Builder(base.DataObject):
 				logging.debug("We are not the designated builder for this job (%s is)" % job.designated_builder)
 				continue
 
+			logging.debug("Bingo!")
+
 			return job
+
+		logging.debug("No eligible jobs in the job queue")
 
 	def get_history(self, *args, **kwargs):
 		kwargs["builder"] = self
