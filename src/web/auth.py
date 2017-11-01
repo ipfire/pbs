@@ -143,10 +143,48 @@ class PasswordRecoveryHandler(base.BaseHandler):
 	def post(self):
 		username = self.get_argument("name", None)
 
-		if not username:
-			return self.get()
+		with self.db.transaction():
+			user = self.backend.users.get_by_email(username) \
+				or self.backend.users.get_by_name(username)
 
-		# XXX TODO
+			if user:
+				user.forgot_password()
+
+		self.render("user-requested-password-recovery.html")
+
+
+class PasswordResetHandler(base.BaseHandler):
+	def get(self):
+		code = self.get_argument("code")
+
+		user = self.backend.users.get_by_password_recovery_code(code)
+		if not user:
+			raise tornado.web.HTTPError(400)
+
+		self.render("user-reset-password.html", user=user)
+
+	def post(self):
+		_ = self.locale.translate
+
+		code = self.get_argument("code")
+		pass1 = self.get_argument("password1")
+		pass2 = self.get_argument("password2")
+
+		user = self.backend.users.get_by_password_recovery_code(code)
+		if not user:
+			raise tornado.web.HTTPError(400)
+
+		if not pass1 == pass2:
+			return self.render("user-reset-password-fail.html",
+				message=_("Second password does not match"))
+
+		# XXX Check password strength
+
+		with self.db.transaction():
+			user.passphrase = pass1
+			user.password_recovery_code = None
+
+		self.render("user-reset-password-success.html")
 
 
 class LogoutHandler(base.BaseHandler):

@@ -118,6 +118,7 @@ class Application(tornado.web.Application):
 			(r"/logout", auth.LogoutHandler),
 			(r"/register", auth.RegisterHandler),
 			(r"/password-recovery", auth.PasswordRecoveryHandler),
+			(r"/password-reset", auth.PasswordResetHandler),
 
 			# User profiles
 			(r"/users", users.UsersHandler),

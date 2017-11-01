@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import datetime
 import email.utils
 import hashlib
 import logging
@@ -185,6 +186,10 @@ class Users(base.Object):
 			LEFT JOIN users_emails ON users.id = users_emails.user_id \
 			WHERE users_emails.email = %s", email)
 
+	def get_by_password_recovery_code(self, code):
+		return self._get_user("SELECT * FROM users \
+			WHERE password_recovery_code = %s AND password_recovery_code_expires_at > NOW()", code)
+
 	def find_maintainers(self, maintainers):
 		email_addresses = []
 
@@ -297,6 +302,10 @@ class User(base.DataObject):
 		"""
 			Update the passphrase the users uses to log on.
 		"""
+		# We cannot set the password for ldap users
+		if self.ldap_dn:
+			raise AttributeError("Cannot set passphrase for LDAP user")
+
 		self.db.execute("UPDATE users SET passphrase = %s WHERE id = %s",
 			generate_password_hash(passphrase), self.id)
 
@@ -442,6 +451,32 @@ class User(base.DataObject):
 		self._set_attribute("timezone", timezone)
 
 	timezone = property(get_timezone, set_timezone)
+
+	def get_password_recovery_code(self):
+		return self.data.password_recovery_code
+
+	def set_password_recovery_code(self, code):
+		self._set_attribute("password_recovery_code", code)
+
+		self._set_attribute("password_recovery_code_expires_at",
+			datetime.datetime.utcnow() + datetime.timedelta(days=1))
+
+	password_recovery_code = property(get_password_recovery_code, set_password_recovery_code)
+
+	def forgot_password(self):
+		log.debug("User %s reqested password recovery" % self.name)
+
+		# We cannot reset te password for ldap users
+		if self.ldap_dn:
+			# Maybe we should send an email with an explanation
+			return
+
+		# Add a recovery code to the database and a timestamp when this code expires
+		self.password_recovery_code = generate_random_string(64)
+
+		# XXX
+		# We should send an email with the activation code
+
 
 	@property
 	def activated(self):
