@@ -214,7 +214,11 @@ dist_templates_DATA = \
 	src/templates/user-profile.html \
 	src/templates/user-profile-need-activation.html \
 	src/templates/user-profile-passwd.html \
-	src/templates/user-profile-passwd-ok.html
+	src/templates/user-profile-passwd-ok.html \
+	src/templates/user-requested-password-recovery.html \
+	src/templates/user-reset-password.html \
+	src/templates/user-reset-password-success.html \
+	src/templates/user-reset-password-fail.html
 
 templatesdir = $(datadir)/templates
 
@@ -240,6 +244,21 @@ dist_templates_errors_DATA = \
 	src/templates/errors/error-404.html
 
 templates_errorsdir = $(templatesdir)/errors
+
+templates_messagesdir = $(templatesdir)/messages
+
+dist_templates_messages_jobs_DATA = \
+	src/templates/messages/jobs/failed.markdown \
+	src/templates/messages/jobs/finished.markdown
+
+templates_messages_jobsdir = $(templates_messagesdir)/jobs
+
+dist_templates_messages_users_DATA = \
+	src/templates/messages/users/account-activation.markdown \
+	src/templates/messages/users/email-activation.markdown \
+	src/templates/messages/users/password-reset.markdown
+
+templates_messages_usersdir = $(templates_messagesdir)/users
 
 dist_templates_mirrors_DATA = \
 	src/templates/mirrors/delete.html \

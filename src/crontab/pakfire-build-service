@@ -2,7 +2,7 @@
 * * * * *	pakfire	pakfire-build-service process-message-queue &>/dev/null
 
 # Check build dependencies
-* * * * *	pakfire	pakfire-build-service check-build-dependencies &>/dev/null
+* * * * *	root	pakfire-build-service check-build-dependencies &>/dev/null
 
 # Remaster repositories
 */5 * * * *	pakfire	pakfire-build-service remaster-repositories &>/dev/null

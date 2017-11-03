@@ -77,31 +77,6 @@
 
 		</fieldset>
 
-		{% if current_user.is_admin() %}
-			<fieldset>
-				<legend>{{ _("Admin actions") }}</legend>
-
-				<div class="control-group">
-					<label class="control-label" for="inputState">{{ _("State") }}</label>
-					<div class="controls">
-						<select class="input-xlarge" id="inputState" name="state">
-							<option value="user">{{ _("User") }}</option>
-							<option value="tester" {% if user.is_tester() %}selected="selected"{% end %}>
-								{{ _("Tester") }}
-							</option>
-							<option value="admin" {% if user.is_admin() %}selected="selected"{% end %}>
-								{{ _("Admin") }}
-							</option>
-						</select>
-
-						<span class="help-block">
-							{{ _("Define the permissions of the user.") }}
-						</span>
-					</div>
-				</div>
-			</fieldset>
-		{% end %}
-
 		<fieldset>
 			<legend>{{ _("Account security settings") }}</legend>
 

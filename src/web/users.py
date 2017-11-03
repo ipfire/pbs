@@ -154,12 +154,6 @@ class UserEditHandler(base.BaseHandler):
 			pass2 = self.get_argument("pass2", None)
 			locale = self.get_argument("locale", "")
 
-			# Only an admin can alter the state of a user.
-			if self.current_user.is_admin():
-				state = self.get_argument("state", user.state)
-			else:
-				state = user.state
-
 			# Collect error messages
 			msgs = []
 
@@ -184,7 +178,6 @@ class UserEditHandler(base.BaseHandler):
 			user.realname = realname
 			if pass1:
 				user.passphrase = pass1
-			user.state = state
 
 			# Get the timezone settings.
 			tz = self.get_argument("timezone", None)

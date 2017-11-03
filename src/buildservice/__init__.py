@@ -40,6 +40,8 @@ from .decorators import *
 from .constants import *
 
 class Backend(object):
+	version = __version__
+
 	def __init__(self, config_file=None):
 		# Read configuration file.
 		self.config = self.read_config(config_file)

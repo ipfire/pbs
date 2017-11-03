@@ -16,6 +16,11 @@ from .decorators import *
 
 from .users import generate_password_hash, check_password_hash, generate_random_string
 
+ACTIVE_STATES = [
+	"dispatching",
+	"running",
+]
+
 class Builders(base.Object):
 	def _get_builder(self, query, *args):
 		res = self.db.get(query, *args)
@@ -391,11 +396,18 @@ class Builder(base.DataObject):
 		return list(jobs)
 
 	@property
+	def num_active_jobs(self):
+		res = self.db.get("SELECT COUNT(*) AS count FROM jobs \
+			WHERE builder_id = %s AND state = ANY(%s)", self.id, ACTIVE_STATES)
+
+		return res.count
+
+	@property
 	def too_many_jobs(self):
 		"""
 			Tell if this host is already running enough or too many jobs.
 		"""
-		return len(self.active_jobs) >= self.max_jobs
+		return self.num_active_jobs >= self.max_jobs
 
 	@lazy_property
 	def jobqueue(self):
@@ -414,22 +426,26 @@ class Builder(base.DataObject):
 			logging.debug("%s has too many jobs running" % self)
 			return
 
-		for job in self.jobqueue:
+		# Get all jobs from the job queue this builder can build
+		jobs = self.backend.jobqueue.for_arches(self.supported_arches)
+
+		for job in jobs:
 			logging.debug("Looking at %s..." % job)
+
 			# Only allow building test jobs in test mode
 			if self.testmode and not job.test:
 				continue
 
-			# If we are the fastest builder to handle this job, we will
-			# get it.
-			if job.candidate_builders:
-				fastest_builder = job.candidate_builders.pop(0)
+			# We will skip this job if we are not the designated builder
+			if job.designated_builder and not job.designated_builder == self:
+				logging.debug("We are not the designated builder for this job (%s is)" % job.designated_builder)
+				continue
 
-				if not self == fastest_builder:
-					logging.debug("We are not the fastest builder for this job (%s is)" % fastest_builder)
-					continue
+			logging.debug("Bingo!")
 
 			return job
+
+		logging.debug("No eligible jobs in the job queue")
 
 	def get_history(self, *args, **kwargs):
 		kwargs["builder"] = self

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import datetime
 import email.utils
 import hashlib
 import logging
@@ -185,6 +186,10 @@ class Users(base.Object):
 			LEFT JOIN users_emails ON users.id = users_emails.user_id \
 			WHERE users_emails.email = %s", email)
 
+	def get_by_password_recovery_code(self, code):
+		return self._get_user("SELECT * FROM users \
+			WHERE password_recovery_code = %s AND password_recovery_code_expires_at > NOW()", code)
+
 	def find_maintainers(self, maintainers):
 		email_addresses = []
 
@@ -297,6 +302,10 @@ class User(base.DataObject):
 		"""
 			Update the passphrase the users uses to log on.
 		"""
+		# We cannot set the password for ldap users
+		if self.ldap_dn:
+			raise AttributeError("Cannot set passphrase for LDAP user")
+
 		self.db.execute("UPDATE users SET passphrase = %s WHERE id = %s",
 			generate_password_hash(passphrase), self.id)
 
@@ -401,21 +410,19 @@ class User(base.DataObject):
 
 		return user_email
 
-	def set_state(self, state):
-		self._set_attribute("state", state)
-
-	state = property(lambda s: s.data.state, set_state)
+	def send_template(self, *args, **kwargs):
+		return self.backend.messages.send_template(self, *args, **kwargs)
 
 	def is_admin(self):
-		return self.state == "admin"
+		return self.data.admin is True
 
-	def is_tester(self):
-		return self.state == "tester"
+	def get_locale(self):
+		return tornado.locale.get(self.data.locale)
 
 	def set_locale(self, locale):
 		self._set_attribute("locale", locale)
 
-	locale = property(lambda s: s.data.locale, set_locale)
+	locale = property(get_locale, set_locale)
 
 	def get_timezone(self, tz=None):
 		if tz is None:
@@ -437,6 +444,31 @@ class User(base.DataObject):
 
 	timezone = property(get_timezone, set_timezone)
 
+	def get_password_recovery_code(self):
+		return self.data.password_recovery_code
+
+	def set_password_recovery_code(self, code):
+		self._set_attribute("password_recovery_code", code)
+
+		self._set_attribute("password_recovery_code_expires_at",
+			datetime.datetime.utcnow() + datetime.timedelta(days=1))
+
+	password_recovery_code = property(get_password_recovery_code, set_password_recovery_code)
+
+	def forgot_password(self):
+		log.debug("User %s reqested password recovery" % self.name)
+
+		# We cannot reset te password for ldap users
+		if self.ldap_dn:
+			# Maybe we should send an email with an explanation
+			return
+
+		# Add a recovery code to the database and a timestamp when this code expires
+		self.password_recovery_code = generate_random_string(64)
+
+		# Send an email with the activation code
+		self.send_template("messages/users/password-reset", user=self)
+
 	@property
 	def activated(self):
 		return self.data.activated
@@ -446,8 +478,8 @@ class User(base.DataObject):
 		return self.data.deleted
 
 	@property
-	def registered(self):
-		return self.data.registered
+	def registered_at(self):
+		return self.data.registered_at
 
 	def gravatar_icon(self, size=128):
 		h = hashlib.new("md5")
@@ -470,10 +502,6 @@ class User(base.DataObject):
 		"""
 		# Admins have the permission for everything.
 		if self.is_admin():
-			return True
-
-		# Exception for voting. All testers are allowed to vote.
-		if perm == "vote" and self.is_tester():
 			return True
 
 		# All others must be checked individually.
@@ -504,7 +532,7 @@ class UserEmail(base.DataObject):
 
 	@property
 	def recipient(self):
-		return "%s <%s>" % (self.user.name, self.email)
+		return "%s <%s>" % (self.user.realname, self.email)
 
 	@property
 	def email(self):
@@ -533,42 +561,12 @@ class UserEmail(base.DataObject):
 
 		logging.debug("Sending activation mail to %s" % self.email)
 
-		# Get the saved locale from the user.
-		_ = tornado.locale.get(self.user.locale).translate
+		self.user.send_template("messages/users/account-activation")
 
-		subject = _("Account Activation")
-
-		message  = _("You, or somebody using your email address, has registered an account on the Pakfire Build Service.")
-		message += "\n"*2
-		message += _("To activate your account, please click on the link below.")
-		message += "\n"*2
-		message += "    %(baseurl)s/user/%(name)s/activate?code=%(activation_code)s" \
-			% { "baseurl" : self.settings.get("baseurl"), "name" : self.user.name,
-				"activation_code" : self.activation_code, }
-		message += "\n"*2
-		message += "Sincerely,\n    The Pakfire Build Service"
-
-		self.backend.messages.add(self.recipient, subject, message)
-
-	def send_email_activation_mail(self, email):
+	def send_email_activation_mail(self):
 		logging.debug("Sending email address activation mail to %s" % self.email)
 
-		# Get the saved locale from the user.
-		_ = tornado.locale.get(self.user.locale).translate
-
-		subject = _("Email address Activation")
-
-		message  = _("You, or somebody using your email address, has add this email address to an account on the Pakfire Build Service.")
-		message += "\n"*2
-		message += _("To activate your this email address account, please click on the link below.")
-		message += "\n"*2
-		message += "    %(baseurl)s/user/%(name)s/activate?code=%(activation_code)s" \
-			% { "baseurl" : self.settings.get("baseurl"), "name" : self.user.name,
-				"activation_code" : self.activation_code, }
-		message += "\n"*2
-		message += "Sincerely,\n    The Pakfire Build Service"
-
-		self.backend.messages.add(self.recipient, subject, message)
+		self.user.send_template("messages/users/email-activation", email=self)
 
 
 # Some testing code.

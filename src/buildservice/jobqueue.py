@@ -66,16 +66,16 @@ class JobQueue(base.Object):
 				LEFT JOIN jobs ON builds.id = jobs.build_id \
 				WHERE builds.type = %s AND builds.state = ANY(%s) AND jobs.state = %s \
 					AND NOT EXISTS (SELECT 1 FROM jobs test_jobs \
-						WHERE test_jobs.build_id = builds.id AND jobs.type = %s \
+						WHERE test_jobs.build_id = builds.id AND jobs.test IS %s \
 							AND (test_jobs.state <> %s OR test_jobs.state = %s AND test_jobs.time_finished >= %s)) LIMIT %s",
-				"release", ["stable", "testing"], "finished", "test", "finished", "finished", threshold, limit)
+				"release", ["stable", "testing"], "finished", True, "finished", "finished", threshold, limit)
 
 			# Search for the job with the right architecture in each
 			# build and schedule a test job.
 			for build in builds:
 				for job in build:
 					if job.arch == arch:
-						job.schedule("test")
+						job.restart()
 						break
 
 	def check_build_dependencies(self):

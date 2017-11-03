@@ -151,10 +151,10 @@ class Repository(base.DataObject):
 
 	@property
 	def basepath(self):
-		return "/".join((
+		return os.path.join(
 			self.distro.identifier,
 			self.identifier,
-		))
+		)
 
 	@property
 	def path(self):
@@ -162,20 +162,20 @@ class Repository(base.DataObject):
 
 	@property
 	def url(self):
-		return os.path.join(
+		return "/".join((
 			self.settings.get("baseurl", "https://pakfire.ipfire.org"),
 			"repositories",
 			self.basepath,
-		)
+		))
 
 	@property
 	def mirrorlist(self):
-		return os.path.join(
+		return "/".join((
 			self.settings.get("baseurl", "https://pakfire.ipfire.org"),
 			"distro", self.distro.identifier,
 			"repo", self.identifier,
 			"mirrorlist?arch=%{arch}"
-		)
+		))
 
 	def get_conf(self, local=False):
 		lines = [

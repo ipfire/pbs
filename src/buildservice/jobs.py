@@ -341,6 +341,8 @@ class Job(base.DataObject):
 			return self.backend.builders.get_by_id(self.data.builder_id)
 
 	def set_builder(self, builder, user=None):
+		log.info("Builder %s has been assigned to %s" % (builder.name, self.name))
+
 		self._set_attribute("builder_id", builder.id)
 
 		# Log the event.
@@ -349,7 +351,7 @@ class Job(base.DataObject):
 
 	builder = lazy_property(get_builder, set_builder)
 
-	@lazy_property
+	@property
 	def candidate_builders(self):
 		"""
 			Returns all active builders that could build this job
@@ -359,8 +361,19 @@ class Job(base.DataObject):
 		# Remove all builders that are not available
 		builders = (b for b in builders if b.enabled and b.is_online())
 
+		# Remove all builders that have too many jobs
+		builders = (b for b in builders if not b.too_many_jobs)
+
 		# Sort them by the fastest builder first
 		return sorted(builders, key=lambda b: -b.performance_index)
+
+	@property
+	def designated_builder(self):
+		"""
+			Returns the fastest candidate builder builder
+		"""
+		if self.candidate_builders:
+			return self.candidate_builders[0]
 
 	@property
 	def arch(self):
@@ -553,31 +566,15 @@ class Job(base.DataObject):
 		logging.debug("Sending finished message for job %s to %s" % \
 			(self.name, ", ".join(self.message_recipients)))
 
-		info = {
-			"build_name" : self.name,
-			"build_host" : self.builder.name,
-			"build_uuid" : self.uuid,
-		}
-
-		self.backend.messages.send_to_all(self.message_recipients,
-			MSG_BUILD_FINISHED_SUBJECT, MSG_BUILD_FINISHED, info)
+		self.backend.messages.send_template_to_many(self.message_recipients,
+			"messages/jobs/finished", job=self)
 
 	def send_failed_message(self):
 		logging.debug("Sending failed message for job %s to %s" % \
 			(self.name, ", ".join(self.message_recipients)))
 
-		build_host = "--"
-		if self.builder:
-			build_host = self.builder.name
-
-		info = {
-			"build_name" : self.name,
-			"build_host" : build_host,
-			"build_uuid" : self.uuid,
-		}
-
-		self.backend.messages.send_to_all(self.message_recipients,
-			MSG_BUILD_FAILED_SUBJECT, MSG_BUILD_FAILED, info)
+		self.backend.messages.send_template_to_many(self.message_recipients,
+			"messages/jobs/failed", job=self)
 
 	def get_build_repos(self):
 		"""

@@ -15,6 +15,7 @@ RUN yum install -y \
 	python2-pip \
 	python-daemon \
 	python-ldap \
+	python-markdown \
 	python-memcached \
 	python-psycopg2 \
 	python-tornado \
