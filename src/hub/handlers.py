@@ -153,13 +153,44 @@ class UploadsCreateHandler(BaseHandler):
 
 		filename = self.get_argument("filename")
 		filesize = self.get_argument_int("filesize")
-		filehash = self.get_argument("hash")
+		filehash = self.get_argument("hash", None)
 
 		with self.db.transaction():
 			upload = self.backend.uploads.create(filename, filesize,
 				filehash, user=self.user, builder=self.builder)
 
 			self.finish(upload.uuid)
+
+
+@tornado.web.stream_request_body
+class UploadsStreamHandler(BaseHandler):
+	@tornado.web.authenticated
+	def prepare(self):
+		# Received file size
+		self.size = 0
+
+		upload_uuid = self.get_argument("id")
+
+		# Fetch upload object from database
+		self.upload = self.backend.uploads.get_by_uuid(upload_uuid)
+		if not self.upload:
+			raise tornado.web.HTTPError(404)
+
+	def data_received(self, data):
+		logging.debug("Received chunk of %s bytes" % len(data))
+		self.size += len(data)
+
+		# Write the received chunk to disk
+		with self.db.transaction():
+			self.upload.append(data)
+
+	def put(self):
+		logging.info("Received entire file (%s bytes)" % self.size)
+
+		with self.db.transaction():
+			self.upload.finished()
+
+		self.finish("OK")
 
 
 class UploadsSendChunkHandler(BaseHandler):

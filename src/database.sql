@@ -1385,7 +1385,7 @@ CREATE TABLE uploads (
     user_id integer,
     builder_id integer,
     filename text NOT NULL,
-    hash text NOT NULL,
+    hash text,
     size bigint NOT NULL,
     progress bigint DEFAULT 0 NOT NULL,
     finished boolean DEFAULT false NOT NULL,
