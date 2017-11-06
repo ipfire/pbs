@@ -76,10 +76,15 @@
 	{% end %}
 
 	{% if jobs %}
-		<hr>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
-		<h4>{{ _("Build jobs") }}</h4>
-		{% module JobsList(jobs) %}
+			<hr>
+
+			<h4>{{ _("Build jobs") }}</h4>
+			{% module JobsList(jobs) %}
+		</div>
+	</div>
 	{% end %}
 
 	<ul class="nav nav-pills">
