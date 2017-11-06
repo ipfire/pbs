@@ -405,6 +405,7 @@ dist_static_js_DATA = \
 	src/static/js/bootstrap.min.js \
 	src/static/js/jquery.js \
 	src/static/js/pbs.js \
+	src/static/js/popper.min.js \
 	src/static/js/prettify.js
 
 static_jsdir = $(staticdir)/js

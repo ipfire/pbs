@@ -12,176 +12,109 @@
 		<link rel="stylesheet" type="text/css" href="{{ static_url("css/prettify.css") }}" />
 		<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">
 
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" type="text/css" href="{{ static_url("css/bootstrap-responsive.min.css") }}" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	</head>
 
 	<body>
-		<div class="navbar navbar-fixed-top">
-			<div class="navbar-inner">
-				<div class="container">
-					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</a>
-					<a class="brand" href="/">
-						{{ _("Pakfire Build Service") }}
-					</a>
-					<div class="nav-collapse">
-						<ul class="nav">
-							<li>
-								<a href="/packages">{{ _("Packages") }}</a>
-							</li>
-							<li>
-								<a href="/builds">{{ _("Builds") }}</a>
-							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-									{{ _("More") }} <b class="caret"></b>
-								</a>
-								<ul class="dropdown-menu">
-									<li>
-										<a href="/documents">
-											<i class="icon-book"></i>
-											{{ _("Documentation") }}
-										</a>
-									</li>
-									<li>
-										<a href="/search">
-											<i class="icon-search"></i>
-											{{ _("Search") }}
-										</a>
-									</li>
-									<li class="divider"></li>
-									<li>
-										<a href="/distros">
-											<i class="icon-star"></i>
-											{{ _("Distributions") }}
-										</a>
-									</li>
-									<li>
-										<a href="/builders">
-											<i class="icon-cog"></i>
-											{{ _("Builders") }}
-										</a>
-									</li>
-									<li>
-										<a href="/mirrors">
-											<i class="icon-road"></i>
-											{{ _("Mirrors") }}
-										</a>
-									</li>
-									<li>
-										<a href="/keys">
-											<i class="icon-barcode"></i>
-											{{ _("Key Management") }}
-										</a>
-									</li>
+		<nav class="navbar fixed-top navbar-expand-lg  navbar-dark bg-dark">
+			<a class="navbar-brand" href="/">
+				{{ _("Pakfire Build Service") }}
+			</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
 
-									{% if current_user %}
-										<li>
-											<a href="/users">
-												<i class="icon-group"></i>
-												{{ _("Users") }}
-											</a>
-										</li>
-									{% end %}
-
-									{% if current_user and current_user.is_admin() %}
-										<li class="divider"></li>
-										<li class="nav-header">
-											{{ _("Administration") }}
-										</li>
-										<li>
-											<a href="/sessions">
-												<i class="icon-user"></i>
-												{{ _("Sessions") }}
-											</a>
-										</li>
-										<li>
-											<a href="/uploads">
-												<i class="icon-upload"></i>
-												{{ _("Uploads") }}
-											</a>
-										</li>
-									{% end %}
-								</ul>
-							</li>
-						</ul>
-
-						<ul class="nav pull-right">
-							<li class="divider-vertical"></li>
-
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="/packages">{{ _("Packages") }}</a>
+					</li>
+					<li class="nav-item">
+						  <a class="nav-link" href="/builds">{{ _("Builds") }}</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							{{ _("More") }}
+						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<a class="dropdown-item" href="/documents">{{ _("Documentation") }}</a>
+							<a class="dropdown-item" href="/search">{{ _("Search") }}</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="/distros">{{ _("Distributions") }}</a>
+							<a class="dropdown-item" href="/builders">{{ _("Builders") }}</a>
+							<a class="dropdown-item" href="/mirrors">{{ _("Mirrors") }}</a>
+							<a class="dropdown-item" href="/keys">{{ _("Key Management") }}</a>
 							{% if current_user %}
-								<li class="dropdown">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-										{{ current_user.realname }} <b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu">
-										<li>
-											<a href="/profile">
-												<i class="icon-user"></i>
-												{{ _("My profile") }}
-											</a>
-										</li>
-										<li>
-											<a href="/profile/builds">
-												<i class="icon-signal"></i>
-												{{ _("My builds") }}
-											</a>
-										</li>
-										<li class="divider"></li>
-										{% if session and session.impersonated_user %}
-											<li class="nav-header">{{ _("Impersonated by") }}</li>
-											<li>
-												<a href="/user/{{ session.user.name }}">
-													<i class="icon-user"></i>
-													{{ session.user.realname }}
-												</a>
-											</li>
-										{% end %}
-										<li>
-											<a href="/logout">
-												<i class="icon-off"></i>
-												{{ _("Logout") }}
-											</a>
-										</li>
-									</ul>
-								</li>
-							{% else %}
-								<li>
-									<a href="/register">{{ _("Register") }}</a>
-								</li>
-								<li class="dropdown">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-										{{ _("Sign in") }} <b class="caret"></b>
-									</a>
-									<div class="dropdown-menu dropdown-login">
-										<form action="/login" method="POST">
-											{% raw xsrf_form_html() %}
-											<input class="span3" type="text" name="name" placeholder="{{ _("Username") }}">
-											<input class="span3" type="password" name="pass" placeholder="{{ _("Password") }}">
-											<input class="btn btn-primary span3" type="submit" value="{{ _("Sign In") }}">
-										</form>
-
-										<div class="links">
-											<a href="/password-recovery">
-												<small>{{ _("Forgot your password?") }}</small>
-											</a>
-										</div>
-									</div>
-								</li>
+								<a class="dropdown-item" href="/users">{{ _("Users") }}</a>
 							{% end %}
-						</ul>
+							{% if current_user and current_user.is_admin() %}
+								<li class="divider"></li>
+								<li class="dropdown-header">{{ _("Administration") }}</li>
+								<a class="dropdown-item" href="/sessions">{{ _("Sessions") }}</a>
+								<a class="dropdown-item" href="/uploads">{{ _("Uploads") }}</a>
+							{% end %}
+						</div>
+					</li>
+				 </ul>
+				 <form class="form-inline my-2 my-lg-0" method="GET" action="/search">
+						<input type="text"
+							class="form-control mr-sm-2 search-query typeahead-packages-autocomplete"
+							id="search" placeholder="{{ _("Search...") }}"
+							aria-label="{{ _("Search...") }}"
+							name="q" autocomplete="off">
+				</form>
+				{% if current_user %}
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								{{ current_user.realname }}
+							</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+								<a class="dropdown-item" href="/profile">{{ _("My profile") }}</a>
+								<a class="dropdown-item" href="/profile/builds">{{ _("My builds") }}</a>
+								<div class="dropdown-divider"></div>
+								{% if session and session.impersonated_user %}
+									<li class="dropdown-header">{{ _("Impersonated by") }}</li>
+									<a class="dropdown-item" href="/user/{{ session.user.name }}">
+										{{ session.user.realname }}
+									</a>
+								{% end %}
+								<a class="dropdown-item" href="/logout">{{ _("Logout") }}</a>
+							</div>
+						</li>
+					</ul>
+				{% else %}
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item">
+							<a class="nav-link" href="/register">{{ _("Register") }}</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								{{ _("Sign in") }}
+							</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+								<form class="" action="/login" method="POST">
+									<div class="form-group dropdown-item">
+										{% raw xsrf_form_html() %}
+										<input class=" form-control btn " type="text" name="name" placeholder="{{ _("Username") }}">
+									</div>
+									<div class="form-group dropdown-item">
+										<input class="form-control btn " type="password" name="pass" placeholder="{{ _("Password") }}">
+									</div>
+									<div class="form-group dropdown-item">
+										<input class="form-control btn  btn-primary" type="submit" value="{{ _("Sign In") }}">
+									</div>
+								</form>
+								<a class="dropdown-item" href="/password-recovery">
+									<small>{{ _("Forgot your password?") }}</small>
+								</a>
 
-						<form class="navbar-search pull-right" method="GET" action="/search">
-							<input type="text" class="search-query typeahead-packages-autocomplete" id="search" placeholder="{{ _("Search...") }}" name="q" autocomplete="off">
-						</form>
-					</div>
-				</div>
+							</div>
+						</li>
+					</ul>
+				{% end %}
 			</div>
-		</div>
+		</nav>
 
 		{% block container %}
 			<div class="container container-body">
@@ -193,6 +126,7 @@
 
 		<!-- include javascript files -->
 		<script src="{{ static_url("js/jquery.js") }}"></script>
+		<script src="{{ static_url("js/popper.min.js") }}"></script>
 		<script src="{{ static_url("js/bootstrap.min.js") }}"></script>
 		<script src="{{ static_url("js/prettify.js") }}"></script>
 		<script src="{{ static_url("js/pbs.js") }}"></script>
