@@ -1,50 +1,54 @@
-{% extends "base-form2.html" %}
+{% extends "base.html" %}
 
 {% block title %}{{ _("Login") }}{% end block %}
 
 {% block body %}
-	<div class="page-header">
-		<h1>{{ _("Login") }}</h1>
+	<div class="row align-items-center justify-content-center">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+			<h1>{{ _("Login") }}</h1>
+		</div>
 	</div>
 
 	{% if failed %}
-		<div class="alert alert-block alert-error">
-			<h4 class="alert-heading">{{ _("Login failed!") }}</h4>
-			{{ _("Username and/or password was wrong. Login failed.") }}
+	<div class="row align-items-center justify-content-center">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+			<div class="alert alert-danger">
+				<h4 class="alert-heading">{{ _("Login failed!") }}</h4>
+				{{ _("Username and/or password was wrong. Login failed.") }}
+			</div>
 		</div>
+	</div>
 	{% end %}
-
-	<form class="form-horizontal" method="POST" action="">
-		{% raw xsrf_form_html() %}
-
-		<fieldset>
-			<div class="control-group">
-				<label class="control-label" for="name">{{ _("Username") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="name" name="name" />
+	<div class="row align-items-center justify-content-center">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+			<form method="POST" action="">
+				{% raw xsrf_form_html() %}
+				<div class="form-group">
+					  <label for="name">{{ _("Username or email address") }}</label>
+					  <input type="text"
+						  class="form-control" id="name" name="name" aria-describedby="nameHelp"
+						  placeholder="Enter email or username">
 				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="pass">{{ _("Password") }}</label>
-				<div class="controls">
-					<input type="password" class="input-xlarge" id="pass" name="pass" />
+				<div class="form-group">
+					  <label for="pass">{{ _("Password") }}</label>
+					  <input type="password" class="form-control" id="pass" name="pass" laceholder="{{ _("Password") }}">
 				</div>
-			</div>
-			<div class="form-actions">
 				<button type="submit" class="btn btn-primary">{{ _("Login") }}</button>
-			</div>
-		</fieldset>
-	</form>
-
-	<hr>
-
-	<h3>{{ _("You also might want to...") }}</h3>
-	<ul>
-		<li>
-			<a href="/register">{{ _("Register a new account.") }}</a>
-		</li>
-		<li>
-			<a href="/password-recovery">{{ _("Recover your password.") }}</a>
-		</li>
-	</ul>
+			</form>
+			<hr>
+		</div>
+	</div>
+	<div class="row align-items-center justify-content-center">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+			<h3>{{ _("You also might want to...") }}</h3>
+			<ul>
+				<li>
+					<a href="/register">{{ _("Register a new account.") }}</a>
+				</li>
+				<li>
+					<a href="/password-recovery">{{ _("Recover your password.") }}</a>
+				</li>
+			</ul>
+		</div>
+	</div>
 {% end %}
