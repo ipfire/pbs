@@ -38,6 +38,7 @@ class Application(tornado.web.Application):
 
 			# Builders
 			(r"/builders/info", handlers.BuildersInfoHandler),
+			(r"/builders/jobs/get", handlers.BuildersGetNextJobHandler),
 			(r"/builders/jobs/queue", handlers.BuildersJobsQueueHandler),
 			(r"/builders/jobs/(.*)/addfile/(.*)", handlers.BuildersJobsAddFileHandler),
 			(r"/builders/jobs/(.*)/buildroot", handlers.BuildersJobsBuildrootHandler),

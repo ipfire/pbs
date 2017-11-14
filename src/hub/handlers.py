@@ -534,6 +534,48 @@ class BuildersKeepaliveHandler(BuildersBaseHandler):
 		self.finish("OK")
 
 
+class BuildersGetNextJobHandler(BuildersBaseHandler):
+	@tornado.web.authenticated
+	def get(self):
+		# XXX Set keepalive
+
+		# If the builder is disabled, we don't need to do anything
+		# but will ask it to return after 5 min
+		if not self.builder.enabled:
+			self.set_header("Retry-After", "300")
+			return
+
+		# If the builder has too many jobs running,
+		# we will tell it to return after 1 min
+		if self.builder.too_many_jobs:
+			self.set_header("Retry-After", "60")
+			return
+
+		# Okay, we are ready for the next job
+		job = self.builder.get_next_job()
+
+		# If we got no job, we will ask the builder
+		# to return after 30 seconds
+		if not job:
+			self.set_header("Retry-After", "30")
+			return
+
+		# If we got a job, we will serialise it
+		# and send it to the builder
+		with self.db.transaction():
+			job.start(builder=self.builder)
+
+			ret = {
+				"id"                 : job.uuid,
+				"arch"               : job.arch,
+				"source_url"         : job.build.source_download,
+				"source_hash_sha512" : job.build.source_hash_sha512,
+				"type"               : "test" if job.test else "release",
+				"config"             : job.get_config(),
+			}
+			self.finish(ret)
+
+
 class BuildersJobsQueueHandler(BuildersBaseHandler):
 	@tornado.web.asynchronous
 	@tornado.web.authenticated
