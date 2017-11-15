@@ -535,21 +535,28 @@ class BuildersKeepaliveHandler(BuildersBaseHandler):
 
 
 class BuildersGetNextJobHandler(BuildersBaseHandler):
+	def _retry_after(self, seconds):
+		# Consider the builder online until the time has passed
+		self.builder.online_until = \
+			datetime.datetime.utcnow() + datetime.timedelta(seconds=seconds)
+
+		# Set the Retry-After header
+		self.set_header("Retry-After", "%s" % seconds)
+
+		# Send empty response to client
+		self.finish()
+
 	@tornado.web.authenticated
 	def get(self):
-		# XXX Set keepalive
-
 		# If the builder is disabled, we don't need to do anything
 		# but will ask it to return after 5 min
 		if not self.builder.enabled:
-			self.set_header("Retry-After", "300")
-			return
+			return self._retry_after(300)
 
 		# If the builder has too many jobs running,
 		# we will tell it to return after 1 min
 		if self.builder.too_many_jobs:
-			self.set_header("Retry-After", "60")
-			return
+			return self._retry_after(60)
 
 		# Okay, we are ready for the next job
 		job = self.builder.get_next_job()
@@ -557,8 +564,7 @@ class BuildersGetNextJobHandler(BuildersBaseHandler):
 		# If we got no job, we will ask the builder
 		# to return after 30 seconds
 		if not job:
-			self.set_header("Retry-After", "30")
-			return
+			return self._retry_after(30)
 
 		# If we got a job, we will serialise it
 		# and send it to the builder

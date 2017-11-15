@@ -124,7 +124,8 @@ CREATE TABLE builders (
     mem_free bigint,
     swap_total bigint,
     swap_free bigint,
-    space_free bigint
+    space_free bigint,
+    online_until timestamp without time zone
 );
 
 
