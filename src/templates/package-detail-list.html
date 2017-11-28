@@ -3,78 +3,82 @@
 {% block title %}{{ _("Package") }} {{ pkg.name }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/packages">{{ _("Packages") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<div class="pull-right">
-			<ul class="nav nav-pills">
-				<li>
-					<a href="/package/{{ pkg.name }}/builds/times">
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/packages">{{ _("Packages") }}</a></li>
+					<li class="breadcrumb-item active"><a href="/package/{{ pkg.name }}">{{ pkg.name }}</a></li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+			<h2>
+				{{ pkg.name }}<br>
+				<small>{{ pkg.summary }}</small>
+			</h2>
+		</div>
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+			<ul class="nav justify-content-center justify-content-lg-end justify-content-xl-end">
+				<li class="nav-item">
+					<a class="nav-link" href="/package/{{ pkg.name }}/builds/times">
 						{{ _("Build times") }}
 					</a>
 				</li>
-				<li>
-					<a href="/package/{{ pkg.name }}/builds/scratch">
+				<li class="nav-item">
+					<a class="nav-link" href="/package/{{ pkg.name }}/builds/scratch">
 						{{ _("Scratch builds") }}
 					</a>
 				</li>
-				<li>
-					<a href="/package/{{ pkg.name }}/builds/test">
+				<li class="nav-item">
+					<a class="nav-link" href="/package/{{ pkg.name }}/builds/test">
 						{{ _("Test builds") }}
 					</a>
 				</li>
 			</ul>
 		</div>
-
-		<h2>
-			{{ pkg.name }}<br>
-			<small>{{ pkg.summary }}</small>
-		</h2>
 	</div>
+
 
 	<div class="row">
-		<div class="span6">
-			{% module PackageHeader(pkg) %}
+			<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+				{% module PackageHeader(pkg) %}
+			</div>
 
-			{% if bugs %}
-				<br><hr>
+			<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+				{% module Changelog(builds=builds) %}
 
+				<h5 class="text-center">
+					<a href="/package/{{ name }}/changelog">{{ _("Full changelog") }}</a>
+				</h5>
+			</div>
+	</div>
+
+	{% if bugs %}
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
 				<h4>
-					<div class="pull-right">
-						<div class="btn-group">
-							<a class="btn btn-mini" href="{{ backend.bugzilla.enter_url(pkg.name) }}" target="_blank">
-								<i class="icon-asterisk"></i> {{ _("File new bug") }}
-							</a>
-							<a class="btn btn-mini" href="{{ backend.bugzilla.buglist_url(pkg.name) }}" target="_blank">
-								{{ _("Show all bugs") }}
-							</a>
-						</div>
-					</div>
-
 					{{ _("Open bugs") }}
 				</h4>
+			</div>
+			<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+				<div class="btn-group">
+					<a class="btn btn-secondary" href="{{ backend.bugzilla.enter_url(pkg.name) }}" target="_blank">
+						{{ _("File new bug") }}
+					</a>
+					<a class="btn btn-secondary" href="{{ backend.bugzilla.buglist_url(pkg.name) }}" target="_blank">
+						{{ _("Show all bugs") }}
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
 				{% module BugsTable(pkg, bugs) %}
-			{% end %}
+			</div>
 		</div>
-
-		<div class="span6">
-			{% module Changelog(builds=builds) %}
-
-			<p class="ac">
-				<a href="/package/{{ name }}/changelog">{{ _("Full changelog") }}</a>
-			</p>
-		</div>
-	</div>
+	{% end %}
 {% end block %}

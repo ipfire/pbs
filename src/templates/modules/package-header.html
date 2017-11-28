@@ -1,27 +1,37 @@
-<div class="lead lead-small ac">
+<p class="lead">
 	{% module Text(pkg.description) %}
+</p>
+
+<div class="table-responsive">
+	<table class="table table-hover table-sm">
+		<tbody>
+			{% if pkg.url %}
+				<tr>
+					<th >{{ _("Home") }}</th>
+					<td>{% raw linkify(pkg.url, shorten=True) %}</td>
+				</tr>
+			{% end %}
+			{% if pkg.license %}
+				<tr>
+					<th >{{ _("License") }}</th>
+					<td>{{ pkg.license }}</td>
+				</tr>
+			{% end %}
+
+			{% if pkg.groups %}
+				<tr>
+					<th >{{ _("Group", "Groups", len(pkg.groups)) }}</th>
+					<td>{{ locale.list(pkg.groups) }}</td>
+				</tr>
+			{% end %}
+
+			{% if pkg.maintainer %}
+				<tr>
+					<th >{{ _("Maintainer") }}</th>
+					<td>{% module LinkToUser(pkg.maintainer) %}</td>
+				</tr>
+			{% end %}
+
+		</tbody>
+	  </table>
 </div>
-
-<hr>
-
-<dl class="dl-horizontal">
-	{% if pkg.url %}
-		<dt>{{ _("Home") }}</dt>
-		<dd>{% raw linkify(pkg.url, shorten=True) %}</dd>
-	{% end %}
-
-	{% if pkg.license %}
-		<dt>{{ _("License") }}</dt>
-		<dd>{{ pkg.license }}</dd>
-	{% end %}
-
-	{% if pkg.groups %}
-		<dt>{{ _("Group", "Groups", len(pkg.groups)) }}</dt>
-		<dd>{{ locale.list(pkg.groups) }}</dd>
-	{% end %}
-
-	{% if pkg.maintainer %}
-		<dt>{{ _("Maintainer") }}</dt>
-		<dd>{% module LinkToUser(pkg.maintainer) %}</dd>
-	{% end %}
-</dl>
