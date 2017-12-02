@@ -1,9 +1,11 @@
-<ul class="media-list">
-	{% for entry in entries %}
-		{% if entry.type == "comment" %}
-			{% module LogEntryComment(entry, **args) %}
-		{% else %}
-			{% module LogEntry(entry, **args) %}
+<div class="table-responsive">
+	<ul class="list-unstyled">
+		{% for entry in entries %}
+			{% if entry.type == "comment" %}
+				{% module LogEntryComment(entry, **args) %}
+			{% else %}
+				{% module LogEntry(entry, **args) %}
+			{% end %}
 		{% end %}
-	{% end %}
-</ul>
+	</ul>
+</div>

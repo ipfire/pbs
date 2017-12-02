@@ -1,22 +1,21 @@
-<li class="media">
-	<hr>
-
+<li class="media mt-3 mb-3">
 	{% block body %}
 		{% if u %}
-			<a class="pull-left hidden-phone" href="/user/{{ u.name }}">
-				<img class="media-object" src="{{ u.gravatar_icon(96) }}" alt="{{ u.realname }}">
-			</a>
+			<!--<a class="pull-left hidden-phone" href="/user/{{ u.name }}">
+				</a>
+			-->
+			<img class="mr-3" src="{{ u.gravatar_icon(96) }}" alt="{{ u.realname }}">
 		{% end %}
-
 		<div class="media-body">
+
 			{% block title %}
-				<p class="muted pull-right">
+				<p class="text-muted float-md-right float-lg-right float-xl-right">
 					{% block extra-title %}{% end block %}
 					{{ format_date(entry.time) }}
 				</p>
 
 				{% if entry.user %}
-					<h4 class="media-heading">
+					<h4>
 						{% if current_user == entry.user %}
 							<a href="/profile">{{ _("You") }}</a>
 						{% else %}
