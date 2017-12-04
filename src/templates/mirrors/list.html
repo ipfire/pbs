@@ -8,18 +8,18 @@
 			<nav aria-label="breadcrumb" role="navigation">
 				<ol class="breadcrumb">
 					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
-					<li class="breadcrumb-item"><a href="/mirrors">{{ _("Mirrors") }}</a></li>
+					<li class="breadcrumb-item active"><a href="/mirrors">{{ _("Mirrors") }}</a></li>
 				</ol>
 			</nav>
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-9 col-xl-6">
 			<h2>{{ _("Mirrors") }}</h2>
 		</div>
 		{% if current_user and current_user.has_perm("manage_mirrors") %}
-			<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+			<div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
 				<div class="dropdown justify-content-center justify-content-lg-end justify-content-xl-end">
 					<button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						{{ _("Actions") }}
