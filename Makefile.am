@@ -458,6 +458,7 @@ dist_geoip_DATA = \
 geoipdir = $(datadir)/geoip
 
 EXTRA_DIST += \
+	src/misc/lets-encrypt-x3-cross-signed.pem \
 	src/tools/dump-database-schema.sh \
 	src/tools/update-geoip-database.sh
 

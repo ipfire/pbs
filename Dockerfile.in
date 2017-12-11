@@ -12,6 +12,7 @@ RUN yum install -y \
 	autoconf \
 	intltool \
 	make \
+	openssl-perl \
 	python2-pip \
 	python-daemon \
 	python-ldap \
@@ -28,6 +29,11 @@ RUN pip install geoip2
 # Create a user
 RUN groupadd -g 2000 pbs && \
 	useradd --system --no-create-home --shell /bin/bash --uid 2000 --gid 2000 pbs
+
+# Install LDAP certificate
+RUN mkdir -p /etc/openldap/cacerts
+COPY src/misc/lets-encrypt-x3-cross-signed.pem /etc/openldap/cacerts/
+RUN c_rehash -v /etc/openldap/cacerts
 
 # Copy the source code
 COPY . /build/pakfire-build-service
