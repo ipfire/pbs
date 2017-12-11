@@ -468,12 +468,14 @@ class Repository(base.DataObject):
 	def get_build_times(self):
 		times = []
 		for arch in self.arches:
+			if arch == "src":
+				continue
+
 			time = self.db.get("SELECT SUM(jobs.time_finished - jobs.time_started) AS time FROM jobs \
 				JOIN builds ON builds.id = jobs.build_id \
 				JOIN repositories_builds ON builds.id = repositories_builds.build_id \
 				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
-				jobs.type = 'build' AND \
-				repositories_builds.repo_id = %s", arch, "noarch", self.id)
+				jobs.test IS FALSE AND repositories_builds.repo_id = %s", arch, "noarch", self.id)
 
 			times.append((arch, time.time.total_seconds()))
 
