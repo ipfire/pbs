@@ -183,7 +183,7 @@ class Builder(base.DataObject):
 		"""
 			Returns True if the builder is online
 		"""
-		return self.keepalive >= datetime.datetime.utcnow() - datetime.timedelta(minutes=1)
+		return self.online_until >= datetime.datetime.utcnow()
 
 	@property
 	def keepalive(self):
@@ -203,6 +203,11 @@ class Builder(base.DataObject):
 			mem_total = %s, mem_free = %s, swap_total = %s, swap_free = %s \
 			WHERE id = %s", loadavg1, loadavg5, loadavg15, space_free,
 			mem_total, mem_free, swap_total, swap_free, self.id)
+
+	def set_online_until(self, online_until):
+		self._set_attribute("online_until", online_until)
+
+	online_until = property(lambda s: s.data.online_until, set_online_until)
 
 	def update_info(self, cpu_model=None, cpu_count=None, cpu_arch=None, cpu_bogomips=None,
 			pakfire_version=None, host_key=None, os_name=None):

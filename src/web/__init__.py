@@ -147,7 +147,6 @@ class Application(tornado.web.Application):
 
 			# Builds
 			(r"/builds", builds.BuildsHandler),
-			(r"/builds/filter", builds.BuildFilterHandler),
 			(r"/builds/queue", builds.BuildQueueHandler),
 			(r"/builds/comments", builds.BuildsCommentsHandler),
 			(r"/builds/comments/(\w+)", builds.BuildsCommentsHandler),

@@ -38,6 +38,7 @@ class Application(tornado.web.Application):
 
 			# Builders
 			(r"/builders/info", handlers.BuildersInfoHandler),
+			(r"/builders/jobs/get", handlers.BuildersGetNextJobHandler),
 			(r"/builders/jobs/queue", handlers.BuildersJobsQueueHandler),
 			(r"/builders/jobs/(.*)/addfile/(.*)", handlers.BuildersJobsAddFileHandler),
 			(r"/builders/jobs/(.*)/buildroot", handlers.BuildersJobsBuildrootHandler),
@@ -55,6 +56,7 @@ class Application(tornado.web.Application):
 
 			# Uploads
 			(r"/uploads/create", handlers.UploadsCreateHandler),
+			(r"/uploads/stream", handlers.UploadsStreamHandler),
 			(r"/uploads/(.*)/sendchunk", handlers.UploadsSendChunkHandler),
 			(r"/uploads/(.*)/finished", handlers.UploadsFinishedHandler),
 			(r"/uploads/(.*)/destroy", handlers.UploadsDestroyHandler),
@@ -80,7 +82,8 @@ class Application(tornado.web.Application):
 	def run(self, port=81):
 		logging.debug("Going to background")
 
-		http_server = tornado.httpserver.HTTPServer(self, xheaders=True)
+		http_server = tornado.httpserver.HTTPServer(self, xheaders=True,
+			max_body_size=1 * (1024 ** 3))
 
 		# If we are not running in debug mode, we can actually run multiple
 		# frontends to get best performance out of our service.

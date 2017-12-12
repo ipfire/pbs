@@ -391,12 +391,3 @@ class BuildListHandler(base.BaseHandler):
 			limit=25)
 
 		self.render("build-list.html", builds=builds)
-
-
-class BuildFilterHandler(base.BaseHandler):
-	def get(self):
-		builders = self.backend.builders.get_all()
-		distros  = self.backend.distros.get_all()
-
-		self.render("build-filter.html", builders=builders, distros=distros)
-

@@ -22,7 +22,7 @@
 		<div class="col-12 col-sm-12 col-md-6 col-lg-9 col-xl-9">
 			<h2 style="word-wrap: break-word;">
 				{{ _("Mirror: %s") % mirror.hostname }} <br>
-				<small class="text-muted">{{ _("hosted by %s") % mirror.owner }}</small>
+				<small class="text-muted">{{ mirror.owner }}</small>
 			</h2>
 		</div>
 		{% if current_user and current_user.has_perm("manage_mirrors") %}
