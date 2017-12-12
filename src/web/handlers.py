@@ -116,14 +116,13 @@ class RepositoryDetailHandler(base.BaseHandler):
 			offset = None
 
 		builds = repo.get_builds(limit=limit, offset=offset)
-		unpushed_builds = repo.get_unpushed_builds()
 		obsolete_builds = repo.get_obsolete_builds()
 
 		# Get the build times of this repository.
 		build_times = repo.get_build_times()
 
 		self.render("repository-detail.html", distro=distro, repo=repo,
-			builds=builds, unpushed_builds=unpushed_builds,
+			builds=builds,
 			obsolete_builds=obsolete_builds, build_times=build_times)
 
 

@@ -120,14 +120,14 @@
 		</div>
 	{% end %}
 
-	{% if unpushed_builds %}
+	{% if repo.unpushed_builds %}
 		<div class="row">
 			<div class="span12">
 				<h2>{{ _("Unpushed builds") }}</h2>
 				<div class="alert">
 					{{ _("These builds were already put into this repository, but were not pushed out to the mirror servers, yet.") }}
 				</div>
-				{% module BuildTable(unpushed_builds, show_repo_time=True) %}
+				{% module BuildTable(repo.unpushed_builds, show_repo_time=True) %}
 			</div>
 		</div>
 	{% end %}

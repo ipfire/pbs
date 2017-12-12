@@ -153,13 +153,44 @@ class UploadsCreateHandler(BaseHandler):
 
 		filename = self.get_argument("filename")
 		filesize = self.get_argument_int("filesize")
-		filehash = self.get_argument("hash")
+		filehash = self.get_argument("hash", None)
 
 		with self.db.transaction():
 			upload = self.backend.uploads.create(filename, filesize,
 				filehash, user=self.user, builder=self.builder)
 
 			self.finish(upload.uuid)
+
+
+@tornado.web.stream_request_body
+class UploadsStreamHandler(BaseHandler):
+	@tornado.web.authenticated
+	def prepare(self):
+		# Received file size
+		self.size = 0
+
+		upload_uuid = self.get_argument("id")
+
+		# Fetch upload object from database
+		self.upload = self.backend.uploads.get_by_uuid(upload_uuid)
+		if not self.upload:
+			raise tornado.web.HTTPError(404)
+
+	def data_received(self, data):
+		logging.debug("Received chunk of %s bytes" % len(data))
+		self.size += len(data)
+
+		# Write the received chunk to disk
+		with self.db.transaction():
+			self.upload.append(data)
+
+	def put(self):
+		logging.info("Received entire file (%s bytes)" % self.size)
+
+		with self.db.transaction():
+			self.upload.finished()
+
+		self.finish("OK")
 
 
 class UploadsSendChunkHandler(BaseHandler):
@@ -501,6 +532,54 @@ class BuildersKeepaliveHandler(BuildersBaseHandler):
 		self.builder.update_keepalive(**args)
 
 		self.finish("OK")
+
+
+class BuildersGetNextJobHandler(BuildersBaseHandler):
+	def _retry_after(self, seconds):
+		# Consider the builder online until the time has passed
+		self.builder.online_until = \
+			datetime.datetime.utcnow() + datetime.timedelta(seconds=seconds)
+
+		# Set the Retry-After header
+		self.set_header("Retry-After", "%s" % seconds)
+
+		# Send empty response to client
+		self.finish()
+
+	@tornado.web.authenticated
+	def get(self):
+		# If the builder is disabled, we don't need to do anything
+		# but will ask it to return after 5 min
+		if not self.builder.enabled:
+			return self._retry_after(300)
+
+		# If the builder has too many jobs running,
+		# we will tell it to return after 1 min
+		if self.builder.too_many_jobs:
+			return self._retry_after(60)
+
+		# Okay, we are ready for the next job
+		job = self.builder.get_next_job()
+
+		# If we got no job, we will ask the builder
+		# to return after 30 seconds
+		if not job:
+			return self._retry_after(30)
+
+		# If we got a job, we will serialise it
+		# and send it to the builder
+		with self.db.transaction():
+			job.start(builder=self.builder)
+
+			ret = {
+				"id"                 : job.uuid,
+				"arch"               : job.arch,
+				"source_url"         : job.build.source_download,
+				"source_hash_sha512" : job.build.source_hash_sha512,
+				"type"               : "test" if job.test else "release",
+				"config"             : job.get_config(),
+			}
+			self.finish(ret)
 
 
 class BuildersJobsQueueHandler(BuildersBaseHandler):

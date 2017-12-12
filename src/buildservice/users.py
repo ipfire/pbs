@@ -219,10 +219,12 @@ class Users(base.Object):
 	def search(self, pattern, limit=None):
 		pattern = "%%%s%%" % pattern
 
-		return self._get_users("SELECT * FROM users \
+		users = self._get_users("SELECT * FROM users \
 			WHERE (name LIKE %s OR realname LIKE %s) \
 			AND activated IS TRUE AND deleted IS FALSE \
 			ORDER BY name LIMIT %s", pattern, pattern, limit)
+
+		return list(users)
 
 	@staticmethod
 	def check_password_strength(password):

@@ -133,28 +133,13 @@ class Packages(base.Object):
 
 			This function does not work for UUIDs or filenames.
 		"""
-		query = "SELECT * FROM packages \
-			WHERE type = %s AND ( \
-				name LIKE %s OR \
-				summary LIKE %s OR \
-				description LIKE %s \
-			) \
-			GROUP BY name"
-
 		pattern = "%%%s%%" % pattern
-		args = ("source", pattern, pattern, pattern)
 
-		res = self.db.query(query, *args)
+		packages = self._get_packages("SELECT * FROM packages \
+			WHERE type = %s AND (name LIKE %s OR summary LIKE %s OR description LIKE %s)",
+			"source", pattern, pattern, pattern)
 
-		pkgs = []
-		for row in res:
-			pkg = Package(self.backend, row.id, row)
-			pkgs.append(pkg)
-
-			if limit and len(pkgs) >= limit:
-				break
-
-		return pkgs
+		return list(packages)
 
 	def search_by_filename(self, filename, limit=None):
 		query = "SELECT filelists.* FROM filelists \

@@ -8,10 +8,3 @@
 	<h1>{{ _("Build job list") }}</h1>
 	{% module BuildTable(builds, show_user=True) %}
 {% end block %}
-
-{% block sidebar %}
-	<h1>{{ _("Actions") }}</h1>
-	<ul>
-		<li><a href="/builds/filter">{{ _("Filter builds") }}</a></li>
-	</ul>
-{% end block %}
