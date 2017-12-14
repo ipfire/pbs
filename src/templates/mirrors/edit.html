@@ -3,84 +3,76 @@
 {% block title %}{{ _("Manage mirror %s") % mirror.hostname }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/mirrors">{{ _("Mirrors") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/mirror/{{ mirror.hostname }}">{{ mirror.hostname }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/mirror/{{ mirror.hostname }}/edit">{{ _("Manage") }}</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h2>{{ _("Manage mirror: %s") % mirror.hostname }}</h2>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/mirrors">{{ _("Mirrors") }}</a></li>
+					<li class="breadcrumb-item">
+						<a href="/mirror/{{ mirror.hostname }}">{{ mirror.hostname }}</a>
+					</li>
+					<li class="breadcrumb-item active">
+							<a href="/mirror/{{ mirror.hostname }}/edit">{{ _("Manage") }}</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
-	<form class="form-horizontal" method="POST" action="">
-		{% raw xsrf_form_html() %}
-		<fieldset>
-			<div class="control-group">
-				<label class="control-label" for="name">{{ _("Hostname") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="name" name="name" value="{{ mirror.hostname }}">
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Manage mirror: %s") % mirror.hostname }}
+			</h2>
+		</div>
+	</div>
 
-					<p class="help-block">
-						{{ _("The canonical hostname.") }}
-					</p>
-				</div>
-			</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<form method="POST" action="">
+				{% raw xsrf_form_html() %}
+				<fieldset>
+					<div class="form-group">
+						<label for="name">{{ _("Hostname") }}</label>
+						<input type="text" class="form-control" id="name" name="name"
+							aria-describedby="nameHelp" value="{{ mirror.hostname }}">
+						<small id="nameHelp" class="form-text text-muted">
+							{{ _("The canonical hostname.") }}
+						</small>
+					</div>
+					<div class="form-check">
+						<label class="form-check-label">
+							<input class="form-check-input" type="checkbox" name="supports_https" {% if mirror.supports_https %}checked{% end %}>
+							{{ _("Check if this mirror server supports HTTPS.") }}
+						</label>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>{{ _("Contact information") }}</legend>
+					<div class="form-group">
+						<label for="owner">{{ _("Owner") }}</label>
+						<input type="text" class="form-control" id="owner" name="owner"
+							aria-describedby="ownerHelp" placeholder="{{ _("Owner") }}" value="{{ mirror.owner }}">
+						<small id="ownerHelp" class="form-text text-muted">
+							{{ _("The owner of the mirror server.") }}
+						</small>
+					</div>
+					<div class="form-group">
+						<label for="contact">{{ _("Contact address") }}</label>
+						<input type="text" class="form-control" id="contact" name="contact"
+							aria-describedby="contactHelp" placeholder="{{ _("Contact address") }}" value="{{ mirror.contact }}">
+						<small id="contactHelp" class="form-text text-muted">
+								{{ _("An email address to contact an administrator of the mirror.") }}
+								<br>
+								<em>{{ _("This won't be made public.") }}</em>
+						</small>
+					</div>
 
-			<div class="control-group">
-				<label class="control-label">{{ _("Supports HTTPS") }}</label>
-				<div class="controls">
-					<label class="checkbox">
-						<input type="checkbox" name="supports_https" {% if mirror.supports_https %}checked{% end %}>
-						{{ _("Check if this mirror server supports HTTPS.") }}
-					</label>
-				</div>
-			</div>
-		</fieldset>
-
-		<fieldset>
-			<legend>{{ _("Contact information") }}</legend>
-
-			<div class="control-group">
-				<label class="control-label" for="owner">{{ _("Owner") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="owner" name="owner" value="{{ mirror.owner }}">
-
-					<p class="help-block">
-						{{ _("The owner of the mirror server.") }}
-					</p>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label" for="contact">{{ _("Contact address") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="contact" name="contact" value="{{ mirror.contact }}">
-
-					<p class="help-block">
-						{{ _("An email address to contact an administrator of the mirror.") }}
-						<br>
-						<em>{{ _("This won't be made public.") }}</em>
-					</p>
-				</div>
-			</div>
-
-			<div class="form-actions">
+				</fieldset>
 				<button type="submit" class="btn btn-primary">{{ _("Save changes") }}</button>
 				<a class="btn" href="/mirror/{{ mirror.hostname }}">{{ _("Cancel") }}</a>
-			</div>
-		</fieldset>
-	</form>
+			</form>
+		</div>
+	</div>
 {% end block %}

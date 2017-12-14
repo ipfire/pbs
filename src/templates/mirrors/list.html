@@ -15,20 +15,18 @@
 	</div>
 
 	<div class="row">
-		<div class="col-12 col-sm-12 col-md-6 col-lg-9 col-xl-6">
+		<div class="col-12 col-sm-12 col-md-3 col-lg-10 col-xl-10">
 			<h2>{{ _("Mirrors") }}</h2>
 		</div>
 		{% if current_user and current_user.has_perm("manage_mirrors") %}
-			<div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
-				<div class="dropdown justify-content-center justify-content-lg-end justify-content-xl-end">
-					<button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						{{ _("Actions") }}
-					</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-							<a class="dropdown-item" href="/mirror/new">
-								<i class="icon-asterisk"></i> {{ _("Add new mirror") }}
-							</a>
-					</div>
+			<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
+				<button class="btn dropdown-toggle btn-block" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					{{ _("Actions") }}
+				</button>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+						<a class="dropdown-item" href="/mirror/new">
+							<i class="icon-asterisk"></i> {{ _("Add new mirror") }}
+						</a>
 				</div>
 			</div>
 		{% end %}
