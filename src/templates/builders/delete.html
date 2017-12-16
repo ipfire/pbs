@@ -3,40 +3,44 @@
 {% block title %}{{ _("Delete builder %s") % builder.name }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/builders">{{ _("Builders") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/builder/{{ builder.name }}/delete">{{ _("Delete") }}</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h1>{{ _("Builder") }}: {{ builder.name }}</h1>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/builders">{{ _("Builders") }}</a></li>
+					<li class="breadcrumb-item"><a href="/builder/{{ builder.name }}">{{ builder.name }}</a></li>
+					<li class="breadcrumb-item active">
+							<a href="/builder/{{ builder.name }}/delete">{{ _("Delete") }}</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
 	<div class="row">
-		<div class="span6 offset3">
-			<p>
-				{{ _("You are going to delete the build host <strong>%s</strong>.") % builder.name }}
-			</p>
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<div class="alert alert-danger" role="alert">
+				<h2 class="alert-heading" style="word-wrap: break-word;">
+					{{ _("Delete builder: %s") % builder.name }}
+				</h2>
+				<p>
+					{{ _("You are going to delete the build host %s.") % builder.name }}
+				</p>
+			</div>
+		</div>
+	</div>
 
-			<div class="btn-toolbar">
-				<div class="btn-group pull-right">
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<div class="btn-toolbar" role="toolbar">
+				<div class="btn-group mr-2 mb-2" role="group">
 					<a class="btn btn-danger" href="/builder/{{ builder.name }}/delete?confirmed=1">
 						{{ _("Delete %s") % builder.name }}
 					</a>
-					<a class="btn" href="/builder/{{ builder.name }}">{{ _("Cancel") }}</a>
+				</div>
+				<div class="btn-group mb-2" role="group">
+					<a class="btn btn-primary" href="/builder/{{ builder.name }}">{{ _("Cancel") }}</a>
 				</div>
 			</div>
 		</div>

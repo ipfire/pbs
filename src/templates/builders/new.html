@@ -3,43 +3,43 @@
 {% block title %}{{ _("Create new builder") }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/builders">{{ _("Builders") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/builder/new">{{ _("Create new builder") }}</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h1>{{ _("Create a new builder") }}</h1>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/builders">{{ _("Builders") }}</a></li>
+					<li class="breadcrumb-item active">
+						<a href="/builder/new">{{ _("Create new builder") }}</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
 	<div class="row">
-		<div class="span6 offset3">
-			<form class="form-horizontal" method="POST" action="">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Create a new builder") }}
+			</h2>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<form method="POST" action="">
 				{% raw xsrf_form_html() %}
 				<fieldset>
-					<div class="control-group">
-						<label class="control-label" for="name">{{ _("Hostname") }}</label>
-						<div class="controls">
-							<input type="text" class="input-xlarge" id="name" name="name">
-
-							<p class="help-block">
-								{{ _("Enter the canonical hostname of the machine.") }}
-							</p>
-						</div>
+					<div class="form-group">
+						<label for="name">{{ _("Hostname") }}</label>
+						<input type="text" class="form-control" id="name" name="name"
+							aria-describedby="nameHelp" placeholder="{{ _("Hostname") }}">
+						<small id="nameHelp" class="form-text text-muted">
+							{{ _("Enter the canonical hostname of the machine.") }}
+						</small>
 					</div>
 
-					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">{{ _("Create new builder") }}</button>
-					</div>
+					<button type="submit" class="btn btn-primary">{{ _("Create new builder") }}</button>
 				</fieldset>
 			</form>
 		</div>
