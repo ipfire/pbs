@@ -3,25 +3,44 @@
 {% block title %}{{ _("Builds") }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/builds">{{ _("Builds") }}</a>
-		</li>
-	</ul>
 
-	<ul class="nav nav-pills pull-right">
-		<li>
-			<a href="/builds/comments">{{ _("Comments") }}</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h2>{{ _("Builds") }}</h2>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item active">
+						<a href="/builds">{{ _("Builds") }}</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
-	{% module BuildTable(builds, show_user=True) %}
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Builds") }}
+			</h2>
+		</div>
+		<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
+			<div class="dropdown">
+				<button class="btn btn-block btn-light dropdown-toggle mb-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					{{ _("Actions") }}
+				</button>
+				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+					<a class="dropdown-item" href="/builds/comments">
+						{{ _("Show Comments") }}
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			{% module BuildTable(builds, show_user=True) %}
+		</div>
+	</div>
+
 {% end block %}
