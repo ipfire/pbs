@@ -1,6 +1,4 @@
 <p>
-	<strong>{{ _("Watchers") }}:</strong>
-
 	<a href="#watchers" data-toggle="modal">
 		{% if current_user and current_user in watchers %}
 			{% if len(watchers) == 1 %}
@@ -16,49 +14,60 @@
 	</a>
 </p>
 
-<div class="modal hide fade" id="watchers">
-	<div class="modal-header">
-		<a class="close" data-dismiss="modal">&times;</a>
-		<h3>{{ _("Watchers of %s") % build.name }}</h3>
-	</div>
+<div class="modal fade" id="watchers" tabindex="-1">
+	<div class="modal-dialog modal-lg" role="document">
+	  	<div class="modal-content">
+			<div class="modal-header">
+				<h3 style="word-wrap: break-word;" class="modal-title" id="watchers">
+						{{ _("Watchers of %s") % build.name }}
+				</h3>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>
+					{{ _("All users who watch this build will be automatically notified about status changes and comments.") }}
+					{{ _("This is an easy way of staying up to date.") }}
+				</p>
+				<hr/>
 
-	<div class="modal-body">
-		<p>
-			{{ _("All users who watch this build will be automatically notified about status changes and comments.") }}
-			{{ _("This is an easy way of staying up to date.") }}
-		</p>
-		<hr />
+				{% if watchers %}
+					<ul>
+						{% if current_user and current_user in watchers %}
+							<li>
+								<strong>{{ _("You.") }}</strong>
+							</li>
+						{% end %}
 
-		{% if watchers %}
-			<ul>
-				{% if current_user and current_user in watchers %}
-					<li>
-						<strong>{{ _("You.") }}</strong>
-					</li>
+						{% for watcher in [w for w in watchers if current_user and not w == current_user] %}
+							<li>
+								<a href="/user/{{ watcher.name }}">{{ watcher.realname }}</a>
+							</li>
+						{% end %}
+					</ul>
+				{% else %}
+					<p>
+						{{ _("Nobody watches this build, yet. Be the first one.") }}
+					</p>
 				{% end %}
+			</div>
 
-				{% for watcher in [w for w in watchers if current_user and not w == current_user] %}
-					<li>
-						<a href="/user/{{ watcher.name }}">{{ watcher.realname }}</a>
-					</li>
-				{% end %}
-			</ul>
-		{% else %}
-			<p>
-				{{ _("Nobody watches this build, yet. Be the first one.") }}
-			</p>
-		{% end %}
-	</div>
-
-	<div class="modal-footer">
-		{% if current_user %}
-			{% if not current_user in watchers %}
-				<a class="btn" href="/build/{{ build.uuid }}/watch">{{ _("Watch this build") }}</a>
-			{% elif current_user.is_admin() %}
-				<a class="btn" href="/build/{{ build.uuid }}/watch">{{ _("Add a watcher") }}</a>
-			{% end %}
-		{% end %}
-
-		<a class="btn btn-primary" href="#" data-dismiss="modal">{{ _("Close") }}</a>
+			<div class="modal-footer">
+				<div class="float-right" style="width:100%">
+					{% if current_user %}
+						{% if not current_user in watchers %}
+							<a class="btn btn-primary mb-2" href="/build/{{ build.uuid }}/watch">{{ _("Watch this build") }}</a>
+						{% end %}
+						{% if current_user.is_admin() %}
+							<a class="btn btn-primary mb-2" href="/build/{{ build.uuid }}/watch">{{ _("Add a watcher") }}</a>
+						{% end %}
+					{% end %}
+					<a class="btn mb-2" data-dismiss="modal">
+						{{ _("Close") }}
+					</a>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
