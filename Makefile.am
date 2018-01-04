@@ -247,6 +247,11 @@ templates_errorsdir = $(templatesdir)/errors
 
 templates_messagesdir = $(templatesdir)/messages
 
+dist_templates_messages_builds_DATA = \
+	src/templates/messages/builds/new-comment.markdown
+
+templates_messages_buildsdir = $(templates_messagesdir)/builds
+
 dist_templates_messages_jobs_DATA = \
 	src/templates/messages/jobs/failed.markdown \
 	src/templates/messages/jobs/finished.markdown

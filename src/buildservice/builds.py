@@ -824,20 +824,20 @@ class Build(base.DataObject):
 		return comments
 
 	def add_comment(self, user, text, score):
-		# Add the new comment to the database.
-		id = self.db.execute("INSERT INTO \
-			builds_comments(build_id, user_id, text, score, time_created) \
-			VALUES(%s, %s, %s, %s, NOW())",
+		res = self.db.get("INSERT INTO builds_comments(build_id, user_id, \
+			text, score) VALUES(%s, %s, %s, %s) RETURNING *",
 			self.id, user.id, text, score)
 
+		comment = BuildComment(self.backend, res.id, data=res)
+
 		# Update the score cache
-		self.score += score
+		self.score += comment.score
 
-		# Send the new comment to all watchers and stuff.
-		self.send_comment_message(id)
+		# Send the new comment to all watchers and stuff
+		comment.send_message()
 
-		# Return the ID of the newly created comment.
-		return id
+		# Return the newly created comment
+		return comment
 
 	@lazy_property
 	def score(self):
@@ -861,27 +861,6 @@ class Build(base.DataObject):
 			AND NOT users.activated = 'Y' ORDER BY users.id", self.id)
 
 		return [users.User(self.backend, u.id) for u in users]
-
-	def send_comment_message(self, comment_id):
-		comment = self.db.get("SELECT * FROM builds_comments WHERE id = %s",
-			comment_id)
-
-		assert comment
-		assert comment.build_id == self.id
-
-		# Get user who wrote the comment.
-		user = self.backend.users.get_by_id(comment.user_id)
-
-		format = {
-			"build_name" : self.name,
-			"user_name"  : user.realname,
-		}
-
-		# XXX create beautiful message
-
-		self.backend.messages.send_to_all(self.message_recipients,
-			N_("%(user_name)s commented on %(build_name)s"),
-			comment.text, format)
 
 	## Logging stuff
 
@@ -1086,3 +1065,27 @@ class Build(base.DataObject):
 		# Update all bugs linked to this build.
 		for bug_id in self.get_bug_ids():
 			self._update_bug(bug_id, status=status, resolution=resolution, comment=comment)
+
+
+class BuildComment(base.DataObject):
+	table = "builds_comments"
+
+	@lazy_property
+	def build(self):
+		return self.backend.builds.get_by_id(self.data.build_id)
+
+	@lazy_property
+	def user(self):
+		return self.backend.users.get_by_id(self.data.user_id)
+
+	@property
+	def text(self):
+		return self.data.text
+
+	@property
+	def score(self):
+		return self.data.score
+
+	def send_message(self):
+		self.backend.messages.send_template_to_many(self.build.message_recipients, "builds/new-comment",
+			sender=self.user.envelope_from, build=self.build, user=self.user, text=self.text)
