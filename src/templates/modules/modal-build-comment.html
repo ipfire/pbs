@@ -13,32 +13,18 @@
 
 {% block body %}
 	{% if current_user %}
-		<fieldset>
-			<div class="control-group">
-				<label class="control-label" for="cmttxt">{{ _("Comment") }}</label>
-				<div class="controls">
-					<textarea class="input-xlarge" id="cmttxt" name="text" rows="8"></textarea>
+			<div class="form-group">
+				<label for="cmttxt">{{ _("Comment") }}</label>
+				<textarea class="form-control" id="cmttxt" name="text" rows="8"></textarea>
 				</div>
+			<div class="form-group">
+				<label for="vote">{{ _("Vote") }}</label>
+				<select class="form-control" id="vote" name="vote">
+					<option value="option1" checked>{{ _("Not tested.") }}</option>
+					<option value="up">{{ _("Works for me.") }}</option>
+					<option value="down">{{ _("Does not work.") }}</option>
+				</select>
 			</div>
-
-			<div class="control-group">
-				<label class="control-label">{{ _("Vote") }}</label>
-				<div class="controls">
-					<label class="radio">
-						<input type="radio" name="vote" id="vote1" value="option1" checked>
-						{{ _("Not tested.") }}
-					</label>
-					<label class="radio">
-						<input type="radio" name="vote" id="vote2" value="up">
-						{{ _("Works for me.") }}
-					</label>
-					<label class="radio">
-						<input type="radio" name="vote" id="vote3" value="down">
-						{{ _("Does not work.") }}
-					</label>
-				</div>
-			</div>
-		</fieldset>
 	{% else %}
 		<p>
 			{{ _("You need to log in to comment.") }}
