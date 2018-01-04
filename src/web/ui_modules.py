@@ -222,6 +222,25 @@ class BuildStateWarningsModule(UIModule):
 	def render(self, build):
 		return self.render_string("modules/build-state-warnings.html", build=build)
 
+class BuildState(UIModule):
+	def render(self, build_type, build_state):
+		if build_type == "release" and build_state == "stable":
+			return """text-success"""
+		elif build_type == "release" and build_state == "unstable":
+			return """text-danger"""
+		elif build_type == "release" and build_state == "testing":
+			return """text-warning"""
+		elif build_type == "release" and build_state == "obsolete":
+			return """text-muted"""
+		elif build_type == "scratch" and build_state == "stable":
+			return """text-success font-italic"""
+		elif build_type == "scratch" and build_state == "unstable":
+			return """text-danger font-italic"""
+		elif build_type == "scratch" and build_state == "testing":
+			return """text-warning font-italic"""
+		elif build_type == "scratch" and build_state == "obsolete":
+			return """text-muted font-italic"""
+
 
 class JobsBoxesModule(UIModule):
 	def render(self, build, jobs=None):

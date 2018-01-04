@@ -56,6 +56,7 @@ class Application(tornado.web.Application):
 
 				"BuildHeadline"      : ui_modules.BuildHeadlineModule,
 				"BuildStateWarnings" : ui_modules.BuildStateWarningsModule,
+				"BuildState"         : ui_modules.BuildState,
 
 				"BugsTable"          : ui_modules.BugsTableModule,
 				"BuildLog"           : ui_modules.BuildLogModule,
