@@ -258,46 +258,48 @@ class JobStateModule(UIModule):
 		_ = self.locale.translate
 		classes = []
 
+		classes.append("badge")
+
 		icon = None
 		if state == "aborted":
 			text = _("Aborted")
-			classes.append("muted")
+			classes.append("badge-secondary")
 			icon = "icon-warning-sign"
 
 		elif state == "dispatching":
 			text = _("Dispatching")
-			classes.append("text-info")
+			classes.append("badge-info")
 			icon = "icon-download-alt"
 
 		elif state == "failed":
 			text = _("Failed")
-			classes.append("text-error")
+			classes.append("badge-danger")
 			icon = "icon-remove"
 
 		elif state == "finished":
 			text = _("Finished")
-			classes.append("text-success")
+			classes.append("badge-success")
 			icon = "icon-ok"
 
 		elif state == "pending":
 			text = _("Pending")
-			classes.append("muted")
+			classes.append("badge-secondary")
 			icon = "icon-time"
 
 		elif state == "running":
 			text = _("Running")
-			classes.append("text-info")
+			classes.append("badge-info")
 			icon = "icon-cogs"
 
 		elif state == "uploading":
 			text = _("Uploading")
-			classes.append("text-info")
+			classes.append("badge-info")
 			icon = "icon-upload-alt"
 
 		# Return just the string, is state is unknown.
 		else:
 			text = _("Unknown: %s") % state
-			classes.append("muted")
+			classes.append("text-muted")
 
 		if plain:
 			return text
