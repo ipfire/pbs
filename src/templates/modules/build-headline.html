@@ -1,26 +1,19 @@
-<div class="page-header">
-	<div class="pull-right">
-		{% if pkg.critical_path %}
-			<span class="label label-important pull-right">{{ _("Critical path") }}</span>
+<h2 style="word-wrap: break-word;">
+	{% if shorter %}
+		{{ pkg.name }}
+	{% else %}
+		{{ build.name }}
+	{% end %}
+	{% if pkg.critical_path %}
+		<span class=" badge badge-danger float-md-right float-lg-right float-xl-right">{{ _("Critical path") }}</span>
+	{% end %}
+	{% if not short %}
+		{% if build.type == "release" %}
+			<span class=" badge badge-success float-md-right float-lg-right float-xl-right">{{ _("Release build") }}</span>
+		{% elif build.type == "scratch" %}
+			<span class="badge badge-secondary float-md-right float-lg-right float-xl-right">{{ _("Scratch build") }}</span>
 		{% end %}
-
-		{% if not short %}	
-			{% if build.type == "release" %}
-				<span class="label label-success">{{ _("Release build") }}</span>
-			{% elif build.type == "scratch" %}
-				<span class="label label-important">{{ _("Scratch build") }}</span>
-			{% end %}
-		{% end %}
-	</div>
-
-	<h2>
-		{% if shorter %}
-			{{ pkg.name }}
-		{% else %}
-			{{ build.name }}
-		{% end %}
-
-		<br>
-		<small>{{ pkg.summary }}</small>
-	</h2>
-</div>
+	{% end %}
+	<br>
+	<small>{{ pkg.summary }}</small>
+</h2>

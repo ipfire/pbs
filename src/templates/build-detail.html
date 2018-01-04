@@ -3,220 +3,242 @@
 {% block title %}{{ _("Build") }}: {{ build.name }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/packages">{{ _("Packages") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/build/{{ build.uuid }}">{{ build.pkg.friendly_version }}</a>
-		</li>
-	</ul>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/packages">{{ _("Packages") }}</a></li>
+					<li class="breadcrumb-item"><a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a></li>
+					<li class="breadcrumb-item active"><a href="/build/{{ build.uuid }}">{{ build.pkg.friendly_version }}</a></li>
+				</ol>
+			</nav>
+		</div>
+	</div>
 
-	{% module BuildHeadline(build) %}
+	<div class="row">
+		{% if current_user and build.has_perm(current_user) %}
+			<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+				{% module BuildHeadline(build) %}
+			</div>
+			<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
+				<div class="dropdown">
+					<button class="btn btn-block btn-light dropdown-toggle mb-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						{{ _("Actions") }}
+					</button>
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+						{% if build.type == "release" %}
+							<a class="dropdown-item" href="/build/{{ build.uuid }}/state">
+								{{ _("Change state") }}
+							</a>
+							<a class="dropdown-item" href="/build/{{ build.uuid }}/bugs">
+								{{ _("Modify bug list") }}
+							</a>
+						{% elif build.type == "scratch" %}
+							<a class="dropdown-item" href="/build/{{ build.uuid }}/delete">
+								<i class="icon-trash icon-white"></i>
+								{{ _("Delete build") }}
+							</a>
+						{% end %}
+				</div>
+				</div>
+			</div>
+		{% else %}
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				{% module BuildHeadline(build) %}
+			</div>
+		{% end %}
+	</div>
+
 	{% module BuildStateWarnings(build) %}
 
 	<div class="row">
-		<div class="span8">
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="well well-large well-white ac">
-						<p class="huge {% if build.score >= 0 %}text-success{% else %}text-error{% end %}">
-							{% if build.score > 0 %}
-								+{{ build.score }}
-							{% else %}
-								{{ build.score }}
-							{% end %}
-						</p>
-
-						<hr>
-
-						<p>
-							{{ _("Score") }}
-
-							{% if build.state == "broken" %}
-								<span class="text-error">{{ _("(broken)") }}</span>
-							{% elif build.state == "obsolete" %}
-								<span class="text-warning">{{ _("(obsolete)") }}</span>
-							{% end %}
-						</p>
-
-						{% if build.severity %}
-							<hr>
-
-							{% if build.severity == "security update" %}
-								<i class="icon-bolt"></i>
-								{{ _("Security update") }}
-							{% elif build.severity == "bugfix update" %}
-								<i class="icon-wrench"></i>
-								{{ _("Bug fix update") }}
-							{% elif build.severity == "enhancement" %}
-								<i class="icon-plus"></i>
-								{{ _("Enhancement") }}
-							{% elif build.severity == "new package" %}
-								<i class="icon-asterisk"></i>
-								{{ _("New package") }}
-							{% else %}
-								{{ _("Unhandled: %s") % build.severity }}
-							{% end %}
-						{% end %}
-
-						{% if bugs %}
-							<hr>
-
-							<h5>{{ _("Fixed bugs") }}</h5>
-
-							<ul class="unstyled">
-								{% for b in bugs %}
-									<li>
-										<a href="{{ b.url }}" rel="tooltip" title="{{ b.summary }}" target="_blank">
-											#{{ b.id }}
-										</a>
-									</li>
-								{% end %}
-							</ul>
-						{% end %}
-					</div>
-				</div>
-
-				<div class="span9">
-					{% if build.type == "release" %}
-						{% if build.commit %}
-							{% module CommitMessage(build.commit) %}
-
-							<hr>
-
-							<p class="muted">
-								{{ _("Author") }} {% module LinkToUser(build.commit.author) %}
-								&dash;
-								{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
-							</p>
+		{% if build.type == "release" %}
+			<div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+		{% else %}
+			<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+		{% end %}
+			<div class="card mb-2">
+				{% if build.severity %}
+					<h4 class="card-header">
+						{% if build.severity == "security update" %}
+							<i class="icon-bolt"></i>
+							{{ _("Security update") }}
+						{% elif build.severity == "bugfix update" %}
+							<i class="icon-wrench"></i>
+							{{ _("Bug fix update") }}
+						{% elif build.severity == "enhancement" %}
+							<i class="icon-plus"></i>
+							{{ _("Enhancement") }}
+						{% elif build.severity == "new package" %}
+							<i class="icon-asterisk"></i>
+							{{ _("New package") }}
 						{% else %}
-							<p class="muted">{{ _("No commit message.") }}</p>
+							{{ _("Unhandled: %s") % build.severity }}
 						{% end %}
-					{% elif build.type == "scratch" %}
-							...
-					{% end %}
-				</div>
+					</h4>
+				{% end %}
+				<div class="card-body">
+					  <h4 class="card-title text-center">
+							{{ _("Score") }}
+					  </h4>
+					  <p class="card-text">
+							<p class="huge text-center {% if build.score >= 0 %}text-success{% else %}text-danger{% end %}">
+								{% if build.score > 0 %}
+									+{{ build.score }}
+								{% else %}
+									{{ build.score }}
+								{% end %}
+							</p>
+							{% if bugs %}
+								<h5 class="text-center">{{ _("Fixed bugs") }}</h5>
+					  			</p>
+								</div>
+								<ul class="list-group list-group-flush">
+									{% for b in bugs %}
+										<li class="list-group-item" >
+											<a href="{{ b.url }}" rel="tooltip" title="{{ b.summary }}" target="_blank">
+												#{{ b.id }}
+											</a>
+										</li>
+									{% end %}
+								</ul>
+							{% else %}
+								</p>
+								</div>
+							{% end %}
 			</div>
-
-			<hr>
-
-			<h3>
-				<div class="pull-right">
-					<a class="btn btn-small btn-primary" data-toggle="modal" href="#comment" >
-						<i class="icon-comment icon-white"></i>
-						{{ _("Comment") }}
-					</a>
-				</div>
-
-				{{ _("Log") }}
-			</h3>
-
-			{% module Log(log) %}
-
-			<hr class="visible-phone">
 		</div>
+		{% if build.type == "release" %}
+			<div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+				{% if build.commit %}
+					{% module CommitMessage(build.commit) %}
 
-		<div class="span4">
-			<h4 class="visible-phone">{{ _("Jobs") }}</h4>
+					<hr>
+
+					<p class="muted">
+						{{ _("Author") }} {% module LinkToUser(build.commit.author) %}
+						&dash;
+						{{ _("Commit") }} <a href="/distro/{{ build.distro.identifier }}/source/{{ build.pkg.commit.source.identifier }}/{{ build.pkg.commit.revision }}">{{ build.pkg.commit.revision[:7] }}</a>
+					</p>
+				{% else %}
+					<p class="muted">{{ _("No commit message.") }}</p>
+				{% end %}
+			</div>
+		{% end %}
+		{% if build.type == "release" %}
+			<div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+		{% else %}
+			<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+		{% end %}
+			<h4 class="text-center">{{ _("Jobs") }}</h4>
 			{% module JobsBoxes(build) %}
 
-			<p class="ac">
+			<p class="text-center">
 				<a href="/package/{{ build.pkg.uuid }}">{{ _("Source package") }}</a>
 			</p>
 		</div>
 	</div>
-
-	{% if current_user and build.has_perm(current_user) %}
-		<div class="row">
-			<div class="span12">
-				{% if build.type == "release" %}
-					<div class="btn-toolbar pull-right">
-						<a class="btn" href="/build/{{ build.uuid }}/state">{{ _("Change state") }}</a>
-						<a class="btn" href="/build/{{ build.uuid }}/bugs">{{ _("Modify bug list") }}</a>
-					</div>
-				{% elif build.type == "scratch" %}
-					<div class="btn-toolbar pull-right">
-						<a class="btn" href="/build/{{ build.uuid }}/delete">
-							<i class="icon-trash icon-white"></i>
-							{{ _("Delete build") }}
-						</a>
-					</div>
-				{% end %}
-			</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+			<h3 style="word-wrap: break-word;">
+				{{ _("Log") }}
+			</h3>
 		</div>
-	{% end %}
+		<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
+				<a class="btn btn-block btn-primary mb-2 " data-toggle="modal" href="#comment" >
+						<i class="icon-comment icon-white"></i>
+						{{ _("Comment") }}
+				</a>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			{% module Log(log) %}
+		</div>
+	</div>
+
+
+	{% module Modal("build-comment", build=build) %}
+
 
 	<hr>
 
 	{% if build.type == "release" %}
 		<div class="row">
-			<div class="span12">
-				{% if current_user and build.has_perm(current_user) %}
-					{% if build.repo %}
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				<h3 style="word-wrap: break-word;">
+					{{ _("Repository") }}
+				</h3>
+			</div>
+		</div>
+		<div class="row">
+			{% if current_user and build.has_perm(current_user) %}
+				{% if build.repo %}
+					<div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 mb-2">
+						{{ build.distro.name }} -
+						<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
+						{{ _("since %s") % locale.format_date(build.repo_time, relative=False) }}
+					</div>
 						{% if build.can_move_forward %}
-							<div class="btn-group pull-right">
-								<a class="btn btn-success" href="#push" data-toggle="modal">{{ _("Push") }}</a>
-								<button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-									<span class="caret"></span>
-								</button>
-								<ul class="dropdown-menu">
-									<li>
-										<a href="#unpush" data-toggle="modal">{{ _("Unpush") }}</a>
-									</li>
-								</ul>
+							<div class="col-6 col-sm-6 col-md-2 col-lg-2 col-xl-2">
+								<a class="btn btn-success btn-block" href="#push" data-toggle="modal">{{ _("Push") }}</a>
+							</div>
+							<div class="col-6 col-sm-6 col-md-2 col-lg-2 col-xl-2">
+								<a class="btn btn-danger btn-block" href="#unpush" data-toggle="modal">{{ _("Unpush") }}</a>
 							</div>
 
 							{% module Modal("build-push", build=build, current_repo=repo, next_repo=next_repo) %}
 							{% module Modal("build-unpush", build=build, repo=repo) %}
 						{% else %}
-							<a class="btn btn-danger pull-right" href="#unpush" data-toggle="modal">
-								{{ _("Unpush") }}
-							</a>
-
+							<div class="col-12 col-sm-12 col-md-4 col-lg-2 col-xl-2"></div>
+								<a class="btn btn-danger btn-block" href="#unpush" data-toggle="modal">
+									{{ _("Unpush") }}
+								</a>
+							</div>
 							{% module Modal("build-unpush", build=build, repo=repo) %}
 						{% end %}
-					{% else %}
+				{% else %}
+					<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+						<span class="muted">
+							{{ _("This package does not belong to any repository.") }}
+						</span>
+					</div>
+					<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
 						{% if build.can_move_forward or build.state == "obsolete" %}
-							<a class="btn btn-success pull-right" href="#push" data-toggle="modal">
+							<a class="btn btn-success btn-block" href="#push" data-toggle="modal">
 								{{ _("Push") }}
 							</a>
-
 							{% module Modal("build-push", build=build, current_repo=repo, next_repo=next_repo) %}
 						{% end %}
+					</div>
+				{% end %}
+			{% else %}
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+					{% if build.repo %}
+						{{ build.distro.name }} -
+						<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
+						{{ _("since %s") % locale.format_date(build.repo_time, relative=False) }}
+					{% else %}
+						<span class="muted">
+							{{ _("This package does not belong to any repository.") }}
+						</span>
 					{% end %}
-				{% end %}
-
-				{% if build.repo %}
-					{{ build.distro.name }} -
-					<a href="/distro/{{ build.distro.identifier }}/repo/{{ build.repo.identifier }}">{{ build.repo.name }}</a>
-					{{ _("since %s") % locale.format_date(build.repo_time, relative=False) }}
-				{% else %}
-					<span class="muted">
-						{{ _("This package does not belong to any repository.") }}
-					</span>
-				{% end %}
-			</div>
+				</div>
+			{% end %}
 		</div>
-
-		<hr>
 	{% end %}
 
-	{% module Modal("build-comment", build=build) %}
-
 	<hr>
-
 	<div class="row">
-		<div class="span12">
+		<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+			<h3 style="word-wrap: break-word;">
+				{{ _("Watchers") }}
+			</h3>
+		</div>
+	</div>
+	<div class="row">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
 			{% module WatchersSidebarTable(build, build.get_watchers()) %}
 		</div>
 	</div>
