@@ -340,6 +340,10 @@ class User(base.DataObject):
 
 		return firstname
 
+	@property
+	def envelope_from(self):
+		return "%s <%s>" % (self.realname, self.email)
+
 	@lazy_property
 	def emails(self):
 		res = self.backend.users._get_user_emails("SELECT * FROM users_emails \
