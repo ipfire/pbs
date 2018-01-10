@@ -408,6 +408,9 @@ class User(base.DataObject):
 		user_email = self.backend.users._get_user_email("INSERT INTO users_emails(user_id, email, \
 			\"primary\", activated, activation_code) VALUES(%s, %s, %s, %s, %s) RETURNING *",
 			self.id, email, not self.emails, activated, activation_code)
+
+		# Set caches
+		user_email.user = self
 		self.emails.append(user_email)
 
 		# Send activation email if activation is needed

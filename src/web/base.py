@@ -79,7 +79,6 @@ class BaseHandler(tornado.web.RequestHandler):
 			"format_date"     : self.format_date,
 			"format_size"     : misc.format_size,
 			"friendly_time"   : misc.friendly_time,
-			"format_email"    : misc.format_email,
 			"format_filemode" : misc.format_filemode,
 			"lang"            : self.locale.code[:2],
 			"session"         : self.session,
