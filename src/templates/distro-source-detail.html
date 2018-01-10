@@ -1,65 +1,73 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/distros">{{ _("Distributions") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
-				{{ _("Source: %s") % source.name }}
-			</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h1>
-			{{ _("Source") }}: {{ source.name }}
-		</h1>
-	</div>
-
-	<div class="row">
-		<div class="span10 offset1">
-			<table class="table">
-				<tbody>
-					{% if source.gitweb %}
-						<tr>
-							<td>{{ _("Gitweb") }}</td>
-							<td>
-								<a href="{{ source.gitweb }}" target="_blank">
-									{{ source.gitweb }}
-								</a>
-							</td>
-						</tr>
-					{% end %}
-					<tr>
-						<td>{{ _("Branch") }}</td>
-						<td>{{ source.branch }}</td>
-					</tr>
-					<tr>
-						<td>{{ _("Imported commits") }}</td>
-						<td>{{ len(source) }}</td>
-					</tr>
-				</tbody>
-			</table>
+<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/distros">{{ _("Distributions") }}</a></li>
+					<li class="breadcrumb-item"><a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a></li>
+					<li class="breadcrumb-item active">
+						<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
+							{{ _("Source: %s") % source.name }}
+						</a>
+					</li>
+				</ol>
+			</nav>
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="span10 offset1">
-			<h2>{{ _("Latest commits") }}</h2>
-			{% module CommitsTable(distro, source, commits) %}
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Source") }}: {{ source.name }}
+			</h2>
+		</div>
+	</div>
 
-			<a class="btn pull-right" href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/commits">
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<div class="table-responsive mb-2">
+				<table class="table">
+					<tbody>
+						{% if source.gitweb %}
+							<tr>
+								<td>{{ _("Gitweb") }}</td>
+								<td>
+									<a href="{{ source.gitweb }}" target="_blank">
+										{{ source.gitweb }}
+									</a>
+								</td>
+							</tr>
+						{% end %}
+						<tr>
+							<td>{{ _("Branch") }}</td>
+							<td>{{ source.branch }}</td>
+						</tr>
+						<tr>
+							<td>{{ _("Imported commits") }}</td>
+							<td>{{ len(source) }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h3>{{ _("Latest commits") }}</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			{% module CommitsTable(distro, source, commits) %}
+		</div>
+	</div>
+	<div class="row justify-content-end">
+		<div class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+			<a class="btn btn-primary btn-block" href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/commits">
 				{{ _("Show all commits") }}
 			</a>
 		</div>

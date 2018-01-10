@@ -3,56 +3,90 @@
 {% block title %}{{ _("Distribution") }}: {{ distro.name }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/distros">{{ _("Distributions") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
-		</li>
-	</ul>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/distros">{{ _("Distributions") }}</a></li>
+					<li class="breadcrumb-item active">
+						<a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
 
-	<div class="page-header">
-		<h1>
-			{{ _("Distribution") }}: {{ distro.name }}
-			<small>{{ distro.slogan }}</small>
-		</h1>
+
+	<div class="row">
+		{% if current_user and current_user.is_admin() %}
+			<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+				<h2 style="word-wrap: break-word;">
+					{{ _("Distribution") }}: {{ distro.name }} <br>
+					<small class="text-muted">{{ distro.slogan }}</small>
+				</h2>
+			</div>
+			<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2 mb-2">
+				<button class="btn dropdown-toggle btn-block " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					{{ _("Actions") }}
+				</button>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					<a class="dropdown-item" href="/distro/{{ distro.identifier }}/edit">
+						{{ _("Edit distribution") }}
+					</a>
+					<a class="dropdown-item" href="/distro/{{ distro.identifier }}/delete">
+						{{ _("Delete distribution") }}
+					</a>
+					</a>
+					<a class="dropdown-item" href="/distro/{{ distro.identifier }}/repo/new">
+						{{ _("New binary repository") }}
+					</a>
+					<a class="dropdown-item" href="/distro/{{ distro.identifier }}/source/new">
+						{{ _("New source repository") }}
+					</a>
+				</div>
+			</div>
+		{% else %}
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				<h2 style="word-wrap: break-word;">
+					{{ _("Distribution") }}: {{ distro.name }} <br>
+					<small class="text-muted">{{ distro.slogan }}</small>
+				</h2>
+			</div>
+		{% end %}
 	</div>
 
 	<div class="row">
-		<div class="span10 offset1">
-			<blockquote>
-				{{ distro.description }}
-				<small>{{ distro.vendor }}</small>
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<blockquote class="blockquote">
+				<p class="mb-0">{{ distro.description }}</p>
+				<footer class="blockquote-footer"><cite title="{{ distro.vendor }}">{{ distro.vendor }}</cite></footer>
 			</blockquote>
+		</div>
+	</div>
 
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
 			<p>
 				{{ _("Supported architectures") }}:
 				{{ locale.list(distro.arches) or _("None") }}
 			</p>
-
 			<hr />
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="span10 offset1">
-			<h2>
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
 				{{ _("Binary repositories") }}
 				<small>({{ len(distro.repositories) }})</small>
 			</h2>
-			
-			<blockquote>
+
+			<p>
 				{{ _("A binary repository is a composition of packages that are considered stable, unstable or in testing state by the developers.") }}
-				<br /><br />
+				<br/>
 				{{ _("Each repository can be enabled individually.") }}
-				<a href="/documents/enable-repositories">{{ _("Learn how to use them.") }}</a>
-			</blockquote>
+			</p>
 
 			{% module RepositoryTable(distro, distro.repositories) %}
 
@@ -61,8 +95,8 @@
 	</div>
 
 	<div class="row">
-		<div class="span10 offset1">
-			<h2>
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
 				{{ _("Source repositories") }}
 				<small>({{ len(distro.sources) }})</small>
 			</h2>
@@ -71,40 +105,4 @@
 		</div>
 	</div>
 
-	{% if current_user and current_user.is_admin() %}
-		<div class="row">
-			<div class="span10 offset1">
-				<div class="btn-group pull-right">
-					<a class="btn btn-danger dropdown-toggle" data-toggle="dropdown" href="#">
-						<i class="icon-star icon-white"></i>
-						{{ _("Action") }}
-						<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li>
-							<a href="/distro/{{ distro.identifier }}/edit">
-								{{ _("Edit distribution") }}
-							</a>
-						</li>
-						<li>
-							<a href="/distro/{{ distro.identifier }}/delete">
-								{{ _("Delete distribution") }}
-							</a>
-						</li>
-						<li class="divider"></li>
-						<li>
-							<a href="/distro/{{ distro.identifier }}/repo/new">
-								{{ _("New binary repository") }}
-							</a>
-						</li>
-						<li>
-							<a href="/distro/{{ distro.identifier }}/source/new">
-								{{ _("New source repository") }}
-							</a>
-						</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	{% end %}
 {% end block %}

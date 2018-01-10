@@ -1,27 +1,69 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<h1>
-		{{ _("Distribution") }}: {{ distro.name }}
-		<span>- {{ _("Source") }}: {{ source.name }} - {{ _("Commits") }}</span>
-	</h1>
+<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/distros">{{ _("Distributions") }}</a></li>
+					<li class="breadcrumb-item"><a href="/distro/{{ distro.identifier }}">{{ distro.name }}</a></li>
+					<li class="breadcrumb-item">
+						<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
+							{{ _("Source: %s") % source.name }}
+						</a>
+					</li>
+					<li class="breadcrumb-item active">
+							<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}/commits">
+								{{ _("Commits") }}
+							</a>
+						</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
 
-	<p>
-		{{ _("Source repository") }}:
-		<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
-			{{ source.name }}
-		</a>
-	</p>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Distribution") }}: {{ distro.name }} </br>
+				<span>{{ _("Source") }}: {{ source.name }} - {{ _("Commits") }}</span>
+			</h2>
+		</div>
+	</div>
 
-	{% module CommitsTable(distro, source, commits) %}
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<p>
+				{{ _("Source repository") }}:
+				<a href="/distro/{{ distro.identifier }}/source/{{ source.identifier }}">
+					{{ source.name }}
+				</a>
+			</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			{% module CommitsTable(distro, source, commits) %}
+		</div>
+	</div>
 
-	<div class="links">
-		{% if offset %}
-			<a href="?offset={{ offset - number }}">{{ _("Previous commits") }}</a>
-		{% end %}
-
-		{% if limit %}
-			<a href="?offset={{ offset + number }}">{{ _("Next commits") }}</a>
-		{% end %}
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="Page navigation example">
+				<ul class="pagination justify-content-center">
+					{% if offset %}
+						<li class="page-item">
+							<a class="page-link" href="?offset={{ offset - number }}">{{ _("Previous commits") }}</a>
+						</li>
+					{% end %}
+					{% if limit %}
+						<li class="page-item">
+							<a class="page-link" href="?offset={{ offset + number }}">{{ _("Next commits") }}</a>
+						</li>
+					{% end %}
+				</ul>
+			</nav>
+		</div>
 	</div>
 {% end block %}
