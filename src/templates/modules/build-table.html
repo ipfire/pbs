@@ -4,7 +4,7 @@
 			<tbody>
 				{% for date, builds in dates %}
 					<tr>
-						<td colspan="4">
+						<td colspan="{{ colspan }}">
 							<h4>
 								{% module HeadingDate(date) %}
 								<small>({{ len(builds) }})</small>
@@ -22,6 +22,12 @@
 						{% end %}
 						{% if show_when %}
 							<th>{{ _("Created") }}</th>
+						{% end %}
+						{% if show_repo_time %}
+							<th>{{ _("In repository since") }}</th>
+						{% end %}
+						{% if show_can_move_forward %}
+							<th>{{ _("Can be moved forward") }}</th>
 						{% end %}
 					</tr>
 

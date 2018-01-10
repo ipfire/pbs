@@ -205,6 +205,14 @@ class BuildTableModule(UIModule):
 		)
 		settings.update(kwargs)
 
+		colspan = 2
+
+		for key in settings.iterkeys():
+			if settings.get(key) == True:
+				colspan = colspan + 1
+
+		settings.setdefault("colspan", colspan)
+
 		dates = {}
 
 		for b in builds:
