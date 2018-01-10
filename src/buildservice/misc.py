@@ -49,21 +49,6 @@ def friendly_time(t):
 
 	return " ".join(ret)
 
-def format_email(email):
-	m = re.match(r"(.*) <(.*)>", email)
-	if m:
-		fmt = {
-			"name" : xhtml_escape(m.group(1)),
-			"mail" : xhtml_escape(m.group(2)),
-		}
-	else:
-		fmt = {
-			"name" : xhtml_escape(email),
-			"mail" : xhtml_escape(email),
-		}
-
-	return """<a class="email" href="mailto:%(mail)s">%(name)s</a>""" % fmt
-
 def format_filemode(filetype, filemode):
 	if filetype == 2:
 		prefix = "l"

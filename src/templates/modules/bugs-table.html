@@ -8,7 +8,7 @@
 		<dd class="muted">
 			{{ bug.status }} {% if bug.resolution %}{{ bug.resolution }}{% end %}
 			{% if bug.assignee %}
-				&dash; {% raw format_email(bug.assignee) %}
+				&dash; {% module LinkToUser(bug.assignee) %}
 			{% end %}
 		</dd>
 	{% end %}
