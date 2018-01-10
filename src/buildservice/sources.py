@@ -412,7 +412,7 @@ class Source(base.DataObject):
 
 	def get_commits(self, limit=None, offset=None):
 		return self.backend.sources._get_commits("SELECT * FROM sources_commits \
-			WHERE source_id = %s ORDER BY id DESC LIMIT %s OFFSET %s", limit, offset)
+			WHERE source_id = %s ORDER BY id DESC LIMIT %s OFFSET %s", self.id, limit, offset)
 
 	def get_commit(self, revision):
 		commit = self.backend.sources._get_commit("SELECT * FROM sources_commits \
