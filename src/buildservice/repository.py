@@ -477,7 +477,7 @@ class Repository(base.DataObject):
 				WHERE (jobs.arch = %s OR jobs.arch = %s) AND \
 				jobs.test IS FALSE AND repositories_builds.repo_id = %s", arch, "noarch", self.id)
 
-			times.append((arch, time.time.total_seconds()))
+			times.append((arch, time.time.total_seconds() if time.time else 0))
 
 		return times
 
