@@ -365,17 +365,7 @@ staticdir = $(datadir)/static
 dist_static_css_DATA = \
 	src/static/css/bootstrap-responsive.min.css \
 	src/static/css/bootstrap.min.css \
-	src/static/css/build-table.css \
-	src/static/css/commits-table.css \
-	src/static/css/font-awesome.css \
-	src/static/css/jobs-list.css \
-	src/static/css/jobs-table.css \
-	src/static/css/log.css \
-	src/static/css/packages-files-table.css \
-	src/static/css/packages-table.css \
-	src/static/css/prettify.css \
-	src/static/css/style.css \
-	src/static/css/watchers-sidebar-table.css
+	src/static/css/style.css
 
 static_cssdir = $(staticdir)/css
 

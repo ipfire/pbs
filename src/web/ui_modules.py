@@ -461,9 +461,6 @@ class UpdatesTableModule(UIModule):
 
 
 class WatchersSidebarTableModule(UIModule):
-	def css_files(self):
-		return "css/watchers-sidebar-table.css"
-
 	def render(self, build, watchers, limit=5):
 		# Sort the watchers by their realname.
 		watchers.sort(key=lambda watcher: watcher.realname)
