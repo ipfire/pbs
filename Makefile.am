@@ -203,7 +203,6 @@ dist_templates_DATA = \
 	src/templates/source-list.html \
 	src/templates/updates-index.html \
 	src/templates/uploads-list.html \
-	src/templates/user-comments.html \
 	src/templates/user-delete.html \
 	src/templates/user-forgot-password.html \
 	src/templates/user-impersonation.html \
