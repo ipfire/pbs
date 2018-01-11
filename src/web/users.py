@@ -61,7 +61,7 @@ class UserActionHandler(base.BaseHandler):
 		return user
 
 
-class UserDeleteHandler(base.BaseHandler):
+class UserDeleteHandler(UserActionHandler):
 	@tornado.web.authenticated
 	def get(self, name):
 		user = self.get_user(name)
@@ -130,12 +130,7 @@ class UserPasswdHandler(UserActionHandler):
 class UserEditHandler(base.BaseHandler):
 	@tornado.web.authenticated
 	def get(self, name):
-		user = self.backend.users.get_by_name(name)
-		if not user:
-			raise tornado.web.HTTPError(404)
-
-		if not self.current_user == user and not self.current_user.is_admin():
-			raise tornado.web.HTTPError(403)
+		user = self.get_user(name)
 
 		self.render("user-profile-edit.html", user=user)
 
@@ -143,9 +138,7 @@ class UserEditHandler(base.BaseHandler):
 	def post(self, name):
 		_ = self.locale.translate
 
-		user = self.backend.users.get_by_name(name)
-		if not user:
-			raise tornado.web.HTTPError(404)
+		user = self.get_user(name)
 
 		with self.db.transaction():
 			email = self.get_argument("primary_email_address")
