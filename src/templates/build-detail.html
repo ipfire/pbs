@@ -79,17 +79,17 @@
 					</h4>
 				{% end %}
 				<div class="card-body">
-					  <h4 class="card-title text-center">
+					  <h2 class="card-title text-center">
 							{{ _("Score") }}
-					  </h4>
+					  </h2>
 					  <p class="card-text">
-							<p class="huge text-center {% if build.score >= 0 %}text-success{% else %}text-danger{% end %}">
+							<h2 class="text-center {% if build.score >= 0 %}text-success{% else %}text-danger{% end %}">
 								{% if build.score > 0 %}
 									+{{ build.score }}
 								{% else %}
 									{{ build.score }}
 								{% end %}
-							</p>
+							</h3>
 							{% if bugs %}
 								<h5 class="text-center">{{ _("Fixed bugs") }}</h5>
 					  			</p>
