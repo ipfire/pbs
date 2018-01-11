@@ -1,19 +1,29 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<h1>{{ _("Edit failed") }}</h1>
-	<p>
-		{{ _("We are sorry.") }}
-		{{ _("The user profile cannot be saved.") }}
-	</p>
 
-	<ul>
-		{% for msg in messages %}
-			<li>{{ msg }}</li>
-		{% end %}
-	</ul>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<div class="alert alert-danger" role="alert">
+				<h2 style="word-wrap: break-word;" class="alert-heading">
+					{{ _("Edit failed") }}
+				</h2>
+				<p>
+						{{ _("We are sorry.") }}
+						{{ _("The user profile cannot be saved.") }}
+					</p>
 
-	<p>
-		{{ _("Use the back button on your web browser to go back to the previous page and correct your submission.") }}
-	</p>
+					<ul>
+						{% for msg in messages %}
+							<li>{{ msg }}</li>
+						{% end %}
+					</ul>
+
+					<p>
+						{{ _("Use the back button on your web browser to go back to the previous page and correct your submission.") }}
+					</p>
+			</div>
+		</div>
+	</div>
+
 {% end %}

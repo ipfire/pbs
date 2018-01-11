@@ -1,4 +1,4 @@
-<select name="{{ name }}" {% if id %}id="{{ id }}"{% end %}>
+<select class="form-control" name="{{ name }}" {% if id %}id="{{ id }}" aria-describedby="{{ id }}Help"{% end %}>
 	<option value="">- {{ _("Auto-select") }} -</option>
 
 	{% for tz in supported_timezones %}

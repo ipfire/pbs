@@ -3,32 +3,54 @@
 {% block title %}{{ _("Change password") }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/users">{{ _("Users") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/user/{{ user.name }}">{{ user.realname }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/user/{{ user.name }}/passwd">{{ _("Change password") }}</a>
-		</li>
-	</ul>
 
-	<div class="page-header">
-		<h1>{{ _("Change password") }}</h1>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item">
+						<a href="/users">{{ _("Users") }}</a>
+					</li>
+					<li class="breadcrumb-item">
+						<a href="/user/{{ user.name }}">{{ user.realname }}</a>
+					</li>
+					<li class="breadcrumb-item active">
+						<a href="/user/{{ user.name }}/passwd">{{ _("Change password") }}</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
 	<div class="row">
-		<div class="span6 offset3">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Change password") }}
+			</h2>
+		</div>
+	</div>
+
+	{% if error_msg %}
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				<div class="alert alert-danger alert-dismissible fade show" role="alert">
+					<h3 style="word-wrap: break-word;" class="alert-heading">
+						{{ _("Oops!") }}
+					</h3>
+					{{ error_msg }}
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	{% end %}
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
 			{% if user == current_user %}
-				<p>					
+				<p>
 					{{ _("You are going to change your password.") }}
 				</p>
 				<p>
@@ -44,57 +66,43 @@
 	</div>
 
 	<div class="row">
-		<div class="span6 offset3">
-			{% if error_msg %}
-				<div class="alert alert-block alert-important">
-					<a class="close" data-dismiss="alert">&times;</a>
-					<strong>{{ _("Oops!") }}</strong> {{ error_msg }}
-				</div>
-			{% end %}
-
-			<form class="form-horizontal" method="POST" action="">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<form method="POST" action="">
 				{% raw xsrf_form_html() %}
 
 				<fieldset>
 					{% if user == current_user %}
-						<div class="control-group">
-							<label class="control-label">{{ _("Old password") }}</label>
-							<div class="controls">
-								<input type="password" class="input-xlarge" name="pass0" />
-
-								<p class="help-block">
-									{{ _("Please provide your old password.") }}
-								</p>
-							</div>
+						<div class="form-group">
+							<label for="pass0">{{ _("Old password") }}</label>
+							<input type="password" class="form-control"
+								id="pass0" name="pass0" aria-describedby="pass0Help" placeholder="{{ _("Old password") }}">
+							<small id="pass0Help" class="form-text text-muted">
+								{{ _("Please provide your old password.") }}
+							</small>
 						</div>
 					{% end %}
 
-					<div class="control-group">
-						<label class="control-label">{{ _("New password") }}</label>
-						<div class="controls">
-							<input type="password" class="input-xlarge" name="pass1" />
-
-							<p class="help-block">
-								{{ _("Choose a new password. Make sure that it is as strong as possible.") }}
-							</p>
-						</div>
+					<div class="form-group">
+						<label for="pass1">{{ _("New password") }}</label>
+						<input type="password" class="form-control"
+							id="pass1" name="pass1" aria-describedby="pass1Help" placeholder="{{ _("New password") }}">
+						<small id="pass1Help" class="form-text text-muted">
+							{{ _("Choose a new password. Make sure that it is as strong as possible.") }}
+						</small>
 					</div>
 
-					<div class="control-group">
-						<label class="control-label">{{ _("Confirm") }}</label>
-						<div class="controls">
-							<input type="password" class="input-xlarge" name="pass2" />
-
-							<p class="help-block">
-								{{ _("Confirm the new password.") }}
-							</p>
-						</div>
+					<div class="form-group">
+						<label for="pass2">{{ _("Confirm new password") }}</label>
+						<input type="password" class="form-control"
+							id="pass2" name="pass2" aria-describedby="pass2Help" placeholder="{{ _("Confirm new password") }}">
+						<small id="pass2Help" class="form-text text-muted">
+							{{ _("Confirm the new password.") }}
+						</small>
 					</div>
 
-					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">{{ _("Change password") }}</button>
-						<a class="btn" href="/user/{{ user.name }}">{{ _("Cancel") }}</a>
-					</div>
+					<button type="submit" class="btn btn-primary">{{ _("Change password") }}</button>
+					<a class="btn btn-light" href="/user/{{ user.name }}">{{ _("Cancel") }}</a>
+
 				</fieldset>
 			</form>
 		</div>

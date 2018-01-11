@@ -3,16 +3,21 @@
 {% block title %}{{ _("Impersonate user %s") % user.realname }}{% end block %}
 
 {% block body %}
-	<div class="page-header">
-		<h1>{{ _("User impersonation") }}: {{ user.realname }}</h1>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+			<h2 style="word-wrap: break-word;">
+				{{ _("User impersonation") }}: {{ user.realname }}
+			</h2>
+		</div>
 	</div>
 
 	<div class="row">
-		<div class="span2 offset2">
-			<img src="{{ user.gravatar_icon() }}" alt="{{ user.name }}" />
+		<div class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 mb-2">
+			<div class="d-flex justify-content-center justify-content-md-start">
+				<img class="img-fluid" src="{{ user.gravatar_icon(200) }}" alt="{{ user.name }}" />
+			</div>
 		</div>
-
-		<div class="span6">
+		<div class="col-12 col-sm-12 col-md-8 col-lg-9 col-xl-9">
 			<p>
 				{{ _("When impersonating another user, every action you perform will be taking place as if you had logged in as the user whom will be impersonating.") }}
 			</p>
@@ -21,11 +26,14 @@
 				<h4 class="alert-heading">{{ _("Use with caution!") }}</h4>
 				{{ _("This is a very powerful feature. You should be very careful while using it.") }}
 			</div>
-
+		</div>
+	</div>
+	<div class="row justify-content-end">
+		<div class="col-12 col-sm-12 col-md-5 col-lg-4 col-xl-3">
 			<form method="POST" action="">
 				{% raw xsrf_form_html() %}
 				<input type="hidden" name="user" value="{{ user.name }}" />
-				<input class="btn btn-danger pull-right" type="submit" value="{{ _("Impersonate %s") % user.realname }}" />
+				<button type="submit" class="btn btn-block btn-danger">{{ _("Impersonate %s") % user.realname }}</button>
 			</form>
 		</div>
 	</div>

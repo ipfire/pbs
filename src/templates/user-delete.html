@@ -1,20 +1,38 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<h1>{{ _("Delete user %s") % user.realname }}</h1>
 
-	<p>
-		{% if current_user == user %}
-			{{ _("Do you really want to delete your own account?") }}
-			{{ _("You won't be able to login and use this service any more.") }}
-		{% else %}
-			{{ _("Do you really want to delete the user %s?") % user.realname }}
-		{% end %}
-	</p>
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Delete user %s") % user.realname }}
+			</h2>
+		</div>
+	</div>
 
-	<p class="buttons">
-		<a href="/user/delete/{{ user.name }}?confirmed=1">{{ _("Delete %s") % user.realname }}</a>
-		|
-		<a href="/user/{{ user.name }}">{{ _("Back") }}</a>
-	</p>
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<p>
+				{% if current_user == user %}
+					{{ _("Do you really want to delete your own account?") }}
+					{{ _("You won't be able to login and use this service any more.") }}
+				{% else %}
+					{{ _("Do you really want to delete the user %s?") % user.realname }}
+				{% end %}
+			</p>
+		</div>
+	</div>
+
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<div class="d-flex justify-content-end" style="width:100%">
+				<a class="btn btn-danger mb-2 mr-2" href="/user/delete/{{ user.name }}?confirmed=1">
+					{{ _("Delete %s") % user.realname }}
+				</a>
+				<a class="btn btn-primary mb-2" href="/user/{{ user.name }}">
+					{{ _("Back") }}
+				</a>
+			</div>
+		</div>
+	</div>
 {% end block %}

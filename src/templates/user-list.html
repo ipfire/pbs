@@ -3,19 +3,34 @@
 {% block title %}{{ _("User list") }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/users">{{ _("Users") }}</a>
-		</li>
-	</ul>
 
-	<div class="page-header">
-		<h2>{{ _("Users") }}</h2>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item active">
+						<a href="/users">
+							{{ _("Users") }}
+						</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
-	{% module UsersTable(users) %}
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Users") }}
+			</h2>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			{% module UsersTable(users) %}
+		</div>
+	</div>
+
 {% end block %}

@@ -1,17 +1,19 @@
-<table class="table table-striped table-hover">
-	<tbody>
-		{% for u in users %}
-			<tr>
-				<td>
-					<img class="pull-right" src="{{ u.gravatar_icon(64) }}" alt="{{ u.realname }}">
+<div class="table-responsive">
+	<table class="table table-striped table-hover">
+		<tbody>
+			{% for u in users %}
+				<tr>
+					<td>
+						<img class="float-right img-fluid" src="{{ u.gravatar_icon(64) }}" alt="{{ u.realname }}">
 
-					<a href="/user/{{ u.name }}">{{ u.realname }}</a>
-					<br>
-					{% if not u.name == u.realname %}
-						<span class="muted">{{ u.name }}</span>
-					{% end %}
-				</td>
-			</tr>
-		{% end %}
-	</tbody>
-</table>
+						<a href="/user/{{ u.name }}">{{ u.realname }}</a>
+						<br>
+						{% if not u.name == u.realname %}
+							<span class="text-muted">{{ u.name }}</span>
+						{% end %}
+					</td>
+				</tr>
+			{% end %}
+		</tbody>
+	</table>
+</div>

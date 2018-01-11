@@ -3,10 +3,18 @@
 {% block title %}{{ _("Builds by %s") % user.realname }}{% end block %}
 
 {% block body %}
-	<div class="page-header">
-		<h2>{{ _("Builds by %s") % user.realname }}</h2>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Builds by %s") % user.realname }}
+			</h2>
+		</div>
 	</div>
 
-	{% module BuildTable(builds) %}
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			{% module BuildTable(builds) %}
+		</div>
+	</div>
 {% end block %}
 

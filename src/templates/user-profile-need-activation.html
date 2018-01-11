@@ -1,10 +1,19 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<h1>{{ _("Edit successful") }}</h1>
-	<p>
-		{{ _("The user profile was successfully altered.") }}
-		{{ _("But as you have changed the email address, you need to re-activate the account.") }}
-		{{ _("Have a look at you mailbox - you already do know what to do.") }}
-	</p>
+	<div class="row align-items-center justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<div class="alert alert-success" role="alert">
+				<h2 style="word-wrap: break-word;" class="alert-heading">
+					{{ _("Edit successful") }}
+				</h2>
+				<p>
+					{{ _("The user profile was successfully altered.") }}
+					{{ _("But as you have changed the email address, you need to re-activate the account.") }}
+					{{ _("Have a look at you mailbox - you already do know what to do.") }}
+				</p>
+			</div>
+		</div>
+	</div>
+
 {% end %}

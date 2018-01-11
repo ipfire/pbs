@@ -3,135 +3,119 @@
 {% block title %}{{ _("Edit user profile: %s") % user.realname }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/users">{{ _("Users") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/user/{{ user.name }}">{{ user.realname }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/user/{{ user.name }}/edit">{{ _("Edit") }}</a>
-		</li>
-	</ul>
 
-	<div class="page-header">
-		<h2>
-			{{ _("Edit user profile: %s") % user.realname }}
-		</h2>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item">
+						<a href="/users">{{ _("Users") }}</a>
+					</li>
+					<li class="breadcrumb-item">
+						<a href="/user/{{ user.name }}">{{ user.realname }}</a>
+					</li>
+					<li class="breadcrumb-item active">
+						<a href="/user/{{ user.name }}/edit">{{ _("Edit") }}</a>
+					</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
-	<form class="form-horizontal" method="POST" action="">
-		{% raw xsrf_form_html() %}
-
-		<fieldset>
-			<legend>{{ _("User Identity") }}</legend>
-
-			<div class="control-group">
-				<label class="control-label">{{ _("Username") }}</label>
-				<div class="controls">
-					<span class="input-xlarge uneditable-input">{{ user.name }}</span>
-
-					<span class="help-inline">
-						{{ _("Cannot be changed.") }}
-					</span>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label" for="inputRealname">{{ _("Real name") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="inputRealname" name="realname" placeholder="{{ _("Real name") }}"
-						value="{{ user.realname }}">
-
-					<span class="help-block">
-						{{ _("This field is optional, but we appreciate it very much if you type in your real name.") }}
-					</span>
-				</div>
-			</div>
-		</fieldset>
-
-		<fieldset>
-			<legend>{{ _("Email Adresses") }}</legend>
-
-			<div class="control-group">
-				<label class="control-label">{{ _("Primary email address") }}</label>
-				<div class="controls">
-					<select class="input-xlarge" name="primary_email_address">
-						{% for email in user.emails %}
-							<option {% if user.email == email %}selected{% end %}>{{ email }}</option>
-						{% end %}
-					</select>
-
-					<span class="help-block">
-						{{ _("This email address will be used for all messages to you.") }}
-					</span>
-				</div>
-			</div>
-
-		</fieldset>
-
-		<fieldset>
-			<legend>{{ _("Account security settings") }}</legend>
-
-			<div class="control-group">
-				<label class="control-label" for="inputPass1">{{ _("Password") }}</label>
-				<div class="controls">
-					<input type="password" class="input-xlarge" id="inputPass1" name="pass1" placeholder="{{ _("Password") }}">
-
-					<span class="help-block">
-						{{ _("The password is used to secure the login and must be at least 8 characters.") }}
-					</span>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label" for="inputPass2">{{ _("Confirm") }}</label>
-				<div class="controls">
-					<input type="password" class="input-xlarge" id="inputPass2" name="pass2" placeholder="{{ _("Confirm password") }}">
-
-					<span class="help-block">
-						{{ _("Leave the password fields empty to keep the current password.") }}
-					</span>
-				</div>
-			</div>
-		</fieldset>
-
-		<fieldset>
-			<legend>{{ _("Locale & timezone settings") }}</legend>
-
-			<div class="control-group">
-				<label class="control-label" for="inputLocale">{{ _("Preferred language") }}</label>
-				<div class="controls">
-					{% module SelectLocale(name="locale", id="inputLocale", preselect=user.locale) %}
-
-					<span class="help-block">
-						{{ _("Auto-detect will use the language transmitted by your browser.") }}
-					</span>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label" for="inputTimezone">{{ _("Timezone") }}</label>
-				<div class="controls">
-					{% module SelectTimezone(name="timezone", id="inputTimezone", preselect=user.timezone.zone) %}
-
-					<span class="help-block">
-						{{ _("Auto-detect will use the timezone transmitted by your browser.") }}
-					</span>
-				</div>
-			</div>
-		</fieldset>
-
-		<div class="form-actions">
-			<button type="submit" class="btn btn-primary">{{ _("Save") }}</button>
-			<a class="btn" href="/user/{{ user.name }}">{{ _("Cancel") }}</a>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Edit user profile: %s") % user.realname }}
+			</h2>
 		</div>
-	</form>
+	</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<form method="POST" action="">
+				{% raw xsrf_form_html() %}
+
+				<fieldset>
+					<legend>{{ _("User Identity") }}</legend>
+
+					<div class="form-group">
+						<label for="username">{{ _("Username") }}</label>
+						<input type="text" class="form-control" id="username" name="username"
+							aria-describedby="usernameHelp" value="{{ user.name }}" disabled>
+						<small id="usernameHelp" class="form-text text-muted">
+								{{ _("Cannot be changed.") }}
+						</small>
+					</div>
+
+					<div class="form-group">
+						<label for="inputRealname">{{ _("Real name") }}</label>
+						<input type="text" class="form-control" id="inputRealname" name="realname" aria-describedby="realnameHelp"
+							placeholder="{{ _("Real name") }}" value="{{ user.realname }}">
+						<small id="inputRealnameHelp" class="form-text text-muted">
+								{{ _("This field is optional, but we appreciate it very much if you type in your real name.") }}
+						</small>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>{{ _("Email Adresses") }}</legend>
+
+					<div class="form-group">
+						<label for="primary_email_address">{{ _("Primary email address") }}</label>
+						<select class="form-control" id="primary_email_address" name="primary_email_address" aria-describedby="primary_email_addressHelp">
+							{% for email in user.emails %}
+								<option {% if user.email == email %}selected{% end %}>{{ email }}</option>
+							{% end %}
+						</select>
+						<small id="primary_email_addressHelp" class="form-text text-muted">
+								{{ _("This email address will be used for all messages to you.") }}
+						</small>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>{{ _("Account security settings") }}</legend>
+
+					<div class="form-group">
+						<label for="inputPass1">{{ _("Password") }}</label>
+						<input type="password" class="form-control"
+							id="inputPass1" name="pass1" aria-describedby="pass1Help" placeholder="{{ _("Password") }}">
+						<small id="inputPass1Help" class="form-text text-muted">
+							{{ _("The password is used to secure the login and must be at least 8 characters.") }}
+						</small>
+					</div>
+
+					<div class="form-group">
+						<label for="inputPass2">{{ _("Confirm Password") }}</label>
+						<input type="password" class="form-control"
+							id="inputPass2" name="pass2" aria-describedby="inputPass2Help" placeholder="{{ _("Confirm Password") }}">
+						<small id="inputPass2Help" class="form-text text-muted">
+							{{ _("Leave the password fields empty to keep the current password.") }}
+						</small>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>{{ _("Locale & timezone settings") }}</legend>
+
+					<div class="form-group">
+						<label for="inputLocale">{{ _("Preferred language") }}</label>
+						{% module SelectLocale(name="locale", id="inputLocale", preselect=user.locale) %}
+						<small id="inputLocaleHelp" class="form-text text-muted">
+							{{ _("Auto-detect will use the language transmitted by your browser.") }}
+						</small>
+					</div>
+
+					<div class="form-group">
+						<label for="inputTimezone">{{ _("Timezone") }}</label>
+						{% module SelectTimezone(name="timezone", id="inputTimezone", preselect=user.timezone.zone) %}
+						<small id="inputTimezoneHelp" class="form-text text-muted">
+							{{ _("Auto-detect will use the timezone transmitted by your browser.") }}
+						</small>
+					</div>
+				</fieldset>
+
+				<button type="submit" class="btn btn-primary">{{ _("Save") }}</button>
+				<a class="btn btn-light" href="/user/{{ user.name }}">{{ _("Cancel") }}</a>
+			</form>
 {% end block %}
