@@ -35,26 +35,6 @@ class UploadsHandler(base.BaseHandler):
 		self.render("uploads-list.html", uploads=self.backend.uploads)
 
 
-class DocsIndexHandler(base.BaseHandler):
-	def get(self):
-		self.render("docs-index.html")
-
-
-class DocsBuildsHandler(base.BaseHandler):
-	def get(self):
-		self.render("docs-build.html")
-
-
-class DocsUsersHandler(base.BaseHandler):
-	def get(self):
-		self.render("docs-users.html")
-
-
-class DocsWhatsthisHandler(base.BaseHandler):
-	def get(self):
-		self.render("docs-whatsthis.html")
-
-
 class FileDetailHandler(base.BaseHandler):
 	def get(self, uuid):
 		pkg, file = self.backend.packages.get_with_file_by_uuid(uuid)

@@ -55,11 +55,6 @@ src/templates/distro-source-commits.html
 src/templates/distro-source-detail.html
 src/templates/distro-update-detail.html
 src/templates/distro-update-edit.html
-src/templates/docs-base.html
-src/templates/docs-build.html
-src/templates/docs-index.html
-src/templates/docs-users.html
-src/templates/docs-whatsthis.html
 src/templates/errors/error-400.html
 src/templates/errors/error-403.html
 src/templates/errors/error-404.html

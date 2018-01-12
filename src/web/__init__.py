@@ -227,12 +227,6 @@ class Application(tornado.web.Application):
 			(r"/key/([A-Z0-9]+)", keys.KeysDownloadHandler),
 			(r"/key/([A-Z0-9]+)/delete", keys.KeysDeleteHandler),
 
-			# Documents
-			(r"/documents", DocsIndexHandler),
-			(r"/documents/builds", DocsBuildsHandler),
-			(r"/documents/users", DocsUsersHandler),
-			(r"/documents/what-is-the-pakfire-build-service", DocsWhatsthisHandler),
-
 			# Search
 			(r"/search", search.SearchHandler),
 

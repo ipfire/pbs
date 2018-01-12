@@ -170,11 +170,6 @@ dist_templates_DATA = \
 	src/templates/distro-source-detail.html \
 	src/templates/distro-update-detail.html \
 	src/templates/distro-update-edit.html \
-	src/templates/docs-base.html \
-	src/templates/docs-build.html \
-	src/templates/docs-index.html \
-	src/templates/docs-users.html \
-	src/templates/docs-whatsthis.html \
 	src/templates/file-detail.html \
 	src/templates/index.html \
 	src/templates/jobs-abort.html \
