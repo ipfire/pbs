@@ -3,175 +3,211 @@
 {% block title %}{{ _("Package") }}: {{ pkg.friendly_name }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/packages">{{ _("Packages") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/package/{{ pkg.name }}">{{ pkg.name }}</a>
-			<span class="divider">/</span>
-		</li>
-		{% if pkg.build %}
-			<li>
-				<a href="/build/{{ pkg.build.uuid }}">{{ pkg.friendly_version }}</a>
-				<span class="divider">/</span>
-			</li>
-		{% end %}
-		{% if pkg.job %}
-			<li>
-				<a href="/job/{{ pkg.job.uuid }}">{{ pkg.job.arch }}</a>
-				<span class="divider">/</span>
-			</li>
-		{% end %}
-		<li class="active">
-			<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
-		</li>
-	</ul>
 
-	<div class="page-header">
-		<div class="pull-right">
-			{% if pkg.type == "source" %}
-				<span class="label label-success">{{ _("Source package") }}</span>
-			{% end %}
-			{% if pkg.name.endswith("-devel") %}
-				<span class="label label-info">{{ _("Development package") }}</span>
-			{% end %}
-			{% if pkg.name.endswith("-debuginfo") %}
-				<span class="label">{{ _("Debuginfo package") }}</span>
-			{% end %}
+<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/packages">{{ _("Packages") }}</a></li>
+					<li class="breadcrumb-item"><a href="/package/{{ pkg.name }}">{{ pkg.name }}</a></li>
+					{% if pkg.build %}
+						<li class="breadcrumb-item">
+							<a href="/build/{{ pkg.build.uuid }}">{{ pkg.friendly_version }}</a>
+						</li>
+					{% end %}
+					{% if pkg.job %}
+						<li class="breadcrumb-item">
+							<a href="/job/{{ pkg.job.uuid }}">{{ pkg.job.arch }}</a>
+						</li>
+					{% end %}
+					<li class="breadcrumb-item active">
+						<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
+					</li>
+				</ol>
+			</nav>
 		</div>
-
-		<h2>
-			{{ _("Package") }}: {{ pkg.friendly_name }}<br>
-			<small>{{ pkg.summary }}</small>
-		</h2>
 	</div>
 
 	<div class="row">
-		<div class="span4">
+		{% if pkg.build %}
+			<div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+				<h2 style="word-wrap: break-word;">
+					{{ _("Package") }}: {{ pkg.friendly_name }}
+					{% if pkg.type == "source" %}
+						<span class="badge badge-info float-lg-right float-xl-right">{{ _("Source package") }}</span>
+					{% end %}
+					{% if pkg.name.endswith("-devel") %}
+						<span class="badge badge-info float-lg-right float-xl-right">{{ _("Development package") }}</span>
+					{% end %}
+					{% if pkg.name.endswith("-debuginfo") %}
+						<span class="badge badge-info float-lg-right float-xl-right">{{ _("Debuginfo package") }}</span>
+					{% end %}
+					<br>
+					<small>{{ pkg.summary }}</small>
+				</h2>
+			</div>
+			<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
+				<div class="dropdown">
+					<button class="btn btn-block btn-light dropdown-toggle mb-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						{{ _("Actions") }}
+					</button>
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+						<a class="dropdown-item" href="{{ pkg.build.download_prefix }}/{{ pkg.path }}">
+							{{ _("Download") }}
+						</a>
+					</div>
+				</div>
+			</div>
+		{% else %}
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				<h2 style="word-wrap: break-word;">
+					{{ _("Package") }}: {{ pkg.friendly_name }}
+					{% if pkg.type == "source" %}
+						<span class="badge badge-info float-lg-right float-xl-right">{{ _("Source package") }}</span>
+					{% end %}
+					{% if pkg.name.endswith("-devel") %}
+						<span class="badge badge-info float-lg-right float-xl-right">{{ _("Development package") }}</span>
+					{% end %}
+					{% if pkg.name.endswith("-debuginfo") %}
+						<span class="badge badge-info float-lg-right float-xl-right">{{ _("Debuginfo package") }}</span>
+					{% end %}
+					<br>
+					<small>{{ pkg.summary }}</small>
+				</h2>
+			</div>
+		{% end %}
+	</div>
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
 			{% module Text(pkg.description) %}
 		</div>
-
-		<div class="span4">
-			<table class="table">
-				<tbody>
-					<tr>
-						<td>{{ _("Homepage") }}</td>
-						<td>
-							<a href="{{ pkg.url }}" target="_blank">{{ pkg.url }}</a>
-						</td>
-					</tr>
-					<tr>
-						<td>{{ _("License") }}</td>
-						<td>
-							{{ pkg.license }}
-						</td>
-					</tr>
-					{% if pkg.maintainer %}
+	</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+			<div class="table-responsive mb-2">
+				<table class="table">
+					<tbody>
 						<tr>
-							<td>{{ _("Maintainer") }}</td>
-							<td>{% module LinkToUser(pkg.maintainer) %}</td>
+							<td>{{ _("Homepage") }}</td>
+							<td>
+								<a href="{{ pkg.url }}" target="_blank">{{ pkg.url }}</a>
+							</td>
 						</tr>
-					{% end %}
-					<tr>
-						<td>{{ _("Build host") }}</td>
-						<td>
-							<a href="/builder/{{ pkg.build_host }}">{{ pkg.build_host }}</a>
-						</td>
-					</tr>
-					<tr>
-						<td>{{ _("Build time") }}</td>
-						<td>{{ locale.format_date(pkg.build_time, full_format=True) }} UTC</td>
-					</tr>
-				</tbody>
-			</table>
+						<tr>
+							<td>{{ _("License") }}</td>
+							<td>
+								{{ pkg.license }}
+							</td>
+						</tr>
+						{% if pkg.maintainer %}
+							<tr>
+								<td>{{ _("Maintainer") }}</td>
+								<td>{% module LinkToUser(pkg.maintainer) %}</td>
+							</tr>
+						{% end %}
+						<tr>
+							<td>{{ _("Build host") }}</td>
+							<td>
+								<a href="/builder/{{ pkg.build_host }}">{{ pkg.build_host }}</a>
+							</td>
+						</tr>
+						<tr>
+							<td>{{ _("Build time") }}</td>
+							<td>{{ locale.format_date(pkg.build_time, full_format=True) }} UTC</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 
-		<div class="span4">
-			<table class="table">
-				<tbody>
-					{% if pkg.type == "binary" %}
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+			<div class="table-responsive mb-2">
+				<table class="table">
+					<tbody>
+						{% if pkg.type == "binary" %}
+							<tr>
+								<td>{{ _("Source package") }}</td>
+								<td>
+									<a href="/package/{{ pkg.build.pkg.uuid }}">{{ pkg.build.pkg.friendly_name }}</a>
+								</td>
+							</tr>
+						{% end %}
+
+						{% if pkg.build %}
+							<tr>
+								<td>{{ _("Build") }}</td>
+								<td>
+									<a href="/build/{{ pkg.build.uuid }}">{{ pkg.build.name }}</a>
+								</td>
+							</tr>
+						{% end %}
+
+						{% if pkg.job %}
+							<tr>
+								<td>{{ _("Job") }}</td>
+								<td>
+									<a href="/job/{{ pkg.job.uuid }}">{{ pkg.job.name }}</a>
+								</td>
+							</tr>
+						{% end %}
+
 						<tr>
-							<td>{{ _("Source package") }}</td>
+							<td>{{ _("Size") }}</td>
 							<td>
-								<a href="/package/{{ pkg.build.pkg.uuid }}">{{ pkg.build.pkg.friendly_name }}</a>
+								{{ format_size(pkg.filesize) }}
+								{% if pkg.type == "binary" and not pkg.size == pkg.filesize %}
+									({{ _("%(size)s when installed") % { "size" : format_size(pkg.size) } }})
+								{% end %}
 							</td>
 						</tr>
-					{% end %}
 
-					{% if pkg.build %}
-						<tr>
-							<td>{{ _("Build") }}</td>
-							<td>
-								<a href="/build/{{ pkg.build.uuid }}">{{ pkg.build.name }}</a>
-							</td>
-						</tr>
-					{% end %}
-
-					{% if pkg.job %}
-						<tr>
-							<td>{{ _("Job") }}</td>
-							<td>
-								<a href="/job/{{ pkg.job.uuid }}">{{ pkg.job.name }}</a>
-							</td>
-						</tr>
-					{% end %}
-
-					<tr>
-						<td>{{ _("Size") }}</td>
-						<td>
-							{{ format_size(pkg.filesize) }}
-							{% if pkg.type == "binary" and not pkg.size == pkg.filesize %}
-								({{ _("%(size)s when installed") % { "size" : format_size(pkg.size) } }})
-							{% end %}
-						</td>
-					</tr>
-
-					{% if pkg.commit %}
-						<tr>
-							<td>{{ _("Commit") }}</td>
-							<td>
-								<a href="/distro/{{ pkg.commit.distro.identifier }}/source/{{ pkg.commit.source.identifier }}/commit/{{ pkg.commit.revision }}">{{ pkg.commit.revision[:7] }}</a>
-								<br />{{ pkg.commit.subject }}
-							</td>
-						</tr>
-					{% end %}
-				</tbody>
-			</table>
+						{% if pkg.commit %}
+							<tr>
+								<td>{{ _("Commit") }}</td>
+								<td>
+									<a href="/distro/{{ pkg.commit.distro.identifier }}/source/{{ pkg.commit.source.identifier }}/commit/{{ pkg.commit.revision }}">{{ pkg.commit.revision[:7] }}</a>
+									<br />{{ pkg.commit.subject }}
+								</td>
+							</tr>
+						{% end %}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 
-	{% if pkg.build %}
-		<a class="btn pull-right" href="{{ pkg.build.download_prefix }}/{{ pkg.path }}">
-			<i class="icon-download"></i>
-			{{ _("Download") }}
-		</a>
-
-		<br class="clear">
-	{% end %}
-
 	{% if pkg.has_deps() %}
-		<hr>
-
-		{% if pkg.type == "source" %}
-			<h4>{{ _("Build dependencies") }}</h4>
-		{% else %}
-			<h3>{{ _("Dependencies") }}</h3>
-		{% end %}
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				<h3 style="word-wrap: break-word;">
+					{% if pkg.type == "source" %}
+						{{ _("Build dependencies") }}
+					{% else %}
+						{{ _("Dependencies") }}
+					{% end %}
+				</h3>
+			</div>
+		</div>
 
 		{% module PackagesDependencyTable(pkg) %}
+
 	{% end %}
 
 	{% if pkg.filelist %}
-		<hr>
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				<h3 style="word-wrap: break-word;">
+					{{ _("Filelist") }}
+				</h3>
+			</div>
+		</div>
 
-		<h3>{{ _("Filelist") }}</h3>
-
-		{% module PackageFilesTable(pkg, pkg.filelist) %}
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				{% module PackageFilesTable(pkg, pkg.filelist) %}
+			</div>
+		</div>
 	{% end %}
 {% end block %}
