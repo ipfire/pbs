@@ -3,92 +3,83 @@
 {% block title %}{{ _("Register a new account") }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/register">{{ _("Register new account") }}</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h2>
-			{{ _("Register a new account") }}
-			<small>{{ _("Join the community!") }}</small>
-		</h2>
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item active"><a href="/register">{{ _("Register new account") }}</a></li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
-	<form class="form-horizontal" method="POST" action="">
-		{% raw xsrf_form_html() %}
-
-		<legend>{{ _("Registration form") }}</legend>
-
-		<fieldset>
-			<div class="control-group">
-				<label class="control-label" for="name">{{ _("Username") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="name" name="name" placeholder="{{ _("Username") }}">
-
-					<p class="help-block">
-						{{ _("Must be a unique name you login with.") }}
-					</p>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label" for="email">{{ _("Email address") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="email" name="email" placeholder="{{ _("Email address") }}">
-
-					<p class="help-block">
-						{{ _("Type in your email address, which is used to verify the account.") }}
-					</p>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label" for="realname">{{ _("Real name (optional)") }}</label>
-				<div class="controls">
-					<input type="text" class="input-xlarge" id="realname" name="realname" placeholder="{{ _("Real name") }}">
-
-					<p class="help-block">
-						{{ _("Type you firstname and your lastname here.") }}
-					</p>
-				</div>
-			</div>
-		</fieldset>
-
-		<fieldset>
-			<legend>{{ _("Account security") }}</legend>
-
-			<div class="control-group">
-				<label class="control-label" for="pass1">{{ _("Password") }}</label>
-				<div class="controls">
-					<input type="password" class="input-xlarge" id="pass1" name="pass1" placeholder="{{ _("Password") }}">
-
-					<p class="help-block">
-						{{ _("The password is used to secure the login and must be at least 8 characters.") }}
-					</p>
-				</div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label" for="pass2">{{ _("Confirm password") }}</label>
-				<div class="controls">
-					<input type="password" class="input-xlarge" id="pass2" name="pass2" placeholder="{{ _("Confirm password") }}">
-
-					<p class="help-block">
-						{{ _("Pick a password that is as strong as possible.") }}
-						{{ _("Don't login at unsecure places where people could spy on your password.") }}
-					</p>
-				</div>
-			</div>
-		</fieldset>
-
-		<div class="form-actions">
-			<button type="submit" class="btn btn-primary">{{ _("Sign up!") }}</button>
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<h2>
+				{{ _("Register a new account") }}
+				<small>{{ _("Join the community!") }}</small>
+			</h2>
 		</div>
-	</form>
+	</div>
+
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+
+			<form method="POST" action="">
+				{% raw xsrf_form_html() %}
+				<fieldset>
+					<legend>{{ _("Registration form") }}</legend>
+
+					<div class="form-group">
+						<label for="name">{{ _("Username") }}</label>
+						<input type="text" class="form-control" id="name" name="name" aria-describedby="nameHelp" placeholder="{{ _("Username") }}">
+						<small id="nameHelp" class="form-text text-muted">
+							{{ _("Must be a unique name you login with.") }}
+						</small>
+					</div>
+
+					<div class="form-group">
+						<label for="email">{{ _("Email address") }}</label>
+						<input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="{{ _("Email address") }}">
+						<small id="emailHelp" class="form-text text-muted">
+							{{ _("Type in your email address, which is used to verify the account.") }}
+						</small>
+					</div>
+
+					<div class="form-group">
+						<label for="realname">{{ _("Real name (optional)") }}</label>
+						<input type="text" class="form-control" id="realname" name="realname" aria-describedby="realnameHelp" placeholder="{{ _("Real name") }}">
+						<small id="realnameHelp" class="form-text text-muted">
+							{{ _("Type you firstname and your lastname here.") }}
+						</small>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>{{ _("Account security") }}</legend>
+
+					<div class="form-group">
+						<label for="pass1">{{ _("Password") }}</label>
+						<input type="password" class="form-control"
+							id="pass1" name="pass1" aria-describedby="pass1Help" placeholder="{{ _("Password") }}">
+						<small id="pass1Help" class="form-text text-muted">
+							{{ _("The password is used to secure the login and must be at least 8 characters.") }}
+						</small>
+					</div>
+
+					<div class="form-group">
+						<label for="pass2">{{ _("Password") }}</label>
+						<input type="password" class="form-control"
+							id="pass2" name="pass2" aria-describedby="pass2Help" placeholder="{{ _("Confirm password") }}">
+						<small id="pass1Help" class="form-text text-muted">
+							{{ _("Pick a password that is as strong as possible.") }}
+							{{ _("Don't login at unsecure places where people could spy on your password.") }}
+						</small>
+					</div>
+				</fieldset>
+
+				<button type="submit" class="btn btn-primary">{{ _("Sign up!") }}</button>
+			</form>
+		</div>
+	</div>
 {% end block %}

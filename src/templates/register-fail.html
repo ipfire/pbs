@@ -1,19 +1,23 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<h1>{{ _("Registration failed") }}</h1>
-	<p>
-		{{ _("We are sorry.") }}
-		{{ _("We could not create your requested account.") }}
-	</p>
-
-	<ul>
-		{% for msg in messages %}
-			<li>{{ msg }}</li>
-		{% end %}
-	</ul>
-
-	<p>
-		{{ _("Use the back button on your web browser to go back to the previous page and correct your submission.") }}
-	</p>
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<div class="alert alert-danger">
+				<h2 style="word-wrap: break-word;" class="alert-heading">{{ _("Registration failed") }}</h2>
+				<p>
+					{{ _("We are sorry.") }}
+					{{ _("We could not create your requested account, because we encountered the following errors:") }}
+				</p>
+				<ul>
+					{% for msg in messages %}
+						<li>{{ msg }}</li>
+					{% end %}
+				</ul>
+				<p>
+					{{ _("Use the back button on your web browser to go back to the previous page and correct your submission.") }}
+				</p>
+			</div>
+		</div>
+	</div>
 {% end %}

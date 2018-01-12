@@ -3,26 +3,25 @@
 {% block title %}{{ _("Account activation successful") }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			{{ _("Account activation") }}
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h1>{{ _("Activation successful") }}</h1>
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item active">{{ _("Account activation") }}</li>
+				</ol>
+			</nav>
+		</div>
 	</div>
-
-	<div class="row">
-		<div class="span6 offset3">
-			<p>
-				{{ _("Your account has been activated, %s.") % user.realname }}
-				{{ _("Have fun!") }}
-			</p>
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+			<div class="alert alert-success">
+				<h2 style="word-wrap: break-word;" class="alert-heading">{{ _("Activation successful") }}</h2>
+					<p>
+						{{ _("Your account has been activated, %s.") % user.realname }}
+						{{ _("Have fun!") }}
+					</p>
+			</div>
 		</div>
 	</div>
 {% end %}
