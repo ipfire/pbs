@@ -3,51 +3,58 @@
 {% block title %}{{ _("Changelog of %s") % name }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/packages">{{ _("Packages") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/package/{{ name }}">{{ name }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/package/{{ name }}/changelog">{{ _("Changelog") }}</a>
-		</li>
-	</ul>
-
-	<div class="page-header">
-		<h2>
-			{{ name }} <small>{{ _("Changelog") }}</small>
-		</h2>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/packages">{{ _("Packages") }}</a></li>
+					<li class="breadcrumb-item"><a href="/package/{{ name }}">{{ name }}</a></li>
+					<li class="breadcrumb-item active">	<a href="/package/{{ name }}/changelog">{{ _("Changelog") }}</a></li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
-	{% module Changelog(builds=builds) %}
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ name }}
+				<br>
+				<small>{{ _("Changelog") }}</small>
+			</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			{% module Changelog(builds=builds) %}
+		</div>
+	</div>
 
-	<ul class="pager">
-		{% if have_prev %}
-			<li class="previous">
-				<a href="?offset={{ offset - limit }}&limit={{ limit }}">&larr; {{ _("Newer") }}</a>
-			</li>
-		{% else %}
-			<li class="previous disabled">
-				<a href="#">&larr; {{ _("Newer") }}</a>
-			</li>
-		{% end %}
-
-		{% if have_next %}
-			<li class="next">
-				<a href="?offset={{ offset + limit }}&limit={{ limit }}">{{ _("Older") }} &rarr;</a>
-			</li>
-		{% else %}
-			<li class="next disabled">
-				<a href="#">{{ _("Older") }} &rarr;</a>
-			</li>
-		{% end %}
-	</ul>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav>
+				<ul class="pagination justify-content-center">
+					{% if have_prev %}
+						<li class="page-item">
+							<a class="page-link" href="?offset={{ offset - limit }}&limit={{ limit }}">&larr; {{ _("Newer") }}</a>
+						</li>
+					{% else %}
+						<li class="page-item disabled">
+							<a class="page-link" href="#">&larr; {{ _("Newer") }}</a>
+						</li>
+					{% end %}
+					{% if have_next %}
+						<li class="page-item">
+							<a class="page-link" href="?offset={{ offset + limit }}&limit={{ limit }}">{{ _("Older") }} &rarr;</a>
+						</li>
+					{% else %}
+						<li class="page-item disabled">
+							<a class="page-link" href="#">{{ _("Older") }} &rarr;</a>
+						</li>
+					{% end %}
+				</ul>
+			</nav>
+		</div>
+	</div>
 {% end block %}

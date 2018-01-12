@@ -1,36 +1,43 @@
 <div class="card mb-3
-		{% if build.type == "release" and build.repo.type == "stable" %}
-			border-success
-		{% elif build.type == "release" and build.repo.type == "unstable" %}
-			border-warning
-		{% elif build.type == "release" and build.repo.type == "testing" %}
-			border-danger
-		{% elif build.type == "scratch" %}
-			border-danger
-		{% end %}" style="width:100%;">
-		<div class="card-header
 		{% if build.type == "release" and build.repo %}
 			{% if build.repo.type == "stable" %}
-				text-success">
-				<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
-					{{ build.repo.distro.name }} &dash; {{ build.repo.name }}
-				</a>
-			{% elif build.repo.type == "unstable" %}
-				text-warning">
-				<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
-					{{ build.repo.distro.name }} &dash; {{ build.repo.name }}
-				</a>
+				border-success
+			{% elif  build.repo.type == "unstable" %}
+				border-danger
 			{% elif build.repo.type == "testing" %}
-				text-danger">
-				<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
-					{{ build.repo.distro.name }} &dash; {{ build.repo.name }}
-				</a>
+				border-warning
 			{% end %}
 		{% elif build.type == "scratch" %}
-			text-secondary">
-			{{ _("Scratch build") }}
+			border-secondary
 		{% end %}
-		</div>
+	"
+	style="width:100%;">
+		{% if build.type == "release" and build.repo %}
+			{% if build.repo.type == "stable" %}
+				<div class="card-header text-success">
+					<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
+						{{ build.repo.distro.name }} &dash; {{ build.repo.name }}
+					</a>
+				</div>
+			{% elif build.repo.type == "unstable" %}
+				<div class="card-header	text-danger">
+					<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
+						{{ build.repo.distro.name }} &dash; {{ build.repo.name }}
+					</a>
+				</div>
+			{% elif build.repo.type == "testing" %}
+				<div class="card-header	text-warning">
+					<a href="/distro/{{ build.repo.distro.identifier }}/repo/{{ build.repo.name }}">
+						{{ build.repo.distro.name }} &dash; {{ build.repo.name }}
+					</a>
+				</div>
+			{% end %}
+		{% elif build.type == "scratch" %}
+			<div class="card-header text-secondary">
+				{{ _("Scratch build") }}
+			</div>
+		{% end %}
+
 		<div class="card-body">
 			<h4 class="card-title">
 				<a href="/build/{{ build.uuid }}">
