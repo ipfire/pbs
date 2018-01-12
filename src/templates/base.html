@@ -53,7 +53,7 @@
 						</div>
 					</li>
 				 </ul>
-				 <form class="form-inline my-2 my-lg-0" method="GET" action="/search">
+				 <form class="form-inline justify-content-lg-end" method="GET" action="/search">
 						<input type="text"
 							class="form-control mr-sm-2 search-query typeahead-packages-autocomplete"
 							id="search" placeholder="{{ _("Search...") }}"
@@ -61,12 +61,12 @@
 							name="q" autocomplete="off">
 				</form>
 				{% if current_user %}
-					<ul class="navbar-nav mr-auto">
+					<ul class="navbar-nav justify-content-lg-end">
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								{{ current_user.realname }}
 							</a>
-							<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
 								<a class="dropdown-item" href="/profile">{{ _("My profile") }}</a>
 								<a class="dropdown-item" href="/profile/builds">{{ _("My builds") }}</a>
 								<div class="dropdown-divider"></div>
@@ -81,7 +81,7 @@
 						</li>
 					</ul>
 				{% else %}
-					<ul class="navbar-nav mr-auto">
+					<ul class="navbar-nav justify-content-lg-end">
 						<li class="nav-item">
 							<a class="nav-link" href="/register">{{ _("Register") }}</a>
 						</li>
@@ -89,11 +89,11 @@
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								{{ _("Sign in") }}
 							</a>
-							<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
 								<form class="" action="/login" method="POST">
 									<div class="form-group dropdown-item">
 										{% raw xsrf_form_html() %}
-										<input class=" form-control btn " type="text" name="name" placeholder="{{ _("Username") }}">
+										<input class=" form-control btn" style="min-width:30ch" type="text" name="name" placeholder="{{ _("Username") }}">
 									</div>
 									<div class="form-group dropdown-item">
 										<input class="form-control btn " type="password" name="pass" placeholder="{{ _("Password") }}">
@@ -102,7 +102,7 @@
 										<input class="form-control btn  btn-primary" type="submit" value="{{ _("Sign In") }}">
 									</div>
 								</form>
-								<a class="dropdown-item" href="/password-recovery">
+								<a class="dropdown-item text-center" href="/password-recovery">
 									<small>{{ _("Forgot your password?") }}</small>
 								</a>
 
