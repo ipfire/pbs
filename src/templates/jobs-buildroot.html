@@ -3,92 +3,94 @@
 {% block title %}{{ _("Job buildroot")}}: {{ job.name }}{% end block %}
 
 {% block body %}
-	<ul class="breadcrumb">
-		<li>
-			<a href="/">{{ _("Home") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/packages">{{ _("Packages") }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/build/{{ build.uuid }}">{{ build.pkg.friendly_version }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li>
-			<a href="/job/{{ job.uuid }}">{{ job.arch }}</a>
-			<span class="divider">/</span>
-		</li>
-		<li class="active">
-			<a href="/job/{{ job.uuid }}/buildroot">{{ _("Buildroot") }}</a>
-		</li>
-	</ul>
 
-	<div class="page-header">
-		<h2>
-			{{ _("Build job")}}: {{ job.name }} <small>{{ _("Buildroot") }}</small>
-		</h2>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<nav aria-label="breadcrumb" role="navigation">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+					<li class="breadcrumb-item"><a href="/packages">{{ _("Packages") }}</a></li>
+					<li class="breadcrumb-item"><a href="/package/{{ build.pkg.name }}">{{ build.pkg.name }}</a></li>
+					<li class="breadcrumb-item"><a href="/build/{{ build.uuid }}">{{ build.pkg.friendly_version }}</a></li>
+					<li class="breadcrumb-item"><a href="/job/{{ job.uuid }}">{{ job.arch }}</a></li>
+					<li class="breadcrumb-item active"><a href="/job/{{ job.uuid }}/buildroot">{{ _("Buildroot") }}</a></li>
+				</ol>
+			</nav>
+		</div>
 	</div>
 
 	<div class="row">
-		<div class="span9">
-			<p>
-				{{ _("The packages listed below were used to build %s.") % job.name }}
-			</p>
-		</div>
-
-		<div class="span3">
-			<table class="table table-striped table-hover">
-				<tr>
-					<td>{{ _("Packages") }}</td>
-					<td>{{ len(buildroot) }}</td>
-				</tr>
-				<tr>
-					<td>{{ _("Buildroot size") }}</td>
-					<td>{{ format_size(buildroot_size) }}</td>
-				</tr>
-				<tr>
-					<td>{{ _("Download size") }}</td>
-					<td>{{ format_size(download_size) }}</td>
-				</tr>
-			</table>
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h2 style="word-wrap: break-word;">
+				{{ _("Build job")}}: {{ job.name }}<br>
+				<small>{{ _("Buildroot") }}</small>
+			</h2>
 		</div>
 	</div>
 
-	<hr>
 
-	<table class="table table-striped table-hover">
-		<tbody>
-			{% for name, uuid, pkg in buildroot %}
-				<tr>
-					{% if pkg %}
-						<td>
-							<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
-						</td>
-						<td>
-							{{ pkg.summary }}
-						</td>
-						<td>
-							{{ format_size(pkg.filesize) }}
-						</td>
-					{% else %}
-						<td>
-							{{ name }}
-						</td>
-						<td>
-							({{ uuid }})
-						</td>
-						<td>
-							{{ _("N/A") }}
-						</td>
-					{% end %}
-				</tr>
-			{% end %}
-		</tbody>
-	</table>
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<div class="table-responsive mb-2">
+				<table class="table table-striped table-hover">
+					<tr>
+						<td>{{ _("Packages") }}</td>
+						<td>{{ len(buildroot) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Buildroot size") }}</td>
+						<td>{{ format_size(buildroot_size) }}</td>
+					</tr>
+					<tr>
+						<td>{{ _("Download size") }}</td>
+						<td>{{ format_size(download_size) }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<h4 style="word-wrap: break-word;">
+				{{ _("The packages listed below were used to build %s.") % job.name }}
+			</h4>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+			<div class="table-responsive mb-2">
+				<table class="table table-striped table-hover">
+					<tbody>
+						{% for name, uuid, pkg in buildroot %}
+							<tr>
+								{% if pkg %}
+									<td>
+										<a href="/package/{{ pkg.uuid }}">{{ pkg.friendly_name }}</a>
+									</td>
+									<td>
+										{{ pkg.summary }}
+									</td>
+									<td>
+										{{ format_size(pkg.filesize) }}
+									</td>
+								{% else %}
+									<td>
+										{{ name }}
+									</td>
+									<td>
+										({{ uuid }})
+									</td>
+									<td>
+										{{ _("N/A") }}
+									</td>
+								{% end %}
+							</tr>
+						{% end %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 {% end block %}
