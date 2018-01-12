@@ -145,8 +145,6 @@ webdir = $(buildservicedir)/web
 # ------------------------------------------------------------------------------
 
 dist_templates_DATA = \
-	src/templates/base-form1.html \
-	src/templates/base-form2.html \
 	src/templates/base.html \
 	src/templates/build-bugs.html \
 	src/templates/build-delete.html \
