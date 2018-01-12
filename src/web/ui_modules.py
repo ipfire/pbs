@@ -154,16 +154,8 @@ class PackagesDependencyTableModule(UIModule):
 			if deps:
 				has_deps.append((name, deps))
 
-		if len(has_deps):
-			span = math.floor(12 / len(has_deps))
-
-			if span > 3:
-				span = 3
-		else:
-			span = 12
-
 		return self.render_string("modules/packages/dependency-table.html",
-			pkg=pkg, dependencies=has_deps, span=span)
+			pkg=pkg, dependencies=has_deps)
 
 
 class PackageTable2Module(UIModule):
