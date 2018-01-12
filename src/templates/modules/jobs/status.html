@@ -1,11 +1,11 @@
 {% if jobs %}
 	{% for j in jobs %}
-		<a href="/job/{{ j.uuid }}" rel="tooltip" title="{% module JobState(j, plain=True) %}">
+		<a href="/job/{{ j.uuid }}" data-toggle="tooltip" data-placement="top" title="{% module JobState(j, plain=True) %}">
 			{% module JobState(j, show_arch=True) %}
 		</a>
 	{% end %}
 {% else %}
-	<span class="muted">
+	<span class="text-muted">
 		{{ _("This build has got no jobs.") }}
 	</span>
 {% end %}
