@@ -137,7 +137,7 @@
 							</td>
 							<td>
 								{% if job.builder %}
-									<a href="/builder/{{ job.builder.name }}">{{ job.builder.name }}</a>
+									<a href="/builders/{{ job.builder.name }}">{{ job.builder.name }}</a>
 								{% else %}
 									<span class="text-muted">{{ _("No builder assigned.") }}</span>
 								{% end %}

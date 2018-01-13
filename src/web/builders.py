@@ -33,7 +33,7 @@ class BuilderDetailHandler(base.BaseHandler):
 		with self.db.transaction():
 			builder.description = self.get_argument("description", None)
 
-		self.redirect("/builder/%s" % builder.hostname)
+		self.redirect("/builders/%s" % builder.hostname)
 
 
 class BuilderNewHandler(base.BaseHandler):
@@ -89,7 +89,7 @@ class BuilderEditHandler(base.BaseHandler):
 				max_jobs = 1
 			builder.max_jobs = max_jobs
 
-		self.redirect("/builder/%s" % builder.hostname)
+		self.redirect("/builders/%s" % builder.hostname)
 
 
 class BuilderRenewPassphraseHandler(base.BaseHandler):
@@ -139,7 +139,7 @@ class BuilderStatusChangeHandler(base.BaseHandler):
 			with self.db.transaction():
 				builder.enabled = self.enabled
 
-		self.redirect("/builder/%s" % builder.name)
+		self.redirect("/builders/%s" % builder.name)
 
 
 class BuilderEnableHander(BuilderStatusChangeHandler):
@@ -148,3 +148,8 @@ class BuilderEnableHander(BuilderStatusChangeHandler):
 
 class BuilderDisableHander(BuilderStatusChangeHandler):
 	enabled = False
+
+
+class RedirectHandler(base.BaseHandler):
+	def get(self, hostname):
+		self.redirect("/builders/%s" % hostname, permanent=True)

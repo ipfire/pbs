@@ -24,7 +24,7 @@
 					{{ _("Actions") }}
 				</button>
 				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-					<a class="dropdown-item" href="/builder/new">{{ _("Create new builder") }}</a>
+					<a class="dropdown-item" href="/builders/new">{{ _("Create new builder") }}</a>
 				</div>
 		</div>
 	{% end %}
@@ -55,7 +55,7 @@
 									{% end %}
 								</td>
 								<td>
-									<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
+									<a href="/builders/{{ builder.name }}">{{ builder.name }}</a>
 									<br>
 									{{ builder.cpu_model or _("Unknown CPU") }}
 									{% if builder.mem_total %}

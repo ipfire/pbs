@@ -9,9 +9,9 @@
 				<ol class="breadcrumb">
 					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
 					<li class="breadcrumb-item"><a href="/builders">{{ _("Builders") }}</a></li>
-					<li class="breadcrumb-item"><a href="/builder/{{ builder.name }}">{{ builder.name }}</a></li>
+					<li class="breadcrumb-item"><a href="/builders/{{ builder.name }}">{{ builder.name }}</a></li>
 					<li class="breadcrumb-item active">
-							<a href="/builder/{{ builder.name }}/delete">{{ _("Delete") }}</a>
+							<a href="/builders/{{ builder.name }}/delete">{{ _("Delete") }}</a>
 					</li>
 				</ol>
 			</nav>
@@ -35,12 +35,12 @@
 		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
 			<div class="btn-toolbar" role="toolbar">
 				<div class="btn-group mr-2 mb-2" role="group">
-					<a class="btn btn-danger" href="/builder/{{ builder.name }}/delete?confirmed=1">
+					<a class="btn btn-danger" href="/builders/{{ builder.name }}/delete?confirmed=1">
 						{{ _("Delete %s") % builder.name }}
 					</a>
 				</div>
 				<div class="btn-group mb-2" role="group">
-					<a class="btn btn-primary" href="/builder/{{ builder.name }}">{{ _("Cancel") }}</a>
+					<a class="btn btn-primary" href="/builders/{{ builder.name }}">{{ _("Cancel") }}</a>
 				</div>
 			</div>
 		</div>

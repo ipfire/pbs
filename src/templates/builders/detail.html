@@ -10,7 +10,7 @@
 					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
 					<li class="breadcrumb-item"><a href="/builders">{{ _("Builders") }}</a></li>
 					<li class="breadcrumb-item active">
-							<a href="/builder/{{ builder.name }}">{{ builder.name }}</a>
+							<a href="/builders/{{ builder.name }}">{{ builder.name }}</a>
 					</li>
 				</ol>
 			</nav>
@@ -34,25 +34,25 @@
 					{% if current_user and current_user.has_perm("maintain_builders") %}
 						<div class="dropdown-divider"></div>
 						{% if builder.enabled %}
-							<a class="dropdown-item" href="/builder/{{ builder.name }}/disable">
+							<a class="dropdown-item" href="/builders/{{ builder.name }}/disable">
 								{{ _("Disable builder") }}
 							</a>
 						{% else %}
-							<a class="dropdown-item" href="/builder/{{ builder.name }}/enable">
+							<a class="dropdown-item" href="/builders/{{ builder.name }}/enable">
 								{{ _("Enable builder") }}
 							</a>
 						{% end %}
-						<a class="dropdown-item" href="/builder/{{ builder.name }}/edit">
+						<a class="dropdown-item" href="/builders/{{ builder.name }}/edit">
 							<i class="icon-edit"></i>
 							{{ _("Edit builder") }}
 						</a>
 						{% if not builder.enabled %}
-							<a class="dropdown-item" href="/builder/{{ builder.name }}/renew">
+							<a class="dropdown-item" href="/builders/{{ builder.name }}/renew">
 								<i class="icon-refresh"></i>
 								{{ _("Renew passphrase") }}
 							</a>
 						{% end %}
-						<a class="dropdown-item"href="/builder/{{ builder.name }}/delete">
+						<a class="dropdown-item"href="/builders/{{ builder.name }}/delete">
 							<i class="icon-trash"></i>
 							{{ _("Delete builder") }}
 						</a>

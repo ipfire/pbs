@@ -172,13 +172,14 @@ class Application(tornado.web.Application):
 
 			# Builders
 			(r"/builders", builders.BuilderListHandler),
-			(r"/builder/new", builders.BuilderNewHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/enable", builders.BuilderEnableHander),
-			(r"/builder/([A-Za-z0-9\-\.]+)/disable", builders.BuilderDisableHander),
-			(r"/builder/([A-Za-z0-9\-\.]+)/delete", builders.BuilderDeleteHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/edit", builders.BuilderEditHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)/renew", builders.BuilderRenewPassphraseHandler),
-			(r"/builder/([A-Za-z0-9\-\.]+)", builders.BuilderDetailHandler),
+			(r"/builders/new", builders.BuilderNewHandler),
+			(r"/builders/([A-Za-z0-9\-\.]+)/enable", builders.BuilderEnableHander),
+			(r"/builders/([A-Za-z0-9\-\.]+)/disable", builders.BuilderDisableHander),
+			(r"/builders/([A-Za-z0-9\-\.]+)/delete", builders.BuilderDeleteHandler),
+			(r"/builders/([A-Za-z0-9\-\.]+)/edit", builders.BuilderEditHandler),
+			(r"/builders/([A-Za-z0-9\-\.]+)/renew", builders.BuilderRenewPassphraseHandler),
+			(r"/builders/([A-Za-z0-9\-\.]+)", builders.BuilderDetailHandler),
+			(r"/builder/([A-Za-z0-9\-\.]+)", builders.RedirectHandler),
 
 			# Distributions
 			(r"/distros", distributions.DistributionListHandler),

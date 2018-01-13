@@ -7,9 +7,9 @@
 				<ol class="breadcrumb">
 					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
 					<li class="breadcrumb-item"><a href="/builders">{{ _("Builders") }}</a></li>
-					<li class="breadcrumb-item"><a href="/builder/{{ builder.name }}">{{ builder.name }}</a></li>
+					<li class="breadcrumb-item"><a href="/builders/{{ builder.name }}">{{ builder.name }}</a></li>
 					<li class="breadcrumb-item active">
-						<a href="/builder/{{ builder.name }}/edit">{{ _("Manage") }}</a>
+						<a href="/builders/{{ builder.name }}/edit">{{ _("Manage") }}</a>
 					</li>
 				</ol>
 			</nav>
@@ -44,7 +44,7 @@
 
 	<div class="row justify-content-end">
 		<div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
-				<a class="btn btn-primary btn-block" href="/builder/{{ builder.name }}">{{ _("Next") }}</a>
+				<a class="btn btn-primary btn-block" href="/builders/{{ builder.name }}">{{ _("Next") }}</a>
 		</div>
 	</div>
 {% end block %}
