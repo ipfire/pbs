@@ -66,6 +66,10 @@ class LDAP(base.Object):
 		return self.get_dn_by_uid(name) or self.get_dn_by_mail(name)
 
 	def get_user_by_uid(self, uid, **kwargs):
+		# Do not execute search with empty uid
+		if not uid:
+			return None, None
+
 		result = self.search("(&(objectClass=posixAccount)(uid=%s))" % uid, limit=1, **kwargs)
 		for dn, attrs in result:
 			return dn, attrs
@@ -73,6 +77,10 @@ class LDAP(base.Object):
 		return None, None
 
 	def get_user_by_mail(self, mail, **kwargs):
+		# Do not execute search with empty mail
+		if not mail:
+			return None, None
+
 		result = self.search("(&(objectClass=posixAccount)(mail=%s))" % mail, limit=1, **kwargs)
 		for dn, attrs in result:
 			return dn, attrs
