@@ -1,18 +1,13 @@
 
-{% for j in jobs %}
-	<div class="card mb-2">
-		<div class="card-body">
-			<div class="card-title h4">
-				<a class="mr-2"href="/job/{{ j.uuid }}">{{ j.arch }}</a>
+<div class="list-group">
+	{% for j in jobs %}
+		<a href="/job/{{ j.uuid }}" class="list-group-item list-group-item-action flex-column align-itens-start">
+			<div class="d-flex w-100 justify-content-between">
+				<h5 class="mb-1">{{ j.arch }}</h5>
 				{% module JobState(j) %}
 			</div>
-			<p class="card-text">
-				{{ _("Time") }}: {{ format_time(j.duration, shorter=True) }} <br>
-				{% if j.builder %}
-					{{ _("Builder") }}: <a href="/builders/{{ j.builder.name }}">{{ j.builder.name }}</a>
-				{% end %}
-			</p>
-		</div>
-	</div>
-{% end %}
 
+			<small>{{ format_time(j.duration, shorter=True) }}</small>
+		</a>
+	{% end %}
+</div>
