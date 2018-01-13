@@ -3,90 +3,34 @@
 {% block title %}{{ _("Advanced search") }}{% end block %}
 
 {% block body %}
-	<div class="row">
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-			<nav aria-label="breadcrumb" role="navigation">
-				<ol class="breadcrumb">
-					<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
-					<li class="breadcrumb-item active">
-						<a href="/search">{{ _("Search") }}</a>
-					</li>
-				</ol>
-			</nav>
+	<nav aria-label="breadcrumb" role="navigation">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">{{ _("Home") }}</a></li>
+			<li class="breadcrumb-item active">
+				<a href="/search">{{ _("Search") }}</a>
+			</li>
+		</ol>
+	</nav>
+
+	{% if pattern %}
+		<h2 style="word-wrap: break-word;">
+			{{ _("No results for '%s'.") % pattern }}
+		</h2>
+	{% else %}
+		<h2 style="word-wrap: break-word;">
+			{{ _("Search") }}
+		</h2>
+
+		<p class="">
+			{{ _("Type a search pattern into the box below and hit the button.") }}
+		</p>
+	{% end %}
+
+	<form class="form-inline" method="GET" action="/search">
+		<div class="form-group">
+			<input type="text" class="form-control mr-2" id="q" name="q" placeholder="{{ _("Search") }}"
+				value="{{ pattern }}">
 		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-			{% if pattern %}
-				<h2 style="word-wrap: break-word;">
-					{{ _("No results for '%s'.") % pattern }}
-				</h2>
-			{% else %}
-				<h2 style="word-wrap: break-word;">
-					{{ _("Search") }}
-				</h2>
-
-				<p class="">
-					{{ _("Type a search pattern into the box below and hit the button.") }}
-				</p>
-			{% end %}
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-			<form class="form-inline" method="GET" action="/search">
-				<div class="form-group">
-					<input type="text" class="form-control mr-2" id="q" name="q" placeholder="{{ _("Search") }}"
-						value="{{ pattern }}">
-				</div>
-				<button type="submit" class="btn btn-primary">{{ _("Go!") }}</button>
-			</form>
-		</div>
-	</div>
-
-	<hr>
-
-	<div class="row">
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-				<h4>{{ _("Search for packages by name or description") }}</h4>
-				<p>
-					{{ _("If you type a package name to the search box you will get a link to the package.") }}
-					{{ _("The search is performed in case insensitive mode.") }}
-				</p>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-			<h4>{{ _("Search for UUIDs") }}</h4>
-			<p>
-				{{ _("If you type a UUID to the search box, you will be directed to the job, build or package it belongs to.") }}
-				{{ _("This is a handy feature if you have a UUID and search for the corresponding package or build.") }}
-			</p>
-
-			<h5>{{ _("Examples") }}</h5>
-			<ul>
-				<li>fde110ca-f7d9-4ae5-a6c4-1e465a05662a</li>
-			</ul>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-			<h4>{{ _("Search for files") }}</h4>
-			<p>
-				{{ _("You may also search for file names.") }}
-				{{ _("You will get a list of packages that contain the file.") }}
-				{{ _("The search pattern must start with a slash that it will be recognized as a file.") }}
-			</p>
-
-			<h5>{{ _("Examples") }}</h5>
-			<ul>
-				<li>/bin/bash</li>
-				<li>/usr/bin/gcc</li>
-			</ul>
-		</div>
-	</div>
+		<button type="submit" class="btn btn-primary">{{ _("Go!") }}</button>
+	</form>
 {% end block %}
