@@ -101,13 +101,8 @@ class Builds(base.Object):
 		elif type == "scratch":
 			query += " ORDER BY time_created DESC"
 
-		if limit:
-			if offset:
-				query += " LIMIT %s,%s"
-				args.extend([offset, limit])
-			else:
-				query += " LIMIT %s"
-				args.append(limit)
+		query += " LIMIT %s OFFSET %s"
+		args.extend([offset, limit])
 
 		return [Build(self.backend, b.id, b) for b in self.db.query(query, *args)]
 
@@ -262,13 +257,8 @@ class Builds(base.Object):
 
 		query += " ORDER BY builds.time_created DESC"
 
-		if limit:
-			if offset:
-				query += " LIMIT %s,%s"
-				args += [offset, limit]
-			else:
-				query += " LIMIT %s"
-				args.append(limit)
+		query += " LIMIT %s OFFSET %s"
+		args += [offset, limit]
 
 		builds = []
 		for b in self.db.query(query, *args):
@@ -296,14 +286,8 @@ class Builds(base.Object):
 		query += " ORDER BY time_created DESC"
 
 		# Limits.
-		if limit:
-			if offset:
-				query += " LIMIT %s,%s"
-				args.append(offset)
-			else:
-				query += " LIMIT %s"
-
-			args.append(limit)
+		query += " LIMIT %s OFFSET %s"
+		args.extend([limit, offset])
 
 		comments = []
 		for comment in self.db.query(query, *args):
