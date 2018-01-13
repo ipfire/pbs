@@ -12,6 +12,8 @@ class BuilderListHandler(base.BaseHandler):
 class BuilderDetailHandler(base.BaseHandler):
 	def get(self, hostname):
 		builder = self.backend.builders.get_by_name(hostname)
+		if not builder:
+			raise tornado.web.HTTPError(404, "Could not find builder %s" % hostname)
 
 		# Get running and pending jobs.
 		jobs = builder.active_jobs + list(builder.jobqueue)
