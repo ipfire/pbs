@@ -7,8 +7,6 @@ import os
 import re
 import tarfile
 
-from tornado.escape import xhtml_escape
-
 from .constants import *
 
 def format_size(s):
