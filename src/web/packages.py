@@ -200,6 +200,9 @@ class PackageFileDownloadHandler(base.BaseHandler):
 		self.set_header("Content-Disposition", "attachment; filename=%s" % os.path.basename(filename))
 		self.set_header("Content-Type", mimetype)
 
+		# These pages should not be indexed
+		self.add_header("X-Robots-Tag", "noindex")
+
 		# Transfer the content chunk by chunk.
 		while True:
 			buf = f.read(BUFFER_SIZE)
@@ -221,6 +224,9 @@ class PackageFileViewHandler(PackageFileDownloadHandler):
 		# Read in the data.
 		content = f.read()
 		f.close()
+
+		# These pages should not be indexed
+		self.add_header("X-Robots-Tag", "noindex")
 
 		self.render("packages/view-file.html", pkg=pkg, filename=filename,
 			mimetype=mimetype, content=content, filesize=f.size)
