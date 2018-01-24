@@ -5,7 +5,7 @@
 * * * * *	root	pakfire-build-service check-build-dependencies &>/dev/null
 
 # Remaster repositories
-*/5 * * * *	pakfire	pakfire-build-service remaster-repositories &>/dev/null
+*/5 * * * *	root	pakfire-build-service remaster-repositories &>/dev/null
 
 # Cleanup repositories
 5 * * * *	pakfire	pakfire-build-service cleanup-repositories &>/dev/null
