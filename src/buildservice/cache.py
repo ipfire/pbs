@@ -18,17 +18,11 @@ class Client(memcache.Client):
 class Cache(base.Object):
 	key_prefix = "pbs_"
 
-	@property
-	def servers(self):
-		servers = self.settings.get("memcache_servers", "")
-
-		return servers.split()
-
 	@lazy_property
 	def _cache(self):
 		logging.debug("Connecting to memcache...")
 
-		return Client(self.servers, debug=1)
+		return Client(["localhost:11211"], debug=1)
 
 	def get(self, key):
 		log.debug("Querying for: %s" % key)
