@@ -10,7 +10,7 @@ class Application(tornado.web.Application):
 	def __init__(self, **settings):
 		tornado.web.Application.__init__(self, [
 			# Redirect strayed users.
-			#(r"/", handlers.RedirectHandler),
+			(r"/", tornado.web.RedirectHandler, { "url" : "https://pakfire.ipfire.org/" }),
 
 			# Test handlers
 			(r"/noop", handlers.NoopHandler),
