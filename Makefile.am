@@ -441,10 +441,8 @@ dist_database_DATA = \
 
 databasedir = $(datadir)/database
 
-dist_cron_DATA = \
+EXTRA_DIST = \
 	src/crontab/pakfire-build-service
-
-crondir = $(sysconfdir)/cron.d
 
 dist_geoip_DATA = \
 	src/geoip/GeoLite2-Country.mmdb
