@@ -5,6 +5,7 @@
 /missing
 /src/buildservice/constants.py
 /src/buildservice/__version__.py
+/src/systemd/*.service
 /tmp
 /.vscode
 *.py[co]

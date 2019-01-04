@@ -1,28 +1,13 @@
 #!/usr/bin/python
 
 import logging
-import os.path
-import tornado.httpserver
-import tornado.locale
-import tornado.options
 import tornado.web
 
 from .. import Backend
-from ..decorators import *
-
 from . import handlers
 
-# Read command line
-tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
-tornado.options.parse_command_line()
-
 class Application(tornado.web.Application):
-	def __init__(self):
-		settings = dict(
-			debug = tornado.options.options.debug,
-			gzip  = True,
-		)
-
+	def __init__(self, **settings):
 		tornado.web.Application.__init__(self, [
 			# Redirect strayed users.
 			#(r"/", handlers.RedirectHandler),
@@ -62,41 +47,7 @@ class Application(tornado.web.Application):
 			(r"/uploads/(.*)/destroy", handlers.UploadsDestroyHandler),
 		], **settings)
 
+		# Launch backend
+		self.backend = Backend()
+
 		logging.info("Successfully initialied application")
-
-	@lazy_property
-	def backend(self):
-		return Backend()
-
-	def __del__(self):
-		logging.info("Shutting down application")
-
-	@property
-	def ioloop(self):
-		return tornado.ioloop.IOLoop.instance()
-
-	def shutdown(self, *args):
-		logging.debug("Caught shutdown signal")
-		self.ioloop.stop()
-
-	def run(self, port=81):
-		logging.debug("Going to background")
-
-		http_server = tornado.httpserver.HTTPServer(self, xheaders=True,
-			max_body_size=1 * (1024 ** 3))
-
-		# If we are not running in debug mode, we can actually run multiple
-		# frontends to get best performance out of our service.
-		if not self.settings["debug"]:
-			http_server.bind(port)
-			http_server.start(num_processes=4)
-		else:
-			http_server.listen(port)
-
-		# All requests should be done after 30 seconds or they will be killed.
-		self.ioloop.set_blocking_log_threshold(30)
-
-		self.ioloop.start()
-
-	def reload(self):
-		logging.debug("Caught reload signal")

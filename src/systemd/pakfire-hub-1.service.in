@@ -1,0 +1,10 @@
+[Unit]
+Description=Pakfire Hub #1
+After=network.target
+
+[Service]
+ExecStart=@bindir@/pakfire-hub --port=8001
+User=pakfire
+
+[Install]
+WantedBy=multi-user.target
