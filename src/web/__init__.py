@@ -2,16 +2,11 @@
 # encoding: utf-8
 
 import logging
-import multiprocessing
-import os.path
-import tornado.httpserver
 import tornado.locale
-import tornado.options
 import tornado.web
 
 from .. import Backend
 from ..constants import *
-from ..decorators import *
 
 # Import all handlers
 from . import api
@@ -31,15 +26,9 @@ from .handlers import *
 
 from . import ui_modules
 
-# Enable logging
-tornado.options.define("debug", default=False, help="Run in debug mode", type=bool)
-tornado.options.parse_command_line()
-
 class Application(tornado.web.Application):
-	def __init__(self, **_settings):
+	def __init__(self, **kwargs):
 		settings = dict(
-			debug = tornado.options.options.debug,
-			gzip  = True,
 			login_url = "/login",
 			template_path = TEMPLATESDIR,
 			static_path = STATICDIR,
@@ -105,7 +94,7 @@ class Application(tornado.web.Application):
 			},
 			xsrf_cookies = True,
 		)
-		settings.update(_settings)
+		settings.update(kwargs)
 
 		# Load translations.
 		tornado.locale.load_gettext_translations(LOCALEDIR, PACKAGE_NAME)
@@ -244,48 +233,10 @@ class Application(tornado.web.Application):
 			(r"/api/packages/autocomplete", api.ApiPackagesAutocomplete),
 		], default_handler_class=errors.Error404Handler, **settings)
 
+		# Launch backend
+		self.backend = Backend()
+
 		logging.info("Successfully initialied application")
-
-	@lazy_property
-	def backend(self):
-		"""
-			Backend connection
-		"""
-		return Backend()
-
-	def __del__(self):
-		logging.info("Shutting down application")
-
-	@property
-	def ioloop(self):
-		return tornado.ioloop.IOLoop.instance()
-
-	def shutdown(self, *args):
-		logging.debug("Caught shutdown signal")
-		self.ioloop.stop()
-
-	def run(self, port=7001):
-		logging.debug("Going to background")
-
-		http_server = tornado.httpserver.HTTPServer(self, xheaders=True)
-
-		# If we are not running in debug mode, we can actually run multiple
-		# frontends to get best performance out of our service.
-		if self.settings.get("debug", False):
-			http_server.listen(port)
-		else:
-			cpu_count = multiprocessing.cpu_count()
-
-			http_server.bind(port)
-			http_server.start(num_processes=cpu_count)
-
-		# All requests should be done after 60 seconds or they will be killed.
-		self.ioloop.set_blocking_log_threshold(60)
-
-		self.ioloop.start()
-
-	def reload(self):
-		logging.debug("Caught reload signal")
 
 	## UI methods
 

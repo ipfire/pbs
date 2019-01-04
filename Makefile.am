@@ -419,7 +419,9 @@ docker: Dockerfile
 if HAVE_SYSTEMD
 systemdsystemunit_DATA = \
 	src/systemd/pakfire-hub-1.service \
-	src/systemd/pakfire-hub-2.service
+	src/systemd/pakfire-hub-2.service \
+	src/systemd/pakfire-web-1.service \
+	src/systemd/pakfire-web-2.service
 
 CLEANFILES += \
 	 $(systemdsystemunit_DATA)
@@ -430,7 +432,9 @@ endif
 
 EXTRA_DIST += \
 	src/systemd/pakfire-hub-1.service.in \
-	src/systemd/pakfire-hub-2.service.in
+	src/systemd/pakfire-hub-2.service.in \
+	src/systemd/pakfire-web-1.service.in \
+	src/systemd/pakfire-web-2.service.in
 
 dist_database_DATA = \
 	src/database.sql
