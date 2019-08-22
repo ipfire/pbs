@@ -1,11 +1,15 @@
 #!/usr/bin/python
 
 import datetime
-import gpgme
 import io
 import os
 import shutil
 import tempfile
+
+try:
+	import gpgme
+except ImportError:
+	import gpg as gpgme
 
 from . import base
 
