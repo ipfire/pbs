@@ -4,7 +4,8 @@ After=network.target
 
 [Service]
 ExecStart=@bindir@/pakfire-web --port=9002
-User=pakfire
+User=nobody
+Group=nogroup
 
 [Install]
 WantedBy=multi-user.target
